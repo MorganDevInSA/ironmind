@@ -137,7 +137,7 @@ export default function OnboardingPage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-[#F5F5F5] mb-2">You&apos;re set up.</h1>
-            <p className="text-[#6B6B6B]">{importResult?.message}</p>
+            <p className="text-[#7F91AD]">{importResult?.message}</p>
           </div>
           <button onClick={() => router.push('/dashboard')} className="btn-primary w-full flex items-center justify-center gap-2">
             Go to Dashboard <ArrowRight size={18} />
@@ -154,7 +154,7 @@ export default function OnboardingPage() {
       <div className="min-h-screen flex items-center justify-center p-6">
         <div className="glass-panel p-8 max-w-lg w-full space-y-6">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#6B6B6B] mb-1">Ready to import</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#7F91AD] mb-1">Ready to import</p>
             <h1 className="text-2xl font-bold text-[#F5F5F5]">Review Your Plan</h1>
           </div>
 
@@ -201,10 +201,10 @@ export default function OnboardingPage() {
 
       <div className="text-center space-y-3 pt-10">
         <div className="w-14 h-14 rounded-2xl bg-[rgba(212,175,55,0.12)] border border-[rgba(212,175,55,0.35)] flex items-center justify-center mx-auto">
-          <Dumbbell size={28} className="text-[#DC2626]" />
+          <Dumbbell size={28} className="text-[#D4AF37]" />
         </div>
         <h1 className="text-3xl font-bold text-[#F5F5F5]">Load Your Plan</h1>
-        <p className="text-[#6B6B6B] max-w-sm mx-auto text-sm">
+        <p className="text-[#7F91AD] max-w-sm mx-auto text-sm">
           Upload the 6 JSON files your coaching AI generated. Works from phone, tablet, or desktop.
         </p>
       </div>
@@ -218,17 +218,17 @@ export default function OnboardingPage() {
         className={cn(
           'rounded-2xl border-2 border-dashed p-6 text-center transition-all',
           isDragging
-            ? 'border-[#DC2626] bg-[rgba(212,175,55,0.08)]'
+            ? 'border-[#D4AF37] bg-[rgba(212,175,55,0.08)]'
             : 'border-[rgba(80,96,128,0.35)] bg-[rgba(16,22,34,0.4)]'
         )}
       >
         <label htmlFor="bulk-upload" className="cursor-pointer block space-y-2">
-          <Upload size={24} className="mx-auto text-[#6B6B6B]" />
-          <p className="text-sm text-[#6B6B6B]">
-            <span className="font-semibold text-[#9A9A9A]">Tap to select all 6 files at once</span>
+          <Upload size={24} className="mx-auto text-[#7F91AD]" />
+          <p className="text-sm text-[#7F91AD]">
+            <span className="font-semibold text-[#B8C6DE]">Tap to select all 6 files at once</span>
             {' '}or drag them here
           </p>
-          <p className="text-xs text-[#6B6B6B]/60">{loadedCount} / {EXPECTED_FILES.length} loaded</p>
+          <p className="text-xs text-[#7F91AD]/60">{loadedCount} / {EXPECTED_FILES.length} loaded</p>
           <input
             id="bulk-upload"
             type="file"
@@ -263,17 +263,17 @@ export default function OnboardingPage() {
                   ? <CheckCircle2 size={22} className="text-[#10B981]" />
                   : state.status === 'error'
                   ? <XCircle size={22} className="text-[#EF4444]" />
-                  : <FileJson size={22} className="text-[#6B6B6B]" />}
+                  : <FileJson size={22} className="text-[#7F91AD]" />}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-[#F5F5F5]">{file.label}</p>
-                <p className="text-xs text-[#6B6B6B] truncate">
+                <p className="text-xs text-[#7F91AD] truncate">
                   {state.error ?? (state.status === 'loaded' ? file.name : file.description)}
                 </p>
               </div>
               <span className={cn(
                 'shrink-0 text-xs font-bold uppercase tracking-wider',
-                state.status === 'loaded' ? 'text-[#10B981]' : state.status === 'error' ? 'text-[#EF4444]' : 'text-[#6B6B6B]'
+                state.status === 'loaded' ? 'text-[#10B981]' : state.status === 'error' ? 'text-[#EF4444]' : 'text-[#7F91AD]'
               )}>
                 {state.status === 'loaded' ? '✓' : state.status === 'error' ? 'Fix' : 'Pick'}
               </span>
@@ -294,7 +294,7 @@ export default function OnboardingPage() {
 
         <div className="flex items-center gap-3">
           <div className="flex-1 h-px bg-[rgba(80,96,128,0.25)]" />
-          <span className="text-xs text-[#6B6B6B]">or</span>
+          <span className="text-xs text-[#7F91AD]">or</span>
           <div className="flex-1 h-px bg-[rgba(80,96,128,0.25)]" />
         </div>
 
@@ -304,10 +304,10 @@ export default function OnboardingPage() {
           className="btn-secondary w-full flex items-center justify-center gap-2"
         >
           {importing
-            ? <span className="w-4 h-4 border-2 border-[#6B6B6B]/30 border-t-[#6B6B6B] rounded-full animate-spin inline-block" />
+            ? <span className="w-4 h-4 border-2 border-[#7F91AD]/30 border-t-[#7F91AD] rounded-full animate-spin inline-block" />
             : 'Load demo data instead'}
         </button>
-        <p className="text-xs text-center text-[#6B6B6B]/60">
+        <p className="text-xs text-center text-[#7F91AD]/60">
           Demo loads Morgan&apos;s plan. Re-import your own files any time from Settings.
         </p>
       </div>
@@ -318,7 +318,7 @@ export default function OnboardingPage() {
 function Row({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
   return (
     <div className="flex justify-between items-start gap-4 text-sm">
-      <span className="text-[#6B6B6B] shrink-0">{label}</span>
+      <span className="text-[#7F91AD] shrink-0">{label}</span>
       <span className={cn('text-[#F5F5F5] text-right', mono && 'font-mono tabular-nums')}>{value}</span>
     </div>
   );
