@@ -1,12 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useProfile, useRecoveryEntry, useActivePhase, useActiveAlerts } from '@/controllers';
 import { useAuthStore } from '@/stores';
 import { formatDisplayDate, today } from '@/lib/utils';
 import { calculateReadinessScore } from '@/lib/utils/calculations';
 import { Bell, AlertTriangle, Info, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { IronmindLogo } from '@/components/brand/ironmind-logo';
 
 export function TopBar() {
   const { user } = useAuthStore();
@@ -25,7 +27,7 @@ export function TopBar() {
 
   const readinessColor =
     readinessScore === null
-      ? 'text-[#6B6B6B]'
+      ? 'text-[color:var(--text-1)]'
       : readinessScore >= 80
       ? 'text-emerald-400'
       : readinessScore >= 60
@@ -36,13 +38,21 @@ export function TopBar() {
     <header
       className={cn(
         'sticky top-0 z-30 h-14 flex items-center justify-between px-4 lg:px-6',
-        'bg-[#2e2e2e] backdrop-blur-xl',
-        'border-b-[3px] border-[rgba(220,38,38,0.45)]'
+        'bg-[color:var(--chrome-bg-topbar)] backdrop-blur-xl',
+        'border-b border-[color:var(--chrome-border)]',
+        'shadow-[var(--chrome-header-shadow)]'
       )}
     >
-      {/* Left — Date & Phase (crimson micro-header) */}
-      <div className="flex items-center gap-3">
-        <div>
+      {/* Left — Logo on small screens (sidebar is lg+ only); date & phase */}
+      <div className="flex items-center gap-3 min-w-0">
+        <Link
+          href="/dashboard"
+          className="lg:hidden shrink-0 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/55 focus-visible:ring-offset-2 focus-visible:ring-offset-[#131313]"
+          aria-label="IRONMIND home"
+        >
+          <IronmindLogo variant="topbar" priority />
+        </Link>
+        <div className="min-w-0">
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#DC2626]">
             {formatDisplayDate(new Date())}
           </p>
@@ -57,13 +67,13 @@ export function TopBar() {
       {/* Center — Readiness */}
       {readinessScore !== null && (
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#6B6B6B]">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[color:var(--text-2)]">
             Readiness
           </span>
           <span className={cn('text-xl font-bold font-mono tabular-nums', readinessColor)}>
             {Math.round(readinessScore)}
           </span>
-          <span className="text-[11px] text-[#6B6B6B]">/100</span>
+          <span className="text-[11px] text-[color:var(--text-1)]">/100</span>
         </div>
       )}
 
@@ -73,7 +83,7 @@ export function TopBar() {
         <div className="relative">
           <button
             onClick={() => setAlertsOpen(o => !o)}
-            className="relative p-2 text-[#7A7A7A] hover:text-[#F0F0F0] transition-colors duration-200 rounded-lg hover:bg-[rgba(0,0,0,0.35)]"
+            className="relative p-2 text-[color:var(--text-1)] hover:text-[color:var(--text-0)] transition-colors duration-200 rounded-lg hover:bg-[rgba(0,0,0,0.35)]"
           >
             <Bell size={18} />
             {alertCount > 0 && (
@@ -83,16 +93,16 @@ export function TopBar() {
 
           {alertsOpen && (
             <div className="absolute right-0 top-full mt-2 w-80 glass-panel z-50 overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-[rgba(80,96,128,0.15)]">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-[rgba(65,50,50,0.28)]">
                 <span className="text-sm font-semibold text-[#F5F5F5]">Alerts</span>
-                <button onClick={() => setAlertsOpen(false)} className="text-[#6B6B6B] hover:text-[#F5F5F5]">
+                <button onClick={() => setAlertsOpen(false)} className="text-[color:var(--text-1)] hover:text-[color:var(--text-0)]">
                   <X size={16} />
                 </button>
               </div>
-              <div className="max-h-64 overflow-y-auto divide-y divide-[rgba(80,96,128,0.1)]">
+              <div className="max-h-64 overflow-y-auto divide-y divide-[rgba(65,50,50,0.18)]">
                 {alertCount === 0 ? (
                   <div className="px-4 py-6 text-center">
-                    <p className="text-sm text-[#6B6B6B]">No active alerts.</p>
+                    <p className="text-sm text-[color:var(--text-1)]">No active alerts.</p>
                   </div>
                 ) : alerts?.map(alert => (
                   <div key={alert.id} className="px-4 py-3 flex items-start gap-3">
@@ -103,7 +113,7 @@ export function TopBar() {
                       : <Info size={16} className="text-[#DC2626] shrink-0 mt-0.5" />}
                     <div>
                       <p className="text-sm font-medium text-[#F5F5F5]">{alert.title}</p>
-                      <p className="text-xs text-[#6B6B6B] mt-0.5">{alert.message}</p>
+                      <p className="text-xs text-[color:var(--text-1)] mt-0.5">{alert.message}</p>
                     </div>
                   </div>
                 ))}
@@ -122,7 +132,7 @@ export function TopBar() {
             <p className="text-sm font-semibold text-[#F5F5F5] leading-none">
               {user?.displayName || 'Athlete'}
             </p>
-            <p className="text-[11px] text-[#6B6B6B] mt-0.5">
+            <p className="text-[11px] text-[color:var(--text-1)] mt-0.5">
               Target: {profile?.targetWeight ?? '—'}kg
             </p>
           </div>

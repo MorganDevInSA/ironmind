@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useUIStore } from '@/stores';
 import { cn } from '@/lib/utils';
+import { IronmindLogo } from '@/components/brand/ironmind-logo';
 
 const navItems = [
   { href: '/dashboard',    label: 'Dashboard',   icon: LayoutDashboard },
@@ -29,8 +30,8 @@ const navItems = [
 ];
 
 const activeText = 'text-[#EF4444]';
-const idleText = 'text-[#8A8A8A]';
-const hoverText = 'group-hover:text-[#C8C8C8]';
+const idleText = 'text-[color:var(--text-detail)]';
+const hoverText = 'group-hover:text-[color:var(--text-0)]';
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -40,33 +41,30 @@ export function Sidebar() {
     <aside
       className={cn(
         'fixed left-0 top-0 h-full z-40 flex flex-col transition-[width] duration-300 ease-out',
-        'bg-[#2e2e2e] backdrop-blur-xl',
+        'bg-[color:var(--chrome-bg)] backdrop-blur-xl',
+        'border-r border-[color:var(--chrome-border)]',
         sidebarOpen ? 'w-60' : 'w-[72px]'
       )}
     >
-      {/* Vertical accent: starts below TopBar (h-14) so it meets the header bottom border — moves with sidebar width */}
-      <div
-        aria-hidden
-        className={cn(
-          'pointer-events-none absolute right-0 top-14 bottom-0 z-[5] w-[3px]',
-          'bg-[rgba(220,38,38,0.45)] hidden lg:block'
-        )}
-      />
-      {/* Logo — centered crimson wordmark */}
+      {/* Logo — canonical PNG wordmark */}
       <div
         className={cn(
           'flex items-center justify-center w-full shrink-0',
-          sidebarOpen ? 'h-[4.75rem] px-4' : 'h-[4.75rem] px-0'
+          sidebarOpen ? 'h-[4.75rem] px-3' : 'h-[4.75rem] px-0'
         )}
       >
         <Link
           href="/dashboard"
           className={cn(
-            'font-heading font-bold lowercase tracking-[0.14em] text-[#DC2626] text-center leading-none',
-            sidebarOpen ? 'text-2xl md:text-[1.75rem]' : 'text-3xl tracking-tight'
+            'flex items-center justify-center rounded-lg outline-none ring-offset-2 ring-offset-[#0d0d0d] focus-visible:ring-2 focus-visible:ring-[#DC2626]/55',
+            sidebarOpen ? 'w-full justify-start pl-1' : 'w-full'
           )}
         >
-          {sidebarOpen ? 'ironmind' : 'i'}
+          <IronmindLogo
+            variant={sidebarOpen ? 'sidebar-expanded' : 'sidebar-collapsed'}
+            priority
+          />
+          <span className="sr-only">IRONMIND — home</span>
         </Link>
       </div>
 
@@ -77,8 +75,8 @@ export function Sidebar() {
         className={cn(
           'absolute -right-3 top-[5rem] w-6 h-6 rounded-full z-50',
           'flex items-center justify-center',
-          'bg-[#1a1a1a] border border-[rgba(220,38,38,0.40)]',
-          'text-[#DC2626] hover:border-[rgba(239,68,68,0.55)]',
+          'bg-[color:var(--chrome-bg-toggle)] border border-[color:var(--chrome-border)]',
+          'text-[color:var(--text-1)] hover:text-[#DC2626] hover:border-[rgba(220,38,38,0.35)]',
           'shadow-[0_4px_12px_rgba(0,0,0,0.4)]',
           'transition-all duration-200 hover:scale-110'
         )}
@@ -114,7 +112,7 @@ export function Sidebar() {
                 <span
                   className={cn(
                     'text-sm font-semibold tracking-wide transition-colors duration-[220ms] truncate',
-                    isActive ? activeText : cn(idleText, 'group-hover:text-[#E8E8E8]')
+                    isActive ? activeText : cn(idleText, 'group-hover:text-[color:var(--text-0)]')
                   )}
                 >
                   {item.label}
@@ -125,7 +123,7 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="h-8 shrink-0 bg-gradient-to-t from-[#2e2e2e] to-transparent pointer-events-none" />
+      <div className="h-8 shrink-0 bg-gradient-to-t from-[color:var(--chrome-bg)] to-transparent pointer-events-none" />
     </aside>
   );
 }

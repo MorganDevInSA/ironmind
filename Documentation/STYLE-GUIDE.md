@@ -2,6 +2,8 @@
 
 **Elite Bodybuilding Performance System — Premium Dark UI**
 
+> **Current UI tokens** live in **`src/app/globals.css`** and **`.cursor/rules/IRONMIND.md`**. For the **dashboard** hub, the centered overview shell is **`.dashboard-overview`** and numbered exercise rows use **`.exercise-index-badge`** (**`Documentation/ARCHITECTURE.md` §13.4**). Persistent **header / sidebar / mobile nav** chrome uses **`--chrome-bg`**, **`--chrome-bg-topbar`**, and **`--chrome-bg-toggle`** (**§13.5**). Do not implement from the palette table below without cross-checking those sources.
+
 ---
 
 ## Brand Philosophy

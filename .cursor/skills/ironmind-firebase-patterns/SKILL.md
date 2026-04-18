@@ -127,6 +127,17 @@ if (!auth) return null;
 
 ---
 
+## No `undefined` in write payloads
+
+The Firestore Web SDK **rejects `undefined`** as a field value (nested objects included). When merging partial updates:
+
+- Build objects with **only defined keys**, or
+- **Strip** `undefined` recursively before `setDocument` / `setDoc`.
+
+Reference implementation: **`stripUndefinedDeep`** in `src/services/physique.service.ts` (check-ins with optional measurements). Apply the same idea for any domain that sends optional nested fields from forms.
+
+---
+
 ## Firestore Timestamps → ISO Strings
 
 The Firestore converter in `firestore.ts` automatically:

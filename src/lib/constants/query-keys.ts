@@ -27,6 +27,7 @@ export const queryKeys = {
     all: ['recovery'] as const,
     entry: (date: string) => [...queryKeys.recovery.all, 'entry', date] as const,
     trend: (days: number) => [...queryKeys.recovery.all, 'trend', days] as const,
+    latest: () => [...queryKeys.recovery.all, 'latest'] as const,
   },
   physique: {
     all: ['physique'] as const,

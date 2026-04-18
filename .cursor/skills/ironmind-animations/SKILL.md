@@ -13,12 +13,13 @@ Every animation must feel deliberate, swift, and premium. No bounce, no wobble, 
 - **Ease-out**: Decelerating motion feels natural and confident
 - **Purposeful**: Feedback, guidance, or delight — never decoration
 - **Restrained**: One animated element per user action
+- **Crimson tokens**: glows, rings, and glints use **`rgba(220, 38, 38, …)`** — not legacy gold (`#D4AF37`) or blue (`#3B82F6`). Older class names like `.gold-glint` in `globals.css`, if present, should map to crimson visually.
 
 ---
 
 ## Required Keyframes
 
-Add all to `src/app/globals.css`:
+Add all to `src/app/globals.css` (illustrative — align with **`IRONMIND.md`** / **`ironmind-styling`** warm-dark panels):
 
 ```css
 @keyframes pulse-soft {
@@ -26,27 +27,27 @@ Add all to `src/app/globals.css`:
   50% { opacity: 0.72; }
 }
 
-@keyframes gold-glint {
+@keyframes crimson-glint {
   0%, 100% {
-    filter: drop-shadow(0 0 4px rgba(212,175,55,0.8)) drop-shadow(0 0 8px rgba(244,208,63,0.4));
+    filter: drop-shadow(0 0 4px rgba(220,38,38,0.85)) drop-shadow(0 0 8px rgba(220,38,38,0.35));
   }
   50% {
-    filter: drop-shadow(0 0 8px rgba(244,208,63,1)) drop-shadow(0 0 12px rgba(244,208,63,0.6));
+    filter: drop-shadow(0 0 8px rgba(239,68,68,0.95)) drop-shadow(0 0 12px rgba(220,38,38,0.55));
   }
 }
 
 @keyframes pulse-ring {
-  0% { box-shadow: 0 0 0 0 rgba(59,130,246,0.4); }
-  70% { box-shadow: 0 0 0 10px rgba(59,130,246,0); }
-  100% { box-shadow: 0 0 0 0 rgba(59,130,246,0); }
+  0% { box-shadow: 0 0 0 0 rgba(220,38,38,0.45); }
+  70% { box-shadow: 0 0 0 10px rgba(220,38,38,0); }
+  100% { box-shadow: 0 0 0 0 rgba(220,38,38,0); }
 }
 
-@keyframes gold-glow {
+@keyframes crimson-glow {
   0%, 100% {
-    box-shadow: 0 0 20px rgba(212,175,55,0.2), inset 0 1px 2px rgba(244,208,63,0.3);
+    box-shadow: 0 0 20px rgba(220,38,38,0.22), inset 0 1px 2px rgba(220,38,38,0.28);
   }
   50% {
-    box-shadow: 0 0 30px rgba(212,175,55,0.4), inset 0 1px 2px rgba(244,208,63,0.5);
+    box-shadow: 0 0 30px rgba(220,38,38,0.38), inset 0 1px 2px rgba(239,68,68,0.35);
   }
 }
 
@@ -77,15 +78,15 @@ Add all to `src/app/globals.css`:
 }
 
 .pulse-soft { animation: pulse-soft 2s cubic-bezier(0.4,0,0.6,1) infinite; }
-.gold-glint { animation: gold-glint 3s ease-in-out infinite; }
-.gold-glow { animation: gold-glow 3s ease-in-out infinite; }
+.crimson-glint { animation: crimson-glint 3s ease-in-out infinite; }
+.crimson-glow { animation: crimson-glow 3s ease-in-out infinite; }
 .animate-pulse-ring { animation: pulse-ring 1.5s cubic-bezier(0.4,0,0.6,1) infinite; }
 .animate-fade-in-up { animation: fade-in-up 0.3s ease-out; }
 .animate-scale-in { animation: scale-in 0.2s ease-out; }
 .animate-count-up { animation: count-up 0.3s ease-out; }
 
 .skeleton {
-  background: rgba(18,24,38,0.9);
+  background: rgba(18, 14, 14, 0.92);
   background-image: linear-gradient(
     90deg,
     rgba(255,255,255,0) 0,
@@ -110,14 +111,14 @@ Add all to `src/app/globals.css`:
 
 ## Hover Effects (Tailwind)
 
-### Card Lift + Gold Border
+### Card Lift + Crimson Border
 
 ```tsx
-<div className="rounded-[14px] border border-[rgba(80,96,128,0.25)]
+<div className="rounded-[14px] border border-[rgba(65,50,50,0.35)]
   transition-all duration-200
   hover:-translate-y-1
-  hover:border-[rgba(212,175,55,0.25)]
-  hover:shadow-[0_8px_32px_rgba(212,175,55,0.25)]">
+  hover:border-[rgba(220,38,38,0.28)]
+  hover:shadow-[0_8px_32px_rgba(220,38,38,0.18)]">
 ```
 
 ### Button Press
@@ -130,8 +131,8 @@ Add all to `src/app/globals.css`:
 
 ```tsx
 <input className="transition-all duration-200
-  focus:border-[rgba(212,175,55,0.4)]
-  focus:shadow-[0_0_0_3px_rgba(212,175,55,0.1)]
+  focus:border-[rgba(220,38,38,0.45)]
+  focus:shadow-[0_0_0_3px_rgba(220,38,38,0.12)]
   focus:outline-none" />
 ```
 
@@ -153,9 +154,9 @@ Add all to `src/app/globals.css`:
   background: linear-gradient(
     110deg,
     transparent 0%,
-    rgba(255,220,140,0.05) 35%,
-    rgba(255,220,140,0.20) 50%,
-    rgba(255,220,140,0.05) 65%,
+    rgba(220,38,38,0.06) 35%,
+    rgba(220,38,38,0.18) 50%,
+    rgba(220,38,38,0.06) 65%,
     transparent 100%
   );
   opacity: 0;

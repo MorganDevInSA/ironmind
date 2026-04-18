@@ -1,16 +1,36 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores';
-import { useDashboardData, useActiveProgram, useRecentWorkouts } from '@/controllers';
+import { useDashboardData, useActiveProgram, useRecentWorkouts, useRecentCheckIns } from '@/controllers';
 import { getCycleDay, today, formatDisplayDate } from '@/lib/utils';
 import {
   Activity, Dumbbell, Scale, Pill, FileText, TrendingUp, Zap,
-  Calendar, CheckCircle2, X,
+  Calendar, CheckCircle2, X, BarChart3,
 } from 'lucide-react';
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ReferenceLine,
+} from 'recharts';
 import { cn } from '@/lib/utils';
-import type { Workout, NutritionDay, SupplementLog, ProgramSession } from '@/lib/types';
+import type {
+  Workout,
+  NutritionDay,
+  SupplementLog,
+  ProgramSession,
+  CheckIn,
+  Measurements,
+  JournalEntry,
+} from '@/lib/types';
 import { morganNutritionPlan } from '@/lib/seed/nutrition';
 import { morganSupplementProtocol } from '@/lib/seed/supplements';
 
@@ -66,9 +86,24 @@ const SUPPL_TIME: Record<string, string> = {
   morning: '07:30', lunch: '13:00', afternoon: '16:00', dinner: '19:30', bed: '22:00',
 };
 const KIND_META = {
-  meal:     { label: 'Meal',     color: 'text-[#10B981]', bg: 'bg-[rgba(16,185,129,0.08)]',  border: 'border-[rgba(16,185,129,0.25)]' },
-  vitamins: { label: 'Vitamins', color: 'text-[#DC2626]', bg: 'bg-[rgba(59,130,246,0.08)]',  border: 'border-[rgba(59,130,246,0.25)]' },
-  activity: { label: 'Activity', color: 'text-[#DC2626]', bg: 'bg-[rgba(212,175,55,0.08)]',  border: 'border-[rgba(212,175,55,0.25)]' },
+  meal: {
+    label: 'Meal',
+    color: 'text-[#34D399]',
+    bg: 'bg-[rgba(16,185,129,0.11)]',
+    border: 'border-[rgba(16,185,129,0.32)]',
+  },
+  vitamins: {
+    label: 'Vitamins',
+    color: 'text-[#D8B4FE]',
+    bg: 'bg-[rgba(167,139,250,0.12)]',
+    border: 'border-[rgba(167,139,250,0.30)]',
+  },
+  activity: {
+    label: 'Activity',
+    color: 'text-[#FBBF24]',
+    bg: 'bg-[rgba(245,158,11,0.12)]',
+    border: 'border-[rgba(245,158,11,0.32)]',
+  },
 };
 
 type MealPayload     = { kind: 'meal';     slotKey: string; isLiftDay: boolean };
@@ -92,6 +127,265 @@ function toMin(t: string) {
 }
 function capitalize(s: string) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
+const MEASUREMENT_SERIES: { key: keyof Measurements; label: string; color: string }[] = [
+  { key: 'waist', label: 'Waist', color: '#EF4444' },
+  { key: 'chest', label: 'Chest', color: '#DC2626' },
+  { key: 'hips', label: 'Hips', color: '#F59E0B' },
+  { key: 'leftArm', label: 'L arm', color: '#10B981' },
+  { key: 'rightArm', label: 'R arm', color: '#22C55E' },
+  { key: 'leftThigh', label: 'L thigh', color: '#A855F7' },
+  { key: 'rightThigh', label: 'R thigh', color: '#EC4899' },
+];
+
+function PhysiqueMiniCharts({
+  checkIns,
+  targetWeight,
+}: {
+  checkIns: CheckIn[] | undefined;
+  targetWeight: number | undefined;
+}) {
+  const [mode, setMode] = useState<'weight' | 'measurements'>('weight');
+  const chron = (checkIns ?? []).slice().reverse();
+
+  const weightRows = chron.map((c) => ({
+    date: formatDisplayDate(c.date).slice(0, 5),
+    weight: c.bodyweight,
+  }));
+
+  const measRows = chron.map((c) => {
+    const row: Record<string, string | number | undefined> = {
+      date: formatDisplayDate(c.date).slice(0, 5),
+    };
+    const m = c.measurements ?? {};
+    for (const { key } of MEASUREMENT_SERIES) {
+      const v = m[key];
+      if (typeof v === 'number') row[key as string] = v;
+    }
+    return row;
+  });
+
+  const hasMeas = measRows.some((row) =>
+    MEASUREMENT_SERIES.some(({ key }) => typeof row[key as string] === 'number')
+  );
+
+  if (!chron.length) {
+    return (
+      <p className="text-sm text-[color:var(--text-detail)]">
+        No check-ins yet — open Physique to log bodyweight and measurements.
+      </p>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#5E5E5E]">Trend</span>
+        <div className="flex rounded-lg overflow-hidden border border-[rgba(65,50,50,0.35)]">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setMode('weight');
+            }}
+            className={cn(
+              'px-3 py-1 text-xs font-semibold transition-colors',
+              mode === 'weight'
+                ? 'bg-[rgba(220,38,38,0.2)] text-[#F5F5F5]'
+                : 'text-[#9A9A9A] hover:text-[#F0F0F0]'
+            )}
+          >
+            Weight
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setMode('measurements');
+            }}
+            disabled={!hasMeas}
+            className={cn(
+              'px-3 py-1 text-xs font-semibold transition-colors',
+              mode === 'measurements'
+                ? 'bg-[rgba(220,38,38,0.2)] text-[#F5F5F5]'
+                : 'text-[#9A9A9A] hover:text-[#F0F0F0]',
+              !hasMeas && 'opacity-40 cursor-not-allowed'
+            )}
+          >
+            Measurements
+          </button>
+        </div>
+        <span className="text-[10px] text-[color:var(--text-detail)] ml-auto font-mono tabular-nums">{chron.length} pts</span>
+      </div>
+
+      <div className="h-[132px] w-full">
+        {mode === 'weight' && weightRows.length >= 1 ? (
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={weightRows} margin={{ top: 4, right: 4, bottom: 0, left: -16 }}>
+              <defs>
+                <linearGradient id="dashPhysWeight" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#F59E0B" stopOpacity={0.02} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(65,50,50,0.15)" />
+              <XAxis dataKey="date" tick={{ fontSize: 9, fill: '#B8B8B8' }} tickLine={false} axisLine={false} />
+              <YAxis
+                domain={[
+                  (min: number) => Math.floor(min - 0.5),
+                  (max: number) => Math.ceil(max + 0.5),
+                ]}
+                tick={{ fontSize: 9, fill: '#B8B8B8' }}
+                tickLine={false}
+                axisLine={false}
+              />
+              <Tooltip
+                contentStyle={{
+                  background: 'rgba(10,10,10,0.95)',
+                  border: '1px solid rgba(65,50,50,0.4)',
+                  borderRadius: 12,
+                  fontSize: 12,
+                }}
+                labelStyle={{ color: '#9A9A9A' }}
+                formatter={(v) => [`${typeof v === 'number' ? v : '—'} kg`, 'Weight']}
+              />
+              {targetWeight != null && (
+                <ReferenceLine
+                  y={targetWeight}
+                  stroke="rgba(16,185,129,0.45)"
+                  strokeDasharray="4 4"
+                />
+              )}
+              <Area
+                type="monotone"
+                dataKey="weight"
+                stroke="#F59E0B"
+                fill="url(#dashPhysWeight)"
+                strokeWidth={2}
+                dot={{ r: 3, fill: '#F59E0B' }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        ) : mode === 'measurements' && hasMeas ? (
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={measRows} margin={{ top: 4, right: 4, bottom: 0, left: -16 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(65,50,50,0.15)" />
+              <XAxis dataKey="date" tick={{ fontSize: 9, fill: '#B8B8B8' }} tickLine={false} axisLine={false} />
+              <YAxis tick={{ fontSize: 9, fill: '#B8B8B8' }} tickLine={false} axisLine={false} />
+              <Tooltip
+                contentStyle={{
+                  background: 'rgba(10,10,10,0.95)',
+                  border: '1px solid rgba(65,50,50,0.4)',
+                  borderRadius: 12,
+                  fontSize: 12,
+                }}
+              />
+              {MEASUREMENT_SERIES.map(({ key, color }) => (
+                <Line
+                  key={key}
+                  type="monotone"
+                  dataKey={key as string}
+                  stroke={color}
+                  strokeWidth={1.5}
+                  dot={{ r: 2, fill: color }}
+                  connectNulls
+                />
+              ))}
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="h-full flex items-center justify-center text-xs text-[color:var(--text-detail)]">
+            Add a second check-in to see the weight line.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function CoachingNotesModal({
+  open,
+  notes,
+  onClose,
+}: {
+  open: boolean;
+  notes: JournalEntry[] | undefined;
+  onClose: () => void;
+}) {
+  if (!open) return null;
+  const primary = notes?.[0];
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/65 backdrop-blur-sm" />
+      <div
+        className="relative w-full sm:max-w-lg mx-0 sm:mx-4 glass-panel rounded-t-2xl sm:rounded-2xl max-h-[88vh] overflow-hidden flex flex-col border border-[rgba(65,50,50,0.35)]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between p-4 border-b border-[rgba(65,50,50,0.25)]">
+          <div className="flex items-center gap-2">
+            <FileText size={20} className="text-[#DC2626]" />
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#5E5E5E]">Coaching</p>
+              <h2 className="text-lg font-bold text-[#F5F5F5]">Latest notes</h2>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-2 rounded-lg text-[#9A9A9A] hover:text-[#F5F5F5] hover:bg-[rgba(255,255,255,0.05)]"
+            aria-label="Close"
+          >
+            <X size={18} />
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-5 space-y-6">
+          {primary ? (
+            <>
+              <article className="space-y-3">
+                <h3 className="text-xl font-semibold text-[#F5F5F5] leading-snug">{primary.title}</h3>
+                <p className="text-xs font-mono tabular-nums text-[#9A9A9A]">{formatDisplayDate(primary.date)}</p>
+                <p className="text-[#D4D4D4] whitespace-pre-wrap leading-relaxed text-[15px]">{primary.content}</p>
+                {primary.tags?.length ? (
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {primary.tags.map((t) => (
+                      <span
+                        key={t}
+                        className="text-[10px] font-semibold uppercase tracking-wider px-2 py-1 rounded-md bg-[rgba(220,38,38,0.12)] text-[#DC2626] border border-[rgba(220,38,38,0.25)]"
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
+              </article>
+              {notes && notes.length > 1 && (
+                <div className="border-t border-[rgba(65,50,50,0.2)] pt-5 space-y-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#5E5E5E]">
+                    Earlier entries
+                  </p>
+                  <ul className="space-y-3">
+                    {notes.slice(1).map((n) => (
+                      <li key={n.id} className="rounded-xl border border-[rgba(65,50,50,0.2)] p-3 bg-[rgba(0,0,0,0.2)]">
+                        <p className="font-medium text-[#F5F5F5]">{n.title}</p>
+                        <p className="text-[10px] text-[color:var(--text-detail)] font-mono tabular-nums mt-1">
+                          {formatDisplayDate(n.date)}
+                        </p>
+                        <p className="text-sm text-[#9A9A9A] mt-2 line-clamp-3 whitespace-pre-wrap">{n.content}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </>
+          ) : (
+            <p className="text-[#9A9A9A] text-center py-8">No coaching notes yet.</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ─────────────────────────────────────────────────────────────────────
    Modal content components
 ───────────────────────────────────────────────────────────────────── */
@@ -106,19 +400,19 @@ function MealContent({ slotKey, isLiftDay, nutrition }: {
   return (
     <div className="space-y-4">
       <div>
-        <p className="text-[10px] text-[#6B6B6B] uppercase tracking-wider mb-1">Plan</p>
+        <p className="text-[10px] text-[color:var(--text-detail)] uppercase tracking-wider mb-1">Plan</p>
         <p className="text-[#F5F5F5]">{description}</p>
       </div>
       {loggedMeal && loggedMeal.foods.length > 0 ? (
         <div>
-          <p className="text-[10px] text-[#6B6B6B] uppercase tracking-wider mb-2">Logged Foods</p>
+          <p className="text-[10px] text-[color:var(--text-detail)] uppercase tracking-wider mb-2">Logged Foods</p>
           <div className="space-y-1.5">
             {loggedMeal.foods.map((food, i) => (
               <div key={i} className="flex justify-between text-sm">
                 <span className="text-[#F5F5F5]">
-                  {food.name} <span className="text-[#6B6B6B]">× {food.quantity}{food.unit}</span>
+                  {food.name} <span className="text-[color:var(--text-detail)]">× {food.quantity}{food.unit}</span>
                 </span>
-                <span className="font-mono tabular-nums text-[#6B6B6B] text-xs">
+                <span className="font-mono tabular-nums text-[color:var(--text-detail)] text-xs">
                   {food.protein}g P · {food.calories} kcal
                 </span>
               </div>
@@ -126,7 +420,7 @@ function MealContent({ slotKey, isLiftDay, nutrition }: {
           </div>
         </div>
       ) : (
-        <p className="text-sm text-[#6B6B6B]">No foods logged yet — follow the plan above.</p>
+        <p className="text-sm text-[color:var(--text-detail)]">No foods logged yet — follow the plan above.</p>
       )}
     </div>
   );
@@ -142,20 +436,20 @@ function VitaminsContent({ timing, supplements }: {
   return (
     <div className="space-y-4">
       {win.withMeal && (
-        <p className="text-sm text-[#6B6B6B]">Take with {win.withMeal}</p>
+        <p className="text-sm text-[color:var(--text-detail)]">Take with {win.withMeal}</p>
       )}
       <div>
-        <p className="text-[10px] text-[#6B6B6B] uppercase tracking-wider mb-2">Supplements</p>
+        <p className="text-[10px] text-[color:var(--text-detail)] uppercase tracking-wider mb-2">Supplements</p>
         <div className="space-y-1.5">
           {win.supplements.map((name, i) => {
             const taken = winLog[name] === true;
             return (
               <div key={i} className={cn('flex items-center gap-3 text-sm py-1.5 px-2 rounded-lg',
-                taken ? 'opacity-50' : 'bg-[rgba(16,22,34,0.3)]')}>
+                taken ? 'opacity-50' : 'bg-[color:var(--surface-track)]')}>
                 {taken
                   ? <CheckCircle2 size={14} className="text-[#10B981] shrink-0" />
-                  : <span className="w-3.5 h-3.5 rounded-full border border-[rgba(80,96,128,0.4)] shrink-0 inline-block" />}
-                <span className={taken ? 'text-[#6B6B6B] line-through' : 'text-[#F5F5F5]'}>{name}</span>
+                  : <span className="w-3.5 h-3.5 rounded-full border border-[rgba(65,50,50,0.22)] shrink-0 inline-block" />}
+                <span className={taken ? 'text-[color:var(--text-detail)] line-through' : 'text-[#F5F5F5]'}>{name}</span>
               </div>
             );
           })}
@@ -163,10 +457,10 @@ function VitaminsContent({ timing, supplements }: {
       </div>
       {win.optional && win.optional.length > 0 && (
         <div>
-          <p className="text-[10px] text-[#6B6B6B] uppercase tracking-wider mb-2">Optional</p>
+          <p className="text-[10px] text-[color:var(--text-detail)] uppercase tracking-wider mb-2">Optional</p>
           <div className="space-y-1">
             {win.optional.map((name, i) => (
-              <p key={i} className="text-sm text-[#6B6B6B] pl-2">{name}</p>
+              <p key={i} className="text-sm text-[color:var(--text-detail)] pl-2">{name}</p>
             ))}
           </div>
         </div>
@@ -175,38 +469,56 @@ function VitaminsContent({ timing, supplements }: {
   );
 }
 
-function ActivityContent({ session, done, onStart }: {
-  session: ProgramSession | undefined; done: boolean; onStart: () => void;
-}) {
-  if (!session) return <p className="text-[#6B6B6B]">No session data.</p>;
+function SessionProgramPreview({ session }: { session: ProgramSession }) {
+  const exercises = session.exercises ?? [];
+  const hasLift = exercises.length > 0;
+  const hasCardio = !!session.cardio;
+  const breath = session.breathWork ?? [];
+  const core = session.coreWork ?? [];
+  const mobility = session.mobility ?? [];
+  const hasBreath = breath.length > 0;
+  const hasCore = core.length > 0;
+  const hasMobility = mobility.length > 0;
+  const hasNotes = !!session.notes?.trim();
+
+  const hasAnyDetail =
+    hasNotes || hasLift || hasCardio || hasBreath || hasCore || hasMobility;
+
   return (
     <div className="space-y-4">
-      {session.notes && (
+      {hasNotes && (
         <div className="p-3 rounded-lg border-l-4 border-[#F59E0B] bg-[rgba(245,158,11,0.05)]">
-          <p className="text-sm text-[#6B6B6B]">{session.notes}</p>
+          <p className="text-sm text-[color:var(--text-detail)] whitespace-pre-wrap">{session.notes}</p>
         </div>
       )}
-      {session.exercises && session.exercises.length > 0 && (
+      {hasLift && (
         <div>
-          <p className="text-[10px] text-[#6B6B6B] uppercase tracking-wider mb-2">
-            Exercises ({session.exercises.length})
+          <p className="text-[10px] text-[color:var(--text-detail)] uppercase tracking-wider mb-2">
+            Exercises ({exercises.length})
           </p>
-          <div className="divide-y divide-[rgba(80,96,128,0.1)]">
-            {session.exercises.map((ex, i) => (
-              <div key={i} className="flex items-center justify-between py-2 text-sm">
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="text-xs text-[#6B6B6B] font-mono w-5 text-right shrink-0">{i + 1}</span>
-                  <span className={cn('font-medium truncate', ex.isKPI ? 'text-[#DC2626]' : 'text-[#F5F5F5]')}>
-                    {ex.name}
-                  </span>
-                  {ex.isKPI && (
-                    <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-[rgba(212,175,55,0.15)] text-[#DC2626] border border-[rgba(212,175,55,0.3)] shrink-0">
-                      KPI
-                    </span>
-                  )}
+          <div className="divide-y divide-[rgba(65,50,50,0.14)]">
+            {exercises.map((ex, i) => (
+              <div key={i} className="flex items-start justify-between gap-2 py-2 text-sm">
+                <div className="flex items-start gap-2 min-w-0">
+                  <span className="exercise-index-badge shrink-0">{i + 1}</span>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className={cn('font-medium', ex.isKPI ? 'text-[#DC2626]' : 'text-[#F5F5F5]')}>
+                        {ex.name}
+                      </span>
+                      {ex.isKPI && (
+                        <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-[rgba(220,38,38,0.14)] text-[#F5F5F5] border border-[rgba(220,38,38,0.38)] shrink-0">
+                          KPI
+                        </span>
+                      )}
+                    </div>
+                    {ex.notes ? (
+                      <p className="text-xs text-[color:var(--text-detail)] mt-1 whitespace-pre-wrap">{ex.notes}</p>
+                    ) : null}
+                  </div>
                 </div>
-                <span className="font-mono tabular-nums text-[#6B6B6B] text-xs shrink-0 ml-2">
-                  {ex.sets} x {ex.reps} · {ex.rest}s
+                <span className="font-mono tabular-nums text-[color:var(--text-detail)] text-xs shrink-0 pt-0.5">
+                  {ex.sets} × {ex.reps} · {ex.rest}s
                 </span>
               </div>
             ))}
@@ -214,18 +526,98 @@ function ActivityContent({ session, done, onStart }: {
         </div>
       )}
       {session.cardio && (
-        <div className="p-3 rounded-lg bg-[rgba(16,22,34,0.6)] space-y-1">
+        <div className="p-3 rounded-lg bg-[color:var(--surface-track)] space-y-1">
           <p className="text-sm font-medium text-[#F5F5F5]">{session.cardio.type}</p>
-          <p className="text-xs text-[#6B6B6B]">
-            {session.cardio.duration} min{session.cardio.note ? ` · ${session.cardio.note}` : ''}
+          <p className="text-xs text-[color:var(--text-detail)]">
+            {session.cardio.duration} min
+            {session.cardio.note ? ` · ${session.cardio.note}` : ''}
           </p>
+          {session.cardio.intervals && (
+            <p className="text-xs text-[color:var(--text-detail)] font-mono tabular-nums">
+              {session.cardio.intervals.work}s work / {session.cardio.intervals.rest}s rest ×{' '}
+              {session.cardio.intervals.rounds} rounds
+            </p>
+          )}
         </div>
       )}
+      {hasBreath && (
+        <div>
+          <p className="text-[10px] text-[color:var(--text-detail)] uppercase tracking-wider mb-2">Breath work</p>
+          <ul className="space-y-2">
+            {breath.map((bw, i) => (
+              <li key={i} className="text-sm">
+                <span className="font-medium text-[#F5F5F5]">{bw.name}</span>
+                <span className="text-[color:var(--text-detail)] text-xs font-mono tabular-nums ml-2">
+                  in {bw.inhale}s
+                  {bw.hold != null ? ` · hold ${bw.hold}s` : ''} · out {bw.exhale}s
+                  {bw.holdOut != null ? ` · pause ${bw.holdOut}s` : ''} · {bw.rounds} rnd
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {hasCore && (
+        <div>
+          <p className="text-[10px] text-[color:var(--text-detail)] uppercase tracking-wider mb-2">Core</p>
+          <div className="divide-y divide-[rgba(65,50,50,0.14)]">
+            {core.map((c, i) => (
+              <div key={i} className="flex items-start justify-between gap-2 py-2 text-sm">
+                <span className="text-[#F5F5F5]">{c.name}</span>
+                <span className="font-mono tabular-nums text-[color:var(--text-detail)] text-xs shrink-0 text-right">
+                  {c.sets}×
+                  {c.reps != null ? c.reps : c.holdSec != null ? `${c.holdSec}s` : '—'}
+                  {c.perSide ? ' / side' : ''}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {hasMobility && (
+        <div>
+          <p className="text-[10px] text-[color:var(--text-detail)] uppercase tracking-wider mb-2">Mobility</p>
+          <ul className="space-y-1.5">
+            {mobility.map((m, i) => (
+              <li
+                key={i}
+                className="text-sm text-[#D4D4D4] pl-3 border-l-2 border-[rgba(220,38,38,0.28)] leading-snug"
+              >
+                {m}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {!hasAnyDetail && (
+        <p className="text-sm text-[color:var(--text-detail)]">
+          {session.type === 'lift'
+            ? 'No exercises listed for this session yet.'
+            : session.type === 'cardio'
+              ? 'No cardio structure defined for this day.'
+              : 'Recovery session — add mobility or notes in your program.'}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function ActivityContent({ session, done, onStart, canStart }: {
+  session: ProgramSession | undefined; done: boolean; onStart: () => void; canStart?: boolean;
+}) {
+  if (!session) return <p className="text-[color:var(--text-detail)]">No session data.</p>;
+  return (
+    <div className="space-y-4">
+      <SessionProgramPreview session={session} />
       {done ? (
         <div className="flex items-center justify-center gap-2 py-3 text-[#10B981]">
           <CheckCircle2 size={18} />
           <span className="font-semibold">Workout Complete</span>
         </div>
+      ) : canStart === false ? (
+        <p className="text-sm text-[color:var(--text-detail)] text-center py-3 px-2">
+          Select today&apos;s cycle-day tab to start or log this session against your calendar.
+        </p>
       ) : (
         <button
           onClick={onStart}
@@ -239,13 +631,14 @@ function ActivityContent({ session, done, onStart }: {
   );
 }
 
-function ScheduleModal({ item, onClose, session, nutrition, supplements, onStartWorkout }: {
+function ScheduleModal({ item, onClose, session, nutrition, supplements, onStartWorkout, canStartWorkout }: {
   item: ScheduleItem;
   onClose: () => void;
   session: ProgramSession | undefined;
   nutrition: NutritionDay | null | undefined;
   supplements: SupplementLog | null | undefined;
   onStartWorkout: () => void;
+  canStartWorkout?: boolean;
 }) {
   const meta = KIND_META[item.kind];
   const p = item.payload;
@@ -253,21 +646,21 @@ function ScheduleModal({ item, onClose, session, nutrition, supplements, onStart
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" onClick={onClose}>
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
       <div
-        className="relative w-full sm:max-w-md mx-0 sm:mx-4 glass-panel rounded-t-2xl sm:rounded-2xl overflow-hidden max-h-[85vh] flex flex-col"
+        className="relative w-full sm:max-w-md mx-0 sm:mx-4 glass-panel dashboard-card-surface rounded-t-2xl sm:rounded-2xl overflow-hidden max-h-[85vh] flex flex-col"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center gap-3 p-4 border-b border-[rgba(80,96,128,0.15)] shrink-0">
+        <div className="flex items-center gap-3 p-4 border-b border-[rgba(65,50,50,0.28)] shrink-0">
           <span className={cn('text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border shrink-0',
             meta.color, meta.bg, meta.border)}>
             {meta.label}
           </span>
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-[#F5F5F5] truncate">{item.label}</h3>
-            <p className="text-xs text-[#6B6B6B]">{item.time}</p>
+            <p className="text-xs text-[color:var(--text-detail)]">{item.time}</p>
           </div>
           {item.done === true && <CheckCircle2 size={15} className="text-[#10B981] shrink-0" />}
-          <button onClick={onClose} className="p-1.5 text-[#6B6B6B] hover:text-[#F5F5F5] shrink-0 transition-colors">
+          <button onClick={onClose} className="p-1.5 text-[color:var(--text-detail)] hover:text-[#F5F5F5] shrink-0 transition-colors">
             <X size={16} />
           </button>
         </div>
@@ -275,7 +668,14 @@ function ScheduleModal({ item, onClose, session, nutrition, supplements, onStart
         <div className="flex-1 overflow-y-auto p-4">
           {p.kind === 'meal'     && <MealContent slotKey={p.slotKey} isLiftDay={p.isLiftDay} nutrition={nutrition} />}
           {p.kind === 'vitamins' && <VitaminsContent timing={p.timing} supplements={supplements} />}
-          {p.kind === 'activity' && <ActivityContent session={session} done={item.done === true} onStart={onStartWorkout} />}
+          {p.kind === 'activity' && (
+            <ActivityContent
+              session={session}
+              done={item.done === true}
+              onStart={onStartWorkout}
+              canStart={canStartWorkout}
+            />
+          )}
         </div>
       </div>
     </div>
@@ -292,6 +692,10 @@ function TodaySchedule({
   supplements,
   todayDone,
   onActivityClick,
+  scheduleTitle,
+  dateBadge,
+  previewHint,
+  canStartWorkout,
 }: {
   session: ProgramSession | undefined;
   isLiftDay: boolean;
@@ -299,6 +703,10 @@ function TodaySchedule({
   supplements: SupplementLog | null | undefined;
   todayDone: boolean;
   onActivityClick: () => void;
+  scheduleTitle: string;
+  dateBadge: string;
+  previewHint?: string | null;
+  canStartWorkout?: boolean;
 }) {
   const [selected, setSelected] = useState<ScheduleItem | null>(null);
   const items: ScheduleItem[] = [];
@@ -358,28 +766,38 @@ function TodaySchedule({
 
   return (
     <>
-      <div className="glass-panel p-4 col-span-full">
-        <div className="flex items-center gap-2 mb-4">
-          <Calendar size={18} className="text-[#6B6B6B]" />
-          <h3 className="font-semibold text-[#F5F5F5]">Today&apos;s Schedule</h3>
-          <span className="text-xs text-[#6B6B6B] ml-auto">{formatDisplayDate(today())}</span>
+      <div className="glass-panel dashboard-card-surface p-4 col-span-full">
+        <div className="flex flex-wrap items-center gap-2 mb-4">
+          <Calendar size={18} className="text-[color:var(--text-detail)]" />
+          <h3 className="font-semibold text-[#F5F5F5]">{scheduleTitle}</h3>
+          <span className="text-xs text-[color:var(--text-detail)] ml-auto">{dateBadge}</span>
         </div>
+        {previewHint && (
+          <p className="text-xs text-[color:var(--text-detail)] mb-3 border-l-2 border-[rgba(220,38,38,0.42)] pl-3 bg-[rgba(220,38,38,0.04)] rounded-r-lg py-1">{previewHint}</p>
+        )}
 
         <div className="overflow-x-auto">
-          <table className="w-full text-sm min-w-[520px]">
+          <table className="w-full text-sm min-w-[min(100%,52rem)]">
             <thead>
-              <tr className="border-b border-[rgba(80,96,128,0.2)]">
-                {['Time', 'Type', 'Item', ''].map(h => (
-                  <th key={h} className={cn(
-                    'pb-2 text-xs font-semibold text-[#6B6B6B] uppercase tracking-wider whitespace-nowrap',
-                    h === '' ? 'w-8 text-right' : 'text-left pr-4',
-                    h === 'Time' && 'w-16',
-                    h === 'Type' && 'w-24',
-                  )}>{h}</th>
-                ))}
+              <tr className="border-b border-[rgba(65,50,50,0.22)]">
+                <th className="pb-2 text-left pr-4 text-xs font-semibold text-[color:var(--text-detail)] uppercase tracking-wider whitespace-nowrap w-[4.5rem]">
+                  Time
+                </th>
+                <th className="pb-2 text-left pr-4 text-xs font-semibold text-[color:var(--text-detail)] uppercase tracking-wider whitespace-nowrap w-[6.5rem]">
+                  Type
+                </th>
+                <th className="pb-2 text-left pr-4 text-xs font-semibold text-[color:var(--text-detail)] uppercase tracking-wider whitespace-nowrap min-w-[7rem]">
+                  Item
+                </th>
+                <th className="pb-2 text-left pr-4 text-xs font-semibold text-[color:var(--text-detail)] uppercase tracking-wider min-w-[12rem]">
+                  Description
+                </th>
+                <th className="pb-2 text-right text-xs font-semibold text-[color:var(--text-detail)] uppercase tracking-wider whitespace-nowrap w-10">
+                  <span className="sr-only">Status</span>
+                </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[rgba(80,96,128,0.08)]">
+            <tbody className="divide-y divide-[rgba(65,50,50,0.14)]">
               {items.map((item, i) => {
                 const meta = KIND_META[item.kind];
                 return (
@@ -387,39 +805,58 @@ function TodaySchedule({
                     key={i}
                     onClick={() => setSelected(item)}
                     className={cn(
-                      'cursor-pointer transition-colors group hover:bg-[rgba(255,255,255,0.03)]',
+                      'cursor-pointer transition-colors group hover:bg-[rgba(220,38,38,0.055)]',
                       item.done === true && 'opacity-50',
                     )}
                   >
-                    <td className="py-2.5 pr-4 font-mono tabular-nums text-[#6B6B6B] text-xs whitespace-nowrap align-middle">
+                    <td className="py-2.5 pr-4 font-mono tabular-nums text-[color:var(--text-detail)] text-xs whitespace-nowrap align-top">
                       {item.time}
                     </td>
-                    <td className="py-2.5 pr-4 align-middle">
+                    <td className="py-2.5 pr-4 align-top">
                       <span className={cn(
-                        'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border',
+                        'inline-flex text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border',
                         meta.color, meta.bg, meta.border
                       )}>
                         {meta.label}
                       </span>
                     </td>
-                    <td className="py-2.5 pr-4 align-middle">
-                      <span className={cn('font-medium', item.done ? 'text-[#6B6B6B] line-through' : 'text-[#F5F5F5]')}>
-                        {item.label}
-                      </span>
-                      {item.detail && (
-                        <span className="ml-2 text-xs text-[#6B6B6B]">{item.detail}</span>
-                      )}
-                      <span className={cn('ml-2 text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity', meta.color)}>
-                        → view
-                      </span>
+                    <td className="py-2.5 pr-4 align-top">
+                      <div className="flex items-start gap-2 min-w-0">
+                        <span className={cn(
+                          'font-semibold leading-snug',
+                          item.done ? 'text-[color:var(--text-detail)] line-through' : 'text-[#F5F5F5]'
+                        )}>
+                          {item.label}
+                        </span>
+                        <span className={cn(
+                          'text-[11px] font-semibold shrink-0 opacity-0 group-hover:opacity-100 transition-opacity pt-0.5',
+                          meta.color
+                        )}>
+                          →
+                        </span>
+                      </div>
                     </td>
-                    <td className="py-2.5 text-right align-middle">
-                      {item.done === true ? (
-                        <CheckCircle2 size={15} className="text-[#10B981] inline-block" />
-                      ) : item.done === false ? (
-                        <span className="inline-block w-3.5 h-3.5 rounded-full border border-[rgba(80,96,128,0.4)]" />
+                    <td className="py-2.5 pr-4 align-top min-w-0 max-w-xl">
+                      {item.detail ? (
+                        <p
+                          className={cn(
+                            'text-[13px] leading-relaxed text-[color:var(--text-detail)] break-words',
+                            item.done && 'line-through opacity-80'
+                          )}
+                        >
+                          {item.detail}
+                        </p>
                       ) : (
-                        <span className="text-xs text-[#6B6B6B]/30">—</span>
+                        <span className="text-xs text-[color:var(--text-2)]/55">—</span>
+                      )}
+                    </td>
+                    <td className="py-2.5 text-right align-top">
+                      {item.done === true ? (
+                        <CheckCircle2 size={15} className="text-[#10B981] inline-block mt-0.5" aria-hidden />
+                      ) : item.done === false ? (
+                        <span className="inline-block w-3.5 h-3.5 rounded-full border border-[rgba(65,50,50,0.22)] mt-1" />
+                      ) : (
+                        <span className="text-xs text-[rgba(186,186,186,0.38)]">—</span>
                       )}
                     </td>
                   </tr>
@@ -438,6 +875,7 @@ function TodaySchedule({
           nutrition={nutrition}
           supplements={supplements}
           onStartWorkout={() => { setSelected(null); onActivityClick(); }}
+          canStartWorkout={canStartWorkout}
         />
       )}
     </>
@@ -447,20 +885,39 @@ function TodaySchedule({
 /* ─────────────────────────────────────────────────────────────────────
    Density card
 ───────────────────────────────────────────────────────────────────── */
-function DensityCard({ workout }: { workout: Workout }) {
+function DensityCard({ workout, onOpen }: { workout: Workout; onOpen?: () => void }) {
   const [view, setView] = useState<'exercise' | 'bodypart'>('exercise');
   const { byExercise, byMuscle, totalVolume, durationMin, density } = calcDensity(workout);
   const rows = view === 'exercise' ? byExercise : byMuscle;
   const maxVol = Math.max(...rows.map(r => r.volume), 1);
 
   return (
-    <div className="glass-panel p-4 col-span-full space-y-4">
+    <div
+      role={onOpen ? 'button' : undefined}
+      tabIndex={onOpen ? 0 : undefined}
+      onClick={onOpen}
+      onKeyDown={
+        onOpen
+          ? (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onOpen();
+              }
+            }
+          : undefined
+      }
+      className={cn(
+        'glass-panel dashboard-card-surface p-4 col-span-full space-y-4 text-left w-full',
+        onOpen &&
+          'cursor-pointer hover:border-[rgba(220,38,38,0.38)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/50'
+      )}
+    >
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <Zap size={18} className="text-[#F59E0B]" />
           <div>
             <h3 className="font-semibold text-[#F5F5F5]">Training Density</h3>
-            <p className="text-xs text-[#6B6B6B]">
+            <p className="text-xs text-[color:var(--text-detail)]">
               {workout.sessionName} · {formatDisplayDate(workout.date)} · {durationMin} min
             </p>
           </div>
@@ -472,18 +929,25 @@ function DensityCard({ workout }: { workout: Workout }) {
             { label: 'Density',  value: `${density} kg/min`, gold: true },
           ].map(s => (
             <div key={s.label} className="text-center">
-              <p className="text-xs text-[#6B6B6B]">{s.label}</p>
+              <p className="text-xs text-[color:var(--text-detail)]">{s.label}</p>
               <p className={cn('font-mono tabular-nums font-bold', s.gold ? 'text-[#DC2626]' : 'text-[#F5F5F5]')}>
                 {s.value}
               </p>
             </div>
           ))}
         </div>
-        <div className="flex rounded-xl overflow-hidden border border-[rgba(80,96,128,0.25)]">
+        <div
+          className="flex rounded-xl overflow-hidden border border-[rgba(65,50,50,0.22)]"
+          onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => e.stopPropagation()}
+        >
           {(['exercise', 'bodypart'] as const).map(v => (
-            <button key={v} onClick={() => setView(v)}
+            <button
+              key={v}
+              type="button"
+              onClick={() => setView(v)}
               className={cn('px-3 py-1.5 text-xs font-semibold capitalize transition-all',
-                view === v ? 'bg-[rgba(245,158,11,0.15)] text-[#F59E0B]' : 'text-[#6B6B6B] hover:text-[#F5F5F5]'
+                view === v ? 'bg-[rgba(245,158,11,0.15)] text-[#F59E0B]' : 'text-[color:var(--text-detail)] hover:text-[#F5F5F5]'
               )}
             >
               By {v}
@@ -493,7 +957,7 @@ function DensityCard({ workout }: { workout: Workout }) {
       </div>
 
       {rows.length === 0 ? (
-        <p className="text-sm text-[#6B6B6B]">No completed sets recorded.</p>
+        <p className="text-sm text-[color:var(--text-detail)]">No completed sets recorded.</p>
       ) : (
         <div className="space-y-2.5">
           {rows.map(row => (
@@ -501,7 +965,7 @@ function DensityCard({ workout }: { workout: Workout }) {
               <div className="flex justify-between text-sm">
                 <div className="flex items-center gap-2 min-w-0">
                   <span className="font-medium text-[#F5F5F5] capitalize truncate">{row.label}</span>
-                  {view === 'exercise' && <span className="text-xs text-[#6B6B6B] capitalize shrink-0">{row.muscle}</span>}
+                  {view === 'exercise' && <span className="text-xs text-[color:var(--text-detail)] capitalize shrink-0">{row.muscle}</span>}
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
                   <span className="font-mono tabular-nums text-[#F5F5F5]">
@@ -512,7 +976,7 @@ function DensityCard({ workout }: { workout: Workout }) {
                   </span>
                 </div>
               </div>
-              <div className="h-2 bg-[rgba(16,22,34,0.72)] rounded-full overflow-hidden">
+              <div className="h-2 rounded-full overflow-hidden bg-[color:var(--surface-track)] ring-1 ring-inset ring-black/35">
                 <div
                   className="h-full bg-gradient-to-r from-[#F59E0B] to-[#DC2626] rounded-full transition-all duration-500"
                   style={{ width: `${(row.volume / maxVol) * 100}%` }}
@@ -527,6 +991,52 @@ function DensityCard({ workout }: { workout: Workout }) {
 }
 
 /* ─────────────────────────────────────────────────────────────────────
+   Cycle day tabs (length follows active program — 7, 14, etc.)
+───────────────────────────────────────────────────────────────────── */
+function CycleDayTabs({
+  cycleLengthDays,
+  selectedCycleDay,
+  todayCycleDay,
+  onSelect,
+}: {
+  cycleLengthDays: number;
+  selectedCycleDay: number;
+  todayCycleDay: number | null;
+  onSelect: (day: number) => void;
+}) {
+  const days = Array.from({ length: cycleLengthDays }, (_, i) => i + 1);
+  return (
+    <div className="flex flex-col gap-2">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[color:var(--text-2)]">Cycle days</p>
+      <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-thin">
+        {days.map((day) => {
+          const isTodayTab = todayCycleDay !== null && day === todayCycleDay;
+          const isSelected = day === selectedCycleDay;
+          return (
+            <button
+              key={day}
+              type="button"
+              onClick={() => onSelect(day)}
+              className={cn(
+                'shrink-0 min-w-[2.75rem] px-3 py-2 rounded-lg text-sm font-mono tabular-nums transition-all border',
+                isSelected
+                  ? 'bg-[rgba(220,38,38,0.22)] border-[#DC2626] text-[#FAFAFA] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]'
+                  : 'border-[rgba(65,50,50,0.35)] text-[#9A9A9A] hover:border-[rgba(220,38,38,0.45)] hover:text-[#F0F0F0]',
+                isTodayTab && !isSelected && 'ring-1 ring-[rgba(220,38,38,0.35)]'
+              )}
+              aria-pressed={isSelected}
+              title={isTodayTab ? 'Today (calendar)' : `Cycle day ${day}`}
+            >
+              {day}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────
    Main dashboard
 ───────────────────────────────────────────────────────────────────── */
 export default function DashboardPage() {
@@ -534,172 +1044,323 @@ export default function DashboardPage() {
   const { user } = useAuthStore();
   const userId = user?.uid ?? '';
 
-  const { profile, todayNutrition, todayRecovery, todaySupplements, weeklyVolume, recentNotes, isLoading } =
+  const [coachNotesOpen, setCoachNotesOpen] = useState(false);
+
+  const { profile, todayNutrition, todayRecovery, latestRecovery, todaySupplements, weeklyVolume, recentNotes, isLoading } =
     useDashboardData(userId);
   const { data: activeProgram } = useActiveProgram(userId);
   const { data: recentWorkouts } = useRecentWorkouts(userId, 7);
+  const { data: physiqueCheckIns } = useRecentCheckIns(userId, 40);
 
   const todayStr = today();
   const cycleDay = activeProgram
     ? getCycleDay(activeProgram.startDate ?? todayStr, todayStr, activeProgram.cycleLengthDays)
     : null;
-  const todaySession = activeProgram?.sessions.find(s => s.dayNumber === cycleDay);
-  const isLiftDay = todaySession?.type === 'lift';
+
+  const [selectedCycleDay, setSelectedCycleDay] = useState(1);
+
+  useEffect(() => {
+    if (cycleDay != null) setSelectedCycleDay(cycleDay);
+  }, [cycleDay]);
+
+  const cycleLen = activeProgram?.cycleLengthDays ?? 1;
+
+  useEffect(() => {
+    setSelectedCycleDay((d) => Math.min(d, cycleLen));
+  }, [cycleLen]);
+  const safeDay = Math.min(Math.max(selectedCycleDay, 1), cycleLen);
+
+  const selectedSession = activeProgram?.sessions.find(s => s.dayNumber === safeDay);
+  const isLiftForSelected = selectedSession?.type === 'lift';
+  const isViewingToday = cycleDay !== null && safeDay === cycleDay;
 
   const todayWorkout = recentWorkouts?.find(w => w.date === todayStr);
   const lastWorkout = recentWorkouts?.find(w => w.exercises.some(ex => ex.sets.some(s => s.completed)));
 
+  const recoveryDashEntry = todayRecovery ?? latestRecovery ?? null;
+  const recoveryDashHistorical = !todayRecovery && !!latestRecovery;
+
+  const scheduleTitle = isViewingToday ? 'Today\'s Schedule' : `Day ${safeDay} — Plan`;
+  const dateBadge = isViewingToday ? formatDisplayDate(todayStr) : 'Preview';
+  const previewHint = !isViewingToday
+    ? 'Nutrition and supplement cards below reflect calendar today only when the highlighted tab matches today\'s cycle day. Recovery shows your latest saved check-in.'
+    : null;
+
+  const dashboardSubtitle =
+    activeProgram && cycleDay
+      ? `Day ${safeDay} of ${activeProgram.cycleLengthDays} — ${selectedSession?.name ?? 'Rest Day'}`
+      : formatDisplayDate(todayStr);
+
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-2 border-[#DC2626] border-t-transparent rounded-full animate-spin" />
+      <div className="dashboard-overview flex min-h-[40vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#DC2626] border-t-transparent" aria-hidden />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-[#F5F5F5]">Dashboard</h1>
-        <p className="text-[#6B6B6B]">
-          {activeProgram && cycleDay
-            ? <>Day {cycleDay} of {activeProgram.cycleLengthDays} — {todaySession?.name || 'Rest Day'}</>
-            : formatDisplayDate(todayStr)}
-        </p>
-      </div>
+    <>
+      <CoachingNotesModal open={coachNotesOpen} notes={recentNotes} onClose={() => setCoachNotesOpen(false)} />
 
-      {/* Today's Schedule table */}
-      <div className="grid grid-cols-1 gap-4">
-        <TodaySchedule
-          session={todaySession}
-          isLiftDay={isLiftDay ?? false}
-          nutrition={todayNutrition}
-          supplements={todaySupplements}
-          todayDone={!!todayWorkout}
-          onActivityClick={() => router.push('/training/workout')}
-        />
-      </div>
+      <div className="dashboard-overview space-y-6">
+        <header className="space-y-1">
+          <h1 className="text-2xl font-bold text-[#F5F5F5]">Dashboard</h1>
+          <p className="text-[color:var(--text-detail)]">{dashboardSubtitle}</p>
+        </header>
 
-      {/* KPI cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        {activeProgram && cycleDay !== null && (
+          <CycleDayTabs
+            cycleLengthDays={cycleLen}
+            selectedCycleDay={safeDay}
+            todayCycleDay={cycleDay}
+            onSelect={setSelectedCycleDay}
+          />
+        )}
 
-        <Card title="Today's Session" icon={<Dumbbell size={20} />} iconColor="text-[#DC2626]">
-          {todaySession ? (
-            <div className="space-y-3">
-              <p className="font-medium text-[#F5F5F5]">{todaySession.name}</p>
-              <p className="text-sm text-[#6B6B6B]">{todaySession.exercises?.length ?? 0} exercises</p>
-              <button
-                onClick={() => router.push('/training/workout')}
-                className="w-full py-2 bg-[#DC2626] text-white rounded-lg hover:brightness-110 transition-all"
-              >
-                {todayWorkout ? 'View Workout' : 'Start Workout'}
-              </button>
-            </div>
-          ) : (
-            <p className="text-[#6B6B6B]">Rest day — focus on recovery</p>
-          )}
-        </Card>
+        {/* Schedule + cycle-tab cards */}
+        <section key={safeDay} className="space-y-4">
+        <div className="grid grid-cols-1 gap-4">
+          <TodaySchedule
+            session={selectedSession}
+            isLiftDay={isLiftForSelected ?? false}
+            nutrition={isViewingToday ? todayNutrition : undefined}
+            supplements={isViewingToday ? todaySupplements : undefined}
+            todayDone={isViewingToday ? !!todayWorkout : false}
+            onActivityClick={() => router.push('/training/workout')}
+            scheduleTitle={scheduleTitle}
+            dateBadge={dateBadge}
+            previewHint={previewHint}
+            canStartWorkout={isViewingToday}
+          />
+        </div>
 
-        <Card title="Recovery" icon={<Activity size={20} />} iconColor="text-[#10B981]">
-          {todayRecovery ? (
-            <div className="space-y-2">
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-bold font-mono tabular-nums text-[#F5F5F5]">
-                  {Math.round(todayRecovery.readinessScore)}
-                </span>
-                <span className="text-sm text-[#6B6B6B]">/100</span>
-              </div>
-              <p className="text-sm text-[#6B6B6B]">
-                Sleep: {todayRecovery.sleepHours}h · HRV: {todayRecovery.hrv}
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <p className="text-[#6B6B6B]">No recovery data logged today</p>
-              <button
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+
+          {/* Session | Recovery+Physique — two cols on lg+; right stack matches session column height */}
+          <div className="col-span-full grid grid-cols-1 gap-4 lg:grid-cols-2 lg:items-stretch lg:gap-4">
+            <Card
+              className="min-h-0 lg:flex lg:flex-col lg:h-full"
+              title={isViewingToday ? 'Today\'s Session' : `Day ${safeDay} — Session plan`}
+              icon={<Dumbbell size={20} />}
+              iconColor="text-[#DC2626]"
+              onClick={() =>
+                isViewingToday && selectedSession
+                  ? router.push('/training/workout')
+                  : router.push('/training')
+              }
+            >
+              {selectedSession ? (
+                <div className="flex min-h-0 flex-1 flex-col space-y-3">
+                  <p className="font-medium text-[#F5F5F5]">{selectedSession.name}</p>
+                  <p className="text-xs text-[color:var(--text-detail)]">
+                    {selectedSession.type === 'lift' && 'Strength'}
+                    {selectedSession.type === 'cardio' && 'Cardio / conditioning'}
+                    {selectedSession.type === 'recovery' && 'Recovery'}
+                  </p>
+                  <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1 -mr-0.5 max-h-[min(72vh,42rem)] lg:max-h-none">
+                    <SessionProgramPreview session={selectedSession} />
+                  </div>
+                  <div className="border-t border-[rgba(65,50,50,0.25)] pt-3 space-y-1.5 shrink-0">
+                    <p className="text-xs text-[#DC2626]/90 font-medium">
+                      {isViewingToday
+                        ? todayWorkout
+                          ? 'Open workout →'
+                          : 'Start workout →'
+                        : 'Open training →'}
+                    </p>
+                    {!isViewingToday && (
+                      <p className="text-[10px] text-[color:var(--text-detail)] leading-snug">
+                        Logging runs on calendar today when you select today&apos;s cycle-day tab.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <p className="text-[color:var(--text-detail)]">Rest day — focus on recovery</p>
+              )}
+            </Card>
+
+            <div className="flex min-h-0 flex-col gap-4 lg:h-full lg:min-h-0">
+              <Card
+                className="shrink-0 lg:min-h-0"
+                title="Recovery"
+                icon={<Activity size={20} />}
+                iconColor="text-[#10B981]"
                 onClick={() => router.push('/recovery')}
-                className="w-full py-2 bg-[rgba(16,22,34,0.72)] border border-[rgba(80,96,128,0.25)] text-[#9A9A9A] rounded-lg hover:border-[rgba(212,175,55,0.3)] transition-all"
               >
-                Log Recovery
-              </button>
-            </div>
-          )}
-        </Card>
+                {!recoveryDashEntry ? (
+                  <div className="space-y-3">
+                    <p className="text-[color:var(--text-detail)]">No recovery data logged yet</p>
+                    <p className="text-xs text-[#10B981]/90 font-medium">Log on Recovery page →</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {recoveryDashHistorical && latestRecovery && (
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-detail)] leading-snug">
+                        {latestRecovery.date === todayStr
+                          ? 'Latest entry'
+                          : `Last logged · ${formatDisplayDate(latestRecovery.date)}`}
+                      </p>
+                    )}
+                    {todayRecovery && (
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-detail)]">
+                        Today · {formatDisplayDate(todayStr)}
+                      </p>
+                    )}
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl font-bold font-mono tabular-nums text-[#F5F5F5]">
+                        {Math.round(recoveryDashEntry.readinessScore)}
+                      </span>
+                      <span className="text-sm text-[color:var(--text-detail)]">/100</span>
+                    </div>
+                    <p className="text-sm text-[color:var(--text-detail)]">
+                      Sleep: {recoveryDashEntry.sleepHours}h · HRV: {recoveryDashEntry.hrv}
+                    </p>
+                    {!isViewingToday && (
+                      <p className="text-[10px] text-[#5E5E5E] pt-1 leading-snug">
+                        Saved recovery is by calendar date (not the selected cycle day).
+                      </p>
+                    )}
+                    <p className="text-xs text-[#10B981]/90 font-medium pt-1">Open recovery →</p>
+                  </div>
+                )}
+              </Card>
 
-        <Card title="Weight" icon={<Scale size={20} />} iconColor="text-[#F59E0B]">
-          <div className="space-y-2">
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-bold font-mono tabular-nums text-[#F5F5F5]">
-                {profile?.currentWeight ?? '—'}
-              </span>
-              <span className="text-sm text-[#6B6B6B]">kg</span>
+              <Card
+                className="min-h-0 flex-1 lg:flex lg:flex-col"
+                title="Physique"
+                icon={<Scale size={20} />}
+                iconColor="text-[#F59E0B]"
+                onClick={() => router.push('/physique')}
+              >
+                <div className="flex min-h-0 flex-1 flex-col space-y-2">
+                  <div className="flex items-baseline justify-between gap-2 shrink-0">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl font-bold font-mono tabular-nums text-[#F5F5F5]">
+                        {profile?.currentWeight ?? '—'}
+                      </span>
+                      <span className="text-sm text-[color:var(--text-detail)]">kg</span>
+                    </div>
+                    <BarChart3 size={18} className="text-[#DC2626]/60 shrink-0" aria-hidden />
+                  </div>
+                  <p className="text-sm text-[color:var(--text-detail)] shrink-0">
+                    Target: {profile?.targetWeight ?? '—'} kg
+                  </p>
+                  <div className="min-h-0 flex-1">
+                    <PhysiqueMiniCharts checkIns={physiqueCheckIns} targetWeight={profile?.targetWeight} />
+                  </div>
+                  <p className="text-xs text-[#DC2626]/80 font-medium shrink-0">Full check-in &amp; history →</p>
+                </div>
+              </Card>
             </div>
-            <p className="text-sm text-[#6B6B6B]">Target: {profile?.targetWeight ?? '—'} kg</p>
           </div>
-        </Card>
 
-        <Card title="Today's Nutrition" icon={<TrendingUp size={20} />} iconColor="text-[#DC2626]">
-          {todayNutrition ? (
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-[#6B6B6B]">Protein</span>
-                <span className="font-mono tabular-nums text-[#F5F5F5]">
-                  {Math.round(todayNutrition.macroActuals.protein)}g / {todayNutrition.macroTargets.protein}g
-                </span>
+          {/* Full-width row: nutrition · supplements · coaching — always three columns from md */}
+          <div className="col-span-full grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-4">
+          <Card
+            title="Today's Nutrition"
+            icon={<TrendingUp size={20} />}
+            iconColor="text-[#DC2626]"
+            onClick={() => router.push('/nutrition')}
+          >
+            {!isViewingToday ? (
+              <p className="text-sm text-[color:var(--text-detail)]">
+                Meal logging and macro totals are for calendar today. Select today&apos;s cycle-day tab ({cycleDay !== null ? `day ${cycleDay}` : ''}) to edit today&apos;s intake.
+              </p>
+            ) : todayNutrition ? (
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-[color:var(--text-detail)]">Protein</span>
+                  <span className="font-mono tabular-nums text-[#F5F5F5]">
+                    {Math.round(todayNutrition.macroActuals.protein)}g / {todayNutrition.macroTargets.protein}g
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-[color:var(--text-detail)]">Meals</span>
+                  <span className="font-mono tabular-nums text-[#F5F5F5]">
+                    {todayNutrition.meals.filter(m => m.completed).length}/{todayNutrition.meals.length} eaten
+                  </span>
+                </div>
+                <div className="h-2 rounded-full overflow-hidden bg-[color:var(--surface-track)] ring-1 ring-inset ring-black/35">
+                  <div
+                    className="h-full bg-[#DC2626] rounded-full transition-all"
+                    style={{ width: `${Math.min(100, todayNutrition.complianceScore)}%` }}
+                  />
+                </div>
+                <p className="text-xs text-[#DC2626]/80 font-medium pt-1">Open nutrition →</p>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-[#6B6B6B]">Meals</span>
-                <span className="font-mono tabular-nums text-[#F5F5F5]">
-                  {todayNutrition.meals.filter(m => m.completed).length}/{todayNutrition.meals.length} eaten
-                </span>
+            ) : (
+              <>
+                <p className="text-[color:var(--text-detail)]">No meals logged today</p>
+                <p className="text-xs text-[#DC2626]/80 font-medium pt-2">Open nutrition →</p>
+              </>
+            )}
+          </Card>
+
+          <Card
+            title="Supplements"
+            icon={<Pill size={20} />}
+            iconColor="text-[#DC2626]"
+            onClick={() => router.push('/supplements')}
+          >
+            {!isViewingToday ? (
+              <p className="text-sm text-[color:var(--text-detail)]">
+                Supplement checklist reflects calendar today. Switch to today&apos;s cycle tab to tick off today&apos;s windows.
+              </p>
+            ) : todaySupplements ? (
+              <div className="space-y-2">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3xl font-bold font-mono tabular-nums text-[#F5F5F5]">
+                    {todaySupplements.compliancePercent}
+                  </span>
+                  <span className="text-sm text-[color:var(--text-detail)]">%</span>
+                </div>
+                <p className="text-sm text-[color:var(--text-detail)]">compliance today</p>
+                <p className="text-xs text-[#DC2626]/80 font-medium">Open supplements →</p>
               </div>
-              <div className="h-2 bg-[rgba(16,22,34,0.72)] rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-[#DC2626] rounded-full transition-all"
-                  style={{ width: `${Math.min(100, todayNutrition.complianceScore)}%` }}
-                />
+            ) : (
+              <>
+                <p className="text-[color:var(--text-detail)]">No supplements logged today</p>
+                <p className="text-xs text-[#DC2626]/80 font-medium pt-2">Open supplements →</p>
+              </>
+            )}
+          </Card>
+
+          <Card
+            title="Coaching Notes"
+            icon={<FileText size={20} />}
+            iconColor="text-[color:var(--text-1)]"
+            onClick={
+              recentNotes && recentNotes.length > 0 ? () => setCoachNotesOpen(true) : undefined
+            }
+          >
+            {recentNotes && recentNotes.length > 0 ? (
+              <div className="space-y-2">
+                <p className="font-medium text-[#F5F5F5] line-clamp-2">{recentNotes[0].title}</p>
+                <p className="text-sm text-[color:var(--text-detail)] line-clamp-2">{recentNotes[0].content}</p>
+                <p className="text-xs text-[color:var(--text-detail)]/60">{formatDisplayDate(recentNotes[0].date)}</p>
+                <p className="text-xs text-[#DC2626]/80 font-medium pt-1">Read full note →</p>
               </div>
-            </div>
-          ) : (
-            <p className="text-[#6B6B6B]">No meals logged today</p>
+            ) : (
+              <p className="text-[color:var(--text-detail)]">No recent notes</p>
+            )}
+          </Card>
+          </div>
+
+          {isViewingToday && lastWorkout && (
+            <DensityCard workout={lastWorkout} onOpen={() => router.push('/training/history')} />
           )}
-        </Card>
+        </div>
+      </section>
 
-        <Card title="Supplements" icon={<Pill size={20} />} iconColor="text-[#DC2626]">
-          {todaySupplements ? (
-            <div className="space-y-2">
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-bold font-mono tabular-nums text-[#F5F5F5]">
-                  {todaySupplements.compliancePercent}
-                </span>
-                <span className="text-sm text-[#6B6B6B]">%</span>
-              </div>
-              <p className="text-sm text-[#6B6B6B]">compliance today</p>
-            </div>
-          ) : (
-            <p className="text-[#6B6B6B]">No supplements logged today</p>
-          )}
-        </Card>
-
-        <Card title="Coaching Notes" icon={<FileText size={20} />} iconColor="text-[#6B6B6B]">
-          {recentNotes && recentNotes.length > 0 ? (
-            <div className="space-y-2">
-              <p className="font-medium text-[#F5F5F5] line-clamp-2">{recentNotes[0].title}</p>
-              <p className="text-sm text-[#6B6B6B] line-clamp-2">{recentNotes[0].content}</p>
-              <p className="text-xs text-[#6B6B6B]/60">{formatDisplayDate(recentNotes[0].date)}</p>
-            </div>
-          ) : (
-            <p className="text-[#6B6B6B]">No recent notes</p>
-          )}
-        </Card>
-
-        {/* Training Density */}
-        {lastWorkout && <DensityCard workout={lastWorkout} />}
-
-        {/* Weekly Volume */}
-        {weeklyVolume && weeklyVolume.length > 0 && (
-          <Card title="Weekly Volume vs Landmarks" icon={<TrendingUp size={20} />} iconColor="text-[#6B6B6B]" fullWidth>
+      {/* Weekly volume — not driven by cycle tab */}
+      {weeklyVolume && weeklyVolume.length > 0 && (
+      <section
+        className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3"
+        aria-label="Weekly training volume"
+      >
+          <Card title="Weekly Volume vs Landmarks" icon={<TrendingUp size={20} />} iconColor="text-[color:var(--text-1)]" fullWidth>
             <div className="space-y-3">
               {weeklyVolume.map((muscle: {
                 muscleGroup: string; currentSets: number; targetSets: number;
@@ -708,12 +1369,12 @@ export default function DashboardPage() {
                 <div key={muscle.muscleGroup} className="space-y-1">
                   <div className="flex justify-between text-sm">
                     <span className="text-[#F5F5F5] capitalize">{muscle.muscleGroup}</span>
-                    <span className="font-mono tabular-nums text-[#6B6B6B]">
+                    <span className="font-mono tabular-nums text-[color:var(--text-detail)]">
                       {muscle.currentSets} / {muscle.targetSets} sets
                     </span>
                   </div>
-                  <div className="h-2 bg-[rgba(16,22,34,0.72)] rounded-full overflow-hidden relative">
-                    <div className="absolute h-full bg-[#6B6B6B]/30 rounded-l-full"
+                  <div className="h-2 bg-[color:var(--surface-track)] rounded-full overflow-hidden relative">
+                    <div className="absolute h-full bg-[rgba(120,100,98,0.38)] rounded-l-full"
                       style={{ width: `${(muscle.mev / muscle.mrv) * 100}%` }} />
                     <div className="absolute h-full bg-[#DC2626]/30"
                       style={{ left: `${(muscle.mev / muscle.mrv) * 100}%`, width: `${((muscle.mav - muscle.mev) / muscle.mrv) * 100}%` }} />
@@ -725,8 +1386,8 @@ export default function DashboardPage() {
                 </div>
               ))}
               <div className="flex gap-4 pt-1">
-                {[['#6B6B6B', 'MV→MEV'], ['#DC2626', 'MEV→MRV'], ['#DC2626', 'Current']].map(([c, l]) => (
-                  <div key={l} className="flex items-center gap-1.5 text-xs text-[#6B6B6B]">
+                {[['#948A88', 'MV→MEV'], ['#DC2626', 'MEV→MRV'], ['#DC2626', 'Current']].map(([c, l]) => (
+                  <div key={l} className="flex items-center gap-1.5 text-xs text-[color:var(--text-detail)]">
                     <div className="w-2 h-2 rounded-full" style={{ background: c }} />
                     {l}
                   </div>
@@ -734,17 +1395,53 @@ export default function DashboardPage() {
               </div>
             </div>
           </Card>
-        )}
+      </section>
+      )}
       </div>
-    </div>
+    </>
   );
 }
 
-function Card({ title, icon, iconColor, children, fullWidth = false }: {
-  title: string; icon: React.ReactNode; iconColor: string; children: React.ReactNode; fullWidth?: boolean;
+function Card({
+  title,
+  icon,
+  iconColor,
+  children,
+  fullWidth = false,
+  className,
+  onClick,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  iconColor: string;
+  children: React.ReactNode;
+  fullWidth?: boolean;
+  className?: string;
+  onClick?: () => void;
 }) {
+  const interactive = typeof onClick === 'function';
   return (
-    <div className={`glass-panel p-4 card-hover ${fullWidth ? 'col-span-full' : ''}`}>
+    <div
+      role={interactive ? 'button' : undefined}
+      tabIndex={interactive ? 0 : undefined}
+      onClick={onClick}
+      onKeyDown={
+        interactive
+          ? (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onClick?.();
+              }
+            }
+          : undefined
+      }
+      className={cn(
+        `glass-panel dashboard-card-surface p-4 card-hover ${fullWidth ? 'col-span-full' : ''}`,
+        interactive &&
+          'cursor-pointer select-none hover:border-[rgba(220,38,38,0.38)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/55',
+        className
+      )}
+    >
       <div className="flex items-center gap-2 mb-3">
         <span className={iconColor}>{icon}</span>
         <h3 className="font-medium text-[#F5F5F5]">{title}</h3>

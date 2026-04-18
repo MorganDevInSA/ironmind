@@ -296,6 +296,18 @@ From `.cursor/rules/IRONMIND.md`:
 
 Still in repo for historical reference; palette and fonts there may **not** match current crimson/Rajdhani system. For implementation, prefer **`globals.css`**, **`tailwind.config.js`**, and the **ironmind-styling** / **ironmind-visual-persona** skills.
 
+### 13.4 Dashboard layout & exercise list readability
+
+- **Overview shell:** The authenticated dashboard wraps its primary content in **`.dashboard-overview`** (`globals.css`). It is **horizontally centered** (`max-width` + auto margins), uses a **full-depth crimson border on all sides** ( **`4px`** ), **rounded corners** (`1.25rem`), and a subtle warm-dark translucent fill so the panel does not visually collide with the viewport edge (the app layout’s `<main>` still supplies padding).
+- **Ordered exercises:** Row indices use **`.exercise-index-badge`** — **dark tile + primary text + thin crimson border**. Avoid **grey-on-saturated-red** number chips (low contrast); follow **`IRONMIND.md`** and the **ironmind-styling** skill.
+
+### 13.5 App chrome (header, sidebar, mobile nav)
+
+Persistent layout chrome uses the same **warm dark** token hierarchy as the rest of the app — not flat `#2e2e2e`-style cool grey bars.
+
+- **Tokens** (`globals.css` `:root`): `--chrome-bg` (sidebar & mobile nav, matches `--bg-1`), `--chrome-bg-topbar` (sticky header, matches `--bg-2`), `--chrome-bg-toggle` (sidebar rail control, matches `--bg-0`).
+- **Components:** `top-bar.tsx`, `sidebar.tsx`, `mobile-nav.tsx` — backgrounds via `bg-[color:var(--chrome-…)]`; idle/hover chrome text via `var(--text-1)` / `var(--text-0)` (see **`.cursor/rules/IRONMIND.md`**).
+
 ---
 
 ## 14. Quality gates and workflows

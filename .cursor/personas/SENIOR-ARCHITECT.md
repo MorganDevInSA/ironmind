@@ -33,11 +33,17 @@ Before substantial work, align with **rules**, **skills**, **persona**, and **Do
 |------|---------|
 | **`IRONMIND.md`** | Non-negotiable architecture (pages → controllers → services → Firebase), Firebase naming, seed completeness, alert wiring, routing, CSS import order, mobile nav, **crimson design tokens**, monospace numerics, page completeness checklist |
 
+### `.cursor/README.md`
+
+| File | Purpose |
+|------|---------|
+| **`README.md`** | Index of all `.cursor` artifacts, consolidation dates, quick navigation |
+
 ### `.cursor/skills/`
 
 | Path | Purpose |
 |------|---------|
-| **`ironmind-data-layer/SKILL.md`** | Three-layer data flow, controller templates, query keys, mutations, seed/import expectations |
+| **`ironmind-data-layer/SKILL.md`** | Three-layer data flow, **`queryKeys`** (including `recovery.latest`), composite **`useDashboardData`**, mutations, seed/import expectations |
 | **`ironmind-firebase-patterns/SKILL.md`** | Firestore helpers, converters, `QueryConstraint[]`, collection paths |
 | **`ironmind-typescript-patterns/SKILL.md`** | Strict TS conventions, imports, types |
 | **`ironmind-styling/SKILL.md`** | Buttons, cards, panels, typography, tokens |

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { signInWithEmail, signInWithGoogle } from '@/lib/firebase';
+import { IronmindLogo } from '@/components/brand/ironmind-logo';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -45,9 +46,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <h1 className="font-heading font-bold text-3xl text-foreground">
-            IRON<span className="text-accent">MIND</span>
-          </h1>
+          <IronmindLogo variant="auth" priority className="mb-3" />
           <p className="text-text-secondary mt-2">Elite Bodybuilding Performance</p>
         </div>
 

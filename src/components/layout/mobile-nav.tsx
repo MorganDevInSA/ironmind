@@ -26,8 +26,8 @@ export function MobileNav() {
     <nav className={cn(
       'fixed bottom-0 left-0 right-0 z-50 lg:hidden',
       'h-16 flex items-center',
-      'bg-[#2e2e2e] backdrop-blur-xl',
-      'border-t-[3px] border-t-[rgba(220,38,38,0.45)]',
+      'bg-[color:var(--chrome-bg)] backdrop-blur-xl',
+      'border-t border-[color:var(--chrome-border)]',
       'shadow-[0_-8px_24px_rgba(0,0,0,0.3)]'
     )}>
       {navItems.map((item) => {
@@ -41,7 +41,7 @@ export function MobileNav() {
             className={cn(
               'relative flex-1 flex flex-col items-center justify-center gap-1 h-full',
               'transition-all duration-200',
-              isActive ? 'text-[#EF4444]' : 'text-[rgba(140,140,140,0.55)] hover:text-[#B8B8B8]'
+              isActive ? 'text-[#EF4444]' : 'text-[color:var(--text-detail)] hover:text-[color:var(--text-0)]'
             )}
           >
             <Icon
@@ -52,7 +52,7 @@ export function MobileNav() {
             />
             <span className={cn(
               'text-[10px] font-semibold uppercase tracking-wide',
-              isActive ? 'text-[#EF4444]' : 'text-[rgba(140,140,140,0.45)]'
+              isActive ? 'text-[#EF4444]' : 'text-[color:var(--text-detail)] opacity-95'
             )}>
               {item.label}
             </span>

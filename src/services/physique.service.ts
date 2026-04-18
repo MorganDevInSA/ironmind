@@ -13,6 +13,19 @@ import { uploadFile, generateFilePath } from './storage.service';
 
 const converter = createConverter<CheckIn>();
 
+/** Firestore rejects `undefined`; strip recursively so partial check-ins merge cleanly. */
+function stripUndefinedDeep(value: unknown): unknown {
+  if (value === undefined) return undefined;
+  if (value === null || typeof value !== 'object') return value;
+  if (Array.isArray(value)) return value.map(stripUndefinedDeep).filter(v => v !== undefined);
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+    const next = stripUndefinedDeep(v);
+    if (next !== undefined) out[k] = next;
+  }
+  return out;
+}
+
 // Get check-in by date
 export async function getCheckIn(
   userId: string,
@@ -52,10 +65,17 @@ export async function saveCheckIn(
   date: string,
   checkIn: Partial<CheckIn>
 ): Promise<void> {
+  if (!userId) throw new Error('Cannot save check-in without a signed-in user');
+
+  const merged = stripUndefinedDeep({
+    ...checkIn,
+    date,
+    measurements: checkIn.measurements ?? {},
+  }) as Record<string, unknown>;
   await setDocument<CheckIn>(
     collections.checkIns(userId),
     date,
-    { ...checkIn, date } as CheckIn,
+    merged as unknown as CheckIn,
     converter
   );
 }

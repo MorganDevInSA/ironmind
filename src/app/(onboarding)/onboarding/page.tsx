@@ -3,6 +3,9 @@
 import { useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores';
+import { useIsUserSeeded } from '@/controllers';
+import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/constants/query-keys';
 import {
   parseAndValidateFiles,
   importCoachData,
@@ -35,6 +38,7 @@ interface FileState { status: FileStatus; content: string | null; error: string 
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { user } = useAuthStore();
   const userId = user?.uid ?? '';
 
@@ -46,7 +50,12 @@ export default function OnboardingPage() {
   const [importResult, setImportResult] = useState<{ success: boolean; message: string } | null>(null);
   const [step, setStep] = useState<'upload' | 'confirm' | 'done'>('upload');
   const [parsedData, setParsedData] = useState<ParsedCoachData | null>(null);
+  const [overwriteExistingData, setOverwriteExistingData] = useState(false);
   const dropRef = useRef<HTMLDivElement>(null);
+
+  const { data: accountAlreadySeeded = false, isPending: seededCheckPending } = useIsUserSeeded(userId, {
+    enabled: step === 'confirm' && !!userId,
+  });
 
   const loadFile = useCallback((file: File) => {
     const name = file.name.toLowerCase();
@@ -97,10 +106,13 @@ export default function OnboardingPage() {
 
   const handleImport = async () => {
     if (!parsedData) return;
+    if (accountAlreadySeeded && !overwriteExistingData) return;
     setImporting(true);
     try {
-      const result = await importCoachData(userId, parsedData);
+      const force = accountAlreadySeeded && overwriteExistingData;
+      const result = await importCoachData(userId, parsedData, force);
       if (result.success) {
+        await queryClient.invalidateQueries({ queryKey: queryKeys.profile.all });
         setImportResult({ success: true, message: `${result.filesImported.length} files imported successfully.` });
         setStep('done');
       } else {
@@ -177,11 +189,41 @@ export default function OnboardingPage() {
             )}
           </div>
 
+          {accountAlreadySeeded && (
+            <label className="flex items-start gap-3 p-4 rounded-xl border border-[rgba(245,158,11,0.35)] bg-[rgba(245,158,11,0.08)] cursor-pointer">
+              <input
+                type="checkbox"
+                checked={overwriteExistingData}
+                onChange={(e) => setOverwriteExistingData(e.target.checked)}
+                className="mt-1 rounded border-[rgba(80,96,128,0.5)]"
+              />
+              <span className="text-sm text-[#F5F5F5]">
+                <span className="font-semibold text-[#F59E0B]">Replace existing IronMind data</span>
+                {' — '}
+                Your account already has a saved plan. Check this to import this coach pack and set it as your active program (profile, supplements, phase, landmarks, and today&apos;s nutrition targets update accordingly).
+              </span>
+            </label>
+          )}
+
           <div className="flex gap-3">
-            <button onClick={() => setStep('upload')} className="btn-secondary flex items-center gap-2">
+            <button
+              onClick={() => {
+                setOverwriteExistingData(false);
+                setStep('upload');
+              }}
+              className="btn-secondary flex items-center gap-2"
+            >
               <RotateCcw size={16} /> Back
             </button>
-            <button onClick={handleImport} disabled={importing} className="btn-primary flex-1 flex items-center justify-center gap-2">
+            <button
+              onClick={handleImport}
+              disabled={
+                importing ||
+                seededCheckPending ||
+                (accountAlreadySeeded && !overwriteExistingData)
+              }
+              className="btn-primary flex-1 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
               {importing
                 ? <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin inline-block" /> Importing…</>
                 : <><CheckCircle2 size={18} /> Confirm & Import</>}

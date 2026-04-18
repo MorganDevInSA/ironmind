@@ -70,41 +70,43 @@ export function useSaveDomainData() {
 
 ## Query Key Factory Rules
 
-All query keys are defined in `src/lib/constants/query-keys.ts`. Format:
+All query keys live in **`src/lib/constants/query-keys.ts`**. IRONMIND namespaces by **domain**, not duplicate `uid` inside every segment (auth-gated reads still pass `userId` into service calls).
+
+Illustrative excerpt — match **actual** factories when editing:
 
 ```ts
-// Every domain must have:
-domain: {
-  all: (uid: string) => ['domain', uid] as const,
-  detail: (uid: string) => ['domain', uid, 'detail'] as const,
-  list: (uid: string) => ['domain', uid, 'list'] as const,
-  byDate: (uid: string, date: string) => ['domain', uid, date] as const,
-}
+export const queryKeys = {
+  recovery: {
+    all: ['recovery'] as const,
+    entry: (date: string) => [...queryKeys.recovery.all, 'entry', date] as const,
+    trend: (days: number) => [...queryKeys.recovery.all, 'trend', days] as const,
+    latest: () => [...queryKeys.recovery.all, 'latest'] as const,
+  },
+  physique: {
+    all: ['physique'] as const,
+    checkIns: () => [...queryKeys.physique.all, 'check-ins'] as const,
+    // ...
+  },
+  // profile, training, nutrition, supplements, coaching, volume, alerts, export …
+} as const;
 ```
 
-When invalidating, use the broadest key needed:
-```ts
-// Invalidate all queries for a domain after mutation:
-queryClient.invalidateQueries({ queryKey: queryKeys.training.all(userId) });
+When invalidating after a mutation:
+- Invalidate the **specific** document key (e.g. `queryKeys.recovery.entry(date)`).
+- Invalidate any **derived** lists (`queryKeys.recovery.latest()`, trend queries) when the mutation changes “most recent” or aggregates.
+- `invalidateQueries({ queryKey: queryKeys.recovery.all })` matches every key **starting with** `['recovery']` (TanStack Query prefix semantics).
 
-// Invalidate just one document:
-queryClient.invalidateQueries({ queryKey: queryKeys.training.detail(userId, workoutId) });
-```
+---
+
+## Composite dashboard reads
+
+**`useDashboardData`** (`src/controllers/use-dashboard.ts`) bundles profile, today’s nutrition/recovery/supplements (by **calendar date**), **`latestRecovery`** (`getLatestRecoveryEntry`) for dashboard cards when today has no entry, weekly volume, alerts, recent journal notes. New “always show latest X” dashboard metrics should follow the same pattern: dedicated `queryKeys.*.latest()` + service + hook field, not ad-hoc `useQuery` in pages.
 
 ---
 
 ## Stale Time Configuration
 
-Edit `src/lib/constants/stale-times.ts`. Choose the right tier:
-
-| Data Type | Stale Time | Rationale |
-|-----------|-----------|-----------|
-| Profile, landmarks | `Infinity` | Rarely changes |
-| Active program, phase | `5 * 60_000` (5 min) | Changes between cycles |
-| Today's nutrition, recovery | `60_000` (1 min) | User edits frequently |
-| Supplement log | `30_000` (30 sec) | Active checklist |
-| Workouts, history | `2 * 60_000` (2 min) | Logged once per session |
-| Alerts | `60_000` (1 min) | Refresh with new logs |
+Single source of truth: **`src/lib/constants/stale-times.ts`**. Use the tier that matches how often the user or background logic updates that resource (recovery morning log vs profile edits). When adding a new query, pick an existing bucket or add a named constant there — do not inline magic numbers in hooks without documenting why.
 
 ---
 
@@ -172,16 +174,7 @@ export async function seedUserData(userId: string): Promise<boolean> {
   console.log('✓ Domain data seeded');
 ```
 
-The currently MISSING seed call is **nutrition**:
-```ts
-// ADD to seedUserData() in src/lib/seed/index.ts:
-import { saveNutritionDay } from '@/services/nutrition.service';
-import { morganNutritionPlan } from './nutrition';
-
-// Inside seedUserData():
-await saveNutritionDay(userId, morganNutritionPlan.days[0]);
-console.log('✓ Nutrition plan seeded');
-```
+**Nutrition** is already wired: `seedUserData()` calls `saveNutritionDay()` for **today** with moderate targets as a placeholder (`src/lib/seed/index.ts`). When adding a **new** seeded domain, mirror that pattern: import service + seed blob → call inside `seedUserData()` → `console.log('✓ … seeded')`.
 
 ---
 
@@ -249,22 +242,9 @@ Before marking a page as done, verify:
 
 ---
 
-## Currently Incomplete Pages (from audit)
+## Route inventory (keep in sync when linking)
 
-| Page | Missing |
-|------|---------|
-| `recovery/page.tsx` | Full form + trend chart |
-| `physique/page.tsx` | Check-in form + photo upload + chart |
-| `nutrition/page.tsx` | Meal slot logging (write path) |
-| `coaching/page.tsx` | "New Entry" modal + KPI tracker |
-| `dashboard/page.tsx` | "Start Workout" + "Log Recovery" navigation |
-| `settings/page.tsx` | Profile edit form |
-
-Training sub-routes that must be created:
-- `src/app/(app)/training/workout/page.tsx`
-- `src/app/(app)/training/programs/page.tsx`
-- `src/app/(app)/training/exercises/page.tsx`
-- `src/app/(app)/training/history/page.tsx`
+Major authenticated routes under `src/app/(app)/` include **dashboard**, **training** (`/training`, `/training/workout`, `/training/programs`, `/training/history`, `/training/exercises`), **nutrition**, **supplements**, **recovery**, **physique**, **coaching**, **export**, **settings**. Before adding `href` / `router.push`, confirm **`page.tsx` exists** at that segment (`IRONMIND.md` routing rule).
 
 ---
 

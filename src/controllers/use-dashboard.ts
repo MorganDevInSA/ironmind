@@ -1,12 +1,13 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { queryKeys } from '@/lib/constants';
+import { queryKeys, staleTimes } from '@/lib/constants';
 import {
   getProfile,
   getActiveProgram,
   getNutritionDay,
   getRecoveryEntry,
+  getLatestRecoveryEntry,
   getSupplementLog,
   getWeeklyVolumeSummary,
   getActiveAlerts,
@@ -44,6 +45,13 @@ export function useDashboardData(userId: string) {
     enabled: !!userId,
   });
 
+  const latestRecovery = useQuery({
+    queryKey: queryKeys.recovery.latest(),
+    queryFn: () => getLatestRecoveryEntry(userId),
+    staleTime: staleTimes.recovery,
+    enabled: !!userId,
+  });
+
   const todaySupplements = useQuery({
     queryKey: queryKeys.supplements.log(todayStr),
     queryFn: () => getSupplementLog(userId, todayStr),
@@ -73,6 +81,7 @@ export function useDashboardData(userId: string) {
     activeProgram.isLoading ||
     todayNutrition.isLoading ||
     todayRecovery.isLoading ||
+    latestRecovery.isLoading ||
     todaySupplements.isLoading ||
     weeklyVolume.isLoading ||
     alerts.isLoading ||
@@ -83,6 +92,7 @@ export function useDashboardData(userId: string) {
     activeProgram: activeProgram.data,
     todayNutrition: todayNutrition.data,
     todayRecovery: todayRecovery.data,
+    latestRecovery: latestRecovery.data,
     todaySupplements: todaySupplements.data,
     weeklyVolume: weeklyVolume.data,
     alerts: alerts.data,
@@ -93,6 +103,7 @@ export function useDashboardData(userId: string) {
       activeProgram: activeProgram.error,
       todayNutrition: todayNutrition.error,
       todayRecovery: todayRecovery.error,
+      latestRecovery: latestRecovery.error,
       todaySupplements: todaySupplements.error,
       weeklyVolume: weeklyVolume.error,
       alerts: alerts.error,

@@ -40,6 +40,7 @@ export function useSaveRecoveryEntry(userId: string) {
       saveRecoveryEntry(userId, date, entry),
     onSuccess: (_, { date }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.recovery.entry(date) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.recovery.latest() });
       queryClient.invalidateQueries({ queryKey: queryKeys.recovery.all });
     },
   });

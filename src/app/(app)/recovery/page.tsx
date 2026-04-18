@@ -145,6 +145,25 @@ export default function RecoveryPage() {
       {/* ── LOG TAB ─────────────────────────────────────────────── */}
       {tab === 'log' && (
         <>
+          {/* Previous log when today not yet logged */}
+          {latestEntry && latestEntry.date !== today() && (
+            <div className="glass-panel p-4 flex items-center gap-4 border border-[rgba(16,185,129,0.22)]">
+              <div className={cn('w-14 h-14 rounded-full flex items-center justify-center font-mono tabular-nums text-xl font-bold border-2',
+                latestEntry.readinessScore >= 80 ? 'text-[#10B981] border-[rgba(16,185,129,0.4)]' :
+                latestEntry.readinessScore >= 60 ? 'text-[#F59E0B] border-[rgba(245,158,11,0.4)]' :
+                'text-[#EF4444] border-[rgba(239,68,68,0.4)]')}>
+                {Math.round(latestEntry.readinessScore)}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#6B6B6B] mb-0.5">Last logged</p>
+                <p className="font-semibold text-[#F5F5F5] truncate">{formatDisplayDate(latestEntry.date)}</p>
+                <p className="text-sm text-[#6B6B6B]">
+                  Sleep {latestEntry.sleepHours}h · HRV {latestEntry.hrv} · Energy {latestEntry.energy}/10
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Today's readiness preview */}
           {latestEntry && latestEntry.date === today() && (
             <div className="glass-panel p-4 flex items-center gap-4">

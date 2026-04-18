@@ -65,7 +65,7 @@ export default function PhysiquePage() {
   const { user } = useAuthStore();
   const userId = user?.uid ?? '';
 
-  const { mutate: saveCheckIn, isPending, isSuccess } = useSaveCheckIn(userId);
+  const { mutate: saveCheckIn, isPending, isSuccess, isError, error, reset } = useSaveCheckIn(userId);
   const { data: recentCheckIns } = useRecentCheckIns(userId, 20);
   const { data: profile } = useProfile(userId);
 
@@ -74,7 +74,8 @@ export default function PhysiquePage() {
 
   const handleSubmit = () => {
     const bodyweight = parseFloat(form.bodyweight);
-    if (!bodyweight) return;
+    if (!Number.isFinite(bodyweight) || bodyweight <= 0) return;
+    if (!userId) return;
     const todayStr = today();
     saveCheckIn({
       date: todayStr,
@@ -207,6 +208,25 @@ export default function PhysiquePage() {
             <Scale size={18} className="text-[#DC2626]" /> New Check-in
           </h3>
 
+          {!userId && (
+            <p className="text-sm text-[#F59E0B] border border-[rgba(245,158,11,0.35)] rounded-lg px-3 py-2 bg-[rgba(245,158,11,0.06)]">
+              Sign in to save a check-in.
+            </p>
+          )}
+
+          {isError && (
+            <div className="rounded-lg border border-[rgba(239,68,68,0.45)] bg-[rgba(239,68,68,0.08)] px-3 py-2 text-sm text-[#FECACA] flex flex-col gap-2">
+              <p>{error instanceof Error ? error.message : 'Could not save check-in. Try again.'}</p>
+              <button
+                type="button"
+                onClick={() => reset()}
+                className="self-start text-xs font-semibold text-[#DC2626] hover:underline"
+              >
+                Dismiss
+              </button>
+            </div>
+          )}
+
           <Field label="Bodyweight *" value={form.bodyweight} onChange={v => setForm(f => ({ ...f, bodyweight: v }))} unit="kg" placeholder="89.5" />
 
           <div>
@@ -230,9 +250,13 @@ export default function PhysiquePage() {
 
           <div className="flex gap-3">
             <button onClick={() => setShowForm(false)} className="btn-secondary flex-1">Cancel</button>
-            <button onClick={handleSubmit} disabled={isPending || !form.bodyweight}
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={isPending || !form.bodyweight.trim() || !userId}
               className={cn('btn-primary flex-1 flex items-center justify-center gap-2',
-                (!form.bodyweight || isPending) && 'opacity-50 cursor-not-allowed')}>
+                (!form.bodyweight.trim() || isPending || !userId) && 'opacity-50 cursor-not-allowed')}
+            >
               {isPending ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin inline-block" /> : <Scale size={16} />}
               {isPending ? 'Saving…' : 'Save Check-in'}
             </button>
@@ -327,7 +351,8 @@ export default function PhysiquePage() {
                       <p className="text-xs text-[#6B6B6B] truncate max-w-[200px] mt-0.5">{c.coachNotes}</p>
                     )}
                     {/* Measurements mini-row */}
-                    {Object.values(c.measurements).some(Boolean) && (
+                    {c.measurements != null &&
+                      Object.values(c.measurements).some((v) => typeof v === 'number' && Number.isFinite(v)) && (
                       <div className="flex gap-2 mt-1 flex-wrap">
                         {c.measurements.waist && <span className="text-[10px] font-mono text-[#6B6B6B]">W:{c.measurements.waist}</span>}
                         {c.measurements.chest && <span className="text-[10px] font-mono text-[#6B6B6B]">Ch:{c.measurements.chest}</span>}

@@ -17,7 +17,7 @@ IRONMIND is a **raw performance system** for elite athletes. Not a finance dashb
 |-----------|------------------|
 | **Strength** | Heavy weights, aggressive contrasts, crimson fire |
 | **Precision** | Data-driven grids, monospace numbers, exact measurements |
-| **Rawness** | Pure dark backgrounds, no luxury softness, no blue-grey |
+| **Rawness** | Pure dark backgrounds, no luxury softness, no blue-grey — **app chrome** (header, sidebar, mobile nav) uses warm blacks (`--chrome-bg` / `--chrome-bg-topbar`), not flat cool `#2e2e2e` bars |
 | **Intelligence** | Smart data displays, clean information architecture |
 | **Masculine** | Angular geometry, deep blacks, blood-red accents |
 
@@ -46,8 +46,8 @@ Crimson is blood — use only where it matters. Overusing it dilutes the impact.
 
 | Font | Feel | Usage |
 |------|------|-------|
-| **Space Grotesk** | Bold, technical, precise | All headlines and section titles |
-| **Inter** | Clean, modern, neutral | Body text, labels, UI chrome |
+| **Rajdhani** | Bold, technical, precise | Headlines and section titles (`globals.css` import) |
+| **Inter** | Clean, modern, neutral | Body text, labels, UI chrome (Tailwind default `sans`) |
 | **JetBrains Mono** | Data, code, precision | All numbers and metrics |
 | **Cinzel** | Luxury, timeless strength | Brand logo, PR moments only |
 
@@ -56,6 +56,7 @@ Crimson is blood — use only where it matters. Overusing it dilutes the impact.
 - Labels: ALL CAPS, `tracking-[0.3em]`, muted color (`--text-2`)
 - Numbers: always `font-mono tabular-nums` — no exceptions
 - Body: `Inter`, `leading-[1.5]`, `--text-1` color
+- **Contrast for small badges:** Ordered exercise indices use **`.exercise-index-badge`** (`globals.css`) — warm-dark tile (`--exercise-index-bg`) and **`--text-0`** numerals. Avoid **grey-on-saturated-red** pills (unreadable); crimson stays on **borders / accents**, not low-contrast fill behind grey text.
 
 ---
 

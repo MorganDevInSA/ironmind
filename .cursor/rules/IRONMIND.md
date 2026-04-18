@@ -60,7 +60,11 @@ When any `src/lib/seed/*.ts` file is created or modified:
 - Its data MUST be imported into `src/lib/seed/index.ts`
 - Its data MUST be called inside `seedUserData()`
 - Success must be `console.log`'d with a ✓ prefix
-- Currently missing: `morganNutritionPlan` → `saveNutritionDay()`
+- **Nutrition** is seeded via `saveNutritionDay()` (today’s date as a moderate-day placeholder); new domains must follow the same orchestrator pattern
+
+## Firestore Writes — No `undefined`
+
+Firestore rejects **`undefined`** field values. Partial writes must **omit** absent fields (build objects without `undefined`, or strip recursively before `setDocument`) — see `physique.service.ts` (`stripUndefinedDeep`) as the reference pattern for nested payloads.
 
 ---
 
@@ -106,6 +110,12 @@ Always use these tokens, in this priority:
 - Warn: `#F59E0B` — kept for caution states
 - Error/Bad: `#EF4444` — bright red for danger
 
+**App chrome** (header, sidebar, mobile bottom nav) — use **`globals.css`** variables, not flat neutral greys:
+- `--chrome-bg` — sidebar & mobile nav bar (`#0D0D0D`, aligned with `--bg-1`)
+- `--chrome-bg-topbar` — sticky top bar (`#131313`, aligned with `--bg-2`)
+- `--chrome-bg-toggle` — sidebar collapse control (`#080808`, aligned with `--bg-0`)
+- Muted labels and chrome icons: `var(--text-1)` / `var(--text-2)`; hover to `var(--text-0)`. **Do not** use `#2e2e2e`-style cool grey bars or ad-hoc `#6B6B6B` / `#8A8A8A` in chrome.
+
 **Forbidden old tokens** (replace on sight):
 - Any `#D4AF37` / `#F4D03F` / `#B8860B` (old gold) → `#DC2626` / `#EF4444` / `#991B1B`
 - Any `#3B82F6` / `#2A6CFF` (old blue) → `#DC2626` / `#B91C1C`
@@ -124,6 +134,19 @@ Always use these tokens, in this priority:
 ## Numbers Are Monospace
 
 Every numeric data value in the UI uses `font-mono tabular-nums`. No exceptions.
+
+---
+
+## App Chrome (Header, Sidebar, Mobile Nav)
+
+Implementation lives in **`src/components/layout/top-bar.tsx`**, **`sidebar.tsx`**, and **`mobile-nav.tsx`**. Backgrounds use **`bg-[color:var(--chrome-bg)]`** / **`bg-[color:var(--chrome-bg-topbar)]`**; sidebar toggle uses **`var(--chrome-bg-toggle)`**. Secondary chrome copy and idle nav labels use **`text-[color:var(--text-1)]`** (and **`--text-2`** where appropriate), not one-off hex greys. Dropdown dividers in the alerts panel use **warm** `rgba(65, 50, 50, …)` — same rule as panels (`rgba(80, 96, 128, …)` is forbidden).
+
+---
+
+## Dashboard Overview Shell & Exercise List Contrast
+
+- **Overview column:** The main dashboard content uses **`.dashboard-overview`** (`globals.css`) — centered (`max-width` + `margin-inline: auto`), **full border on all sides** (`4px` crimson token), **`border-radius: 1.25rem`**, warm-dark translucent background. Keeps the hub readable on wide screens without hugging the viewport edge (still respects `<main>` padding from the app layout).
+- **Exercise row indices:** Use **`.exercise-index-badge`** for ordered lifts — **dark warm tile** (`--exercise-index-bg`) + **`var(--text-0)`** + thin crimson border. **Do not** place mid-grey (`#6B6B6B`–style) numerals on saturated crimson-filled squares (poor contrast).
 
 ---
 
@@ -157,8 +180,8 @@ Every page must have:
 When working on specific areas, read and apply:
 
 - `ironmind-typescript-patterns` — TypeScript correctness, imports, types
-- `ironmind-firebase-patterns` — Firestore helpers, query constraints, auth
-- `ironmind-data-layer` — Controller/service structure, mutations, seed
+- `ironmind-firebase-patterns` — Firestore helpers, query constraints, auth, write sanitization
+- `ironmind-data-layer` — Controller/service structure, `queryKeys`, composite hooks (`useDashboardData`), mutations, seed
 - `ironmind-styling` — Buttons, cards, badges, typography
 - `ironmind-visual-persona` — Brand identity, color usage, forbidden elements
-- `ironmind-animations` — Motion, hover effects, loading states
+- `ironmind-animations` — Motion, hover effects, loading states (prefer crimson tokens over legacy gold/blue snippets)

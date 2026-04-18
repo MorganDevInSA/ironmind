@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys, staleTimes } from '@/lib/constants';
-import { getProfile, updateProfile } from '@/services';
+import { getProfile, updateProfile, isUserSeeded } from '@/services';
 import type { AthleteProfile } from '@/lib/types';
 
 export function useProfile(userId: string) {
@@ -22,5 +22,15 @@ export function useUpdateProfile(userId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.profile.all });
     },
+  });
+}
+
+/** Firestore user doc has completed initial seed/import */
+export function useIsUserSeeded(userId: string, options?: { enabled?: boolean }) {
+  return useQuery({
+    queryKey: [...queryKeys.profile.all, 'isSeeded'] as const,
+    queryFn: () => isUserSeeded(userId),
+    enabled: !!userId && (options?.enabled ?? true),
+    staleTime: 30 * 1000,
   });
 }
