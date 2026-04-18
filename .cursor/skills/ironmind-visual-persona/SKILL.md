@@ -17,7 +17,7 @@ IRONMIND is a **raw performance system** for elite athletes. Not a finance dashb
 |-----------|------------------|
 | **Strength** | Heavy weights, aggressive contrasts, crimson fire |
 | **Precision** | Data-driven grids, monospace numbers, exact measurements |
-| **Rawness** | Pure dark backgrounds, no luxury softness, no blue-grey — **app chrome** (header, sidebar, mobile nav) uses warm blacks (`--chrome-bg` / `--chrome-bg-topbar`), not flat cool `#2e2e2e` bars |
+| **Rawness** | Pure dark backgrounds, no luxury softness, no blue-grey — **app chrome** (header, sidebar, mobile nav) uses warm blacks (`--chrome-bg`; header uses `--chrome-bg-topbar` = same value), not flat cool `#2e2e2e` bars |
 | **Intelligence** | Smart data displays, clean information architecture |
 | **Masculine** | Angular geometry, deep blacks, blood-red accents |
 

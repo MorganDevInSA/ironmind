@@ -305,7 +305,7 @@ Still in repo for historical reference; palette and fonts there may **not** matc
 
 Persistent layout chrome uses the same **warm dark** token hierarchy as the rest of the app — not flat `#2e2e2e`-style cool grey bars.
 
-- **Tokens** (`globals.css` `:root`): `--chrome-bg` (sidebar & mobile nav, matches `--bg-1`), `--chrome-bg-topbar` (sticky header, matches `--bg-2`), `--chrome-bg-toggle` (sidebar rail control, matches `--bg-0`).
+- **Tokens** (`globals.css` `:root`): `--chrome-bg` (sidebar & mobile nav, matches `--bg-1`), `--chrome-bg-topbar` (sticky header — **same value as `--chrome-bg`** so header and sidebar share one shade), `--chrome-bg-toggle` (sidebar rail control, matches `--bg-0`).
 - **Components:** `top-bar.tsx`, `sidebar.tsx`, `mobile-nav.tsx` — backgrounds via `bg-[color:var(--chrome-…)]`; idle/hover chrome text via `var(--text-1)` / `var(--text-0)` (see **`.cursor/rules/IRONMIND.md`**).
 
 ---

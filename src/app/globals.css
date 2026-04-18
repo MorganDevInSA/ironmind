@@ -84,9 +84,10 @@
   /*
    * App chrome — header, sidebar, mobile nav.
    * Warm dark neutrals (aligned with --bg-*); avoid flat #2e2e2e-style cool grey bars.
+   * Header uses same fill as sidebar so the L-corner reads as one rail (no lighter strip).
    */
   --chrome-bg: #0d0d0d;
-  --chrome-bg-topbar: #131313;
+  --chrome-bg-topbar: var(--chrome-bg);
   --chrome-bg-toggle: #080808;
   /* Bottom edge of sticky header — blended line + depth (used in layout) */
   --chrome-header-shadow:

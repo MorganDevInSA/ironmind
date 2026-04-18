@@ -112,7 +112,7 @@ Always use these tokens, in this priority:
 
 **App chrome** (header, sidebar, mobile bottom nav) — use **`globals.css`** variables, not flat neutral greys:
 - `--chrome-bg` — sidebar & mobile nav bar (`#0D0D0D`, aligned with `--bg-1`)
-- `--chrome-bg-topbar` — sticky top bar (`#131313`, aligned with `--bg-2`)
+- `--chrome-bg-topbar` — sticky top bar (**same as `--chrome-bg`** — unified shade with the sidebar)
 - `--chrome-bg-toggle` — sidebar collapse control (`#080808`, aligned with `--bg-0`)
 - Muted labels and chrome icons: `var(--text-1)` / `var(--text-2)`; hover to `var(--text-0)`. **Do not** use `#2e2e2e`-style cool grey bars or ad-hoc `#6B6B6B` / `#8A8A8A` in chrome.
 
@@ -139,7 +139,7 @@ Every numeric data value in the UI uses `font-mono tabular-nums`. No exceptions.
 
 ## App Chrome (Header, Sidebar, Mobile Nav)
 
-Implementation lives in **`src/components/layout/top-bar.tsx`**, **`sidebar.tsx`**, and **`mobile-nav.tsx`**. Backgrounds use **`bg-[color:var(--chrome-bg)]`** / **`bg-[color:var(--chrome-bg-topbar)]`**; sidebar toggle uses **`var(--chrome-bg-toggle)`**. Secondary chrome copy and idle nav labels use **`text-[color:var(--text-1)]`** (and **`--text-2`** where appropriate), not one-off hex greys. Dropdown dividers in the alerts panel use **warm** `rgba(65, 50, 50, …)` — same rule as panels (`rgba(80, 96, 128, …)` is forbidden).
+Implementation lives in **`src/components/layout/top-bar.tsx`**, **`sidebar.tsx`**, and **`mobile-nav.tsx`**. Backgrounds use **`bg-[color:var(--chrome-bg)]`** (sidebar, mobile nav) and **`bg-[color:var(--chrome-bg-topbar)]`** (header — same color as `--chrome-bg`); sidebar toggle uses **`var(--chrome-bg-toggle)`**. Secondary chrome copy and idle nav labels use **`text-[color:var(--text-1)]`** (and **`--text-2`** where appropriate), not one-off hex greys. Dropdown dividers in the alerts panel use **warm** `rgba(65, 50, 50, …)` — same rule as panels (`rgba(80, 96, 128, …)` is forbidden).
 
 ---
 

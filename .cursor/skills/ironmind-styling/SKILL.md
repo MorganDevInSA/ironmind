@@ -24,7 +24,7 @@ Use **`globals.css`** chrome variables so rails stay **warm-dark** and aligned w
 | Token | Role |
 |-------|------|
 | `--chrome-bg` | Sidebar & mobile bottom nav background (`#0D0D0D`, same tier as `--bg-1`) |
-| `--chrome-bg-topbar` | Sticky top bar (`#131313`, same as `--bg-2`) |
+| `--chrome-bg-topbar` | Sticky top bar (**`var(--chrome-bg)`** — same shade as sidebar) |
 | `--chrome-bg-toggle` | Sidebar collapse pill (`#080808`, same as `--bg-0`) |
 
 In JSX: `className="bg-[color:var(--chrome-bg)]"` (and matching variants). Idle labels/icons: `text-[color:var(--text-1)]`, hover to `text-[color:var(--text-0)]`. **Avoid** `#2e2e2e` bars and stray `#6B6B6B` / `#8A8A8A` in chrome — use the tokens above.
@@ -300,7 +300,7 @@ For **numbered exercise rows** (session preview, program lists):
   --bg-1: #0D0D0D;
   --bg-2: #131313;
   --chrome-bg: #0d0d0d;
-  --chrome-bg-topbar: #131313;
+  --chrome-bg-topbar: var(--chrome-bg);
   --chrome-bg-toggle: #080808;
   --panel: rgba(18, 14, 14, 0.78);
   --panel-strong: rgba(18, 14, 14, 0.94);

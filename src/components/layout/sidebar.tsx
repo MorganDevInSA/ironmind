@@ -41,8 +41,7 @@ export function Sidebar() {
     <aside
       className={cn(
         'fixed left-0 top-0 h-full z-40 flex flex-col transition-[width] duration-300 ease-out',
-        'bg-[color:var(--chrome-bg)] backdrop-blur-xl',
-        'border-r border-[color:var(--chrome-border)]',
+        'bg-[color:var(--chrome-bg)]',
         sidebarOpen ? 'w-60' : 'w-[72px]'
       )}
     >

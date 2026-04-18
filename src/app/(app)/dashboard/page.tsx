@@ -602,6 +602,312 @@ function SessionProgramPreview({ session }: { session: ProgramSession }) {
   );
 }
 
+const sessionTableTh =
+  'text-left py-2.5 px-3 text-[10px] font-semibold uppercase tracking-wider text-[color:var(--text-detail)]';
+const sessionTableTd = 'py-2.5 px-3 align-top border-t border-[rgba(65,50,50,0.14)]';
+const sessionTableWrap = 'overflow-x-auto rounded-lg border border-[rgba(65,50,50,0.28)] bg-[rgba(0,0,0,0.18)]';
+
+function SessionProgramTable({ session }: { session: ProgramSession }) {
+  const exercises = session.exercises ?? [];
+  const breath = session.breathWork ?? [];
+  const core = session.coreWork ?? [];
+  const mobility = session.mobility ?? [];
+  const cardio = session.cardio;
+
+  const sessionNotes = session.notes?.trim();
+
+  const corePrescription = (c: (typeof core)[number]) => {
+    const bit =
+      c.reps != null
+        ? `${c.reps} reps`
+        : c.holdSec != null
+          ? `${c.holdSec}s hold`
+          : '—';
+    return `${c.sets}×${bit}${c.perSide ? ' / side' : ''}`;
+  };
+
+  return (
+    <div className="space-y-6">
+      {sessionNotes ? (
+        <div className="p-3 rounded-lg border-l-4 border-[#F59E0B] bg-[rgba(245,158,11,0.05)]">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--text-detail)] mb-1">
+            Session notes
+          </p>
+          <p className="text-sm text-[color:var(--text-detail)] whitespace-pre-wrap">{sessionNotes}</p>
+        </div>
+      ) : null}
+
+      {exercises.length > 0 ? (
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#5E5E5E] mb-2">
+            Lifts ({exercises.length})
+          </p>
+          <div className={sessionTableWrap}>
+            <table className="w-full min-w-[520px] text-sm">
+              <thead>
+                <tr className="bg-[rgba(0,0,0,0.35)]">
+                  <th className={cn(sessionTableTh, 'w-10')}>#</th>
+                  <th className={sessionTableTh}>Exercise</th>
+                  <th className={cn(sessionTableTh, 'text-right w-[4.5rem]')}>Sets</th>
+                  <th className={cn(sessionTableTh, 'text-right w-[5rem]')}>Reps</th>
+                  <th className={cn(sessionTableTh, 'text-right w-[4.5rem]')}>Rest</th>
+                </tr>
+              </thead>
+              <tbody>
+                {exercises.map((ex, i) => (
+                  <tr key={`${ex.exerciseId}-${i}`}>
+                    <td className={cn(sessionTableTd, 'font-mono tabular-nums text-[color:var(--text-detail)]')}>
+                      {i + 1}
+                    </td>
+                    <td className={cn(sessionTableTd, 'text-[#F5F5F5]')}>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-medium">{ex.name}</span>
+                        {ex.isKPI ? (
+                          <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-[rgba(220,38,38,0.14)] text-[#F5F5F5] border border-[rgba(220,38,38,0.38)]">
+                            KPI
+                          </span>
+                        ) : null}
+                      </div>
+                      {ex.notes ? (
+                        <p className="text-xs text-[color:var(--text-detail)] mt-1.5 whitespace-pre-wrap leading-snug">
+                          {ex.notes}
+                        </p>
+                      ) : null}
+                    </td>
+                    <td className={cn(sessionTableTd, 'text-right font-mono tabular-nums text-[#D4D4D4]')}>
+                      {ex.sets}
+                    </td>
+                    <td className={cn(sessionTableTd, 'text-right font-mono tabular-nums text-[#D4D4D4]')}>
+                      {ex.reps}
+                    </td>
+                    <td className={cn(sessionTableTd, 'text-right font-mono tabular-nums text-[color:var(--text-detail)]')}>
+                      {ex.rest}s
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : null}
+
+      {cardio ? (
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#5E5E5E] mb-2">Cardio</p>
+          <div className={sessionTableWrap}>
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-[rgba(0,0,0,0.35)]">
+                  <th className={sessionTableTh}>Activity</th>
+                  <th className={cn(sessionTableTh, 'text-right w-[6rem]')}>Time</th>
+                  <th className={sessionTableTh}>Structure &amp; notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className={cn(sessionTableTd, 'text-[#F5F5F5] font-medium')}>{cardio.type}</td>
+                  <td className={cn(sessionTableTd, 'text-right font-mono tabular-nums text-[#D4D4D4]')}>
+                    {cardio.duration} min
+                  </td>
+                  <td className={cn(sessionTableTd, 'text-[color:var(--text-detail)] text-xs leading-snug')}>
+                    {cardio.intervals ? (
+                      <span className="font-mono tabular-nums block mb-1">
+                        {cardio.intervals.work}s work / {cardio.intervals.rest}s rest × {cardio.intervals.rounds} rounds
+                      </span>
+                    ) : null}
+                    {cardio.note ? <span className="whitespace-pre-wrap">{cardio.note}</span> : null}
+                    {!cardio.intervals && !cardio.note ? '—' : null}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : null}
+
+      {breath.length > 0 ? (
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#5E5E5E] mb-2">Breath work</p>
+          <div className={sessionTableWrap}>
+            <table className="w-full min-w-[480px] text-sm">
+              <thead>
+                <tr className="bg-[rgba(0,0,0,0.35)]">
+                  <th className={sessionTableTh}>Protocol</th>
+                  <th className={sessionTableTh}>Timing</th>
+                  <th className={cn(sessionTableTh, 'text-right w-[5rem]')}>Rounds</th>
+                </tr>
+              </thead>
+              <tbody>
+                {breath.map((bw, i) => (
+                  <tr key={`${bw.name}-${i}`}>
+                    <td className={cn(sessionTableTd, 'text-[#F5F5F5] font-medium')}>{bw.name}</td>
+                    <td className={cn(sessionTableTd, 'font-mono tabular-nums text-xs text-[color:var(--text-detail)]')}>
+                      in {bw.inhale}s
+                      {bw.hold != null ? ` · hold ${bw.hold}s` : ''} · out {bw.exhale}s
+                      {bw.holdOut != null ? ` · pause ${bw.holdOut}s` : ''}
+                    </td>
+                    <td className={cn(sessionTableTd, 'text-right font-mono tabular-nums text-[#D4D4D4]')}>
+                      {bw.rounds}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : null}
+
+      {core.length > 0 ? (
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#5E5E5E] mb-2">Core</p>
+          <div className={sessionTableWrap}>
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-[rgba(0,0,0,0.35)]">
+                  <th className={sessionTableTh}>Exercise</th>
+                  <th className={cn(sessionTableTh, 'text-right w-[10rem]')}>Prescription</th>
+                </tr>
+              </thead>
+              <tbody>
+                {core.map((c, i) => (
+                  <tr key={`${c.name}-${i}`}>
+                    <td className={cn(sessionTableTd, 'text-[#F5F5F5]')}>{c.name}</td>
+                    <td className={cn(sessionTableTd, 'text-right font-mono tabular-nums text-[#D4D4D4] text-xs')}>
+                      {corePrescription(c)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : null}
+
+      {mobility.length > 0 ? (
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#5E5E5E] mb-2">Mobility</p>
+          <div className={sessionTableWrap}>
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-[rgba(0,0,0,0.35)]">
+                  <th className={sessionTableTh}>Focus</th>
+                </tr>
+              </thead>
+              <tbody>
+                {mobility.map((m, i) => (
+                  <tr key={`${m}-${i}`}>
+                    <td className={cn(sessionTableTd, 'text-[#D4D4D4] pl-4 border-l-2 border-[rgba(220,38,38,0.28)]')}>
+                      {m}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : null}
+
+      {!sessionNotes &&
+        exercises.length === 0 &&
+        !cardio &&
+        breath.length === 0 &&
+        core.length === 0 &&
+        mobility.length === 0 && (
+          <p className="text-sm text-[color:var(--text-detail)]">
+            {session.type === 'lift'
+              ? 'No exercises listed for this session yet.'
+              : session.type === 'cardio'
+                ? 'No cardio structure defined for this day.'
+                : 'Recovery session — add mobility or notes in your program.'}
+          </p>
+        )}
+    </div>
+  );
+}
+
+function SessionDetailModal({
+  open,
+  session,
+  sessionTypeLabel,
+  onClose,
+  isViewingToday,
+  hasLoggedWorkoutToday,
+  onGoWorkout,
+  onGoTraining,
+}: {
+  open: boolean;
+  session: ProgramSession | undefined;
+  sessionTypeLabel: string;
+  onClose: () => void;
+  isViewingToday: boolean;
+  hasLoggedWorkoutToday: boolean;
+  onGoWorkout: () => void;
+  onGoTraining: () => void;
+}) {
+  if (!open || !session) return null;
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/65 backdrop-blur-sm" />
+      <div
+        className="relative w-full sm:max-w-2xl mx-0 sm:mx-4 glass-panel rounded-t-2xl sm:rounded-2xl max-h-[90vh] overflow-hidden flex flex-col border border-[rgba(65,50,50,0.35)]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between gap-3 p-4 border-b border-[rgba(65,50,50,0.25)] shrink-0">
+          <div className="flex items-start gap-3 min-w-0">
+            <span className="text-[#DC2626] shrink-0 mt-0.5">
+              <Dumbbell size={22} />
+            </span>
+            <div className="min-w-0">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#5E5E5E]">Session breakdown</p>
+              <h2 className="text-lg font-bold text-[#F5F5F5] leading-snug truncate">{session.name}</h2>
+              <p className="text-xs text-[color:var(--text-detail)] mt-1">{sessionTypeLabel}</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-2 rounded-lg text-[#9A9A9A] hover:text-[#F5F5F5] hover:bg-[rgba(255,255,255,0.05)] shrink-0"
+            aria-label="Close"
+          >
+            <X size={18} />
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5">
+          <SessionProgramTable session={session} />
+        </div>
+        <div className="flex flex-wrap items-center gap-2 p-4 border-t border-[rgba(65,50,50,0.25)] shrink-0 bg-[rgba(0,0,0,0.2)]">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2.5 rounded-xl text-sm font-semibold text-[#D4D4D4] border border-[rgba(65,50,50,0.45)] hover:bg-[rgba(255,255,255,0.05)]"
+          >
+            Close
+          </button>
+          {isViewingToday ? (
+            <button
+              type="button"
+              onClick={onGoWorkout}
+              className="px-4 py-2.5 rounded-xl text-sm font-bold bg-[#DC2626] text-white hover:brightness-110 flex items-center gap-2"
+            >
+              <Dumbbell size={16} />
+              {hasLoggedWorkoutToday ? 'Open workout' : 'Start workout'}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={onGoTraining}
+              className="px-4 py-2.5 rounded-xl text-sm font-semibold border border-[rgba(220,38,38,0.45)] text-[#DC2626] hover:bg-[rgba(220,38,38,0.12)]"
+            >
+              Open training
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ActivityContent({ session, done, onStart, canStart }: {
   session: ProgramSession | undefined; done: boolean; onStart: () => void; canStart?: boolean;
 }) {
@@ -1045,6 +1351,7 @@ export default function DashboardPage() {
   const userId = user?.uid ?? '';
 
   const [coachNotesOpen, setCoachNotesOpen] = useState(false);
+  const [sessionDetailOpen, setSessionDetailOpen] = useState(false);
 
   const { profile, todayNutrition, todayRecovery, latestRecovery, todaySupplements, weeklyVolume, recentNotes, isLoading } =
     useDashboardData(userId);
@@ -1103,6 +1410,29 @@ export default function DashboardPage() {
     <>
       <CoachingNotesModal open={coachNotesOpen} notes={recentNotes} onClose={() => setCoachNotesOpen(false)} />
 
+      <SessionDetailModal
+        open={sessionDetailOpen}
+        session={selectedSession}
+        sessionTypeLabel={
+          selectedSession?.type === 'lift'
+            ? 'Strength'
+            : selectedSession?.type === 'cardio'
+              ? 'Cardio / conditioning'
+              : 'Recovery'
+        }
+        onClose={() => setSessionDetailOpen(false)}
+        isViewingToday={isViewingToday}
+        hasLoggedWorkoutToday={!!todayWorkout}
+        onGoWorkout={() => {
+          setSessionDetailOpen(false);
+          router.push('/training/workout');
+        }}
+        onGoTraining={() => {
+          setSessionDetailOpen(false);
+          router.push('/training');
+        }}
+      />
+
       <div className="dashboard-overview space-y-6">
         <header className="space-y-1">
           <h1 className="text-2xl font-bold text-[#F5F5F5]">Dashboard</h1>
@@ -1144,11 +1474,10 @@ export default function DashboardPage() {
               title={isViewingToday ? 'Today\'s Session' : `Day ${safeDay} — Session plan`}
               icon={<Dumbbell size={20} />}
               iconColor="text-[#DC2626]"
-              onClick={() =>
-                isViewingToday && selectedSession
-                  ? router.push('/training/workout')
-                  : router.push('/training')
-              }
+              onClick={() => {
+                if (selectedSession) setSessionDetailOpen(true);
+                else router.push('/training');
+              }}
             >
               {selectedSession ? (
                 <div className="flex min-h-0 flex-1 flex-col space-y-3">

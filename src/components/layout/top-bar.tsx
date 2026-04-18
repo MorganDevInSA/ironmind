@@ -38,8 +38,7 @@ export function TopBar() {
     <header
       className={cn(
         'sticky top-0 z-30 h-14 flex items-center justify-between px-4 lg:px-6',
-        'bg-[color:var(--chrome-bg-topbar)] backdrop-blur-xl',
-        'border-b border-[color:var(--chrome-border)]',
+        'bg-[color:var(--chrome-bg-topbar)]',
         'shadow-[var(--chrome-header-shadow)]'
       )}
     >
@@ -47,7 +46,7 @@ export function TopBar() {
       <div className="flex items-center gap-3 min-w-0">
         <Link
           href="/dashboard"
-          className="lg:hidden shrink-0 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/55 focus-visible:ring-offset-2 focus-visible:ring-offset-[#131313]"
+          className="lg:hidden shrink-0 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/55 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d0d0d]"
           aria-label="IRONMIND home"
         >
           <IronmindLogo variant="topbar" priority />
