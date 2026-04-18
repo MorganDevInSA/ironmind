@@ -1,0 +1,68 @@
+import type { VolumeLandmarks } from '@/lib/types';
+
+export const morganVolumeLandmarks: VolumeLandmarks = {
+  chest: {
+    mv: 6,
+    mev: 8,
+    mav: 14,
+    mrv: 20,
+    currentTarget: 7.5,
+    unit: 'sets/week',
+  },
+  back: {
+    mv: 6,
+    mev: 10,
+    mav: 16,
+    mrv: 23,
+    currentTarget: 11,
+    unit: 'sets/week',
+  },
+  quads: {
+    mv: 4,
+    mev: 6,
+    mav: 14,
+    mrv: 20,
+    currentTarget: 6,
+    unit: 'sets/week',
+  },
+  hamstrings: {
+    mv: 3,
+    mev: 4,
+    mav: 10,
+    mrv: 16,
+    currentTarget: 3,
+    unit: 'sets/week',
+  },
+  delts: {
+    mv: 4,
+    mev: 6,
+    mav: 14,
+    mrv: 22,
+    currentTarget: 7,
+    unit: 'sets/week',
+  },
+  biceps: {
+    mv: 3,
+    mev: 4,
+    mav: 12,
+    mrv: 18,
+    currentTarget: 4,
+    unit: 'sets/week',
+  },
+  triceps: {
+    mv: 3,
+    mev: 4,
+    mav: 10,
+    mrv: 16,
+    currentTarget: 5,
+    unit: 'sets/week',
+  },
+  calves: {
+    mv: 4,
+    mev: 6,
+    mav: 12,
+    mrv: 18,
+    currentTarget: 3,
+    unit: 'sets/week',
+  },
+};
