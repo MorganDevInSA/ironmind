@@ -182,7 +182,7 @@ export default function WorkoutPage() {
     }, 0);
     return (
       <div className="space-y-4 max-w-2xl mx-auto">
-        <div className="glass-panel p-6 text-center space-y-4 border border-[rgba(16,185,129,0.3)]">
+        <div className="glass-panel p-6 text-center space-y-4 border-[3px] border-[rgba(16,185,129,0.3)]">
           <CheckCircle2 size={40} className="text-[#10B981] mx-auto" />
           <div>
             <h2 className="text-xl font-bold text-[#F5F5F5]">Session Complete</h2>

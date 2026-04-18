@@ -27,7 +27,7 @@ export function MobileNav() {
       'fixed bottom-0 left-0 right-0 z-50 lg:hidden',
       'h-16 flex items-center',
       'bg-[#2e2e2e] backdrop-blur-xl',
-      'border-t border-[rgba(0,0,0,0.35)]',
+      'border-t-[3px] border-t-[rgba(220,38,38,0.45)]',
       'shadow-[0_-8px_24px_rgba(0,0,0,0.3)]'
     )}>
       {navItems.map((item) => {

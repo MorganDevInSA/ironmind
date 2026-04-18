@@ -202,7 +202,7 @@ export default function PhysiquePage() {
 
       {/* Check-in form (collapsible) */}
       {showForm && (
-        <div className="glass-panel p-5 space-y-5 border border-[rgba(212,175,55,0.2)]">
+        <div className="glass-panel p-5 space-y-5 border-[3px] border-[rgba(220,38,38,0.28)]">
           <h3 className="font-semibold text-[#F5F5F5] flex items-center gap-2">
             <Scale size={18} className="text-[#DC2626]" /> New Check-in
           </h3>

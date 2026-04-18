@@ -37,7 +37,7 @@ export function TopBar() {
       className={cn(
         'sticky top-0 z-30 h-14 flex items-center justify-between px-4 lg:px-6',
         'bg-[#2e2e2e] backdrop-blur-xl',
-        'border-b border-[rgba(220,38,38,0.45)]'
+        'border-b-[3px] border-[rgba(220,38,38,0.45)]'
       )}
     >
       {/* Left — Date & Phase (crimson micro-header) */}

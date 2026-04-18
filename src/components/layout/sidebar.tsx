@@ -48,7 +48,7 @@ export function Sidebar() {
       <div
         aria-hidden
         className={cn(
-          'pointer-events-none absolute right-0 top-14 bottom-0 z-[5] w-px',
+          'pointer-events-none absolute right-0 top-14 bottom-0 z-[5] w-[3px]',
           'bg-[rgba(220,38,38,0.45)] hidden lg:block'
         )}
       />
