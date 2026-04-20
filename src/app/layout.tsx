@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { Toaster } from "sonner";
+import { RegisterServiceWorker } from "@/components/pwa/register-service-worker";
 
 export const metadata: Metadata = {
   title: "IRONMIND — Elite Bodybuilding Performance",
@@ -9,6 +10,14 @@ export const metadata: Metadata = {
   keywords: ["bodybuilding", "fitness", "strength training", "nutrition tracking", "workout log"],
   authors: [{ name: "IRONMIND" }],
   manifest: "/manifest.json",
+  icons: {
+    apple: "/ironmind_transparent_1_reverted.png",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "IRONMIND",
+  },
 };
 
 export const viewport: Viewport = {
@@ -28,6 +37,7 @@ export default function RootLayout({
       <body className="min-h-full text-foreground font-sans">
         <QueryProvider>
           {children}
+          <RegisterServiceWorker />
           <Toaster
             position="bottom-right"
             toastOptions={{

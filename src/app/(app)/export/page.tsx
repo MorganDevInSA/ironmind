@@ -6,6 +6,19 @@ import { generateSummary } from '@/lib/export';
 import type { ExportOptions } from '@/lib/types';
 import { Download, Copy, Check } from 'lucide-react';
 
+const DEFAULT_COACH_OPTIONS: ExportOptions = {
+  historyDays: 42,
+  includeProfile: true,
+  includeProgram: true,
+  includeWorkouts: true,
+  includeNutrition: true,
+  includeRecovery: true,
+  includePhysique: true,
+  includeSupplements: true,
+  includeAlerts: true,
+  includeCoachingNotes: true,
+};
+
 export default function ExportPage() {
   const { user } = useAuthStore();
   const userId = user?.uid ?? '';
@@ -66,7 +79,9 @@ export default function ExportPage() {
       <div>
         <h1 className="text-2xl font-heading font-bold text-foreground">Export Data</h1>
         <p className="text-text-secondary">
-          Generate a structured summary for AI analysis
+          Generate an <strong>Athlete Status Report</strong> (markdown) for coach-style analysis. Pair the export with{' '}
+          <code className="rounded bg-surface-elevated px-1 py-0.5 text-xs">prompts/04-coach-analysis-from-export-or-screenshots.md</code>{' '}
+          and your coach persona—full history, set-level training detail, volume landmarks, supplements protocol, alerts, and journal notes when enabled below.
         </p>
       </div>
 
@@ -92,7 +107,7 @@ export default function ExportPage() {
             ))}
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-4">
           <label className="text-sm text-text-secondary">History period:</label>
           <select
             value={options.historyDays}
@@ -102,10 +117,21 @@ export default function ExportPage() {
             className="bg-surface-elevated border border-border rounded-lg px-3 py-1.5 text-sm text-foreground"
           >
             <option value={7}>7 days</option>
-            <option value={14}>14 days (1 cycle)</option>
-            <option value={28}>28 days (2 cycles)</option>
+            <option value={14}>14 days</option>
+            <option value={21}>21 days</option>
+            <option value={28}>28 days</option>
             <option value={30}>30 days</option>
+            <option value={42}>42 days (coach preset)</option>
+            <option value={60}>60 days</option>
+            <option value={90}>90 days</option>
           </select>
+          <button
+            type="button"
+            onClick={() => setOptions(DEFAULT_COACH_OPTIONS)}
+            className="text-sm font-medium text-accent underline-offset-4 hover:underline"
+          >
+            Coach analysis preset (42d · all sections)
+          </button>
         </div>
       </div>
 
@@ -141,9 +167,15 @@ export default function ExportPage() {
             </div>
           </div>
 
-          <div className="bg-surface border border-border rounded-xl p-4 font-mono text-sm text-foreground overflow-auto max-h-96 whitespace-pre">
-            {generated.slice(0, 2000)}
-            {generated.length > 2000 && '\n\n... (truncated for preview)'}
+          <div className="bg-surface border border-border rounded-xl p-4 font-mono text-xs sm:text-sm text-foreground overflow-auto max-h-[min(70vh,36rem)] whitespace-pre-wrap break-words">
+            {generated.length > 12000 ? (
+              <>
+                {generated.slice(0, 12000)}
+                {'\n\n… (preview truncated — use Download .md for the full report)'}
+              </>
+            ) : (
+              generated
+            )}
           </div>
         </div>
       )}

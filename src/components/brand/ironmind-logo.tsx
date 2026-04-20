@@ -3,14 +3,14 @@
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
-/** Canonical title wordmark: `public/Logo/ironmind_logo_4_bottom_right.png` (768×512) */
-export const IRONMIND_LOGO_SRC = '/Logo/ironmind_logo_4_bottom_right.png';
+/** Transparent wordmark: `public/ironmind_transparent_1_reverted.png` (300×301, RGBA) */
+export const IRONMIND_LOGO_SRC = '/ironmind_transparent_1_reverted.png';
 
 const BASE = {
   src: IRONMIND_LOGO_SRC,
   alt: 'IRONMIND',
-  width: 768,
-  height: 512,
+  width: 300,
+  height: 301,
 } as const;
 
 export type IronmindLogoVariant =
@@ -31,7 +31,7 @@ export function IronmindLogo({
 }) {
   const variantClass =
     variant === 'sidebar-expanded'
-      ? 'h-10 w-auto max-w-[12rem] object-contain object-center'
+      ? 'h-[3.125rem] w-auto max-w-[15rem] object-contain object-center'
       : variant === 'sidebar-collapsed'
         ? 'h-10 w-10 object-contain object-center'
         : variant === 'topbar'
@@ -44,7 +44,7 @@ export function IronmindLogo({
       : variant === 'topbar'
         ? '96px'
         : variant === 'sidebar-expanded'
-          ? '192px'
+          ? '240px'
           : '40px';
 
   return (

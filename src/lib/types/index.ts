@@ -160,6 +160,8 @@ export interface Meal {
   time: string;
   foods: Food[];
   completed: boolean;
+  /** Selected meal-plan line from schedule options; persisted on the nutrition day document. */
+  planLine?: string;
 }
 
 export interface Food {

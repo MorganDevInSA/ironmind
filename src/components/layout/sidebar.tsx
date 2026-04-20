@@ -11,6 +11,7 @@ import {
   Settings,
   FileText,
   Pill,
+  Download,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
@@ -26,6 +27,7 @@ const navItems = [
   { href: '/recovery',     label: 'Recovery',     icon: Activity },
   { href: '/physique',     label: 'Physique',     icon: User },
   { href: '/coaching',     label: 'Coaching',     icon: FileText },
+  { href: '/export',       label: 'Export',       icon: Download },
   { href: '/settings',     label: 'Settings',     icon: Settings },
 ];
 
@@ -45,18 +47,20 @@ export function Sidebar() {
         sidebarOpen ? 'w-60' : 'w-[72px]'
       )}
     >
-      {/* Logo — canonical PNG wordmark */}
+      {/* Logo — centered above nav when expanded */}
       <div
         className={cn(
-          'flex items-center justify-center w-full shrink-0',
-          sidebarOpen ? 'h-[4.75rem] px-3' : 'h-[4.75rem] px-0'
+          'flex w-full shrink-0',
+          sidebarOpen
+            ? 'min-h-[5.5rem] items-center justify-center px-3 pt-4 pb-3'
+            : 'h-[4.75rem] items-center justify-center px-0'
         )}
       >
         <Link
           href="/dashboard"
           className={cn(
             'flex items-center justify-center rounded-lg outline-none ring-offset-2 ring-offset-[#0d0d0d] focus-visible:ring-2 focus-visible:ring-[#DC2626]/55',
-            sidebarOpen ? 'w-full justify-start pl-1' : 'w-full'
+            sidebarOpen ? 'w-full justify-center' : 'w-full'
           )}
         >
           <IronmindLogo
@@ -72,7 +76,8 @@ export function Sidebar() {
         type="button"
         onClick={toggleSidebar}
         className={cn(
-          'absolute -right-3 top-[5rem] w-6 h-6 rounded-full z-50',
+          'absolute -right-3 w-6 h-6 rounded-full z-50',
+          sidebarOpen ? 'top-[6rem]' : 'top-[5rem]',
           'flex items-center justify-center',
           'bg-[color:var(--chrome-bg-toggle)] border border-[color:var(--chrome-border)]',
           'text-[color:var(--text-1)] hover:text-[#DC2626] hover:border-[rgba(220,38,38,0.35)]',

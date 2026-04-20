@@ -7,16 +7,16 @@ import {
   Dumbbell,
   Utensils,
   Activity,
-  MoreHorizontal,
+  Download,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
-  { href: '/dashboard',  label: 'Home',     icon: LayoutDashboard },
-  { href: '/training',   label: 'Train',    icon: Dumbbell },
+  { href: '/dashboard',  label: 'Home',      icon: LayoutDashboard },
+  { href: '/training',   label: 'Train',     icon: Dumbbell },
   { href: '/nutrition',  label: 'Nutrition', icon: Utensils },
-  { href: '/recovery',   label: 'Recovery', icon: Activity },
-  { href: '/more',       label: 'More',     icon: MoreHorizontal },
+  { href: '/recovery',   label: 'Recovery',  icon: Activity },
+  { href: '/export',     label: 'Export',    icon: Download },
 ];
 
 export function MobileNav() {

@@ -58,6 +58,39 @@ Pages -> Controllers -> TanStack Cache -> Services -> Firebase
    npm run dev
    ```
 
+## Deploy To Vercel
+
+### One-time setup
+
+1. Push this repo to GitHub.
+2. Go to [Vercel](https://vercel.com/new) and import the GitHub repository.
+3. In Vercel project settings, add the same Firebase env vars used in `.env.local`:
+   - `NEXT_PUBLIC_FIREBASE_API_KEY`
+   - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
+   - `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
+   - `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`
+   - `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
+   - `NEXT_PUBLIC_FIREBASE_APP_ID`
+4. Deploy. Vercel will run `npm install` and `npm run build` automatically.
+
+### Optional CLI deploy
+
+```bash
+npm i -g vercel
+vercel
+vercel --prod
+```
+
+## PWA / Add To Home Screen
+
+This project now includes:
+
+- `public/manifest.json` for install metadata
+- `public/sw.js` service worker for app-shell style offline caching
+- `src/components/pwa/register-service-worker.tsx` auto registration in production
+
+On mobile, open the deployed site in Chrome or Safari and use **Add to Home Screen**.
+
 ## Seed Data
 
 On first login, the app automatically seeds Firestore with Morgan's real data:
