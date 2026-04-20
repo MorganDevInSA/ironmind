@@ -1,6 +1,6 @@
 import type { Program } from '@/lib/types';
 
-export const morganProgram: Omit<Program, 'id'> = {
+export const mortonProgram: Omit<Program, 'id'> = {
   name: 'Rebuild Block 1',
   cycleLengthDays: 14,
   splitType: 'rotating-14',

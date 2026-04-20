@@ -65,4 +65,5 @@ export const collections = {
   journalEntries: (uid: string) => `users/${uid}/journal`,
   volumeLandmarks: (uid: string) => `users/${uid}/landmarks`,
   supplementProtocol: (uid: string) => `users/${uid}/protocol`,
+  nutritionPlan: (uid: string) => `users/${uid}/nutritionPlan`,
 } as const;

@@ -59,7 +59,7 @@ function normalizeSleepHours(hours: number): number {
 
 function normalizeHRV(hrv: number): number {
   // Normalize HRV to 0-10 scale
-  // Assuming 60-100 is a good range for Morgan's age
+  // Assuming 60-100 is a good range for Morton's age
   if (hrv >= 60 && hrv <= 100) return 10;
   if (hrv < 60) return Math.max(0, hrv / 6);
   return Math.max(0, 10 - (hrv - 100) / 10);

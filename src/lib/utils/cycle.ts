@@ -4,7 +4,7 @@ import { differenceInDays, startOfDay, parseISO } from 'date-fns';
  * Determine the current day in an N-day rotating cycle
  * @param startDate - The date when the cycle started (ISO string)
  * @param currentDate - The current date (ISO string)
- * @param cycleLengthDays - Length of the cycle (e.g., 14 for Morgan's program)
+ * @param cycleLengthDays - Length of the cycle (e.g., 14 for Morton's program)
  * @returns Day number in the cycle (1 to cycleLengthDays)
  */
 export function getCycleDay(
@@ -38,7 +38,7 @@ export function getCycleWeek(
 
 /**
  * Check if a day is a repeat/progression day
- * For Morgan's 14-day cycle: Days 1-7 are Week 1, Days 9-13 are Week 2 (repeats with progression)
+ * For Morton's 14-day cycle: Days 1-7 are Week 1, Days 9-13 are Week 2 (repeats with progression)
  * @param dayInCycle - Current day in cycle
  * @returns Whether this day should apply progression rules
  */
@@ -115,12 +115,12 @@ export function isSpecificCycleDay(
 }
 
 /**
- * Get session type for a specific day in Morgan's 14-day cycle
+ * Get session type for a specific day in Morton's 14-day cycle
  * @param dayInCycle - Day number (1-14)
  * @returns Session type
  */
 export function getSessionTypeForDay(dayInCycle: number): 'lift' | 'cardio' | 'recovery' {
-  // Morgan's 14-day split:
+  // Morton's 14-day split:
   // Days 1, 3, 5, 7, 9, 11, 13 are various lift sessions
   // Days 2, 4, 6, 8, 10, 12 are cardio/breath/abs
   // Day 14 is full recovery

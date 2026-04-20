@@ -55,11 +55,17 @@ export function TopBar() {
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#DC2626]">
             {formatDisplayDate(new Date())}
           </p>
-          {phase && (
-            <p className="text-xs font-semibold text-[#DC2626] mt-0.5 tracking-wide">
-              {phase.name}
-            </p>
-          )}
+          {(() => {
+            const name = profile?.clientName ?? user?.displayName?.split(' ')[0];
+            const nameColor = profile?.sex === 'female' ? 'text-[#FF69B4]' : 'text-[#F0F0F0]';
+            if (!name && !phase) return null;
+            return (
+              <p className="text-xs font-semibold text-[#DC2626] mt-0.5 tracking-wide">
+                {name && <span className={nameColor}>{name}{phase ? ' — ' : ''}</span>}
+                {phase?.name}
+              </p>
+            );
+          })()}
         </div>
       </div>
 
@@ -128,8 +134,11 @@ export function TopBar() {
             {profile?.currentWeight ? `${profile.currentWeight}` : '—'}
           </div>
           <div className="hidden sm:block">
-            <p className="text-sm font-semibold text-[#F5F5F5] leading-none">
-              {user?.displayName || 'Athlete'}
+            <p className={cn(
+              'text-sm font-semibold leading-none',
+              profile?.sex === 'female' ? 'text-[#FF69B4]' : 'text-[#F5F5F5]'
+            )}>
+              {profile?.clientName ?? user?.displayName ?? 'Athlete'}
             </p>
             <p className="text-[11px] text-[color:var(--text-1)] mt-0.5">
               Target: {profile?.targetWeight ?? '—'}kg

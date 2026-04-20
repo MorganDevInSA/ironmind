@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores';
-import { useDashboardData, useActiveProgram, useRecentWorkouts, useRecentCheckIns } from '@/controllers';
+import { useDashboardData, useActiveProgram, useRecentWorkouts, useRecentCheckIns, useNutritionPlan, useProtocol } from '@/controllers';
 import { getCycleDay, today, formatDisplayDate } from '@/lib/utils';
 import {
   Activity, Dumbbell, Scale, Pill, FileText, TrendingUp, Zap,
@@ -31,8 +31,10 @@ import type {
   Measurements,
   JournalEntry,
 } from '@/lib/types';
-import { morganNutritionPlan } from '@/lib/seed/nutrition';
-import { morganSupplementProtocol } from '@/lib/seed/supplements';
+import { mortonNutritionPlan } from '@/lib/seed/nutrition';
+import { mortonSupplementProtocol } from '@/lib/seed/supplements';
+import type { NutritionPlanSeed } from '@/lib/seed/nutrition';
+import type { SupplementProtocol } from '@/lib/types';
 
 /* ─────────────────────────────────────────────────────────────────────
    Muscle / density helpers
@@ -389,10 +391,12 @@ function CoachingNotesModal({
 /* ─────────────────────────────────────────────────────────────────────
    Modal content components
 ───────────────────────────────────────────────────────────────────── */
-function MealContent({ slotKey, isLiftDay, nutrition }: {
+function MealContent({ slotKey, isLiftDay, nutrition, nutritionPlan: nutritionPlanProp }: {
   slotKey: string; isLiftDay: boolean; nutrition: NutritionDay | null | undefined;
+  nutritionPlan?: NutritionPlanSeed | null;
 }) {
-  const slot = morganNutritionPlan.mealSchedule.find(s => s.slot === slotKey);
+  const nutritionPlan = nutritionPlanProp ?? mortonNutritionPlan;
+  const slot = nutritionPlan.mealSchedule.find(s => s.slot === slotKey);
   if (!slot) return null;
   const description = isLiftDay ? (slot.liftDay ?? slot.default) : (slot.recoveryDay ?? slot.default);
   const loggedMeal = nutrition?.meals.find(m => m.slot === slotKey);
@@ -426,10 +430,12 @@ function MealContent({ slotKey, isLiftDay, nutrition }: {
   );
 }
 
-function VitaminsContent({ timing, supplements }: {
+function VitaminsContent({ timing, supplements, protocol: protocolProp }: {
   timing: string; supplements: SupplementLog | null | undefined;
+  protocol?: SupplementProtocol | null;
 }) {
-  const win = morganSupplementProtocol.windows.find(w => w.timing === timing);
+  const protocol = protocolProp ?? mortonSupplementProtocol;
+  const win = protocol.windows.find(w => w.timing === timing);
   if (!win) return null;
   const winLog = supplements?.windows?.[timing] ?? {};
 
@@ -937,7 +943,7 @@ function ActivityContent({ session, done, onStart, canStart }: {
   );
 }
 
-function ScheduleModal({ item, onClose, session, nutrition, supplements, onStartWorkout, canStartWorkout }: {
+function ScheduleModal({ item, onClose, session, nutrition, supplements, onStartWorkout, canStartWorkout, nutritionPlan, protocol }: {
   item: ScheduleItem;
   onClose: () => void;
   session: ProgramSession | undefined;
@@ -945,6 +951,8 @@ function ScheduleModal({ item, onClose, session, nutrition, supplements, onStart
   supplements: SupplementLog | null | undefined;
   onStartWorkout: () => void;
   canStartWorkout?: boolean;
+  nutritionPlan?: NutritionPlanSeed | null;
+  protocol?: SupplementProtocol | null;
 }) {
   const meta = KIND_META[item.kind];
   const p = item.payload;
@@ -972,8 +980,8 @@ function ScheduleModal({ item, onClose, session, nutrition, supplements, onStart
         </div>
         {/* Body */}
         <div className="flex-1 overflow-y-auto p-4">
-          {p.kind === 'meal'     && <MealContent slotKey={p.slotKey} isLiftDay={p.isLiftDay} nutrition={nutrition} />}
-          {p.kind === 'vitamins' && <VitaminsContent timing={p.timing} supplements={supplements} />}
+          {p.kind === 'meal'     && <MealContent slotKey={p.slotKey} isLiftDay={p.isLiftDay} nutrition={nutrition} nutritionPlan={nutritionPlan} />}
+          {p.kind === 'vitamins' && <VitaminsContent timing={p.timing} supplements={supplements} protocol={protocol} />}
           {p.kind === 'activity' && (
             <ActivityContent
               session={session}
@@ -1002,6 +1010,8 @@ function TodaySchedule({
   dateBadge,
   previewHint,
   canStartWorkout,
+  nutritionPlan: nutritionPlanProp,
+  protocol: protocolProp,
 }: {
   session: ProgramSession | undefined;
   isLiftDay: boolean;
@@ -1013,12 +1023,17 @@ function TodaySchedule({
   dateBadge: string;
   previewHint?: string | null;
   canStartWorkout?: boolean;
+  nutritionPlan?: NutritionPlanSeed | null;
+  protocol?: SupplementProtocol | null;
 }) {
+  const nutritionPlan = nutritionPlanProp ?? mortonNutritionPlan;
+  const protocol = protocolProp ?? mortonSupplementProtocol;
+
   const [selected, setSelected] = useState<ScheduleItem | null>(null);
   const items: ScheduleItem[] = [];
 
   /* — Meals — */
-  for (const slot of morganNutritionPlan.mealSchedule) {
+  for (const slot of nutritionPlan.mealSchedule) {
     if (slot.liftDayOnly && !isLiftDay) continue;
     const description = isLiftDay ? (slot.liftDay ?? slot.default) : (slot.recoveryDay ?? slot.default);
     const mealData = nutrition?.meals.find(m => m.slot === slot.slot);
@@ -1034,7 +1049,7 @@ function TodaySchedule({
   }
 
   /* — Vitamins — */
-  for (const win of morganSupplementProtocol.windows) {
+  for (const win of protocol.windows) {
     const time = SUPPL_TIME[win.timing] ?? '00:00';
     const winData = supplements?.windows?.[win.timing];
     const takenCount = winData ? Object.values(winData).filter(Boolean).length : null;
@@ -1182,6 +1197,8 @@ function TodaySchedule({
           supplements={supplements}
           onStartWorkout={() => { setSelected(null); onActivityClick(); }}
           canStartWorkout={canStartWorkout}
+          nutritionPlan={nutritionPlan}
+          protocol={protocol}
         />
       )}
     </>
@@ -1358,6 +1375,11 @@ export default function DashboardPage() {
   const { data: activeProgram } = useActiveProgram(userId);
   const { data: recentWorkouts } = useRecentWorkouts(userId, 7);
   const { data: physiqueCheckIns } = useRecentCheckIns(userId, 40);
+  const { data: nutritionPlanData } = useNutritionPlan(userId);
+  const { data: protocolData } = useProtocol(userId);
+
+  const activePlan = nutritionPlanData ?? mortonNutritionPlan;
+  const activeProtocol = protocolData ?? mortonSupplementProtocol;
 
   const todayStr = today();
   const cycleDay = activeProgram
@@ -1462,6 +1484,8 @@ export default function DashboardPage() {
             dateBadge={dateBadge}
             previewHint={previewHint}
             canStartWorkout={isViewingToday}
+            nutritionPlan={activePlan}
+            protocol={activeProtocol}
           />
         </div>
 

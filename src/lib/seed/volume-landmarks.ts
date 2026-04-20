@@ -1,6 +1,6 @@
 import type { VolumeLandmarks } from '@/lib/types';
 
-export const morganVolumeLandmarks: VolumeLandmarks = {
+export const mortonVolumeLandmarks: VolumeLandmarks = {
   chest: {
     mv: 6,
     mev: 8,

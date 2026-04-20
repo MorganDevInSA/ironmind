@@ -1,7 +1,7 @@
 import type { Exercise } from '@/lib/types';
 
 export const exercises: Exercise[] = [
-  // Shoulders (Morgan's strength)
+  // Shoulders (Morton's strength)
   {
     id: 'seated-db-ohp',
     name: 'Seated DB Overhead Press',
@@ -39,7 +39,7 @@ export const exercises: Exercise[] = [
     instructions: 'Elevate shoulders toward ears. Control the descent.',
   },
 
-  // Chest (Morgan's weakpoint)
+  // Chest (Morton's weakpoint)
   {
     id: 'db-bench',
     name: 'Dumbbell Bench Press',
@@ -86,7 +86,7 @@ export const exercises: Exercise[] = [
     instructions: 'Hands shoulder-width apart. Focus on triceps.',
   },
 
-  // Back (Morgan's weakpoint)
+  // Back (Morton's weakpoint)
   {
     id: 'pull-ups',
     name: 'Pull-ups',
@@ -124,7 +124,7 @@ export const exercises: Exercise[] = [
     instructions: 'Prone position supports lower back.',
   },
 
-  // Quads (Morgan's weakpoint) - Prolapse-safe alternatives
+  // Quads (Morton's weakpoint) - Prolapse-safe alternatives
   {
     id: 'walking-lunge',
     name: 'Walking Lunge',
@@ -200,7 +200,7 @@ export const exercises: Exercise[] = [
     instructions: 'Machine-based. No spinal loading.',
   },
 
-  // Biceps (Morgan's strength)
+  // Biceps (Morton's strength)
   {
     id: 'bb-curl',
     name: 'Barbell Curl',
@@ -258,7 +258,7 @@ export const exercises: Exercise[] = [
     instructions: 'Control the descent. Keep upper arms fixed.',
   },
 
-  // Calves (Morgan's strength)
+  // Calves (Morton's strength)
   {
     id: 'standing-calf-raise',
     name: 'Standing Calf Raise',

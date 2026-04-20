@@ -9,6 +9,7 @@ import {
 } from '@/lib/firebase';
 import { collections } from '@/lib/firebase/config';
 import { defaultMacroTargets } from '@/lib/constants/day-types';
+import type { NutritionPlanSeed } from '@/lib/seed/nutrition';
 
 const converter = createConverter<NutritionDay>();
 
@@ -69,6 +70,32 @@ export async function getRecentNutritionDays(
       orderBy('date', 'desc'),
     ],
     converter
+  );
+}
+
+// Save the user's nutrition plan (meal schedule + macro targets)
+export async function saveNutritionPlan(
+  userId: string,
+  plan: NutritionPlanSeed
+): Promise<void> {
+  const planConverter = createConverter<NutritionPlanSeed>();
+  await setDocument<NutritionPlanSeed>(
+    collections.nutritionPlan(userId),
+    'current',
+    plan,
+    planConverter
+  );
+}
+
+// Get the user's active nutrition plan
+export async function getNutritionPlan(
+  userId: string
+): Promise<NutritionPlanSeed | null> {
+  const planConverter = createConverter<NutritionPlanSeed>();
+  return getDocument<NutritionPlanSeed>(
+    collections.nutritionPlan(userId),
+    'current',
+    planConverter
   );
 }
 

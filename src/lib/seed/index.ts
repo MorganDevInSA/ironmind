@@ -5,21 +5,42 @@ import { saveProtocol } from '@/services/supplements.service';
 import { createPhase, setActivePhase } from '@/services/coaching.service';
 import { updateVolumeLandmarks } from '@/services/volume.service';
 import { createJournalEntry } from '@/services/coaching.service';
-import { saveNutritionDay } from '@/services/nutrition.service';
+import { saveNutritionDay, saveNutritionPlan } from '@/services/nutrition.service';
 import { today } from '@/lib/utils';
 
-import { morganProfile } from './profile';
-import { morganProgram } from './program';
-import { morganNutritionPlan } from './nutrition';
-import { morganSupplementProtocol } from './supplements';
-import { morganInitialPhase } from './phase';
-import { morganVolumeLandmarks } from './volume-landmarks';
-import { morganInitialNotes } from './coaching-notes';
+import { mortonProfile } from './profile';
+import { mortonProgram } from './program';
+import { mortonNutritionPlan } from './nutrition';
+import { mortonSupplementProtocol } from './supplements';
+import { mortonInitialPhase } from './phase';
+import { mortonVolumeLandmarks } from './volume-landmarks';
+import { mortonInitialNotes } from './coaching-notes';
+
+import { sheriProfile } from './sheri-profile';
+import { sheriProgram } from './sheri-program';
+import { sheriNutritionPlan } from './sheri-nutrition';
+import { sheriSupplementProtocol } from './sheri-supplements';
+import { sheriInitialPhase } from './sheri-phase';
+import { sheriVolumeLandmarks } from './sheri-volume-landmarks';
+
+import { alexProfile } from './alex-profile';
+import { alexProgram } from './alex-program';
+import { alexNutritionPlan } from './alex-nutrition';
+import { alexSupplementProtocol } from './alex-supplements';
+import { alexInitialPhase } from './alex-phase';
+import { alexVolumeLandmarks } from './alex-volume-landmarks';
+
+import { jordanProfile } from './jordan-profile';
+import { jordanProgram } from './jordan-program';
+import { jordanNutritionPlan } from './jordan-nutrition';
+import { jordanSupplementProtocol } from './jordan-supplements';
+import { jordanInitialPhase } from './jordan-phase';
+import { jordanVolumeLandmarks } from './jordan-volume-landmarks';
 
 /**
  * Seed data for new users
  * This runs once on first login after Firebase Auth is initialized
- * Writes all Morgan's real data to Firestore
+ * Writes all Morton's real data to Firestore
  */
 export async function seedUserData(userId: string): Promise<boolean> {
   try {
@@ -33,30 +54,31 @@ export async function seedUserData(userId: string): Promise<boolean> {
     console.log('Seeding user data for:', userId);
 
     // 1. Profile
-    await updateProfile(userId, morganProfile);
+    await updateProfile(userId, mortonProfile);
     console.log('✓ Profile seeded');
 
     // 2. Program (14-day rotating cycle)
-    const programId = await createProgram(userId, morganProgram);
+    const programId = await createProgram(userId, mortonProgram);
     await setActiveProgram(userId, programId);
     console.log('✓ Program seeded');
 
     // 3. Supplement Protocol
-    await saveProtocol(userId, morganSupplementProtocol);
+    await saveProtocol(userId, mortonSupplementProtocol);
     console.log('✓ Supplement protocol seeded');
 
     // 4. Phase
-    const phaseId = await createPhase(userId, morganInitialPhase);
+    const phaseId = await createPhase(userId, mortonInitialPhase);
     await setActivePhase(userId, phaseId);
     console.log('✓ Phase seeded');
 
     // 5. Volume Landmarks
-    await updateVolumeLandmarks(userId, morganVolumeLandmarks);
+    await updateVolumeLandmarks(userId, mortonVolumeLandmarks);
     console.log('✓ Volume landmarks seeded');
 
-    // 6. Nutrition plan — seed today's moderate day as a placeholder
+    // 6. Nutrition plan — save full plan doc + seed today's moderate day
+    await saveNutritionPlan(userId, mortonNutritionPlan);
     const todayStr = today();
-    const { macroTargetsByDayType } = morganNutritionPlan;
+    const { macroTargetsByDayType } = mortonNutritionPlan;
     await saveNutritionDay(userId, todayStr, {
       date: todayStr,
       dayType: 'moderate',
@@ -68,7 +90,7 @@ export async function seedUserData(userId: string): Promise<boolean> {
     console.log('✓ Nutrition plan seeded');
 
     // 7. Initial Coaching Notes
-    for (const note of morganInitialNotes) {
+    for (const note of mortonInitialNotes) {
       await createJournalEntry(userId, note);
     }
     console.log('✓ Coaching notes seeded');
@@ -85,11 +107,111 @@ export async function seedUserData(userId: string): Promise<boolean> {
   }
 }
 
+/**
+ * Seed Morton's data — always overwrites existing data for userId
+ */
+export async function seedMortonData(userId: string): Promise<void> {
+  await updateProfile(userId, mortonProfile);
+  const programId = await createProgram(userId, mortonProgram);
+  await setActiveProgram(userId, programId);
+  await saveProtocol(userId, mortonSupplementProtocol);
+  const phaseId = await createPhase(userId, mortonInitialPhase);
+  await setActivePhase(userId, phaseId);
+  await updateVolumeLandmarks(userId, mortonVolumeLandmarks);
+
+  await saveNutritionPlan(userId, mortonNutritionPlan);
+  const todayStr = today();
+  await saveNutritionDay(userId, todayStr, {
+    date: todayStr,
+    dayType: 'moderate',
+    meals: [],
+    macroTargets: mortonNutritionPlan.macroTargetsByDayType.moderate,
+    macroActuals: { calories: 0, protein: 0, carbs: 0, fat: 0 },
+    complianceScore: 0,
+  });
+  await markUserSeeded(userId);
+}
+
+/**
+ * Seed Sheri's data — overwrites any existing data for userId
+ */
+export async function seedSheriData(userId: string): Promise<void> {
+  await updateProfile(userId, sheriProfile);
+  const programId = await createProgram(userId, sheriProgram);
+  await setActiveProgram(userId, programId);
+  await saveProtocol(userId, sheriSupplementProtocol);
+  const phaseId = await createPhase(userId, sheriInitialPhase);
+  await setActivePhase(userId, phaseId);
+  await updateVolumeLandmarks(userId, sheriVolumeLandmarks);
+
+  await saveNutritionPlan(userId, sheriNutritionPlan);
+  const todayStr = today();
+  await saveNutritionDay(userId, todayStr, {
+    date: todayStr,
+    dayType: 'moderate',
+    meals: [],
+    macroTargets: sheriNutritionPlan.macroTargetsByDayType.moderate,
+    macroActuals: { calories: 0, protein: 0, carbs: 0, fat: 0 },
+    complianceScore: 0,
+  });
+  await markUserSeeded(userId);
+}
+
+/**
+ * Seed Alex's data — overwrites any existing data for userId
+ */
+export async function seedAlexData(userId: string): Promise<void> {
+  await updateProfile(userId, alexProfile);
+  const programId = await createProgram(userId, alexProgram);
+  await setActiveProgram(userId, programId);
+  await saveProtocol(userId, alexSupplementProtocol);
+  const phaseId = await createPhase(userId, alexInitialPhase);
+  await setActivePhase(userId, phaseId);
+  await updateVolumeLandmarks(userId, alexVolumeLandmarks);
+
+  await saveNutritionPlan(userId, alexNutritionPlan);
+  const todayStr = today();
+  await saveNutritionDay(userId, todayStr, {
+    date: todayStr,
+    dayType: 'high',
+    meals: [],
+    macroTargets: alexNutritionPlan.macroTargetsByDayType.high,
+    macroActuals: { calories: 0, protein: 0, carbs: 0, fat: 0 },
+    complianceScore: 0,
+  });
+  await markUserSeeded(userId);
+}
+
+/**
+ * Seed Jordan's data — overwrites any existing data for userId
+ */
+export async function seedJordanData(userId: string): Promise<void> {
+  await updateProfile(userId, jordanProfile);
+  const programId = await createProgram(userId, jordanProgram);
+  await setActiveProgram(userId, programId);
+  await saveProtocol(userId, jordanSupplementProtocol);
+  const phaseId = await createPhase(userId, jordanInitialPhase);
+  await setActivePhase(userId, phaseId);
+  await updateVolumeLandmarks(userId, jordanVolumeLandmarks);
+
+  await saveNutritionPlan(userId, jordanNutritionPlan);
+  const todayStr = today();
+  await saveNutritionDay(userId, todayStr, {
+    date: todayStr,
+    dayType: 'moderate',
+    meals: [],
+    macroTargets: jordanNutritionPlan.macroTargetsByDayType.moderate,
+    macroActuals: { calories: 0, protein: 0, carbs: 0, fat: 0 },
+    complianceScore: 0,
+  });
+  await markUserSeeded(userId);
+}
+
 // Re-export all seed data for reference
-export { morganProfile } from './profile';
-export { morganProgram } from './program';
-export { morganNutritionPlan } from './nutrition';
-export { morganSupplementProtocol } from './supplements';
-export { morganInitialPhase } from './phase';
-export { morganVolumeLandmarks } from './volume-landmarks';
-export { morganInitialNotes } from './coaching-notes';
+export { mortonProfile } from './profile';
+export { mortonProgram } from './program';
+export { mortonNutritionPlan } from './nutrition';
+export { mortonSupplementProtocol } from './supplements';
+export { mortonInitialPhase } from './phase';
+export { mortonVolumeLandmarks } from './volume-landmarks';
+export { mortonInitialNotes } from './coaching-notes';

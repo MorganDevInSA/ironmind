@@ -22,6 +22,7 @@ export const queryKeys = {
     history: (dateRange: { from: string; to: string }) =>
       [...queryKeys.nutrition.all, 'history', dateRange] as const,
     macroTargets: () => [...queryKeys.nutrition.all, 'macro-targets'] as const,
+    plan: () => [...queryKeys.nutrition.all, 'plan'] as const,
   },
   recovery: {
     all: ['recovery'] as const,

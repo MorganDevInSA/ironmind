@@ -1,6 +1,6 @@
 import type { JournalEntry } from '@/lib/types';
 
-export const morganInitialNotes: Omit<JournalEntry, 'id'>[] = [
+export const mortonInitialNotes: Omit<JournalEntry, 'id'>[] = [
   {
     date: new Date().toISOString().split('T')[0],
     title: 'Rebuild Block 1 — Opening Notes',

@@ -1,5 +1,7 @@
 // User & Profile Types
 export interface AthleteProfile {
+  clientName?: string;
+  sex?: 'male' | 'female';
   age: number;
   height: string;
   currentWeight: number;

@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys, staleTimes } from '@/lib/constants';
-import { getNutritionDay, saveNutritionDay, getNutritionHistory, getRecentNutritionDays } from '@/services';
+import { getNutritionDay, saveNutritionDay, getNutritionHistory, getRecentNutritionDays, getNutritionPlan } from '@/services';
 import type { NutritionDay } from '@/lib/types';
 
 export function useNutritionDay(userId: string, date: string) {
@@ -27,6 +27,15 @@ export function useRecentNutritionDays(userId: string, days: number = 14) {
   return useQuery({
     queryKey: queryKeys.nutrition.all,
     queryFn: () => getRecentNutritionDays(userId, days),
+    staleTime: staleTimes.nutritionHistory,
+    enabled: !!userId,
+  });
+}
+
+export function useNutritionPlan(userId: string) {
+  return useQuery({
+    queryKey: queryKeys.nutrition.plan(),
+    queryFn: () => getNutritionPlan(userId),
     staleTime: staleTimes.nutritionHistory,
     enabled: !!userId,
   });

@@ -1,6 +1,6 @@
 import type { Phase } from '@/lib/types';
 
-export const morganInitialPhase: Omit<Phase, 'id'> = {
+export const mortonInitialPhase: Omit<Phase, 'id'> = {
   name: 'Rebuild / Rebound / Intro Block',
   type: 'rebuild',
   startDate: new Date().toISOString().split('T')[0],

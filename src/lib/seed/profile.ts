@@ -1,6 +1,8 @@
 import type { AthleteProfile } from '@/lib/types';
 
-export const morganProfile: AthleteProfile = {
+export const mortonProfile: AthleteProfile = {
+  clientName: 'Morton',
+  sex: 'male',
   age: 46,
   height: "5'10\"",
   currentWeight: 80,

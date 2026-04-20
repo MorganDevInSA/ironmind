@@ -18,7 +18,7 @@ export interface NutritionPlanSeed {
   emergencyRule: string;
 }
 
-export const morganNutritionPlan: NutritionPlanSeed = {
+export const mortonNutritionPlan: NutritionPlanSeed = {
   proteinTarget: 190,
   coreProteinRotation: [
     'Chicken Thighs',

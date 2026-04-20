@@ -12,6 +12,7 @@ import {
   FileText,
   Pill,
   Download,
+  BookOpen,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
@@ -29,6 +30,7 @@ const navItems = [
   { href: '/coaching',     label: 'Coaching',     icon: FileText },
   { href: '/export',       label: 'Export',       icon: Download },
   { href: '/settings',     label: 'Settings',     icon: Settings },
+  { href: '/guide',        label: 'User Guide',   icon: BookOpen },
 ];
 
 const activeText = 'text-[#EF4444]';
@@ -52,12 +54,12 @@ export function Sidebar() {
         className={cn(
           'flex w-full shrink-0',
           sidebarOpen
-            ? 'min-h-[5.5rem] items-center justify-center px-3 pt-4 pb-3'
+            ? 'min-h-[5.5rem] items-start justify-center px-3 pt-[1.125rem] pb-3'
             : 'h-[4.75rem] items-center justify-center px-0'
         )}
       >
         <Link
-          href="/dashboard"
+          href="/guide"
           className={cn(
             'flex items-center justify-center rounded-lg outline-none ring-offset-2 ring-offset-[#0d0d0d] focus-visible:ring-2 focus-visible:ring-[#DC2626]/55',
             sidebarOpen ? 'w-full justify-center' : 'w-full'
@@ -67,7 +69,7 @@ export function Sidebar() {
             variant={sidebarOpen ? 'sidebar-expanded' : 'sidebar-collapsed'}
             priority
           />
-          <span className="sr-only">IRONMIND — home</span>
+          <span className="sr-only">IRONMIND — User Guide</span>
         </Link>
       </div>
 

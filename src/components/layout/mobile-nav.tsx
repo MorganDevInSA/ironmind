@@ -7,7 +7,7 @@ import {
   Dumbbell,
   Utensils,
   Activity,
-  Download,
+  BookOpen,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -16,7 +16,7 @@ const navItems = [
   { href: '/training',   label: 'Train',     icon: Dumbbell },
   { href: '/nutrition',  label: 'Nutrition', icon: Utensils },
   { href: '/recovery',   label: 'Recovery',  icon: Activity },
-  { href: '/export',     label: 'Export',    icon: Download },
+  { href: '/guide',      label: 'Guide',     icon: BookOpen },
 ];
 
 export function MobileNav() {

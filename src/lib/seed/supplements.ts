@@ -1,6 +1,6 @@
 import type { SupplementProtocol } from '@/lib/types';
 
-export const morganSupplementProtocol: SupplementProtocol = {
+export const mortonSupplementProtocol: SupplementProtocol = {
   windows: [
     {
       timing: 'morning',

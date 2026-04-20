@@ -2,27 +2,26 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/stores';
-import { useNutritionDay, useSaveNutritionDay, useActiveProgram } from '@/controllers';
+import { useNutritionDay, useSaveNutritionDay, useActiveProgram, useNutritionPlan } from '@/controllers';
 import { today, formatDisplayDate, getCycleDay } from '@/lib/utils';
-import { morganNutritionPlan } from '@/lib/seed/nutrition';
+import { mortonNutritionPlan } from '@/lib/seed/nutrition';
 import { getDefaultPlanLine, getPlanLineOptions, mergePlanLineOptions } from '@/lib/nutrition/meal-plan-options';
 import { Utensils, CheckCircle2, Circle, MessageSquare, Save, ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { DayType, Meal, MacroTargetRange } from '@/lib/types';
 
-const SCHEDULE = morganNutritionPlan.mealSchedule;
-
-function slotFor(slotId: string) {
-  return SCHEDULE.find((s) => s.slot === slotId);
-}
-
-function buildDefaultMeals(isLiftDay: boolean): Meal[] {
-  return SCHEDULE.filter((slot) => !(slot.liftDayOnly && !isLiftDay)).map((slot) => ({
-    slot: slot.slot,
-    time: slot.time,
-    foods: [],
-    completed: false,
-  }));
+function buildDefaultMeals(
+  schedule: typeof mortonNutritionPlan.mealSchedule,
+  isLiftDay: boolean
+): Meal[] {
+  return schedule
+    .filter((slot) => !(slot.liftDayOnly && !isLiftDay))
+    .map((slot) => ({
+      slot: slot.slot,
+      time: slot.time,
+      foods: [],
+      completed: false,
+    }));
 }
 
 const DAY_TYPES: { value: DayType; label: string; color: string }[] = [
@@ -69,7 +68,11 @@ export default function NutritionPage() {
 
   const { data: nutritionDay, isLoading } = useNutritionDay(userId, todayStr);
   const { data: program } = useActiveProgram(userId);
+  const { data: nutritionPlanData } = useNutritionPlan(userId);
   const { mutate: saveDay, isPending: isSaving } = useSaveNutritionDay(userId);
+
+  const activePlan = nutritionPlanData ?? mortonNutritionPlan;
+  const schedule = activePlan.mealSchedule;
 
   const cycleDay = program
     ? getCycleDay(program.startDate ?? todayStr, todayStr, program.cycleLengthDays)
@@ -86,7 +89,7 @@ export default function NutritionPage() {
 
   const persistNutritionDay = useCallback(
     (nextMeals: Meal[], nextDayType: DayType = dayType, nextNotes: string = agentNotes) => {
-      const targets = morganNutritionPlan.macroTargetsByDayType[nextDayType];
+      const targets = activePlan.macroTargetsByDayType[nextDayType];
       const macroTargets: MacroTargetRange = {
         calories: targets.calories,
         protein: targets.protein,
@@ -132,7 +135,7 @@ export default function NutritionPage() {
     if (nutritionDay) {
       setDayType(nutritionDay.dayType);
       setAgentNotes(nutritionDay.agentNotes ?? '');
-      const seedMeals = buildDefaultMeals(lift);
+      const seedMeals = buildDefaultMeals(schedule, lift);
       const merged = seedMeals.map((seed) => {
         const existing = nutritionDay.meals.find((m) => m.slot === seed.slot);
         return existing
@@ -147,9 +150,9 @@ export default function NutritionPage() {
       });
       setMeals(merged);
     } else if (!isLoading) {
-      setMeals(buildDefaultMeals(lift));
+      setMeals(buildDefaultMeals(schedule, lift));
     }
-  }, [nutritionDay, isLoading, isLiftDay]);
+  }, [nutritionDay, isLoading, isLiftDay, schedule]);
 
   const toggleMeal = (slot: string) => {
     const next = meals.map((m) => (m.slot === slot ? { ...m, completed: !m.completed } : m));
@@ -164,7 +167,7 @@ export default function NutritionPage() {
   };
 
   const completedCount = meals.filter((m) => m.completed).length;
-  const targets = morganNutritionPlan.macroTargetsByDayType[dayType];
+  const targets = activePlan.macroTargetsByDayType[dayType];
 
   const handleSave = () => {
     persistNutritionDay(meals, dayType, agentNotes);
@@ -275,7 +278,7 @@ export default function NutritionPage() {
 
         <div className="divide-y divide-[rgba(80,96,128,0.1)]">
           {meals.map((meal) => {
-            const slotDef = slotFor(meal.slot);
+            const slotDef = schedule.find((s) => s.slot === meal.slot);
             const defaultLine = slotDef ? getDefaultPlanLine(slotDef, isLiftDay) : '';
             const displayLine =
               meal.planLine?.trim() ||
