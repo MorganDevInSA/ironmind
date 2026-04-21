@@ -8,7 +8,7 @@ This document is the **canonical technical overview** for implementing and exten
 
 ## 1. Product summary
 
-**IRONMIND** is an elite bodybuilding performance application: rotating training programs, KPI tracking, day-type-aware nutrition, supplement protocols, recovery and physique logging, coaching journal/phases, volume-vs-landmarks analytics, computed **smart alerts**, and a **markdown export** of full athlete state for LLM analysis.
+**IRONMIND** is an elite bodybuilding performance application: rotating training programs, KPI tracking, day-type-aware nutrition, supplement protocols, recovery and physique logging, volume-vs-landmarks analytics, computed **smart alerts**, and a **markdown export** of full athlete state for LLM analysis. Coaching notes are retained as journal data but entered from the **Export** workflow rather than a standalone Coaching page.
 
 The app is built for **multiple independent athletes** (each Firebase Auth user sees only their own data under `users/{uid}/…`). The codebase uses Firebase-backed persistence and a strict **layered architecture** so UI never talks to Firebase directly.
 
@@ -48,7 +48,7 @@ ironmind/
 ├── Documentation/
 │   ├── README.md                  # Index of docs in this folder
 │   ├── ARCHITECTURE.md            # This file
-│   ├── STYLE-GUIDE.md             # Legacy visual doc; prefer IRONMIND rules + styling skill
+│   ├── STYLE-GUIDE.md             # Current visual implementation guide
 │   ├── LOGO-BRIEF.md              # Logo prompts + `public/brand/` asset map
 │   └── Data/                      # Archived snippets (see Data/README.md)
 ├── public/
@@ -149,7 +149,6 @@ Paths below map to `page.tsx` files — **any new `Link` must target one of thes
 | `/supplements` | Protocol + daily log |
 | `/recovery` | Readiness / pelvic comfort |
 | `/physique` | Weight, measurements, photos |
-| `/coaching` | Phases, journal |
 | `/settings` | Profile / app settings |
 | `/export` | LLM-oriented markdown export |
 | `/more` | Mobile “more” hub |
@@ -163,7 +162,7 @@ Paths below map to `page.tsx` files — **any new `Link` must target one of thes
 ### 6.1 Zustand (`src/stores/`)
 
 - **`auth-store`** — Current Firebase user snapshot, `isAuthenticated`, persisted slice for user identity.
-- **`ui-store`** — Shell UX (e.g. sidebar open); not server data.
+- **`ui-store`** — Shell UX + theme preferences (`crimson`, `hot-pink`, `custom` with `customAccent`), persisted in local storage; not Firestore server data.
 
 Use Zustand for **transient UI and auth identity**, not for Firestore document mirrors (those belong in TanStack Query).
 
@@ -230,7 +229,7 @@ Exported services (`src/services/index.ts`): profile, training, nutrition, recov
 | Recovery | `recovery.service.ts` | `use-recovery` | Recovery |
 | Physique | `physique.service.ts` | `use-physique` | Physique |
 | Supplements | `supplements.service.ts` | `use-supplements` | Supplements |
-| Coaching | `coaching.service.ts` | `use-coaching` | Coaching |
+| Coaching | `coaching.service.ts` | `use-coaching` | Export note composer (journal-backed); no dedicated `/coaching` route |
 | Volume | `volume.service.ts` | `use-volume`, `use-dashboard` | Dashboard charts, landmarks |
 | Alerts | `alerts.service.ts` | `use-alerts` | Dashboard / notifications |
 | Export | (summary in `lib/export`) | `use-export` | Export page |
@@ -251,13 +250,13 @@ Single umbrella module for domain entities: `AthleteProfile`, `Program`, `Workou
 
 `seedUserData(userId)` runs once when the user has no seed flag:
 
-1. Profile (`morganProfile`)
-2. Program + active program (`morganProgram`)
+1. Profile (`mortonProfile`)
+2. Program + active program (`mortonProgram`)
 3. Supplement protocol
 4. Phase + active phase
 5. Volume landmarks
 6. Nutrition placeholder for **today** via `saveNutritionDay`
-7. Coaching journal seeds
+7. Initial journal notes (used by export when coaching notes are included)
 8. **`markUserSeeded`**
 
 **Rule:** Any new `src/lib/seed/*.ts` file must be imported into `seed/index.ts`, invoked inside `seedUserData()`, and log **`✓`** lines on success (IRONMIND.md).
@@ -265,6 +264,15 @@ Single umbrella module for domain entities: `AthleteProfile`, `Program`, `Workou
 ### 10.2 Coach JSON import (`import.service.ts` + onboarding UI)
 
 Structured JSON files (e.g. `athlete_profile.json`, `training_program.json`, …) are validated, merged into `ParsedCoachData`, then persisted through the same services as seed data.
+
+Current onboarding flow is **6 steps**:
+
+1. Overview
+2. Theme selection (`crimson`, `hot-pink`, `custom`)
+3. Coach prompt
+4. Questionnaire
+5. Data generation + analysis guidance
+6. Import
 
 ---
 
@@ -279,6 +287,8 @@ Structured JSON files (e.g. `athlete_profile.json`, `training_program.json`, …
 ## 12. Export architecture (`src/lib/export/`)
 
 `generateSummary(userId, ExportOptions)` pulls parallel data via services and emits a single **markdown** report for external LLM consumption. Options select sections (profile, program, workouts, nutrition, …) and history depth.
+
+`/export` also contains a **persisted note composer** that writes journal entries via `useCreateJournalEntry`; these entries are included in output when `includeCoachingNotes` is enabled.
 
 ---
 
@@ -299,9 +309,9 @@ From `.cursor/rules/IRONMIND.md`:
 - **Glass panels** — `.glass-panel` / `.glass-panel-strong` patterns; panel border width driven by CSS variables (e.g. `--panel-border-width`)
 - **Mobile nav** — active indicator is `absolute`; parent `Link` must be `relative`
 
-### 13.3 Legacy `Documentation/STYLE-GUIDE.md`
+### 13.3 `Documentation/STYLE-GUIDE.md`
 
-Still in repo for historical reference; palette and fonts there may **not** match current crimson/Rajdhani system. For implementation, prefer **`globals.css`**, **`tailwind.config.js`**, and the **ironmind-styling** / **ironmind-visual-persona** skills.
+`STYLE-GUIDE.md` now tracks the live visual baseline (tokens, selected-state rules, onboarding theme behavior). If any table drifts, implementation still defers to **`globals.css`**, **`tailwind.config.js`**, and the **ironmind-styling** / **ironmind-visual-persona** skills.
 
 ### 13.4 Dashboard layout & exercise list readability
 
@@ -321,6 +331,12 @@ Persistent layout chrome uses the same **warm dark** token hierarchy as the rest
 - **In code:** **`src/lib/constants/brand-assets.ts`** exports **`brandAssets`** — the only supported way to reference those URLs (`brandAssets.logoMale`, `logoFemale`, `logoCombined`, `appleTouchIcon`, alternates).
 - **Components:** **`IronmindLogo`** (`src/components/brand/ironmind-logo.tsx`) picks male vs female PNG by UI theme (hot-pink → female). **`/login`** uses the **combined** mark directly via `brandAssets.logoCombined`.
 - **Full asset list and prompts:** **`Documentation/LOGO-BRIEF.md`**.
+
+### 13.7 Shared selected-state styling
+
+- **Utility class:** `.is-selected` in `src/app/globals.css`.
+- **Purpose:** Keep selected buttons, tabs, and cards synchronized with one theme-driven glow/border treatment.
+- **Applied in:** dashboard cycle-day tabs + selected session card, nutrition day-type selector, recovery log/trends tab switcher, and selected demo profile tiles during onboarding.
 
 ---
 
@@ -353,6 +369,7 @@ Use this table when planning work — **read the relevant skill before coding**.
 | **Senior architect persona** | `.cursor/personas/SENIOR-ARCHITECT.md` | System-level decisions, review mindset |
 | **Next.js agent note** | `AGENTS.md` | Next.js behavior differences — consult `node_modules/next/dist/docs/` |
 | **This architecture doc** | `Documentation/ARCHITECTURE.md` | Orientation, boundaries, Firestore map |
+| **Implementation review (2026-04-21)** | `Documentation/IMPLEMENTATION-REVIEW-2026-04-21.md` | Request-to-delivery trace for current UI/UX retrofit |
 | **Documentation index** | `Documentation/README.md` | Which doc to read for what |
 | **Logo brief & assets** | `Documentation/LOGO-BRIEF.md` | Brand prompts, `public/brand/` files, `brandAssets` |
 
