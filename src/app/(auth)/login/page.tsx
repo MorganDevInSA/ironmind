@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { signInWithEmail, signInWithGoogle } from '@/lib/firebase';
+import { logout, resendEmailVerification, signInWithEmail, signInWithGoogle } from '@/lib/firebase';
 import { IronmindLogo } from '@/components/brand/ironmind-logo';
 
 export default function LoginPage() {
@@ -10,17 +10,28 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [info, setInfo] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showResend, setShowResend] = useState(false);
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
+    setInfo('');
+    setShowResend(false);
 
     try {
-      await signInWithEmail(email, password);
+      const user = await signInWithEmail(email, password);
+      if (!user.emailVerified) {
+        await resendEmailVerification();
+        await logout();
+        setError('Email not verified yet. We sent a fresh verification link.');
+        setShowResend(true);
+        return;
+      }
       router.push('/dashboard');
-    } catch (err) {
+    } catch {
       setError('Invalid email or password');
     } finally {
       setIsLoading(false);
@@ -30,12 +41,34 @@ export default function LoginPage() {
   const handleGoogleLogin = async () => {
     setIsLoading(true);
     setError('');
+    setInfo('');
+    setShowResend(false);
 
     try {
       await signInWithGoogle();
       router.push('/dashboard');
     } catch (err) {
       setError('Failed to sign in with Google');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    setIsLoading(true);
+    setError('');
+    setInfo('');
+    try {
+      const user = await signInWithEmail(email, password);
+      if (user.emailVerified) {
+        setInfo('Email already verified. You can sign in now.');
+      } else {
+        await resendEmailVerification();
+        setInfo('Verification email sent. Check your inbox and spam folder.');
+      }
+      await logout();
+    } catch {
+      setError('Could not resend verification email. Please check your credentials and try again.');
     } finally {
       setIsLoading(false);
     }
@@ -57,6 +90,11 @@ export default function LoginPage() {
           {error && (
             <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive text-sm">
               {error}
+            </div>
+          )}
+          {info && (
+            <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-400 text-sm">
+              {info}
             </div>
           )}
 
@@ -129,6 +167,17 @@ export default function LoginPage() {
             </svg>
             Continue with Google
           </button>
+
+          {showResend && (
+            <button
+              type="button"
+              onClick={handleResendVerification}
+              disabled={isLoading}
+              className="w-full mt-3 py-2.5 bg-surface-elevated border border-border text-foreground font-medium rounded-lg hover:bg-border transition-colors disabled:opacity-50"
+            >
+              Resend verification email
+            </button>
+          )}
         </div>
 
         <p className="text-center text-sm text-text-muted mt-6">

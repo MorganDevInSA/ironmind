@@ -3,6 +3,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  sendEmailVerification,
   User,
   GoogleAuthProvider,
   signInWithPopup,
@@ -30,6 +31,7 @@ export async function signUpWithEmail(email: string, password: string, displayNa
 
   const { user } = await createUserWithEmailAndPassword(auth, email, password);
   await updateProfile(user, { displayName });
+  await sendEmailVerification(user);
   return user;
 }
 
@@ -39,6 +41,13 @@ export async function signInWithEmail(email: string, password: string) {
 
   const { user } = await signInWithEmailAndPassword(auth, email, password);
   return user;
+}
+
+// Resend verification link
+export async function resendEmailVerification() {
+  if (!auth) throw new Error('Firebase auth not initialized');
+  if (!auth.currentUser) throw new Error('No authenticated user to verify');
+  await sendEmailVerification(auth.currentUser);
 }
 
 // Google sign in

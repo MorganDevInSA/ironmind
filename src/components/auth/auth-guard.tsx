@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { onAuthChange } from '@/lib/firebase';
+import { logout, onAuthChange } from '@/lib/firebase';
 import { useAuthStore } from '@/stores';
 import { isUserSeeded } from '@/services/profile.service';
 
@@ -16,6 +16,17 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
     const unsubscribe = onAuthChange(async (firebaseUser) => {
       if (firebaseUser) {
+        const signedInWithPassword = firebaseUser.providerData.some(
+          (provider) => provider.providerId === 'password'
+        );
+        if (signedInWithPassword && !firebaseUser.emailVerified) {
+          await logout();
+          setUser(null);
+          router.replace('/login');
+          setLoading(false);
+          return;
+        }
+
         setUser({
           uid: firebaseUser.uid,
           email: firebaseUser.email,

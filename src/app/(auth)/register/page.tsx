@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Check, X } from 'lucide-react';
-import { signUpWithEmail } from '@/lib/firebase';
+import { logout, signUpWithEmail } from '@/lib/firebase';
 import { IronmindLogo } from '@/components/brand/ironmind-logo';
 
 // ─── password rules ───────────────────────────────────────────────────────────
@@ -66,6 +66,7 @@ export default function RegisterPage() {
   const [password, setPassword]       = useState('');
   const [confirm, setConfirm]         = useState('');
   const [error, setError]             = useState('');
+  const [success, setSuccess]         = useState('');
   const [isLoading, setIsLoading]     = useState(false);
   const [touched, setTouched]         = useState(false);
 
@@ -81,9 +82,12 @@ export default function RegisterPage() {
 
     setIsLoading(true);
     setError('');
+    setSuccess('');
     try {
       await signUpWithEmail(email, password, displayName);
-      router.push('/dashboard');
+      await logout();
+      setSuccess('Account created. Check your email and verify your address before signing in.');
+      setTimeout(() => router.push('/login'), 1200);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to create account';
       setError(msg);
@@ -119,6 +123,11 @@ export default function RegisterPage() {
           {error && (
             <div className="mb-4 p-3 rounded-lg text-sm bg-[rgba(239,68,68,0.10)] border border-[rgba(239,68,68,0.30)] text-[#EF4444]">
               {error}
+            </div>
+          )}
+          {success && (
+            <div className="mb-4 p-3 rounded-lg text-sm bg-[rgba(34,197,94,0.12)] border border-[rgba(34,197,94,0.30)] text-[#22C55E]">
+              {success}
             </div>
           )}
 
