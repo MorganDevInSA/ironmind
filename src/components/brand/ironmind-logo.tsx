@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import { brandAssets } from '@/lib/constants/brand-assets';
 import { useUIStore } from '@/stores';
 
 export type IronmindLogoVariant =
@@ -22,9 +23,8 @@ export function IronmindLogo({
 }) {  
   const theme = useUIStore((s) => s.theme);
 
-  const src = theme === 'hot-pink'
-    ? '/ironmind_logo_female.png'
-    : '/ironmind_logo_male.png';
+  const src =
+    theme === 'hot-pink' ? brandAssets.logoFemale : brandAssets.logoMale;
 
   const variantClass =
     variant === 'sidebar-expanded'

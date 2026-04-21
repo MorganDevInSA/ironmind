@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { brandAssets } from "@/lib/constants/brand-assets";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { Toaster } from "sonner";
 import { RegisterServiceWorker } from "@/components/pwa/register-service-worker";
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.json",
   icons: {
-    apple: "/ironmind_transparent_1_reverted.png",
+    apple: brandAssets.appleTouchIcon,
   },
   appleWebApp: {
     capable: true,

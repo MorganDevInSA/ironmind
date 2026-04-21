@@ -125,18 +125,18 @@ export default function RecoveryPage() {
       {/* Header + tab switcher */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#6B6B6B] mb-1">Morning Check-in</p>
-          <h1 className="text-2xl font-bold text-[#F5F5F5]">Recovery</h1>
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[color:var(--text-2)] mb-1">Morning Check-in</p>
+          <h1 className="text-2xl font-bold text-[color:var(--text-0)]">Recovery</h1>
         </div>
-        <div className="flex rounded-xl overflow-hidden border border-[rgba(80,96,128,0.25)]">
+        <div className="flex rounded-xl overflow-hidden border border-[color:var(--chrome-border)] bg-[color:var(--surface-well)]">
           <button onClick={() => setTab('log')}
-            className={cn('px-4 py-2 text-sm font-semibold transition-all flex items-center gap-1.5',
-              tab === 'log' ? 'bg-[color:color-mix(in_srgb,var(--accent)_18%,transparent)] text-[color:var(--accent)]' : 'text-[#6B6B6B] hover:text-[#F5F5F5]')}>
+            className={cn('px-4 py-2 text-sm font-semibold transition-all flex items-center gap-1.5 border border-transparent',
+              tab === 'log' ? 'is-selected text-[color:var(--accent-light)]' : 'text-[color:var(--text-2)] hover:text-[color:var(--text-0)]')}>
             <Activity size={15} /> Log
           </button>
           <button onClick={() => setTab('trends')}
-            className={cn('px-4 py-2 text-sm font-semibold transition-all flex items-center gap-1.5',
-              tab === 'trends' ? 'bg-[color:color-mix(in_srgb,var(--accent)_18%,transparent)] text-[color:var(--accent)]' : 'text-[#6B6B6B] hover:text-[#F5F5F5]')}>
+            className={cn('px-4 py-2 text-sm font-semibold transition-all flex items-center gap-1.5 border border-transparent',
+              tab === 'trends' ? 'is-selected text-[color:var(--accent-light)]' : 'text-[color:var(--text-2)] hover:text-[color:var(--text-0)]')}>
             <TrendingUp size={15} /> Trends
           </button>
         </div>

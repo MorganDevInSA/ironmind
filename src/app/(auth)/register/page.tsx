@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Check, X } from 'lucide-react';
-import { logout, signUpWithEmail } from '@/lib/firebase';
+import { logout, signUpWithEmail, signInWithFacebook, signInWithMicrosoft } from '@/lib/firebase';
 import { IronmindLogo } from '@/components/brand/ironmind-logo';
 
 // ─── password rules ───────────────────────────────────────────────────────────
@@ -69,6 +69,34 @@ export default function RegisterPage() {
   const [success, setSuccess]         = useState('');
   const [isLoading, setIsLoading]     = useState(false);
   const [touched, setTouched]         = useState(false);
+
+  const handleFacebookRegister = async () => {
+    setIsLoading(true);
+    setError('');
+    setSuccess('');
+    try {
+      await signInWithFacebook();
+      router.push('/dashboard');
+    } catch {
+      setError('Failed to sign in with Facebook');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleMicrosoftRegister = async () => {
+    setIsLoading(true);
+    setError('');
+    setSuccess('');
+    try {
+      await signInWithMicrosoft();
+      router.push('/dashboard');
+    } catch {
+      setError('Failed to sign in with Microsoft');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const ruleResults = useMemo(() => RULES.map(r => ({ ...r, pass: r.test(password) })), [password]);
   const allRulesPass = ruleResults.every(r => r.pass);
@@ -228,6 +256,52 @@ export default function RegisterPage() {
               ) : 'Create Account'}
             </button>
           </form>
+
+          {/* Facebook / Microsoft — hidden until console credentials are configured */}
+          {false && (
+            <>
+              <div className="my-6 flex items-center gap-4">
+                <div className="flex-1 h-px bg-[rgba(65,50,50,0.40)]" />
+                <span className="text-xs text-[#5E5E5E] uppercase tracking-[0.15em]">or continue with</span>
+                <div className="flex-1 h-px bg-[rgba(65,50,50,0.40)]" />
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <button
+                  type="button"
+                  onClick={handleFacebookRegister}
+                  disabled={isLoading}
+                  className="w-full py-2.5 rounded-lg text-sm font-medium
+                    bg-[#131313] border border-[rgba(65,50,50,0.50)] text-[#F0F0F0]
+                    hover:bg-[rgba(65,50,50,0.30)] transition-colors disabled:opacity-50
+                    flex items-center justify-center gap-2"
+                >
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                  </svg>
+                  Continue with Facebook
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleMicrosoftRegister}
+                  disabled={isLoading}
+                  className="w-full py-2.5 rounded-lg text-sm font-medium
+                    bg-[#131313] border border-[rgba(65,50,50,0.50)] text-[#F0F0F0]
+                    hover:bg-[rgba(65,50,50,0.30)] transition-colors disabled:opacity-50
+                    flex items-center justify-center gap-2"
+                >
+                  <svg className="w-5 h-5" viewBox="0 0 21 21">
+                    <rect x="1" y="1" width="9" height="9" fill="#f25022" />
+                    <rect x="11" y="1" width="9" height="9" fill="#7fba00" />
+                    <rect x="1" y="11" width="9" height="9" fill="#00a4ef" />
+                    <rect x="11" y="11" width="9" height="9" fill="#ffb900" />
+                  </svg>
+                  Continue with Microsoft
+                </button>
+              </div>
+            </>
+          )}
         </div>
 
         <p className="text-center text-sm text-[#5E5E5E] mt-6">

@@ -25,7 +25,7 @@ export function StepAnalysisSetup({ onNext, onBack }: StepAnalysisSetupProps) {
       {/* Heading */}
       <div>
         <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[color:var(--accent)]">
-          Step 4 of 5
+          Step 5 of 6
         </span>
         <h2 className="mt-2 text-2xl sm:text-3xl font-bold font-heading tracking-tight text-[#F0F0F0]">
           Ongoing Coach Analysis

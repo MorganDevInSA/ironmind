@@ -181,13 +181,24 @@ If needed, add:
 
 ---
 
-## Production asset (in-repo)
+## Production assets (in-repo)
 
-| Item | Value |
-|------|--------|
-| **Canonical file (title)** | `public/Logo/ironmind_logo_4_bottom_right.png` |
-| **Public URL** | `/Logo/ironmind_logo_4_bottom_right.png` |
-| **Dimensions** | 768 × 512 px (PNG) |
-| **UI usage** | **`IronmindLogo`** in `sidebar.tsx` (desktop **`lg+` only**), **`top-bar.tsx`** compact mark (**`lg:hidden`** — phones/tablets never show the sidebar), login & register headers. **`object-contain object-center`** so PNG framing stays visible (avoid chaining `object-left` + `object-bottom` — Tailwind resolves to one axis and can show empty canvas). |
+All raster logos live under **`public/brand/`**. Runtime URLs are centralized in **`brandAssets`** (`src/lib/constants/brand-assets.ts`). **Do not** duplicate path strings in components — import **`brandAssets`** or add a new key there when introducing a file.
 
-Other variants in the same folder (`ironmind_logo_2_top_right.png`, `ironmind_logo_3_bottom_left.png`) are optional alternates; change **`IRONMIND_LOGO_SRC`** in `src/components/brand/ironmind-logo.tsx` to swap.
+### Inventory
+
+| File (`public/brand/…`) | `brandAssets` key | Typical use |
+|-------------------------|-------------------|-------------|
+| `ironmind_logo_male.png` | `logoMale` | **`IronmindLogo`** when theme ≠ hot-pink (sidebar, top bar, register). |
+| `ironmind_logo_female.png` | `logoFemale` | **`IronmindLogo`** when theme is hot-pink (e.g. Sheri demo profile). |
+| `ironmind_logo_combined.png` | `logoCombined` | **`/login`** page hero (`next/image`), layered male + female mark. |
+| `ironmind_transparent_1_reverted.png` | `appleTouchIcon` | Root layout **`metadata.icons.apple`** (iOS home screen / PWA). |
+| `ironmind_logo_2_top_right.png` | `alternateTopRight` | Marketing / optional UI — not wired by default. |
+| `ironmind_logo_3_bottom_left.png` | `alternateBottomLeft` | Same. |
+| `ironmind_logo_4_bottom_right.png` | `alternateBottomRight` | Canonical title-style crop reference (768 × 512 px). |
+
+### UI wiring notes
+
+- **`IronmindLogo`** (`src/components/brand/ironmind-logo.tsx`): sidebar (desktop **`lg+`**), **`top-bar.tsx`** compact mark (**`lg:hidden`**), **register** header. Uses **`object-contain object-center`** so PNG framing stays visible (avoid chaining `object-left` + `object-bottom` — Tailwind resolves to one axis and can show empty canvas).
+- **`/login`**: uses **`brandAssets.logoCombined`** directly (not `IronmindLogo`) for the stacked lockup.
+- **OAuth buttons** (Google; Facebook/Microsoft when enabled in UI) use text + icons only — no extra logo files.

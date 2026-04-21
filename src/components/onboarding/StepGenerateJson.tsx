@@ -17,7 +17,7 @@ const EXPECTED_FILES = [
 ];
 
 const instructions = [
-  { num: '01', text: 'Go back to the same AI chat where you activated the coach persona (Step 1)' },
+  { num: '01', text: 'Go back to the same AI chat where you activated the coach persona (Step 2)' },
   { num: '02', text: 'Click Copy to Clipboard below and paste the data-generation prompt' },
   { num: '03', text: 'Then paste or type your questionnaire JSON from Step 2 at the bottom where instructed' },
   { num: '04', text: 'The AI will output 6 JSON files — save each with the exact filename shown in the reference panel below' },
@@ -29,7 +29,7 @@ export function StepGenerateJson({ onNext, onBack }: StepGenerateJsonProps) {
       {/* Heading */}
       <div>
         <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[color:var(--accent)]">
-          Step 3 of 5
+          Step 4 of 6
         </span>
         <h2 className="mt-2 text-2xl sm:text-3xl font-bold font-heading tracking-tight text-[#F0F0F0]">
           Generate Your Data Pack

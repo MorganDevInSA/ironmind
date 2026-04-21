@@ -2,9 +2,12 @@
 
 import { useState } from 'react';
 import { useAuthStore } from '@/stores';
+import { useCreateJournalEntry, useJournalEntries } from '@/controllers';
 import { generateSummary } from '@/lib/export';
 import type { ExportOptions } from '@/lib/types';
+import { formatDisplayDate, today } from '@/lib/utils';
 import { Download, Copy, Check } from 'lucide-react';
+import { toast } from 'sonner';
 
 const DEFAULT_COACH_OPTIONS: ExportOptions = {
   historyDays: 42,
@@ -39,6 +42,11 @@ export default function ExportPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generated, setGenerated] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [noteTitle, setNoteTitle] = useState('');
+  const [noteContent, setNoteContent] = useState('');
+
+  const { data: recentNotes } = useJournalEntries(userId, 5);
+  const { mutate: createEntry, isPending: isSavingNote } = useCreateJournalEntry(userId);
 
   const handleGenerate = async () => {
     setIsGenerating(true);
@@ -74,6 +82,35 @@ export default function ExportPage() {
     setOptions(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
+  const handleSaveNote = () => {
+    const trimmedTitle = noteTitle.trim();
+    const trimmedContent = noteContent.trim();
+
+    if (!trimmedTitle || !trimmedContent) {
+      toast.error('Add a title and note content before saving.');
+      return;
+    }
+
+    createEntry(
+      {
+        date: today(),
+        title: trimmedTitle,
+        content: trimmedContent,
+        tags: [],
+      },
+      {
+        onSuccess: () => {
+          setNoteTitle('');
+          setNoteContent('');
+          toast.success('Export note saved.');
+        },
+        onError: (error) => {
+          toast.error(`Failed to save note: ${error.message}`);
+        },
+      }
+    );
+  };
+
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div>
@@ -83,6 +120,61 @@ export default function ExportPage() {
           <code className="rounded bg-surface-elevated px-1 py-0.5 text-xs">prompts/04-coach-analysis-from-export-or-screenshots.md</code>{' '}
           and your coach persona—full history, set-level training detail, volume landmarks, supplements protocol, alerts, and journal notes when enabled below.
         </p>
+      </div>
+
+      {/* Notes for export */}
+      <div className="glass-panel p-4 space-y-4">
+        <div>
+          <h2 className="font-semibold text-foreground">Notes for Export</h2>
+          <p className="text-sm text-text-secondary">
+            Add coaching notes here before generating your report. Saved notes are included when
+            <span className="font-medium text-foreground"> coaching notes</span> are enabled below.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <input
+            type="text"
+            value={noteTitle}
+            onChange={(e) => setNoteTitle(e.target.value)}
+            placeholder="Note title"
+            className="w-full rounded-lg border border-[color:var(--chrome-border)] bg-[color:var(--surface-well)] p-3 text-sm text-foreground placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color:color-mix(in_srgb,var(--accent)_55%,transparent)]"
+          />
+          <textarea
+            value={noteContent}
+            onChange={(e) => setNoteContent(e.target.value)}
+            placeholder="Write context for this export: training issues, fatigue, schedule constraints, or recent changes."
+            rows={4}
+            className="w-full rounded-lg border border-[color:var(--chrome-border)] bg-[color:var(--surface-well)] p-3 text-sm text-foreground placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color:color-mix(in_srgb,var(--accent)_55%,transparent)] resize-none"
+          />
+          <button
+            type="button"
+            onClick={handleSaveNote}
+            disabled={isSavingNote}
+            className="btn-primary px-4 py-2 text-sm disabled:opacity-50"
+          >
+            {isSavingNote ? 'Saving note...' : 'Save Note'}
+          </button>
+        </div>
+
+        <div className="space-y-2 border-t border-border pt-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">
+            Recent saved notes
+          </p>
+          {recentNotes && recentNotes.length > 0 ? (
+            <div className="space-y-2">
+              {recentNotes.map((note) => (
+                <div key={note.id} className="rounded-lg border border-[color:var(--chrome-border)] bg-[rgba(0,0,0,0.2)] p-3">
+                  <p className="text-sm font-medium text-foreground">{note.title}</p>
+                  <p className="text-xs text-text-secondary line-clamp-2 mt-1">{note.content}</p>
+                  <p className="text-[11px] text-[color:var(--text-2)] mt-1">{formatDisplayDate(note.date)}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-text-secondary">No notes saved yet.</p>
+          )}
+        </div>
       </div>
 
       {/* Options */}

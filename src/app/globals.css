@@ -565,6 +565,18 @@ h4 { font-size: 1.125rem; }
       inset 0px -1px 0 rgba(0, 0, 0, 0.58);
   }
 
+  /* Shared selected-state glow used by tabs, cards, and toggles */
+  .is-selected {
+    border-color: color-mix(in srgb, var(--accent) 62%, transparent);
+    background:
+      radial-gradient(120% 140% at 50% 0%, color-mix(in srgb, var(--accent) 10%, transparent) 0%, transparent 60%),
+      linear-gradient(180deg, rgba(22, 16, 16, 0.94) 0%, rgba(10, 10, 10, 0.98) 100%);
+    box-shadow:
+      0 0 14px color-mix(in srgb, var(--accent) 14%, transparent),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.58);
+  }
+
   /* Active shimmer sweep */
   .nav-item::after {
     content: '';

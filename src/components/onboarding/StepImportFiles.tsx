@@ -189,7 +189,7 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
     return (
       <div className="flex flex-col gap-7 py-4">
         <div>
-          <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[color:var(--accent)]">Step 5 of 5</span>
+          <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[color:var(--accent)]">Step 6 of 6</span>
           <h2 className="mt-2 text-2xl font-bold font-heading tracking-tight text-[#F0F0F0]">Review Your Plan</h2>
         </div>
 
@@ -269,7 +269,7 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
       {/* Heading */}
       <div>
         <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[color:var(--accent)]">
-          Step 5 of 5
+          Step 6 of 6
         </span>
         <h2 className="mt-2 text-2xl sm:text-3xl font-bold font-heading tracking-tight text-[#F0F0F0]">
           Import Your Data Pack

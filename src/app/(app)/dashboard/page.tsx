@@ -6,7 +6,7 @@ import { useAuthStore } from '@/stores';
 import { useDashboardData, useActiveProgram, useRecentWorkouts, useRecentCheckIns, useNutritionPlan, useProtocol } from '@/controllers';
 import { getCycleDay, today, formatDisplayDate } from '@/lib/utils';
 import {
-  Activity, Dumbbell, Scale, Pill, FileText, TrendingUp, Zap,
+  Activity, Dumbbell, Scale, Pill, TrendingUp, Zap,
   Calendar, CheckCircle2, X, BarChart3,
 } from 'lucide-react';
 import {
@@ -29,7 +29,6 @@ import type {
   ProgramSession,
   CheckIn,
   Measurements,
-  JournalEntry,
 } from '@/lib/types';
 import { mortonNutritionPlan } from '@/lib/seed/nutrition';
 import { mortonSupplementProtocol } from '@/lib/seed/supplements';
@@ -299,90 +298,6 @@ function PhysiqueMiniCharts({
             Add a second check-in to see the weight line.
           </div>
         )}
-      </div>
-    </div>
-  );
-}
-
-function CoachingNotesModal({
-  open,
-  notes,
-  onClose,
-}: {
-  open: boolean;
-  notes: JournalEntry[] | undefined;
-  onClose: () => void;
-}) {
-  if (!open) return null;
-  const primary = notes?.[0];
-
-  return (
-    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/65 backdrop-blur-sm" />
-      <div
-        className="relative w-full sm:max-w-lg mx-0 sm:mx-4 glass-panel rounded-t-2xl sm:rounded-2xl max-h-[88vh] overflow-hidden flex flex-col border border-[rgba(65,50,50,0.35)]"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between p-4 border-b border-[rgba(65,50,50,0.25)]">
-          <div className="flex items-center gap-2">
-            <FileText size={20} className="text-[color:var(--accent)]" />
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#5E5E5E]">Coaching</p>
-              <h2 className="text-lg font-bold text-[#F5F5F5]">Latest notes</h2>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-2 rounded-lg text-[#9A9A9A] hover:text-[#F5F5F5] hover:bg-[rgba(255,255,255,0.05)]"
-            aria-label="Close"
-          >
-            <X size={18} />
-          </button>
-        </div>
-        <div className="flex-1 overflow-y-auto p-5 space-y-6">
-          {primary ? (
-            <>
-              <article className="space-y-3">
-                <h3 className="text-xl font-semibold text-[#F5F5F5] leading-snug">{primary.title}</h3>
-                <p className="text-xs font-mono tabular-nums text-[#9A9A9A]">{formatDisplayDate(primary.date)}</p>
-                <p className="text-[#D4D4D4] whitespace-pre-wrap leading-relaxed text-[15px]">{primary.content}</p>
-                {primary.tags?.length ? (
-                  <div className="flex flex-wrap gap-2 pt-2">
-                    {primary.tags.map((t) => (
-                      <span
-                        key={t}
-                        className="text-[10px] font-semibold uppercase tracking-wider px-2 py-1 rounded-md bg-[color:color-mix(in_srgb,var(--accent)_12%,transparent)] text-[color:var(--accent)] border border-[color:color-mix(in_srgb,var(--accent)_25%,transparent)]"
-                      >
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                ) : null}
-              </article>
-              {notes && notes.length > 1 && (
-                <div className="border-t border-[rgba(65,50,50,0.2)] pt-5 space-y-3">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#5E5E5E]">
-                    Earlier entries
-                  </p>
-                  <ul className="space-y-3">
-                    {notes.slice(1).map((n) => (
-                      <li key={n.id} className="rounded-xl border border-[rgba(65,50,50,0.2)] p-3 bg-[rgba(0,0,0,0.2)]">
-                        <p className="font-medium text-[#F5F5F5]">{n.title}</p>
-                        <p className="text-[10px] text-[color:var(--text-detail)] font-mono tabular-nums mt-1">
-                          {formatDisplayDate(n.date)}
-                        </p>
-                        <p className="text-sm text-[#9A9A9A] mt-2 line-clamp-3 whitespace-pre-wrap">{n.content}</p>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </>
-          ) : (
-            <p className="text-[#9A9A9A] text-center py-8">No coaching notes yet.</p>
-          )}
-        </div>
       </div>
     </div>
   );
@@ -1343,7 +1258,7 @@ function CycleDayTabs({
               className={cn(
                 'shrink-0 min-w-[2.75rem] px-3 py-2 rounded-lg text-sm font-mono tabular-nums transition-all border',
                 isSelected
-                  ? 'bg-[color:color-mix(in_srgb,var(--accent)_22%,transparent)] border-[color:var(--accent)] text-[#FAFAFA] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]'
+                  ? 'is-selected text-[#FAFAFA]'
                   : 'border-[rgba(65,50,50,0.35)] text-[#9A9A9A] hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[#F0F0F0]',
                 isTodayTab && !isSelected && 'ring-1 ring-[rgba(220,38,38,0.35)]'
               )}
@@ -1367,10 +1282,9 @@ export default function DashboardPage() {
   const { user } = useAuthStore();
   const userId = user?.uid ?? '';
 
-  const [coachNotesOpen, setCoachNotesOpen] = useState(false);
   const [sessionDetailOpen, setSessionDetailOpen] = useState(false);
 
-  const { profile, todayNutrition, todayRecovery, latestRecovery, todaySupplements, weeklyVolume, recentNotes, isLoading } =
+  const { profile, todayNutrition, todayRecovery, latestRecovery, todaySupplements, weeklyVolume, isLoading } =
     useDashboardData(userId);
   const { data: activeProgram } = useActiveProgram(userId);
   const { data: recentWorkouts } = useRecentWorkouts(userId, 7);
@@ -1430,8 +1344,6 @@ export default function DashboardPage() {
 
   return (
     <>
-      <CoachingNotesModal open={coachNotesOpen} notes={recentNotes} onClose={() => setCoachNotesOpen(false)} />
-
       <SessionDetailModal
         open={sessionDetailOpen}
         session={selectedSession}
@@ -1498,6 +1410,7 @@ export default function DashboardPage() {
               title={isViewingToday ? 'Today\'s Session' : `Day ${safeDay} — Session plan`}
               icon={<Dumbbell size={20} />}
               iconColor="text-[color:var(--accent)]"
+              selected
               onClick={() => {
                 if (selectedSession) setSessionDetailOpen(true);
                 else router.push('/training');
@@ -1679,26 +1592,6 @@ export default function DashboardPage() {
               </>
             )}
           </Card>
-
-          <Card
-            title="Coaching Notes"
-            icon={<FileText size={20} />}
-            iconColor="text-[color:var(--text-1)]"
-            onClick={
-              recentNotes && recentNotes.length > 0 ? () => setCoachNotesOpen(true) : undefined
-            }
-          >
-            {recentNotes && recentNotes.length > 0 ? (
-              <div className="space-y-2">
-                <p className="font-medium text-[#F5F5F5] line-clamp-2">{recentNotes[0].title}</p>
-                <p className="text-sm text-[color:var(--text-detail)] line-clamp-2">{recentNotes[0].content}</p>
-                <p className="text-xs text-[color:var(--text-detail)]/60">{formatDisplayDate(recentNotes[0].date)}</p>
-                <p className="text-xs text-[color:var(--accent)]/80 font-medium pt-1">Read full note →</p>
-              </div>
-            ) : (
-              <p className="text-[color:var(--text-detail)]">No recent notes</p>
-            )}
-          </Card>
           </div>
 
           {isViewingToday && lastWorkout && (
@@ -1761,6 +1654,7 @@ function Card({
   iconColor,
   children,
   fullWidth = false,
+  selected = false,
   className,
   onClick,
 }: {
@@ -1769,6 +1663,7 @@ function Card({
   iconColor: string;
   children: React.ReactNode;
   fullWidth?: boolean;
+  selected?: boolean;
   className?: string;
   onClick?: () => void;
 }) {
@@ -1790,6 +1685,7 @@ function Card({
       }
       className={cn(
         `glass-panel dashboard-card-surface p-4 card-hover ${fullWidth ? 'col-span-full' : ''}`,
+        selected && 'is-selected',
         interactive &&
           'cursor-pointer select-none hover:border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent)]/55',
         className

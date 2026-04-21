@@ -7,6 +7,7 @@ import { useAuthStore, useUIStore } from '@/stores';
 import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/constants/query-keys';
 import { seedMortonData, seedSheriData, seedAlexData, seedJordanData } from '@/lib/seed';
+import { cn } from '@/lib/utils';
 
 // ─── demo profiles ────────────────────────────────────────────────────────────
 
@@ -20,6 +21,11 @@ interface DemoProfile {
   description: string;
   tag: string;
   tagColor: string;
+  lifestyle: string;
+  trainingHistory: string;
+  geneticsNote: string;
+  equipment: string;
+  coachNote: string;
 }
 
 const DEMO_PROFILES: DemoProfile[] = [
@@ -30,9 +36,14 @@ const DEMO_PROFILES: DemoProfile[] = [
     sex: 'Male',
     level: 'Advanced',
     goal: 'Off-season muscle gain',
-    description: '14-day rotating split, pelvic-safe core, high-calorie rebuild phase targeting 80 → 85 kg.',
+    description: 'Advanced rebuild block with high-capacity progression and pelvic-safe loading strategy.',
     tag: 'Masters athlete',
     tagColor: 'text-[color:var(--accent)] bg-[color:color-mix(in_srgb,var(--accent)_12%,transparent)] border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)]',
+    lifestyle: 'Remote high-pressure professional role with flexible windows for training and recovery.',
+    trainingHistory: 'Natural, highly trained athlete with deep lifting history and advanced exercise literacy.',
+    geneticsNote: 'Elite responder profile: lower training dose produces outsized hypertrophy and strength carryover.',
+    equipment: 'Fully equipped home-gym environment with reliable access to high-quality nutrition.',
+    coachNote: 'Primary coaching focus is intelligent load progression around pelvic constraints, not motivation or access.',
   },
   {
     id: 'sheri',
@@ -41,9 +52,14 @@ const DEMO_PROFILES: DemoProfile[] = [
     sex: 'Female',
     level: 'Beginner',
     goal: 'Fat loss — 95 kg → 83 kg',
-    description: '7-day full-body rotation (3 lift / 3 cardio / 1 recovery), 1600–1900 kcal cut, simple repeatable meals.',
+    description: 'Structured reduction phase with adherence-first planning and repeatable meal architecture.',
     tag: 'Foundation cut',
     tagColor: 'text-[#F59E0B] bg-[rgba(245,158,11,0.12)] border-[rgba(245,158,11,0.35)]',
+    lifestyle: 'Up at 06:00 in winter (South Africa), office workload 07:00–18:00 with compressed daytime eating windows.',
+    trainingHistory: 'Former high-level dance background with strong neuromuscular patterning and retained muscle memory.',
+    geneticsNote: 'Normal-to-slower metabolic profile with increased fat-gain sensitivity under stress and low sleep.',
+    equipment: 'Home-only training setup with constrained meal prep time on workdays.',
+    coachNote: 'Program design prioritizes schedule durability, dance-transfer movement quality, and late-day session execution.',
   },
   {
     id: 'alex',
@@ -52,9 +68,14 @@ const DEMO_PROFILES: DemoProfile[] = [
     sex: 'Male',
     level: 'Intermediate',
     goal: 'Strength & size',
-    description: '4-day upper/lower split, evidence-based hypertrophy programming, moderate caloric surplus.',
+    description: 'Intermediate mass-and-strength block with high compliance and measurable progression markers.',
     tag: 'Hypertrophy',
     tagColor: 'text-[#22C55E] bg-[rgba(34,197,94,0.12)] border-[rgba(34,197,94,0.35)]',
+    lifestyle: 'Office-based schedule with regular commute and stable sleep routine during weekdays.',
+    trainingHistory: '5+ years of uninterrupted resistance training with strong competency on compound lifts.',
+    geneticsNote: 'Moderate recovery curve and predictable adaptation when volume is periodized.',
+    equipment: 'Commercial gym access with full machine, free-weight, and cable station availability.',
+    coachNote: 'High upside candidate for structured hypertrophy mesocycles with periodic strength expression blocks.',
   },
   {
     id: 'jordan',
@@ -63,9 +84,14 @@ const DEMO_PROFILES: DemoProfile[] = [
     sex: 'Female',
     level: 'Beginner',
     goal: 'General fitness',
-    description: '3-day full-body with progressive loading, balanced nutrition, and habit-building focus.',
+    description: 'Beginner progression template focused on consistency, body composition, and sustainable weekly output.',
     tag: 'Beginner friendly',
-    tagColor: 'text-[#60A5FA] bg-[rgba(96,165,250,0.12)] border-[rgba(96,165,250,0.35)]',
+    tagColor: 'text-[color:var(--accent-light)] bg-[color:color-mix(in_srgb,var(--accent)_10%,transparent)] border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)]',
+    lifestyle: 'Parent-led schedule with narrow training windows and 45-minute session ceilings.',
+    trainingHistory: 'Early-stage trainee with completed restart phase and reliable baseline movement patterns.',
+    geneticsNote: 'Responds well to moderate deficits, high-protein intake, and repeatable habit loops.',
+    equipment: 'Compact home setup with adjustable dumbbells, bench, and resistance bands.',
+    coachNote: 'Best outcomes come from time-efficient templates that remove scheduling friction and decision fatigue.',
   },
 ];
 
@@ -177,11 +203,12 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
             <button
               key={profile.id}
               onClick={() => setSelected(profile.id)}
-              className={`w-full text-left p-4 rounded-[12px] border transition-all duration-200
-                ${selected === profile.id
-                  ? 'border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_8%,transparent)] shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_12%,transparent)]'
+              className={cn(
+                'w-full text-left p-4 rounded-[12px] border transition-all duration-200',
+                selected === profile.id
+                  ? 'is-selected'
                   : 'border-[rgba(65,50,50,0.40)] bg-[rgba(18,14,14,0.60)] hover:border-[rgba(65,50,50,0.70)] hover:bg-[rgba(22,16,16,0.80)]'
-                }`}
+              )}
             >
               <div className="flex items-start gap-3">
                 {/* Selection indicator */}
@@ -204,6 +231,30 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
                   </div>
                   <p className="text-xs font-semibold text-[color:var(--accent)] mb-1">{profile.goal}</p>
                   <p className="text-xs text-[#5E5E5E] leading-relaxed">{profile.description}</p>
+                  {selected === profile.id && (
+                    <div className="mt-3 space-y-2 border-t border-[rgba(65,50,50,0.35)] pt-3">
+                      <div>
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">Lifestyle</p>
+                        <p className="text-xs text-[#9A9A9A] leading-relaxed">{profile.lifestyle}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">Training History</p>
+                        <p className="text-xs text-[#9A9A9A] leading-relaxed">{profile.trainingHistory}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">Genetics & Recovery</p>
+                        <p className="text-xs text-[#9A9A9A] leading-relaxed">{profile.geneticsNote}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">Equipment & Resources</p>
+                        <p className="text-xs text-[#9A9A9A] leading-relaxed">{profile.equipment}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">Coach Summary</p>
+                        <p className="text-xs text-[#F0F0F0] leading-relaxed">{profile.coachNote}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </button>

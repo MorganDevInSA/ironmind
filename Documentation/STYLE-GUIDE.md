@@ -2,7 +2,7 @@
 
 **Elite Bodybuilding Performance System — Premium Dark UI**
 
-> **Current UI tokens** live in **`src/app/globals.css`** and **`.cursor/rules/IRONMIND.md`**. For the **dashboard** hub, the centered overview shell is **`.dashboard-overview`** and numbered exercise rows use **`.exercise-index-badge`** (**`Documentation/ARCHITECTURE.md` §13.4**). Persistent **header / sidebar / mobile nav** chrome uses **`--chrome-bg`**, **`--chrome-bg-topbar`**, and **`--chrome-bg-toggle`** (**§13.5**). Do not implement from the palette table below without cross-checking those sources.
+> **Current UI tokens** live in **`src/app/globals.css`** and **`.cursor/rules/IRONMIND.md`**. For the **dashboard** hub, the centered overview shell is **`.dashboard-overview`** and numbered exercise rows use **`.exercise-index-badge`** (**`Documentation/ARCHITECTURE.md` §13.4**). Persistent **header / sidebar / mobile nav** chrome uses **`--chrome-bg`**, **`--chrome-bg-topbar`**, and **`--chrome-bg-toggle`** (**§13.5**). **Raster logos** live in **`public/brand/`** and are referenced only through **`brandAssets`** in `src/lib/constants/brand-assets.ts` — see **`Documentation/LOGO-BRIEF.md`** and **ARCHITECTURE §13.6**. Do not implement from the palette table below without cross-checking those sources.
 
 ---
 
@@ -14,6 +14,20 @@ IRONMIND is a **premium performance system** for elite athletes and serious trai
 - **Power**: Bold weights, masculine energy
 - **Exclusivity**: High-contrast, luxury aesthetics
 - **Performance**: Immediate visual feedback, zero friction
+
+---
+
+## Brand assets (logos)
+
+| Concern | Source |
+|---------|--------|
+| Files on disk | `public/brand/*.png` |
+| URL constants | `brandAssets` in `src/lib/constants/brand-assets.ts` |
+| UI component | `IronmindLogo` for sidebar / top bar / register (theme picks male vs female PNG) |
+| Login hero | `/login` uses the **combined** mark via `brandAssets.logoCombined` |
+| Apple touch icon | Root `metadata.icons.apple` uses `brandAssets.appleTouchIcon` |
+
+Do not hardcode `/ironmind_*.png` paths in components — add the file under `public/brand/` and extend **`brandAssets`**.
 
 ---
 
@@ -620,6 +634,8 @@ Add to your `globals.css` or HTML head:
 
 ---
 
-**Version**: 1.0  
-**Last Updated**: 2026-04-18  
+**Version**: 1.1  
+**Last Updated**: 2026-04-21  
 **Project**: IRONMIND — Elite Bodybuilding Performance System
+
+See also **`Documentation/README.md`** for the full documentation index.

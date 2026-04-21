@@ -11,7 +11,6 @@ import {
   getSupplementLog,
   getWeeklyVolumeSummary,
   getActiveAlerts,
-  getJournalEntries,
 } from '@/services';
 import { today } from '@/lib/utils';
 
@@ -71,12 +70,6 @@ export function useDashboardData(userId: string) {
     enabled: !!userId,
   });
 
-  const recentNotes = useQuery({
-    queryKey: qk.coaching.journal(3),
-    queryFn: () => getJournalEntries(userId, 3),
-    enabled: !!userId,
-  });
-
   const isLoading =
     profile.isLoading ||
     activeProgram.isLoading ||
@@ -85,8 +78,7 @@ export function useDashboardData(userId: string) {
     latestRecovery.isLoading ||
     todaySupplements.isLoading ||
     weeklyVolume.isLoading ||
-    alerts.isLoading ||
-    recentNotes.isLoading;
+    alerts.isLoading;
 
   return {
     profile: profile.data,
@@ -97,7 +89,6 @@ export function useDashboardData(userId: string) {
     todaySupplements: todaySupplements.data,
     weeklyVolume: weeklyVolume.data,
     alerts: alerts.data,
-    recentNotes: recentNotes.data,
     isLoading,
     errors: {
       profile: profile.error,
@@ -108,7 +99,6 @@ export function useDashboardData(userId: string) {
       todaySupplements: todaySupplements.error,
       weeklyVolume: weeklyVolume.error,
       alerts: alerts.error,
-      recentNotes: recentNotes.error,
     },
   };
 }

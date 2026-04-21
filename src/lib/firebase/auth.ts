@@ -6,6 +6,8 @@ import {
   sendEmailVerification,
   User,
   GoogleAuthProvider,
+  FacebookAuthProvider,
+  OAuthProvider,
   signInWithPopup,
   updateProfile,
 } from 'firebase/auth';
@@ -55,6 +57,25 @@ export async function signInWithGoogle() {
   if (!auth) throw new Error('Firebase auth not initialized');
 
   const provider = new GoogleAuthProvider();
+  const { user } = await signInWithPopup(auth, provider);
+  return user;
+}
+
+// Facebook sign in
+export async function signInWithFacebook() {
+  if (!auth) throw new Error('Firebase auth not initialized');
+
+  const provider = new FacebookAuthProvider();
+  const { user } = await signInWithPopup(auth, provider);
+  return user;
+}
+
+// Microsoft sign in (personal accounts: Hotmail, Outlook.com, Live.com + work/school)
+export async function signInWithMicrosoft() {
+  if (!auth) throw new Error('Firebase auth not initialized');
+
+  const provider = new OAuthProvider('microsoft.com');
+  provider.setCustomParameters({ prompt: 'select_account' });
   const { user } = await signInWithPopup(auth, provider);
   return user;
 }

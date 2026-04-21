@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { logout, resendEmailVerification, signInWithEmail, signInWithGoogle } from '@/lib/firebase';
-import { IronmindLogo } from '@/components/brand/ironmind-logo';
+import { brandAssets } from '@/lib/constants/brand-assets';
+import { logout, resendEmailVerification, signInWithEmail, signInWithFacebook, signInWithGoogle, signInWithMicrosoft } from '@/lib/firebase';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -54,6 +55,36 @@ export default function LoginPage() {
     }
   };
 
+  const handleFacebookLogin = async () => {
+    setIsLoading(true);
+    setError('');
+    setInfo('');
+    setShowResend(false);
+    try {
+      await signInWithFacebook();
+      router.push('/dashboard');
+    } catch {
+      setError('Failed to sign in with Facebook');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleMicrosoftLogin = async () => {
+    setIsLoading(true);
+    setError('');
+    setInfo('');
+    setShowResend(false);
+    try {
+      await signInWithMicrosoft();
+      router.push('/dashboard');
+    } catch {
+      setError('Failed to sign in with Microsoft');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleResendVerification = async () => {
     setIsLoading(true);
     setError('');
@@ -77,9 +108,17 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Logo */}
+        {/* Logo — combined male + female mark (transparent PNG) */}
         <div className="text-center mb-8">
-          <IronmindLogo variant="auth" priority className="mb-3" />
+          <Image
+            src={brandAssets.logoCombined}
+            alt="IRONMIND"
+            width={1536}
+            height={1024}
+            priority
+            sizes="(max-width: 640px) 85vw, 384px"
+            className="mx-auto mb-3 h-auto max-h-[min(28vh,240px)] w-auto max-w-[min(100%,384px)] object-contain object-center drop-shadow-[0_12px_40px_rgba(0,0,0,0.45)]"
+          />
           <p className="text-text-secondary mt-2">Elite Bodybuilding Performance</p>
         </div>
 
@@ -167,6 +206,36 @@ export default function LoginPage() {
             </svg>
             Continue with Google
           </button>
+
+          {/* Facebook / Microsoft — hidden until console credentials are configured */}
+          {false && (
+            <>
+              <button
+                onClick={handleFacebookLogin}
+                disabled={isLoading}
+                className="w-full py-2.5 bg-surface-elevated border border-border text-foreground font-medium rounded-lg hover:bg-border transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                </svg>
+                Continue with Facebook
+              </button>
+
+              <button
+                onClick={handleMicrosoftLogin}
+                disabled={isLoading}
+                className="w-full py-2.5 bg-surface-elevated border border-border text-foreground font-medium rounded-lg hover:bg-border transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 21 21">
+                  <rect x="1" y="1" width="9" height="9" fill="#f25022" />
+                  <rect x="11" y="1" width="9" height="9" fill="#7fba00" />
+                  <rect x="1" y="11" width="9" height="9" fill="#00a4ef" />
+                  <rect x="11" y="11" width="9" height="9" fill="#ffb900" />
+                </svg>
+                Continue with Microsoft
+              </button>
+            </>
+          )}
 
           {showResend && (
             <button

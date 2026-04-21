@@ -24,11 +24,11 @@ function buildDefaultMeals(
     }));
 }
 
-const DAY_TYPES: { value: DayType; label: string; color: string }[] = [
-  { value: 'recovery', label: 'Recovery', color: 'text-[#6B6B6B]' },
-  { value: 'moderate', label: 'Moderate', color: 'text-[color:var(--accent)]' },
-  { value: 'high', label: 'High', color: 'text-[#F59E0B]' },
-  { value: 'highest', label: 'Highest', color: 'text-[color:var(--accent-light)]' },
+const DAY_TYPES: { value: DayType; label: string }[] = [
+  { value: 'recovery', label: 'Recovery' },
+  { value: 'moderate', label: 'Moderate' },
+  { value: 'high', label: 'High' },
+  { value: 'highest', label: 'Highest' },
 ];
 
 function MacroBar({
@@ -216,7 +216,7 @@ export default function NutritionPage() {
 
       {/* Day type selector */}
       <div className="glass-panel p-4 space-y-3">
-        <p className="text-xs font-semibold uppercase tracking-wider text-[#6B6B6B]">Day Type</p>
+        <p className="text-xs font-semibold uppercase tracking-wider text-[color:var(--text-2)]">Day Type</p>
         <div className="grid grid-cols-4 gap-2">
           {DAY_TYPES.map((dt) => (
             <button
@@ -226,8 +226,8 @@ export default function NutritionPage() {
               className={cn(
                 'py-2 rounded-lg text-sm font-semibold border transition-all',
                 dayType === dt.value
-                  ? 'border-[rgba(212,175,55,0.5)] bg-[rgba(212,175,55,0.1)] text-[color:var(--accent)]'
-                  : 'border-[rgba(80,96,128,0.2)] text-[#6B6B6B] hover:text-[#F5F5F5]'
+                  ? 'is-selected text-[color:var(--accent-light)]'
+                  : 'border-[color:var(--chrome-border)] text-[color:var(--text-2)] hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]'
               )}
             >
               {dt.label}

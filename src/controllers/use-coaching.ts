@@ -2,17 +2,8 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys, staleTimes } from '@/lib/constants';
-import { getPhases, getActivePhase, getJournalEntries, createJournalEntry, updateJournalEntry } from '@/services';
+import { getActivePhase, getJournalEntries, createJournalEntry } from '@/services';
 import type { JournalEntry } from '@/lib/types';
-
-export function usePhases(userId: string) {
-  return useQuery({
-    queryKey: queryKeys(userId).coaching.phases(),
-    queryFn: () => getPhases(userId),
-    staleTime: staleTimes.phases,
-    enabled: !!userId,
-  });
-}
 
 export function useActivePhase(userId: string) {
   return useQuery({
@@ -37,18 +28,6 @@ export function useCreateJournalEntry(userId: string) {
 
   return useMutation({
     mutationFn: (entry: Omit<JournalEntry, 'id'>) => createJournalEntry(userId, entry),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys(userId).coaching.all });
-    },
-  });
-}
-
-export function useUpdateJournalEntry(userId: string) {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ entryId, updates }: { entryId: string; updates: Partial<JournalEntry> }) =>
-      updateJournalEntry(userId, entryId, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys(userId).coaching.all });
     },

@@ -8,9 +8,9 @@ This document is the **canonical technical overview** for implementing and exten
 
 ## 1. Product summary
 
-**IRONMIND** is a solo-athlete elite bodybuilding performance application: rotating training programs, KPI tracking, day-type-aware nutrition, supplement protocols, recovery and physique logging, coaching journal/phases, volume-vs-landmarks analytics, computed **smart alerts**, and a **markdown export** of full athlete state for LLM analysis.
+**IRONMIND** is an elite bodybuilding performance application: rotating training programs, KPI tracking, day-type-aware nutrition, supplement protocols, recovery and physique logging, coaching journal/phases, volume-vs-landmarks analytics, computed **smart alerts**, and a **markdown export** of full athlete state for LLM analysis.
 
-The codebase optimizes for **one primary user** (self-coaching workflow) with Firebase-backed persistence and a strict **layered architecture** so UI never talks to Firebase directly.
+The app is built for **multiple independent athletes** (each Firebase Auth user sees only their own data under `users/{uid}/…`). The codebase uses Firebase-backed persistence and a strict **layered architecture** so UI never talks to Firebase directly.
 
 ---
 
@@ -46,8 +46,15 @@ ironmind/
 │   ├── skills/                    # Cursor skills (see §15)
 │   └── personas/SENIOR-ARCHITECT.md
 ├── Documentation/
+│   ├── README.md                  # Index of docs in this folder
 │   ├── ARCHITECTURE.md            # This file
-│   └── STYLE-GUIDE.md             # Legacy visual doc; prefer IRONMIND rules + styling skill
+│   ├── STYLE-GUIDE.md             # Legacy visual doc; prefer IRONMIND rules + styling skill
+│   ├── LOGO-BRIEF.md              # Logo prompts + `public/brand/` asset map
+│   └── Data/                      # Archived snippets (see Data/README.md)
+├── public/
+│   ├── brand/                     # Raster logos — URLs via `brandAssets` (see §13.6)
+│   ├── manifest.json
+│   └── …
 ├── src/
 │   ├── app/                       # Next.js App Router (pages, layouts, globals)
 │   ├── components/                # Shared UI (layout, auth, providers)
@@ -56,7 +63,7 @@ ironmind/
 │   ├── lib/
 │   │   ├── firebase/              # SDK init, converters, helpers
 │   │   ├── types/                 # Domain TypeScript models
-│   │   ├── constants/             # query keys, stale times, domain constants
+│   │   ├── constants/             # query keys, stale times, brand assets, domain constants
 │   │   ├── seed/                  # Initial data + seedUserData()
 │   │   ├── export/                # Markdown summary generation
 │   │   └── utils/                 # dates, formatting, cn(), cycle math, etc.
@@ -167,7 +174,7 @@ Use Zustand for **transient UI and auth identity**, not for Firestore document m
 
 ### 6.3 Query keys and staleness
 
-- **Keys:** `src/lib/constants/query-keys.ts` — single factory for all domains; extend here when adding features.
+- **Keys:** `src/lib/constants/query-keys.ts` — **`queryKeys(userId)`** factory so every TanStack Query key is **user-scoped** (no cache bleed between accounts). Extend the factory when adding features; never use a global static key array for user data.
 - **Stale times:** `src/lib/constants/stale-times.ts` — per-entity tuning (e.g. profile `Infinity`, workouts minutes-level).
 
 ---
@@ -206,8 +213,8 @@ All paths go through **`collections`** — never hand-roll `'users/...'` strings
 
 ### 7.4 Storage & auth
 
-- **`src/lib/firebase/storage.ts`** — Upload helpers for physique photos etc.
-- **`src/lib/firebase/auth.ts`** — Auth helpers consumed by login/register flows.
+- **`src/lib/firebase/storage.ts`** — Upload helpers for physique photos etc. (optional feature flags in app code when Storage is unavailable).
+- **`src/lib/firebase/auth.ts`** — Email/password + **OAuth** (`signInWithPopup`): Google; Facebook and Microsoft helpers exist and may be hidden in UI until provider console setup is complete.
 
 ---
 
@@ -308,6 +315,13 @@ Persistent layout chrome uses the same **warm dark** token hierarchy as the rest
 - **Tokens** (`globals.css` `:root`): `--chrome-bg` (sidebar & mobile nav, matches `--bg-1`), `--chrome-bg-topbar` (sticky header — **same value as `--chrome-bg`** so header and sidebar share one shade), `--chrome-bg-toggle` (sidebar rail control, matches `--bg-0`).
 - **Components:** `top-bar.tsx`, `sidebar.tsx`, `mobile-nav.tsx` — backgrounds via `bg-[color:var(--chrome-…)]`; idle/hover chrome text via `var(--text-1)` / `var(--text-0)` (see **`.cursor/rules/IRONMIND.md`**).
 
+### 13.6 Brand imagery (logos)
+
+- **On disk:** All raster logo PNGs live under **`public/brand/`** (male, female, combined mark, Apple touch icon, optional alternate crops).
+- **In code:** **`src/lib/constants/brand-assets.ts`** exports **`brandAssets`** — the only supported way to reference those URLs (`brandAssets.logoMale`, `logoFemale`, `logoCombined`, `appleTouchIcon`, alternates).
+- **Components:** **`IronmindLogo`** (`src/components/brand/ironmind-logo.tsx`) picks male vs female PNG by UI theme (hot-pink → female). **`/login`** uses the **combined** mark directly via `brandAssets.logoCombined`.
+- **Full asset list and prompts:** **`Documentation/LOGO-BRIEF.md`**.
+
 ---
 
 ## 14. Quality gates and workflows
@@ -339,12 +353,20 @@ Use this table when planning work — **read the relevant skill before coding**.
 | **Senior architect persona** | `.cursor/personas/SENIOR-ARCHITECT.md` | System-level decisions, review mindset |
 | **Next.js agent note** | `AGENTS.md` | Next.js behavior differences — consult `node_modules/next/dist/docs/` |
 | **This architecture doc** | `Documentation/ARCHITECTURE.md` | Orientation, boundaries, Firestore map |
+| **Documentation index** | `Documentation/README.md` | Which doc to read for what |
+| **Logo brief & assets** | `Documentation/LOGO-BRIEF.md` | Brand prompts, `public/brand/` files, `brandAssets` |
 
 ---
 
 ## 16. Environment variables
 
 Required for full Firebase operation (see `README.md`):
+
+Feature flags (when present; see `.env.local` examples in repo):
+
+- `NEXT_PUBLIC_ENABLE_PHOTO_UPLOAD` — set to `true` only when Firebase Storage is provisioned.
+
+Core Firebase:
 
 - `NEXT_PUBLIC_FIREBASE_API_KEY`
 - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`

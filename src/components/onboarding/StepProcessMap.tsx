@@ -58,8 +58,8 @@ export function StepProcessMap({ onNext }: StepProcessMapProps) {
           </span>
         </h1>
         <p className="text-[#9A9A9A] text-base max-w-xl mx-auto">
-          Follow this 5-step process to initialize your personal AI bodybuilding coach and fully
-          populate your coaching app with data tailored to you.
+          Follow this 6-step process to personalize your theme, initialize your AI bodybuilding
+          coach, and fully populate your coaching app with data tailored to you.
         </p>
       </div>
 
