@@ -10,14 +10,14 @@ export const alexSupplementProtocol: SupplementProtocol = {
       optional: [],
     },
     {
-      timing: 'preworkout',
+      timing: 'afternoon',
       withMeal: null,
       time: '17:00',
       supplements: [],
       optional: ['Caffeine / pre-workout', 'Citrulline (6g)'],
     },
     {
-      timing: 'postworkout',
+      timing: 'dinner',
       withMeal: 'post-training meal',
       time: '18:30',
       supplements: ['Whey Protein (if under protein target)'],
