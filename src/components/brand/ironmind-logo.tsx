@@ -19,7 +19,7 @@ export function IronmindLogo({
   variant: IronmindLogoVariant;
   className?: string;
   priority?: boolean;
-}) {
+}) {  
   const theme = useUIStore((s) => s.theme);
 
   const src = theme === 'hot-pink'
@@ -28,11 +28,11 @@ export function IronmindLogo({
 
   const variantClass =
     variant === 'sidebar-expanded'
-      ? 'h-16 w-16 object-contain object-center'
+      ? 'h-[8rem] w-[8rem] object-contain object-center'
       : variant === 'sidebar-collapsed'
-        ? 'h-[3.375rem] w-[3.375rem] object-contain object-center'
+        ? 'h-[3rem] w-[3rem] object-contain object-center'
         : variant === 'topbar'
-          ? 'h-8 w-auto max-w-[6.25rem] object-contain object-center'
+          ? 'h-12 w-auto max-w-[6.25rem] object-contain object-center'
           : 'mx-auto h-auto max-h-24 w-auto max-w-[min(100%,280px)] object-contain object-center';
 
   const sizes =
@@ -41,8 +41,8 @@ export function IronmindLogo({
       : variant === 'topbar'
         ? '96px'
         : variant === 'sidebar-expanded'
-          ? '64px'
-          : '54px';
+          ? '104px'
+          : '48px';
 
   return (
     <span className="inline-flex items-center justify-center shrink-0 [&>img]:max-h-full">

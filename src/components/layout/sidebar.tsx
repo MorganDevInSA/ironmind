@@ -49,26 +49,13 @@ export function Sidebar() {
         sidebarOpen ? 'w-60' : 'w-[72px]'
       )}
     >
-      {/* Logo — centered above nav when expanded */}
-      <div
-        className={cn(
-          'flex w-full shrink-0',
-          sidebarOpen
-            ? 'min-h-[5.5rem] items-start justify-center px-3 pt-[1.125rem] pb-3'
-            : 'h-[4.75rem] items-center justify-center px-0'
-        )}
-      >
+      {/* Logo — fixed size and position regardless of sidebar state */}
+      <div className="flex w-full shrink-0 h-[5.5rem] items-center justify-center px-2">
         <Link
           href="/guide"
-          className={cn(
-            'flex items-center justify-center rounded-lg outline-none ring-offset-2 ring-offset-[#0d0d0d] focus-visible:ring-2 focus-visible:ring-[color:var(--accent)]/55',
-            sidebarOpen ? 'w-full justify-center' : 'w-full'
-          )}
+          className="flex items-center justify-center rounded-lg outline-none ring-offset-2 ring-offset-[#0d0d0d] focus-visible:ring-2 focus-visible:ring-[color:var(--accent)]/55"
         >
-          <IronmindLogo
-            variant={sidebarOpen ? 'sidebar-expanded' : 'sidebar-collapsed'}
-            priority
-          />
+          <IronmindLogo variant="sidebar-expanded" priority />
           <span className="sr-only">IRONMIND — User Guide</span>
         </Link>
       </div>
@@ -78,8 +65,7 @@ export function Sidebar() {
         type="button"
         onClick={toggleSidebar}
         className={cn(
-          'absolute -right-3 w-6 h-6 rounded-full z-50',
-          sidebarOpen ? 'top-[6rem]' : 'top-[5rem]',
+          'absolute -right-3 w-6 h-6 rounded-full z-50 top-[5.75rem]',
           'flex items-center justify-center',
           'bg-[color:var(--chrome-bg-toggle)] border border-[color:var(--chrome-border)]',
           'text-[color:var(--text-1)] hover:text-[color:var(--accent)] hover:border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)]',
