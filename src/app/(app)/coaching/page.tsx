@@ -77,7 +77,7 @@ export default function CoachingPage() {
         <div className="glass-panel p-5">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-lg bg-[rgba(212,175,55,0.1)] flex items-center justify-center">
-              <Target className="text-[#DC2626]" size={20} />
+              <Target className="text-[color:var(--accent)]" size={20} />
             </div>
             <div>
               <h2 className="font-semibold text-[#F5F5F5]">{phase.name}</h2>
@@ -107,7 +107,7 @@ export default function CoachingPage() {
         <div className="glass-panel p-5">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-lg bg-[rgba(59,130,246,0.1)] flex items-center justify-center">
-              <TrendingUp className="text-[#DC2626]" size={20} />
+              <TrendingUp className="text-[color:var(--accent)]" size={20} />
             </div>
             <h2 className="font-semibold text-[#F5F5F5]">Weekly Volume vs Landmarks</h2>
           </div>
@@ -121,7 +121,7 @@ export default function CoachingPage() {
                 </div>
                 <div className="h-2 bg-[rgba(16,22,34,0.72)] rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-[#DC2626] rounded-full"
+                    className="h-full bg-[color:var(--accent)] rounded-full"
                     style={{ width: `${Math.min(100, (muscle.currentSets / muscle.mrv) * 100)}%` }}
                   />
                 </div>

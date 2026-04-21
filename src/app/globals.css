@@ -8,6 +8,11 @@
    CSS VARIABLES — Design tokens
 ============================================================ */
 :root {
+  /* ── Per-theme atmospheric glow (body bg) ─ */
+  --body-glow-1: rgba(180, 20, 20, 0.06);
+  --body-glow-2: rgba(120, 10, 10, 0.04);
+  --body-glow-3: rgba(200, 25, 25, 0.03);
+
   /* ── Backgrounds ─────────────────────────── */
   --bg-0: #080808;
   --bg-1: #0D0D0D;
@@ -45,6 +50,7 @@
   /* ── Accent — Crimson ────────────────────── */
   --accent:   #DC2626;
   --accent-2: #991B1B;
+  --accent-light: #EF4444;
 
   /* ── Status ──────────────────────────────── */
   --good: #22C55E;
@@ -56,7 +62,7 @@
   --gold-light: #EF4444;
   --gold-dark:  #991B1B;
   --crimson:       #DC2626;
-  --crimson-light: #EF4444;
+  --crimson-light: var(--accent-light);
   --crimson-dark:  #991B1B;
 
   /* ── Shadows ─────────────────────────────── */
@@ -86,13 +92,55 @@
    * Warm dark neutrals (aligned with --bg-*); avoid flat #2e2e2e-style cool grey bars.
    * Header uses same fill as sidebar so the L-corner reads as one rail (no lighter strip).
    */
-  --chrome-bg: #0d0d0d;
+  --chrome-bg: #141414;
   --chrome-bg-topbar: var(--chrome-bg);
-  --chrome-bg-toggle: #080808;
+  --chrome-bg-toggle: #101010;
   /* Bottom edge of sticky header — blended line + depth (used in layout) */
   --chrome-header-shadow:
     0 8px 28px rgba(0, 0, 0, 0.42),
     inset 0 -1px 0 rgba(255, 255, 255, 0.045);
+}
+
+html[data-theme='hot-pink'] {
+  --accent: #FF3EA5;
+  --accent-2: #C21877;
+  --accent-light: #FF7DC4;
+  --crimson: var(--accent);
+  --crimson-light: var(--accent-light);
+  --crimson-dark: var(--accent-2);
+  --gold: var(--accent);
+  --gold-light: var(--accent-light);
+  --gold-dark: var(--accent-2);
+  --shadow-gold: 0 8px 32px rgba(255, 62, 165, 0.20);
+  --shadow-accent: 0 8px 32px rgba(255, 62, 165, 0.20);
+  --dashboard-overview-border: rgba(255, 62, 165, 0.26);
+  --panel-border: rgba(100, 50, 80, 0.40);
+  --chrome-border: rgba(100, 50, 80, 0.38);
+  --chrome-border-subtle: rgba(80, 40, 60, 0.72);
+  --body-glow-1: rgba(255, 62, 165, 0.06);
+  --body-glow-2: rgba(180, 20, 120, 0.04);
+  --body-glow-3: rgba(255, 80, 180, 0.03);
+}
+
+html[data-theme='chlorine-blue'] {
+  --accent: #2EC5FF;
+  --accent-2: #1786B5;
+  --accent-light: #7BDDFF;
+  --crimson: var(--accent);
+  --crimson-light: var(--accent-light);
+  --crimson-dark: var(--accent-2);
+  --gold: var(--accent);
+  --gold-light: var(--accent-light);
+  --gold-dark: var(--accent-2);
+  --shadow-gold: 0 8px 32px rgba(46, 197, 255, 0.20);
+  --shadow-accent: 0 8px 32px rgba(46, 197, 255, 0.20);
+  --dashboard-overview-border: rgba(46, 197, 255, 0.26);
+  --panel-border: rgba(30, 80, 110, 0.40);
+  --chrome-border: rgba(30, 80, 110, 0.38);
+  --chrome-border-subtle: rgba(20, 60, 90, 0.72);
+  --body-glow-1: rgba(46, 197, 255, 0.06);
+  --body-glow-2: rgba(20, 100, 160, 0.04);
+  --body-glow-3: rgba(46, 197, 255, 0.03);
 }
 
 /* ============================================================
@@ -112,11 +160,11 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
-  /* Blood-and-iron atmospheric background */
+  /* Atmospheric background — glow colours swap with theme token */
   background:
-    radial-gradient(1200px 600px at 10% -10%, rgba(180, 20, 20, 0.06), transparent 60%),
-    radial-gradient(900px 500px at 110% 10%,  rgba(120, 10, 10, 0.04), transparent 55%),
-    radial-gradient(800px 400px at 50% 100%,  rgba(200, 25, 25, 0.03), transparent 50%),
+    radial-gradient(1200px 600px at 10% -10%, var(--body-glow-1), transparent 60%),
+    radial-gradient(900px 500px at 110% 10%,  var(--body-glow-2), transparent 55%),
+    radial-gradient(800px 400px at 50% 100%,  var(--body-glow-3), transparent 50%),
     linear-gradient(160deg, var(--bg-0), var(--bg-1) 45%, var(--bg-2) 100%);
   background-attachment: fixed;
 }
@@ -143,12 +191,12 @@ h4 { font-size: 1.125rem; }
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: rgba(12, 8, 8, 0.8); }
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, rgba(220, 38, 38, 0.5), rgba(153, 27, 27, 0.7));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 50%, transparent), color-mix(in srgb, var(--accent-2) 70%, transparent));
   border-radius: 999px;
   border: 2px solid rgba(12, 8, 8, 0.8);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, rgba(239, 68, 68, 0.7), rgba(220, 38, 38, 0.9));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent-light) 70%, transparent), color-mix(in srgb, var(--accent) 90%, transparent));
 }
 
 /* Modal scrollable */
@@ -161,12 +209,12 @@ h4 { font-size: 1.125rem; }
    FOCUS & SELECTION
 ============================================================ */
 :focus-visible {
-  outline: 2px solid var(--crimson);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
 ::selection {
-  background: rgba(220, 38, 38, 0.25);
+  background: color-mix(in srgb, var(--accent) 25%, transparent);
   color: var(--text-0);
 }
 
@@ -309,9 +357,9 @@ h4 { font-size: 1.125rem; }
     border-radius: 0.5rem;
     font-weight: 600;
     color: white;
-    border: 1px solid rgba(220, 38, 38, 0.5);
-    background: linear-gradient(120deg, rgba(220, 38, 38, 0.95), rgba(185, 28, 28, 0.95));
-    box-shadow: 0 12px 22px rgba(220, 38, 38, 0.25);
+    border: 1px solid color-mix(in srgb, var(--accent) 52%, transparent);
+    background: linear-gradient(120deg, color-mix(in srgb, var(--accent) 94%, transparent), color-mix(in srgb, var(--accent-2) 94%, transparent));
+    box-shadow: 0 12px 22px color-mix(in srgb, var(--accent) 26%, transparent);
     transition: all 0.2s ease;
   }
 
@@ -341,9 +389,9 @@ h4 { font-size: 1.125rem; }
     border-radius: 0.5rem;
     font-weight: 600;
     color: white;
-    background: linear-gradient(120deg, rgba(220, 38, 38, 0.95), rgba(153, 27, 27, 0.95));
-    border: 1px solid rgba(220, 38, 38, 0.5);
-    box-shadow: 0 8px 24px rgba(220, 38, 38, 0.20);
+    background: linear-gradient(120deg, color-mix(in srgb, var(--accent) 94%, transparent), color-mix(in srgb, var(--accent-2) 94%, transparent));
+    border: 1px solid color-mix(in srgb, var(--accent) 52%, transparent);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--accent) 20%, transparent);
     transition: all 0.2s ease;
   }
 
@@ -527,10 +575,10 @@ h4 { font-size: 1.125rem; }
   }
 
   .nav-item.active {
-    background: radial-gradient(120% 140% at 50% 0%, rgba(220, 38, 38, 0.08) 0%, #070707 58%);
-    border-color: rgba(220, 38, 38, 0.38);
+    background: radial-gradient(120% 140% at 50% 0%, color-mix(in srgb, var(--accent) 8%, transparent) 0%, #070707 58%);
+    border-color: color-mix(in srgb, var(--accent) 38%, transparent);
     box-shadow:
-      0px 0px 14px rgba(220, 38, 38, 0.09),
+      0px 0px 14px color-mix(in srgb, var(--accent) 9%, transparent),
       inset 0px 1px 0 rgba(255, 255, 255, 0.04),
       inset 0px -1px 0 rgba(0, 0, 0, 0.58);
   }
@@ -546,9 +594,9 @@ h4 { font-size: 1.125rem; }
     background: linear-gradient(
       110deg,
       transparent 0%,
-      rgba(239, 68, 68, 0.04) 35%,
-      rgba(239, 68, 68, 0.14) 50%,
-      rgba(239, 68, 68, 0.04) 65%,
+      color-mix(in srgb, var(--accent-light) 4%, transparent) 35%,
+      color-mix(in srgb, var(--accent-light) 14%, transparent) 50%,
+      color-mix(in srgb, var(--accent-light) 4%, transparent) 65%,
       transparent 100%
     );
     opacity: 0;
@@ -566,7 +614,7 @@ h4 { font-size: 1.125rem; }
     height: 1px;
     margin: 1rem 0;
     border: none;
-    background: linear-gradient(90deg, transparent, rgba(220, 38, 38, 0.30), transparent);
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 30%, transparent), transparent);
   }
 
   /* --- Live indicator --------------------------------------- */
@@ -665,8 +713,8 @@ h4 { font-size: 1.125rem; }
     height: 1.5rem;
     border-radius: 9999px;
     animation: spin 0.6s linear infinite;
-    border: 3px solid rgba(65, 50, 50, 0.6);
-    border-top-color: var(--crimson);
+    border: 3px solid color-mix(in srgb, var(--accent) 20%, rgba(65, 50, 50, 0.6));
+    border-top-color: var(--accent);
   }
 
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -685,7 +733,7 @@ h4 { font-size: 1.125rem; }
 
   .tab-button.active {
     color: var(--text-0);
-    border-bottom-color: var(--crimson);
+    border-bottom-color: var(--accent);
   }
 
   /* --- Chart containers ------------------------------------- */
@@ -721,26 +769,26 @@ h4 { font-size: 1.125rem; }
 
 @keyframes gold-glint {
   0%, 100% {
-    filter: drop-shadow(0 0 4px rgba(220, 38, 38, 0.9)) drop-shadow(0 0 8px rgba(239, 68, 68, 0.5));
+    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--accent) 90%, transparent)) drop-shadow(0 0 8px color-mix(in srgb, var(--accent-light) 50%, transparent));
   }
   50% {
-    filter: drop-shadow(0 0 8px rgba(239, 68, 68, 1)) drop-shadow(0 0 12px rgba(220, 38, 38, 0.7)) drop-shadow(0 0 16px rgba(153, 27, 27, 0.5));
+    filter: drop-shadow(0 0 8px var(--accent-light)) drop-shadow(0 0 12px color-mix(in srgb, var(--accent) 70%, transparent)) drop-shadow(0 0 16px color-mix(in srgb, var(--accent-2) 50%, transparent));
   }
 }
 
 @keyframes gold-glow {
   0%, 100% {
-    box-shadow: 0 0 20px rgba(220, 38, 38, 0.20), inset 0 1px 2px rgba(239, 68, 68, 0.2);
+    box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 20%, transparent), inset 0 1px 2px color-mix(in srgb, var(--accent-light) 20%, transparent);
   }
   50% {
-    box-shadow: 0 0 30px rgba(220, 38, 38, 0.40), inset 0 1px 2px rgba(239, 68, 68, 0.4);
+    box-shadow: 0 0 30px color-mix(in srgb, var(--accent) 40%, transparent), inset 0 1px 2px color-mix(in srgb, var(--accent-light) 40%, transparent);
   }
 }
 
 @keyframes pulse-ring {
-  0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
-  70% { box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 40%, transparent); }
+  70% { box-shadow: 0 0 0 10px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
 }
 
 @keyframes pulse-broken {

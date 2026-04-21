@@ -48,12 +48,12 @@ export function StepProcessMap({ onNext }: StepProcessMapProps) {
     <div className="flex flex-col gap-8 py-4">
       {/* Header */}
       <div className="text-center">
-        <span className="inline-block text-[10px] font-semibold uppercase tracking-[0.35em] text-[#DC2626] mb-3">
+        <span className="inline-block text-[10px] font-semibold uppercase tracking-[0.35em] text-[color:var(--accent)] mb-3">
           Setup Process
         </span>
         <h1 className="text-3xl sm:text-4xl font-bold font-heading tracking-tight text-[#F0F0F0] mb-3">
           Welcome to{' '}
-          <span className="bg-gradient-to-r from-[#FF4040] via-[#DC2626] to-[#991B1B] bg-clip-text text-transparent [filter:drop-shadow(0_2px_12px_rgba(220,38,38,0.4))]">
+          <span className="bg-gradient-to-r from-[color:var(--accent-light)] via-[color:var(--accent)] to-[color:var(--accent-2)] bg-clip-text text-transparent [filter:drop-shadow(0_2px_12px_color-mix(in_srgb,var(--accent)_40%,transparent))]">
             IRONMIND
           </span>
         </h1>
@@ -82,11 +82,11 @@ export function StepProcessMap({ onNext }: StepProcessMapProps) {
                     shadow-[0_10px_24px_rgba(0,0,0,0.45)]">
                     {/* Number badge */}
                     <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold
-                      bg-[rgba(220,38,38,0.15)] border border-[rgba(220,38,38,0.38)] text-[#EF4444]
+                      bg-[rgba(220,38,38,0.15)] border border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)] text-[color:var(--accent-light)]
                       [text-shadow:0_0_8px_rgba(220,38,38,0.4)]">
                       {node.number}
                     </div>
-                    <Icon size={20} className="text-[#DC2626]" />
+                    <Icon size={20} className="text-[color:var(--accent)]" />
                     <span className="text-[10px] font-bold uppercase tracking-wider text-[#F0F0F0] text-center leading-tight">
                       {node.label}
                     </span>
@@ -125,7 +125,7 @@ export function StepProcessMap({ onNext }: StepProcessMapProps) {
         <button
           onClick={onNext}
           className="flex items-center gap-3 px-8 py-4 rounded-lg font-semibold text-white text-base
-            bg-gradient-to-r from-[#DC2626] to-[#B91C1C] border border-[rgba(220,38,38,0.5)]
+            bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-2)] border border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]
             shadow-[0_12px_30px_rgba(220,38,38,0.30)]
             hover:brightness-110 active:scale-95 transition-all duration-200"
         >

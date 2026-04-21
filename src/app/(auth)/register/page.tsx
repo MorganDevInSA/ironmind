@@ -41,7 +41,7 @@ function PasswordInput({
         className="w-full px-3 py-2.5 pr-10 rounded-lg text-sm
           bg-[#131313] border border-[rgba(65,50,50,0.50)]
           text-[#F0F0F0] placeholder:text-[#5E5E5E]
-          focus:border-[rgba(220,38,38,0.50)] focus:shadow-[0_0_0_3px_rgba(220,38,38,0.10)]
+          focus:border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)] focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--accent)_10%,transparent)]
           focus:outline-none transition-all duration-200"
       />
       <button
@@ -99,14 +99,14 @@ export default function RegisterPage() {
   const inputCls = `w-full px-3 py-2.5 rounded-lg text-sm
     bg-[#131313] border border-[rgba(65,50,50,0.50)]
     text-[#F0F0F0] placeholder:text-[#5E5E5E]
-    focus:border-[rgba(220,38,38,0.50)] focus:shadow-[0_0_0_3px_rgba(220,38,38,0.10)]
+    focus:border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)] focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--accent)_10%,transparent)]
     focus:outline-none transition-all duration-200`;
 
   const labelCls = 'block text-xs font-semibold uppercase tracking-[0.2em] text-[#5E5E5E] mb-1.5';
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4
-      bg-[radial-gradient(900px_500px_at_50%_-10%,rgba(180,20,20,0.07),transparent_60%),linear-gradient(160deg,#080808,#0D0D0D_55%,#131313)]">
+      bg-[radial-gradient(900px_500px_at_50%_-10%,color-mix(in_srgb,var(--accent)_7%,transparent),transparent_60%),linear-gradient(160deg,#080808,#0D0D0D_55%,#131313)]">
       <div className="w-full max-w-md">
 
         {/* Logo */}
@@ -215,8 +215,8 @@ export default function RegisterPage() {
               type="submit"
               disabled={isLoading}
               className="mt-1 w-full py-3 rounded-lg font-semibold text-sm text-white
-                bg-gradient-to-r from-[#DC2626] to-[#B91C1C] border border-[rgba(220,38,38,0.5)]
-                shadow-[0_8px_22px_rgba(220,38,38,0.25)]
+                bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-2)] border border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]
+                shadow-[0_8px_22px_color-mix(in_srgb,var(--accent)_25%,transparent)]
                 hover:brightness-110 active:scale-95 transition-all duration-200
                 disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -232,7 +232,7 @@ export default function RegisterPage() {
 
         <p className="text-center text-sm text-[#5E5E5E] mt-6">
           Already have an account?{' '}
-          <a href="/login" className="text-[#DC2626] hover:text-[#EF4444] underline underline-offset-2 transition-colors">
+          <a href="/login" className="text-[color:var(--accent)] hover:text-[color:var(--accent-light)] underline underline-offset-2 transition-colors">
             Sign in
           </a>
         </p>

@@ -3,6 +3,7 @@ import "./globals.css";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { Toaster } from "sonner";
 import { RegisterServiceWorker } from "@/components/pwa/register-service-worker";
+import { ThemeSync } from "@/components/theme/theme-sync";
 
 export const metadata: Metadata = {
   title: "IRONMIND — Elite Bodybuilding Performance",
@@ -36,6 +37,7 @@ export default function RootLayout({
     <html lang="en" className="h-full antialiased dark">
       <body className="min-h-full text-foreground font-sans">
         <QueryProvider>
+          <ThemeSync />
           {children}
           <RegisterServiceWorker />
           <Toaster

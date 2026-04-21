@@ -44,7 +44,7 @@ function Field({
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-center gap-3 mt-2 mb-4">
-      <h3 className="text-sm font-bold uppercase tracking-[0.25em] text-[#DC2626]">{children}</h3>
+      <h3 className="text-sm font-bold uppercase tracking-[0.25em] text-[color:var(--accent)]">{children}</h3>
       <div className="flex-1 h-px bg-[rgba(220,38,38,0.20)]" />
     </div>
   );
@@ -94,7 +94,7 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
     <div className="flex flex-col gap-7 py-4">
       {/* Heading */}
       <div>
-        <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[#DC2626]">
+        <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[color:var(--accent)]">
           Step 2 of 5
         </span>
         <h2 className="mt-2 text-2xl sm:text-3xl font-bold font-heading tracking-tight text-[#F0F0F0]">
@@ -102,7 +102,7 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
         </h2>
             <p className="mt-2 text-sm text-[#9A9A9A]">
           Fill in as much as you can. Leave unknown fields blank — they become{' '}
-          <code className="text-[#EF4444] text-xs bg-[rgba(220,38,38,0.10)] px-1.5 py-0.5 rounded">null</code>{' '}
+          <code className="text-[color:var(--accent-light)] text-xs bg-[color:color-mix(in_srgb,var(--accent)_10%,transparent)] px-1.5 py-0.5 rounded">null</code>{' '}
           in the output. The more detail you provide, the better your personalised program.
         </p>
       </div>
@@ -274,7 +274,7 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
         </p>
         {([0, 1, 2] as const).map(idx => (
           <div key={idx} className="p-4 rounded-xl border border-[rgba(65,50,50,0.30)] bg-[rgba(8,8,8,0.5)] flex flex-col gap-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#DC2626]">Injury {idx + 1}</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--accent)]">Injury {idx + 1}</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Field label="Injury Name">
                 <input className={inputCls} value={answers.injuries[idx].name} onChange={e => setInjury(idx, 'name', e.target.value)} placeholder="e.g. Left shoulder labrum" />
@@ -531,7 +531,7 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
         <button
           onClick={downloadJson}
           className="flex items-center gap-2 px-5 py-3 rounded-lg font-semibold text-white text-sm
-            bg-gradient-to-r from-[#DC2626] to-[#B91C1C] border border-[rgba(220,38,38,0.5)]
+            bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-2)] border border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]
             shadow-[0_8px_20px_rgba(220,38,38,0.22)]
             hover:brightness-110 active:scale-95 transition-all duration-200"
         >
@@ -551,7 +551,7 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
           onClick={onBack}
           className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm text-[#9A9A9A]
             bg-[rgba(22,16,16,0.9)] border border-[rgba(65,50,50,0.45)]
-            hover:border-[rgba(220,38,38,0.45)] hover:text-[#F0F0F0]
+            hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[#F0F0F0]
             active:scale-95 transition-all duration-200"
         >
           <ArrowLeft size={15} />
@@ -562,7 +562,7 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
           onClick={onNext}
           disabled={!downloaded}
           className="flex items-center gap-2 px-6 py-2.5 rounded-lg font-semibold text-sm text-white
-            bg-gradient-to-r from-[#DC2626] to-[#B91C1C] border border-[rgba(220,38,38,0.5)]
+            bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-2)] border border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]
             shadow-[0_8px_20px_rgba(220,38,38,0.22)]
             hover:brightness-110 active:scale-95 transition-all duration-200
             disabled:opacity-40 disabled:cursor-not-allowed"

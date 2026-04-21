@@ -130,8 +130,8 @@ function toMin(t: string) {
 function capitalize(s: string) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
 const MEASUREMENT_SERIES: { key: keyof Measurements; label: string; color: string }[] = [
-  { key: 'waist', label: 'Waist', color: '#EF4444' },
-  { key: 'chest', label: 'Chest', color: '#DC2626' },
+  { key: 'waist', label: 'Waist', color: 'var(--accent-light)' },
+  { key: 'chest', label: 'Chest', color: 'var(--accent)' },
   { key: 'hips', label: 'Hips', color: '#F59E0B' },
   { key: 'leftArm', label: 'L arm', color: '#10B981' },
   { key: 'rightArm', label: 'R arm', color: '#22C55E' },
@@ -325,7 +325,7 @@ function CoachingNotesModal({
       >
         <div className="flex items-center justify-between p-4 border-b border-[rgba(65,50,50,0.25)]">
           <div className="flex items-center gap-2">
-            <FileText size={20} className="text-[#DC2626]" />
+            <FileText size={20} className="text-[color:var(--accent)]" />
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#5E5E5E]">Coaching</p>
               <h2 className="text-lg font-bold text-[#F5F5F5]">Latest notes</h2>
@@ -352,7 +352,7 @@ function CoachingNotesModal({
                     {primary.tags.map((t) => (
                       <span
                         key={t}
-                        className="text-[10px] font-semibold uppercase tracking-wider px-2 py-1 rounded-md bg-[rgba(220,38,38,0.12)] text-[#DC2626] border border-[rgba(220,38,38,0.25)]"
+                        className="text-[10px] font-semibold uppercase tracking-wider px-2 py-1 rounded-md bg-[color:color-mix(in_srgb,var(--accent)_12%,transparent)] text-[color:var(--accent)] border border-[color:color-mix(in_srgb,var(--accent)_25%,transparent)]"
                       >
                         {t}
                       </span>
@@ -509,11 +509,11 @@ function SessionProgramPreview({ session }: { session: ProgramSession }) {
                   <span className="exercise-index-badge shrink-0">{i + 1}</span>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className={cn('font-medium', ex.isKPI ? 'text-[#DC2626]' : 'text-[#F5F5F5]')}>
+                      <span className={cn('font-medium', ex.isKPI ? 'text-[color:var(--accent)]' : 'text-[#F5F5F5]')}>
                         {ex.name}
                       </span>
                       {ex.isKPI && (
-                        <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-[rgba(220,38,38,0.14)] text-[#F5F5F5] border border-[rgba(220,38,38,0.38)] shrink-0">
+                        <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-[rgba(220,38,38,0.14)] text-[#F5F5F5] border border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)] shrink-0">
                           KPI
                         </span>
                       )}
@@ -669,7 +669,7 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="font-medium">{ex.name}</span>
                         {ex.isKPI ? (
-                          <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-[rgba(220,38,38,0.14)] text-[#F5F5F5] border border-[rgba(220,38,38,0.38)]">
+                          <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-[rgba(220,38,38,0.14)] text-[#F5F5F5] border border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)]">
                             KPI
                           </span>
                         ) : null}
@@ -861,7 +861,7 @@ function SessionDetailModal({
       >
         <div className="flex items-start justify-between gap-3 p-4 border-b border-[rgba(65,50,50,0.25)] shrink-0">
           <div className="flex items-start gap-3 min-w-0">
-            <span className="text-[#DC2626] shrink-0 mt-0.5">
+            <span className="text-[color:var(--accent)] shrink-0 mt-0.5">
               <Dumbbell size={22} />
             </span>
             <div className="min-w-0">
@@ -894,7 +894,7 @@ function SessionDetailModal({
             <button
               type="button"
               onClick={onGoWorkout}
-              className="px-4 py-2.5 rounded-xl text-sm font-bold bg-[#DC2626] text-white hover:brightness-110 flex items-center gap-2"
+              className="px-4 py-2.5 rounded-xl text-sm font-bold bg-[color:var(--accent)] text-white hover:brightness-110 flex items-center gap-2"
             >
               <Dumbbell size={16} />
               {hasLoggedWorkoutToday ? 'Open workout' : 'Start workout'}
@@ -903,7 +903,7 @@ function SessionDetailModal({
             <button
               type="button"
               onClick={onGoTraining}
-              className="px-4 py-2.5 rounded-xl text-sm font-semibold border border-[rgba(220,38,38,0.45)] text-[#DC2626] hover:bg-[rgba(220,38,38,0.12)]"
+              className="px-4 py-2.5 rounded-xl text-sm font-semibold border border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] text-[color:var(--accent)] hover:bg-[color:color-mix(in_srgb,var(--accent)_12%,transparent)]"
             >
               Open training
             </button>
@@ -933,7 +933,7 @@ function ActivityContent({ session, done, onStart, canStart }: {
       ) : (
         <button
           onClick={onStart}
-          className="w-full py-3 bg-[#DC2626] text-white font-bold rounded-xl hover:brightness-110 transition-all flex items-center justify-center gap-2"
+          className="w-full py-3 bg-[color:var(--accent)] text-white font-bold rounded-xl hover:brightness-110 transition-all flex items-center justify-center gap-2"
         >
           <Dumbbell size={18} />
           Start Workout
@@ -1232,7 +1232,7 @@ function DensityCard({ workout, onOpen }: { workout: Workout; onOpen?: () => voi
       className={cn(
         'glass-panel dashboard-card-surface p-4 col-span-full space-y-4 text-left w-full',
         onOpen &&
-          'cursor-pointer hover:border-[rgba(220,38,38,0.38)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/50'
+          'cursor-pointer hover:border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent)]/50'
       )}
     >
       <div className="flex items-center justify-between flex-wrap gap-2">
@@ -1253,7 +1253,7 @@ function DensityCard({ workout, onOpen }: { workout: Workout; onOpen?: () => voi
           ].map(s => (
             <div key={s.label} className="text-center">
               <p className="text-xs text-[color:var(--text-detail)]">{s.label}</p>
-              <p className={cn('font-mono tabular-nums font-bold', s.gold ? 'text-[#DC2626]' : 'text-[#F5F5F5]')}>
+              <p className={cn('font-mono tabular-nums font-bold', s.gold ? 'text-[color:var(--accent)]' : 'text-[#F5F5F5]')}>
                 {s.value}
               </p>
             </div>
@@ -1301,7 +1301,7 @@ function DensityCard({ workout, onOpen }: { workout: Workout; onOpen?: () => voi
               </div>
               <div className="h-2 rounded-full overflow-hidden bg-[color:var(--surface-track)] ring-1 ring-inset ring-black/35">
                 <div
-                  className="h-full bg-gradient-to-r from-[#F59E0B] to-[#DC2626] rounded-full transition-all duration-500"
+                  className="h-full bg-gradient-to-r from-[#F59E0B] to-[color:var(--accent)] rounded-full transition-all duration-500"
                   style={{ width: `${(row.volume / maxVol) * 100}%` }}
                 />
               </div>
@@ -1343,8 +1343,8 @@ function CycleDayTabs({
               className={cn(
                 'shrink-0 min-w-[2.75rem] px-3 py-2 rounded-lg text-sm font-mono tabular-nums transition-all border',
                 isSelected
-                  ? 'bg-[rgba(220,38,38,0.22)] border-[#DC2626] text-[#FAFAFA] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]'
-                  : 'border-[rgba(65,50,50,0.35)] text-[#9A9A9A] hover:border-[rgba(220,38,38,0.45)] hover:text-[#F0F0F0]',
+                  ? 'bg-[color:color-mix(in_srgb,var(--accent)_22%,transparent)] border-[color:var(--accent)] text-[#FAFAFA] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]'
+                  : 'border-[rgba(65,50,50,0.35)] text-[#9A9A9A] hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[#F0F0F0]',
                 isTodayTab && !isSelected && 'ring-1 ring-[rgba(220,38,38,0.35)]'
               )}
               aria-pressed={isSelected}
@@ -1423,7 +1423,7 @@ export default function DashboardPage() {
   if (isLoading) {
     return (
       <div className="dashboard-overview flex min-h-[40vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#DC2626] border-t-transparent" aria-hidden />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[color:var(--accent)] border-t-transparent" aria-hidden />
       </div>
     );
   }
@@ -1497,7 +1497,7 @@ export default function DashboardPage() {
               className="min-h-0 lg:flex lg:flex-col lg:h-full"
               title={isViewingToday ? 'Today\'s Session' : `Day ${safeDay} — Session plan`}
               icon={<Dumbbell size={20} />}
-              iconColor="text-[#DC2626]"
+              iconColor="text-[color:var(--accent)]"
               onClick={() => {
                 if (selectedSession) setSessionDetailOpen(true);
                 else router.push('/training');
@@ -1515,7 +1515,7 @@ export default function DashboardPage() {
                     <SessionProgramPreview session={selectedSession} />
                   </div>
                   <div className="border-t border-[rgba(65,50,50,0.25)] pt-3 space-y-1.5 shrink-0">
-                    <p className="text-xs text-[#DC2626]/90 font-medium">
+                    <p className="text-xs text-[color:var(--accent)]/90 font-medium">
                       {isViewingToday
                         ? todayWorkout
                           ? 'Open workout →'
@@ -1595,7 +1595,7 @@ export default function DashboardPage() {
                       </span>
                       <span className="text-sm text-[color:var(--text-detail)]">kg</span>
                     </div>
-                    <BarChart3 size={18} className="text-[#DC2626]/60 shrink-0" aria-hidden />
+                    <BarChart3 size={18} className="text-[color:var(--accent)]/60 shrink-0" aria-hidden />
                   </div>
                   <p className="text-sm text-[color:var(--text-detail)] shrink-0">
                     Target: {profile?.targetWeight ?? '—'} kg
@@ -1603,7 +1603,7 @@ export default function DashboardPage() {
                   <div className="min-h-0 flex-1">
                     <PhysiqueMiniCharts checkIns={physiqueCheckIns} targetWeight={profile?.targetWeight} />
                   </div>
-                  <p className="text-xs text-[#DC2626]/80 font-medium shrink-0">Full check-in &amp; history →</p>
+                  <p className="text-xs text-[color:var(--accent)]/80 font-medium shrink-0">Full check-in &amp; history →</p>
                 </div>
               </Card>
             </div>
@@ -1614,7 +1614,7 @@ export default function DashboardPage() {
           <Card
             title="Today's Nutrition"
             icon={<TrendingUp size={20} />}
-            iconColor="text-[#DC2626]"
+            iconColor="text-[color:var(--accent)]"
             onClick={() => router.push('/nutrition')}
           >
             {!isViewingToday ? (
@@ -1637,16 +1637,16 @@ export default function DashboardPage() {
                 </div>
                 <div className="h-2 rounded-full overflow-hidden bg-[color:var(--surface-track)] ring-1 ring-inset ring-black/35">
                   <div
-                    className="h-full bg-[#DC2626] rounded-full transition-all"
+                    className="h-full bg-[color:var(--accent)] rounded-full transition-all"
                     style={{ width: `${Math.min(100, todayNutrition.complianceScore)}%` }}
                   />
                 </div>
-                <p className="text-xs text-[#DC2626]/80 font-medium pt-1">Open nutrition →</p>
+                <p className="text-xs text-[color:var(--accent)]/80 font-medium pt-1">Open nutrition →</p>
               </div>
             ) : (
               <>
                 <p className="text-[color:var(--text-detail)]">No meals logged today</p>
-                <p className="text-xs text-[#DC2626]/80 font-medium pt-2">Open nutrition →</p>
+                <p className="text-xs text-[color:var(--accent)]/80 font-medium pt-2">Open nutrition →</p>
               </>
             )}
           </Card>
@@ -1654,7 +1654,7 @@ export default function DashboardPage() {
           <Card
             title="Supplements"
             icon={<Pill size={20} />}
-            iconColor="text-[#DC2626]"
+            iconColor="text-[color:var(--accent)]"
             onClick={() => router.push('/supplements')}
           >
             {!isViewingToday ? (
@@ -1670,12 +1670,12 @@ export default function DashboardPage() {
                   <span className="text-sm text-[color:var(--text-detail)]">%</span>
                 </div>
                 <p className="text-sm text-[color:var(--text-detail)]">compliance today</p>
-                <p className="text-xs text-[#DC2626]/80 font-medium">Open supplements →</p>
+                <p className="text-xs text-[color:var(--accent)]/80 font-medium">Open supplements →</p>
               </div>
             ) : (
               <>
                 <p className="text-[color:var(--text-detail)]">No supplements logged today</p>
-                <p className="text-xs text-[#DC2626]/80 font-medium pt-2">Open supplements →</p>
+                <p className="text-xs text-[color:var(--accent)]/80 font-medium pt-2">Open supplements →</p>
               </>
             )}
           </Card>
@@ -1693,7 +1693,7 @@ export default function DashboardPage() {
                 <p className="font-medium text-[#F5F5F5] line-clamp-2">{recentNotes[0].title}</p>
                 <p className="text-sm text-[color:var(--text-detail)] line-clamp-2">{recentNotes[0].content}</p>
                 <p className="text-xs text-[color:var(--text-detail)]/60">{formatDisplayDate(recentNotes[0].date)}</p>
-                <p className="text-xs text-[#DC2626]/80 font-medium pt-1">Read full note →</p>
+                <p className="text-xs text-[color:var(--accent)]/80 font-medium pt-1">Read full note →</p>
               </div>
             ) : (
               <p className="text-[color:var(--text-detail)]">No recent notes</p>
@@ -1729,17 +1729,17 @@ export default function DashboardPage() {
                   <div className="h-2 bg-[color:var(--surface-track)] rounded-full overflow-hidden relative">
                     <div className="absolute h-full bg-[rgba(120,100,98,0.38)] rounded-l-full"
                       style={{ width: `${(muscle.mev / muscle.mrv) * 100}%` }} />
-                    <div className="absolute h-full bg-[#DC2626]/30"
+                    <div className="absolute h-full bg-[color:var(--accent)]/30"
                       style={{ left: `${(muscle.mev / muscle.mrv) * 100}%`, width: `${((muscle.mav - muscle.mev) / muscle.mrv) * 100}%` }} />
-                    <div className="absolute h-full bg-[#DC2626]/60"
+                    <div className="absolute h-full bg-[color:var(--accent)]/60"
                       style={{ left: `${(muscle.mav / muscle.mrv) * 100}%`, width: `${((muscle.mrv - muscle.mav) / muscle.mrv) * 100}%` }} />
-                    <div className="absolute top-0 w-0.5 h-full bg-[#DC2626]"
+                    <div className="absolute top-0 w-0.5 h-full bg-[color:var(--accent)]"
                       style={{ left: `${Math.min(99, (muscle.currentSets / muscle.mrv) * 100)}%` }} />
                   </div>
                 </div>
               ))}
               <div className="flex gap-4 pt-1">
-                {[['#948A88', 'MV→MEV'], ['#DC2626', 'MEV→MRV'], ['#DC2626', 'Current']].map(([c, l]) => (
+                {[['#948A88', 'MV→MEV'], ['var(--accent)', 'MEV→MRV'], ['var(--accent)', 'Current']].map(([c, l]) => (
                   <div key={l} className="flex items-center gap-1.5 text-xs text-[color:var(--text-detail)]">
                     <div className="w-2 h-2 rounded-full" style={{ background: c }} />
                     {l}
@@ -1791,7 +1791,7 @@ function Card({
       className={cn(
         `glass-panel dashboard-card-surface p-4 card-hover ${fullWidth ? 'col-span-full' : ''}`,
         interactive &&
-          'cursor-pointer select-none hover:border-[rgba(220,38,38,0.38)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/55',
+          'cursor-pointer select-none hover:border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent)]/55',
         className
       )}
     >

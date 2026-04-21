@@ -231,12 +231,12 @@ export default function WorkoutPage() {
           <Timer size={14} />
           {fmtTime(elapsed)}
         </div>
-        <span className="font-mono tabular-nums text-[#DC2626] font-bold text-sm">{progress}%</span>
+        <span className="font-mono tabular-nums text-[color:var(--accent)] font-bold text-sm">{progress}%</span>
       </div>
 
       {/* Progress bar */}
-      <div className="h-1 bg-[rgba(16,22,34,0.72)] rounded-full overflow-hidden mx-1">
-        <div className="h-full bg-[#DC2626] rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
+        <div className="h-1 bg-[rgba(16,22,34,0.72)] rounded-full overflow-hidden mx-1">
+        <div className="h-full bg-[color:var(--accent)] rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
       </div>
 
       {/* Session note */}
@@ -273,7 +273,7 @@ export default function WorkoutPage() {
                   <div className="flex items-center gap-2">
                     <span className="font-semibold text-[#F5F5F5]">{exercise.name}</span>
                     {exercise.isKPI && (
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-[rgba(212,175,55,0.15)] text-[#DC2626] border border-[rgba(212,175,55,0.3)]">KPI</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-[color:color-mix(in_srgb,var(--accent)_15%,transparent)] text-[color:var(--accent)] border border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)]">KPI</span>
                     )}
                   </div>
                   <p className="text-xs text-[#6B6B6B]">{exercise.sets} × {exercise.reps} · {exercise.rest}s rest</p>

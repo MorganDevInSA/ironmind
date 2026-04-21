@@ -45,7 +45,7 @@ function SliderField({ label, value, onChange, min = 1, max = 10, unit = '' }: {
       </div>
       <input type="range" min={min} max={max} step={1} value={value}
         onChange={e => onChange(Number(e.target.value))}
-        className="w-full h-2 accent-[#DC2626] rounded-full" />
+        className="w-full h-2 rounded-full" style={{ accentColor: 'var(--accent)' }} />
       <div className="flex justify-between text-xs text-[#6B6B6B]">
         <span>{min}{unit}</span><span>{max}{unit}</span>
       </div>
@@ -131,12 +131,12 @@ export default function RecoveryPage() {
         <div className="flex rounded-xl overflow-hidden border border-[rgba(80,96,128,0.25)]">
           <button onClick={() => setTab('log')}
             className={cn('px-4 py-2 text-sm font-semibold transition-all flex items-center gap-1.5',
-              tab === 'log' ? 'bg-[rgba(59,130,246,0.2)] text-[#DC2626]' : 'text-[#6B6B6B] hover:text-[#F5F5F5]')}>
+              tab === 'log' ? 'bg-[color:color-mix(in_srgb,var(--accent)_18%,transparent)] text-[color:var(--accent)]' : 'text-[#6B6B6B] hover:text-[#F5F5F5]')}>
             <Activity size={15} /> Log
           </button>
           <button onClick={() => setTab('trends')}
             className={cn('px-4 py-2 text-sm font-semibold transition-all flex items-center gap-1.5',
-              tab === 'trends' ? 'bg-[rgba(59,130,246,0.2)] text-[#DC2626]' : 'text-[#6B6B6B] hover:text-[#F5F5F5]')}>
+              tab === 'trends' ? 'bg-[color:color-mix(in_srgb,var(--accent)_18%,transparent)] text-[color:var(--accent)]' : 'text-[#6B6B6B] hover:text-[#F5F5F5]')}>
             <TrendingUp size={15} /> Trends
           </button>
         </div>
@@ -189,7 +189,7 @@ export default function RecoveryPage() {
               </div>
               <input type="range" min={3} max={12} step={0.5} value={form.sleepHours}
                 onChange={e => setForm(f => ({ ...f, sleepHours: Number(e.target.value) }))}
-                className="w-full h-2 accent-[#DC2626] rounded-full" />
+                className="w-full h-2 rounded-full" style={{ accentColor: 'var(--accent)' }} />
               <div className="flex justify-between text-xs text-[#6B6B6B]"><span>3h</span><span>12h</span></div>
             </div>
 
@@ -207,7 +207,7 @@ export default function RecoveryPage() {
                 {MOODS.map((emoji, i) => (
                   <button key={i} onClick={() => setForm(f => ({ ...f, mood: i + 1 }))}
                     className={cn('flex-1 py-2 rounded-lg text-xl border transition-all',
-                      form.mood === i + 1 ? 'border-[#DC2626] bg-[rgba(212,175,55,0.15)]' : 'border-[rgba(80,96,128,0.25)]')}>
+                      form.mood === i + 1 ? 'border-[color:var(--accent)] bg-[color:color-mix(in_srgb,var(--accent)_15%,transparent)]' : 'border-[rgba(80,96,128,0.25)]')}>
                     {emoji}
                   </button>
                 ))}
@@ -267,8 +267,8 @@ export default function RecoveryPage() {
                     <YAxis yAxisId="hrv" orientation="right" domain={[0, 120]} tick={{ fontSize: 10, fill: '#6B6B6B' }} tickLine={false} axisLine={false} />
                     <Tooltip content={<ChartTooltip />} />
                     <Legend iconType="circle" wrapperStyle={{ fontSize: '11px', color: '#6B6B6B' }} />
-                    <Line yAxisId="sleep" type="monotone" dataKey="sleep" stroke="#DC2626" strokeWidth={2} dot={{ r: 3, fill: '#DC2626', strokeWidth: 0 }} name="sleep (h)" />
-                    <Line yAxisId="hrv" type="monotone" dataKey="hrv" stroke="#DC2626" strokeWidth={2} dot={{ r: 3, fill: '#DC2626', strokeWidth: 0 }} name="HRV" />
+                    <Line yAxisId="sleep" type="monotone" dataKey="sleep" stroke="var(--accent)" strokeWidth={2} dot={{ r: 3, fill: 'var(--accent)', strokeWidth: 0 }} name="sleep (h)" />
+                    <Line yAxisId="hrv" type="monotone" dataKey="hrv" stroke="var(--accent-light)" strokeWidth={2} dot={{ r: 3, fill: 'var(--accent-light)', strokeWidth: 0 }} name="HRV" />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -284,7 +284,7 @@ export default function RecoveryPage() {
                     <Tooltip content={<ChartTooltip />} />
                     <Legend iconType="circle" wrapperStyle={{ fontSize: '11px', color: '#6B6B6B' }} />
                     <Line type="monotone" dataKey="energy" stroke="#10B981" strokeWidth={2} dot={{ r: 3, fill: '#10B981', strokeWidth: 0 }} />
-                    <Line type="monotone" dataKey="stress" stroke="#EF4444" strokeWidth={2} dot={{ r: 3, fill: '#EF4444', strokeWidth: 0 }} />
+                    <Line type="monotone" dataKey="stress" stroke="var(--accent)" strokeWidth={2} dot={{ r: 3, fill: 'var(--accent)', strokeWidth: 0 }} />
                     <Line type="monotone" dataKey="doms" stroke="#F59E0B" strokeWidth={2} dot={{ r: 3, fill: '#F59E0B', strokeWidth: 0 }} />
                   </LineChart>
                 </ResponsiveContainer>
@@ -300,7 +300,7 @@ export default function RecoveryPage() {
                       <PolarGrid stroke="rgba(80,96,128,0.2)" />
                       <PolarAngleAxis dataKey="metric" tick={{ fontSize: 11, fill: '#6B6B6B' }} />
                       <PolarRadiusAxis domain={[0, 10]} tick={false} axisLine={false} />
-                      <Radar dataKey="value" stroke="#DC2626" fill="#DC2626" fillOpacity={0.18} strokeWidth={2} dot={{ r: 4, fill: '#DC2626' }} />
+                      <Radar dataKey="value" stroke="var(--accent)" fill="var(--accent)" fillOpacity={0.18} strokeWidth={2} dot={{ r: 4, fill: 'var(--accent)' }} />
                     </RadarChart>
                   </ResponsiveContainer>
                 </div>

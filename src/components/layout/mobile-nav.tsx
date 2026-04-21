@@ -41,23 +41,23 @@ export function MobileNav() {
             className={cn(
               'relative flex-1 flex flex-col items-center justify-center gap-1 h-full',
               'transition-all duration-200',
-              isActive ? 'text-[#EF4444]' : 'text-[color:var(--text-detail)] hover:text-[color:var(--text-0)]'
+              isActive ? 'text-[color:var(--accent-light)]' : 'text-[color:var(--text-detail)] hover:text-[color:var(--text-0)]'
             )}
           >
             <Icon
               size={20}
               className={cn(
-                isActive && '[filter:drop-shadow(0_0_6px_rgba(220,38,38,0.45))]'
+                isActive && 'drop-shadow-[0_0_6px_color-mix(in_srgb,var(--accent)_55%,transparent)]'
               )}
             />
             <span className={cn(
               'text-[10px] font-semibold uppercase tracking-wide',
-              isActive ? 'text-[#EF4444]' : 'text-[color:var(--text-detail)] opacity-95'
+              isActive ? 'text-[color:var(--accent-light)]' : 'text-[color:var(--text-detail)] opacity-95'
             )}>
               {item.label}
             </span>
             {isActive && (
-              <span className="absolute bottom-0 w-6 h-0.5 rounded-t-full bg-[#DC2626] [filter:drop-shadow(0_0_4px_rgba(220,38,38,0.6))]" />
+              <span className="absolute bottom-0 w-6 h-0.5 rounded-t-full bg-[color:var(--accent)] [filter:drop-shadow(0_0_4px_color-mix(in_srgb,var(--accent)_60%,transparent))]" />
             )}
           </Link>
         );

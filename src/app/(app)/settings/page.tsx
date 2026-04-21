@@ -1,16 +1,39 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/stores';
+import { useAuthStore, useUIStore } from '@/stores';
 import { useProfile, useUpdateProfile } from '@/controllers';
 import { logout } from '@/lib/firebase';
-import { Settings, Upload, User, LogOut, Target } from 'lucide-react';
+import { Settings, Upload, User, LogOut, Target, Palette } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import type { AppTheme } from '@/stores/ui-store';
+
+const themeOptions: Array<{ value: AppTheme; label: string; description: string; swatch: string }> = [
+  {
+    value: 'crimson',
+    label: 'Crimson (Default)',
+    description: 'Original IRONMIND red treatment.',
+    swatch: 'linear-gradient(135deg, var(--accent), var(--accent-2))',
+  },
+  {
+    value: 'hot-pink',
+    label: 'Hot Pink',
+    description: 'Swap red accents for high-energy hot pink.',
+    swatch: 'linear-gradient(135deg, #FF3EA5, #C21877)',
+  },
+  {
+    value: 'chlorine-blue',
+    label: 'Chlorine Blue',
+    description: 'Swap red accents for sharp chlorine blue.',
+    swatch: 'linear-gradient(135deg, #2EC5FF, #1786B5)',
+  },
+];
 
 export default function SettingsPage() {
   const router = useRouter();
   const { user } = useAuthStore();
+  const { theme, setTheme } = useUIStore();
   const userId = user?.uid ?? '';
 
   const { data: profile } = useProfile(userId);
@@ -47,6 +70,46 @@ export default function SettingsPage() {
         <p className="text-[#6B6B6B]">Manage your profile and plan</p>
       </div>
 
+      {/* Theme */}
+      <div className="glass-panel p-5 space-y-4">
+        <div className="flex items-center gap-3">
+          <Palette size={20} className="text-[color:var(--accent)]" />
+          <h2 className="font-semibold text-[#F5F5F5]">Theme</h2>
+        </div>
+        <p className="text-sm text-[#6B6B6B]">
+          Choose your accent palette. This updates buttons, highlights, and key UI accents.
+        </p>
+        <div className="space-y-2">
+          {themeOptions.map((option) => {
+            const active = theme === option.value;
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => setTheme(option.value)}
+                style={active ? { backgroundColor: 'color-mix(in srgb, var(--accent) 14%, transparent)' } : undefined}
+                className={`w-full p-3 rounded-lg border text-left transition-colors ${
+                  active
+                    ? 'border-[color:var(--accent)]'
+                    : 'border-[rgba(65,50,50,0.38)] bg-[rgba(16,16,16,0.78)] hover:border-[rgba(120,120,120,0.45)]'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <span
+                    className="w-5 h-5 rounded-full border border-white/20 shrink-0"
+                    style={{ background: option.swatch }}
+                  />
+                  <div>
+                    <p className="text-sm font-semibold text-[#F5F5F5]">{option.label}</p>
+                    <p className="text-xs text-[#9A9A9A]">{option.description}</p>
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Profile */}
       <div className="glass-panel p-5 space-y-4">
         <div className="flex items-center gap-3">
@@ -74,7 +137,7 @@ export default function SettingsPage() {
       {/* Update weights */}
       <div className="glass-panel p-5 space-y-4">
         <div className="flex items-center gap-3">
-          <Target size={20} className="text-[#DC2626]" />
+          <Target size={20} className="text-[color:var(--accent)]" />
           <h2 className="font-semibold text-[#F5F5F5]">Update Weights</h2>
         </div>
 
@@ -115,7 +178,7 @@ export default function SettingsPage() {
       {/* Re-import plan */}
       <div className="glass-panel p-5 space-y-4">
         <div className="flex items-center gap-3">
-          <Upload size={20} className="text-[#DC2626]" />
+          <Upload size={20} className="text-[color:var(--accent)]" />
           <h2 className="font-semibold text-[#F5F5F5]">Re-import Plan</h2>
         </div>
         <p className="text-sm text-[#6B6B6B]">
@@ -139,7 +202,7 @@ export default function SettingsPage() {
         </div>
         <button
           onClick={handleLogout}
-          className="w-full py-2.5 bg-[rgba(239,68,68,0.12)] border border-[rgba(239,68,68,0.3)] text-[#EF4444] font-medium rounded-lg hover:bg-[rgba(239,68,68,0.2)] transition-colors flex items-center justify-center gap-2"
+          className="w-full py-2.5 bg-[color:color-mix(in_srgb,var(--accent)_12%,transparent)] border border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)] text-[color:var(--accent-light)] font-medium rounded-lg hover:bg-[color:color-mix(in_srgb,var(--accent)_20%,transparent)] transition-colors flex items-center justify-center gap-2"
         >
           <LogOut size={18} /> Sign Out
         </button>

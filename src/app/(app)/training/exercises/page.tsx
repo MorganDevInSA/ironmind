@@ -34,7 +34,7 @@ export default function ExercisesPage() {
                 <div className="flex items-center gap-2">
                   <p className="font-medium text-[#F5F5F5]">{ex.name}</p>
                   {ex.isKPI && (
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-[rgba(212,175,55,0.15)] text-[#DC2626] border border-[rgba(212,175,55,0.3)]">
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-[color:color-mix(in_srgb,var(--accent)_15%,transparent)] text-[color:var(--accent)] border border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)]">
                       KPI
                     </span>
                   )}

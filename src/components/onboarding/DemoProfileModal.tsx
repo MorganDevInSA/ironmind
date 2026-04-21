@@ -32,7 +32,7 @@ const DEMO_PROFILES: DemoProfile[] = [
     goal: 'Off-season muscle gain',
     description: '14-day rotating split, pelvic-safe core, high-calorie rebuild phase targeting 80 → 85 kg.',
     tag: 'Masters athlete',
-    tagColor: 'text-[#DC2626] bg-[rgba(220,38,38,0.12)] border-[rgba(220,38,38,0.35)]',
+    tagColor: 'text-[color:var(--accent)] bg-[color:color-mix(in_srgb,var(--accent)_12%,transparent)] border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)]',
   },
   {
     id: 'sheri',
@@ -163,7 +163,7 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
           )}
 
           {error && (
-            <div className="p-3 rounded-lg text-xs border border-[rgba(239,68,68,0.30)] bg-[rgba(239,68,68,0.06)] text-[#EF4444]">
+            <div className="p-3 rounded-lg text-xs border border-[rgba(239,68,68,0.30)] bg-[rgba(239,68,68,0.06)] text-[color:var(--accent-light)]">
               {error}
             </div>
           )}
@@ -182,7 +182,7 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
                 {/* Selection indicator */}
                 <div className={`mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-200
                   ${selected === profile.id
-                    ? 'border-[#DC2626] bg-[#DC2626]'
+                    ? 'border-[color:var(--accent)] bg-[color:var(--accent)]'
                     : 'border-[rgba(65,50,50,0.60)] bg-transparent'}`}>
                   {selected === profile.id && <Check size={10} className="text-white" strokeWidth={3} />}
                 </div>
@@ -197,7 +197,7 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
                       {profile.tag}
                     </span>
                   </div>
-                  <p className="text-xs font-semibold text-[#DC2626] mb-1">{profile.goal}</p>
+                  <p className="text-xs font-semibold text-[color:var(--accent)] mb-1">{profile.goal}</p>
                   <p className="text-xs text-[#5E5E5E] leading-relaxed">{profile.description}</p>
                 </div>
               </div>
@@ -215,7 +215,7 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
             onClick={onClose}
             className="flex-1 py-2.5 rounded-lg font-semibold text-sm text-[#9A9A9A]
               bg-[rgba(22,16,16,0.9)] border border-[rgba(65,50,50,0.45)]
-              hover:border-[rgba(220,38,38,0.45)] hover:text-[#F0F0F0]
+              hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[#F0F0F0]
               active:scale-95 transition-all duration-200"
           >
             Cancel
@@ -225,7 +225,7 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
             onClick={handleLoad}
             disabled={!selected || loading || done}
             className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg font-semibold text-sm text-white
-              bg-gradient-to-r from-[#DC2626] to-[#B91C1C] border border-[rgba(220,38,38,0.5)]
+              bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-2)] border border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]
               shadow-[0_8px_20px_rgba(220,38,38,0.22)]
               hover:brightness-110 active:scale-95 transition-all duration-200
               disabled:opacity-40 disabled:cursor-not-allowed"

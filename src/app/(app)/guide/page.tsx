@@ -33,8 +33,8 @@ function CopyButton({ text, label = 'Copy' }: { text: string; label?: string }) 
     <button
       onClick={handleCopy}
       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold
-        bg-[rgba(220,38,38,0.12)] border border-[rgba(220,38,38,0.30)] text-[#EF4444]
-        hover:bg-[rgba(220,38,38,0.20)] active:scale-95 transition-all duration-200"
+        bg-[color:color-mix(in_srgb,var(--accent)_12%,transparent)] border border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)] text-[color:var(--accent-light)]
+        hover:bg-[color:color-mix(in_srgb,var(--accent)_20%,transparent)] active:scale-95 transition-all duration-200"
     >
       {copied ? <Check size={12} /> : <Copy size={12} />}
       {copied ? 'Copied!' : label}
@@ -66,14 +66,14 @@ function Section({
       bg-[rgba(18,14,14,0.78)] shadow-[0_10px_24px_rgba(0,0,0,0.45)]">
       <button
         onClick={() => setOpen(v => !v)}
-        className="w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-[rgba(220,38,38,0.04)] transition-colors"
+        className="w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-[color:color-mix(in_srgb,var(--accent)_4%,transparent)] transition-colors"
       >
         <div className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center text-xs font-bold
-          bg-[rgba(220,38,38,0.15)] border border-[rgba(220,38,38,0.38)] text-[#EF4444]
-          [text-shadow:0_0_8px_rgba(220,38,38,0.4)]">
+          bg-[color:color-mix(in_srgb,var(--accent)_15%,transparent)] border border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)] text-[color:var(--accent-light)]
+          [text-shadow:0_0_8px_color-mix(in_srgb,var(--accent)_40%,transparent)]">
           {number}
         </div>
-        <Icon size={18} className="text-[#DC2626] shrink-0" />
+        <Icon size={18} className="text-[color:var(--accent)] shrink-0" />
         <div className="flex-1 flex items-center gap-3">
           <span className="font-bold text-[#F0F0F0] text-sm tracking-wide">{title}</span>
           {badge && (
@@ -101,7 +101,7 @@ function Step({ num, children }: { num: number; children: React.ReactNode }) {
   return (
     <div className="flex items-start gap-3">
       <span className="mt-0.5 w-5 h-5 shrink-0 rounded-full flex items-center justify-center
-        text-[9px] font-bold bg-[rgba(220,38,38,0.12)] border border-[rgba(220,38,38,0.35)] text-[#EF4444]">
+        text-[9px] font-bold bg-[color:color-mix(in_srgb,var(--accent)_12%,transparent)] border border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)] text-[color:var(--accent-light)]">
         {num}
       </span>
       <p className="text-sm text-[#9A9A9A] leading-relaxed">{children}</p>
@@ -118,7 +118,7 @@ function Callout({ icon: Icon, color, children }: {
 }) {
   const palette = {
     amber:  'border-[rgba(245,158,11,0.30)] bg-[rgba(245,158,11,0.06)] text-[#F59E0B]',
-    crimson: 'border-[rgba(220,38,38,0.30)] bg-[rgba(220,38,38,0.06)] text-[#EF4444]',
+    crimson: 'border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_6%,transparent)] text-[color:var(--accent-light)]',
     green:  'border-[rgba(34,197,94,0.30)] bg-[rgba(34,197,94,0.06)] text-[#22C55E]',
   };
   return (
@@ -139,7 +139,7 @@ export default function GuidePage() {
 
       {/* Header */}
       <div>
-        <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[#DC2626]">
+        <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[color:var(--accent)]">
           User Guide
         </span>
         <h1 className="mt-2 text-3xl font-bold font-heading tracking-tight text-[#F0F0F0]">
@@ -167,10 +167,10 @@ export default function GuidePage() {
               href={item.href}
               className="flex flex-col items-center gap-2 p-3 rounded-[12px] text-center
                 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)]
-                hover:border-[rgba(220,38,38,0.30)] hover:shadow-[0_4px_16px_rgba(220,38,38,0.12)]
+                hover:border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)] hover:shadow-[0_4px_16px_color-mix(in_srgb,var(--accent)_12%,transparent)]
                 transition-all duration-200"
             >
-              <Icon size={18} className="text-[#DC2626]" />
+              <Icon size={18} className="text-[color:var(--accent)]" />
               <span className="text-[10px] font-semibold uppercase tracking-wide text-[#9A9A9A] leading-tight">
                 {item.label}
               </span>
@@ -207,7 +207,7 @@ export default function GuidePage() {
             href="/settings"
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold text-sm text-[#9A9A9A]
               bg-[rgba(22,16,16,0.9)] border border-[rgba(65,50,50,0.45)]
-              hover:border-[rgba(220,38,38,0.45)] hover:text-[#F0F0F0]
+              hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[#F0F0F0]
               active:scale-95 transition-all duration-200"
           >
             Import your own data →
@@ -228,7 +228,7 @@ export default function GuidePage() {
         <div className="flex flex-col gap-2">
           <Step num={1}>Open <strong className="text-[#F0F0F0]">ChatGPT</strong>, <strong className="text-[#F0F0F0]">Claude</strong>, or <strong className="text-[#F0F0F0]">Gemini</strong> in your browser.</Step>
           <Step num={2}>Start a <strong className="text-[#F0F0F0]">brand-new chat</strong> — do not reuse an existing thread.</Step>
-          <Step num={3}>Go to the <Link href="/onboarding" className="text-[#DC2626] hover:text-[#EF4444] underline underline-offset-2">Setup Wizard → Step 1</Link>, copy the Coach Persona Prompt, and paste it as your first message.</Step>
+            <Step num={3}>Go to the <Link href="/onboarding" className="text-[color:var(--accent)] hover:text-[color:var(--accent-light)] underline underline-offset-2">Setup Wizard → Step 1</Link>, copy the Coach Persona Prompt, and paste it as your first message.</Step>
           <Step num={4}>The AI confirms it is operating as your coach. <strong className="text-[#F0F0F0]">Keep this chat open</strong> — you will return to it in Step 3.</Step>
         </div>
 
@@ -247,8 +247,8 @@ export default function GuidePage() {
         </p>
 
         <div className="flex flex-col gap-2">
-          <Step num={1}>Go to the <Link href="/onboarding" className="text-[#DC2626] hover:text-[#EF4444] underline underline-offset-2">Setup Wizard → Step 2</Link> and fill in the form.</Step>
-          <Step num={2}>Leave fields blank where you genuinely don&apos;t know — they become <code className="text-[#EF4444] text-xs bg-[rgba(220,38,38,0.10)] px-1.5 py-0.5 rounded">null</code> and the AI works around them.</Step>
+          <Step num={1}>Go to the <Link href="/onboarding" className="text-[color:var(--accent)] hover:text-[color:var(--accent-light)] underline underline-offset-2">Setup Wizard → Step 2</Link> and fill in the form.</Step>
+          <Step num={2}>Leave fields blank where you genuinely don&apos;t know — they become <code className="text-[color:var(--accent-light)] text-xs bg-[color:color-mix(in_srgb,var(--accent)_10%,transparent)] px-1.5 py-0.5 rounded">null</code> and the AI works around them.</Step>
           <Step num={3}>Pay special attention to <strong className="text-[#F0F0F0]">Injuries &amp; Health Constraints</strong> — be specific. The AI uses this to exclude dangerous movements before building anything.</Step>
           <Step num={4}>Click <strong className="text-[#F0F0F0]">Save &amp; Download JSON</strong>. Your questionnaire is saved as <code className="text-[#9A9A9A] text-xs">questionnaire-answers.json</code> and copied to clipboard automatically.</Step>
         </div>
@@ -269,7 +269,7 @@ export default function GuidePage() {
 
         <div className="flex flex-col gap-2">
           <Step num={1}>Return to the <strong className="text-[#F0F0F0]">same chat</strong> where you pasted the coach persona (Step 1).</Step>
-          <Step num={2}>Go to <Link href="/onboarding" className="text-[#DC2626] hover:text-[#EF4444] underline underline-offset-2">Setup Wizard → Step 3</Link>, copy the Data Generation Prompt, and paste it into the chat.</Step>
+          <Step num={2}>Go to <Link href="/onboarding" className="text-[color:var(--accent)] hover:text-[color:var(--accent-light)] underline underline-offset-2">Setup Wizard → Step 3</Link>, copy the Data Generation Prompt, and paste it into the chat.</Step>
           <Step num={3}>Paste your <code className="text-[#9A9A9A] text-xs">questionnaire-answers.json</code> content below the prompt (replace the <code className="text-[#9A9A9A] text-xs">[PASTE QUESTIONNAIRE JSON HERE]</code> placeholder).</Step>
           <Step num={4}>The AI will output <strong className="text-[#F0F0F0]">6 JSON blocks</strong>, each preceded by its filename. Save each one with the <strong className="text-[#F0F0F0]">exact filename</strong> listed below:</Step>
         </div>
@@ -286,7 +286,7 @@ export default function GuidePage() {
           ].map(([name, desc]) => (
             <div key={name} className="flex items-start gap-3 p-3 rounded-lg
               bg-[rgba(8,8,8,0.7)] border border-[rgba(65,50,50,0.25)]">
-              <FileJson size={14} className="text-[#DC2626] mt-0.5 shrink-0" />
+              <FileJson size={14} className="text-[color:var(--accent)] mt-0.5 shrink-0" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-xs font-mono font-semibold text-[#F0F0F0]">{name}</span>
@@ -312,7 +312,7 @@ export default function GuidePage() {
         </p>
 
         <div className="flex flex-col gap-2">
-          <Step num={1}>Go to <Link href="/onboarding" className="text-[#DC2626] hover:text-[#EF4444] underline underline-offset-2">Setup Wizard → Step 5</Link> — or <Link href="/settings" className="text-[#DC2626] hover:text-[#EF4444] underline underline-offset-2">Settings → Import Coach Data</Link> if already in the app.</Step>
+          <Step num={1}>Go to <Link href="/onboarding" className="text-[color:var(--accent)] hover:text-[color:var(--accent-light)] underline underline-offset-2">Setup Wizard → Step 5</Link> — or <Link href="/settings" className="text-[color:var(--accent)] hover:text-[color:var(--accent-light)] underline underline-offset-2">Settings → Import Coach Data</Link> if already in the app.</Step>
           <Step num={2}>Use the drag-and-drop zone or tap individual file slots to upload all 6 JSON files.</Step>
           <Step num={3}>Click <strong className="text-[#F0F0F0]">Review &amp; Import</strong> — the app validates the files and shows a summary.</Step>
           <Step num={4}>Confirm the import. Your program, nutrition plan, supplements, phase, and volume landmarks are immediately active.</Step>
@@ -334,7 +334,7 @@ export default function GuidePage() {
         </p>
 
         <div className="flex flex-col gap-2">
-          <Step num={1}>In IRONMIND, go to <Link href="/export" className="text-[#DC2626] hover:text-[#EF4444] underline underline-offset-2">Export</Link> and click <strong className="text-[#F0F0F0]">Generate Report</strong> to create your Athlete Status Report.</Step>
+          <Step num={1}>In IRONMIND, go to <Link href="/export" className="text-[color:var(--accent)] hover:text-[color:var(--accent-light)] underline underline-offset-2">Export</Link> and click <strong className="text-[#F0F0F0]">Generate Report</strong> to create your Athlete Status Report.</Step>
           <Step num={2}>Open your AI chat. If starting fresh, paste the Coach Persona Prompt first (Setup Wizard Step 1). If returning to an existing thread, paste the Context Retention Prompt (Setup Wizard Step 4) with your export below it.</Step>
           <Step num={3}>Copy and paste the <strong className="text-[#F0F0F0]">Analysis Prompt</strong> from Setup Wizard Step 4, followed by your full export text.</Step>
           <Step num={4}>The AI will produce a structured coaching response: Assessment → Plan → Metrics to Track → Why This Works → Next Step.</Step>
@@ -347,7 +347,7 @@ export default function GuidePage() {
           </p>
           <Link
             href="/onboarding"
-            className="self-start inline-flex items-center gap-1.5 text-xs text-[#DC2626] hover:text-[#EF4444] font-semibold"
+            className="self-start inline-flex items-center gap-1.5 text-xs text-[color:var(--accent)] hover:text-[color:var(--accent-light)] font-semibold"
           >
             <ExternalLink size={12} />
             Get full prompt in Setup Wizard → Step 4
@@ -401,9 +401,9 @@ export default function GuidePage() {
       <div className="flex flex-col sm:flex-row gap-3 justify-center pb-4">
         <Link
           href="/onboarding"
-          className="flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-white text-sm
-            bg-gradient-to-r from-[#DC2626] to-[#B91C1C] border border-[rgba(220,38,38,0.5)]
-            shadow-[0_12px_22px_rgba(220,38,38,0.25)]
+            className="flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-white text-sm
+            bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-2)] border border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]
+            shadow-[0_12px_22px_color-mix(in_srgb,var(--accent)_25%,transparent)]
             hover:brightness-110 active:scale-95 transition-all duration-200"
         >
           <Brain size={16} />

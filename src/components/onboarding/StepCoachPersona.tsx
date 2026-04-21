@@ -19,7 +19,7 @@ export function StepCoachPersona({ onNext, onBack }: StepCoachPersonaProps) {
     <div className="flex flex-col gap-7 py-4">
       {/* Heading */}
       <div>
-        <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[#DC2626]">
+        <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[color:var(--accent)]">
           Step 1 of 5
         </span>
         <h2 className="mt-2 text-2xl sm:text-3xl font-bold font-heading tracking-tight text-[#F0F0F0]">
@@ -35,14 +35,14 @@ export function StepCoachPersona({ onNext, onBack }: StepCoachPersonaProps) {
       <div className="rounded-[14px] p-5 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)]
         shadow-[0_10px_24px_rgba(0,0,0,0.45)] flex flex-col gap-4">
         <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.25em] text-[#5E5E5E]">
-          <MessageSquare size={13} className="text-[#DC2626]" />
+          <MessageSquare size={13} className="text-[color:var(--accent)]" />
           Instructions
         </div>
         {instructions.map(step => (
           <div key={step.num} className="flex items-start gap-4">
             <span className="mt-0.5 w-6 h-6 shrink-0 rounded-full flex items-center justify-center
-              text-[10px] font-bold bg-[rgba(220,38,38,0.12)] border border-[rgba(220,38,38,0.35)]
-              text-[#EF4444]">
+              text-[10px] font-bold bg-[color:color-mix(in_srgb,var(--accent)_12%,transparent)] border border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)]
+              text-[color:var(--accent-light)]">
               {step.num}
             </span>
             <p className="text-sm text-[#F0F0F0] leading-relaxed">{step.text}</p>
@@ -66,7 +66,7 @@ export function StepCoachPersona({ onNext, onBack }: StepCoachPersonaProps) {
           onClick={onBack}
           className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm text-[#9A9A9A]
             bg-[rgba(22,16,16,0.9)] border border-[rgba(65,50,50,0.45)]
-            hover:border-[rgba(220,38,38,0.45)] hover:text-[#F0F0F0]
+            hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[#F0F0F0]
             active:scale-95 transition-all duration-200"
         >
           <ArrowLeft size={15} />
@@ -76,7 +76,7 @@ export function StepCoachPersona({ onNext, onBack }: StepCoachPersonaProps) {
         <button
           onClick={onNext}
           className="flex items-center gap-2 px-6 py-2.5 rounded-lg font-semibold text-sm text-white
-            bg-gradient-to-r from-[#DC2626] to-[#B91C1C] border border-[rgba(220,38,38,0.5)]
+            bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-2)] border border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]
             shadow-[0_8px_20px_rgba(220,38,38,0.22)]
             hover:brightness-110 active:scale-95 transition-all duration-200"
         >

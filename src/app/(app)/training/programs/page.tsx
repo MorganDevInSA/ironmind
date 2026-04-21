@@ -57,7 +57,7 @@ export default function ProgramsPage() {
                     <p className="text-sm font-medium text-[#F5F5F5]">{s.name}</p>
                   </div>
                   <span className={`text-xs font-semibold uppercase tracking-wide ${
-                    s.type === 'lift' ? 'text-[#DC2626]' : s.type === 'recovery' ? 'text-[#10B981]' : 'text-[#6B6B6B]'
+                    s.type === 'lift' ? 'text-[color:var(--accent)]' : s.type === 'recovery' ? 'text-[#10B981]' : 'text-[#6B6B6B]'
                   }`}>{s.type}</span>
                 </div>
               ))}
@@ -66,7 +66,7 @@ export default function ProgramsPage() {
 
           {program.kpis && program.kpis.length > 0 && (
             <div className="glass-panel p-5 space-y-3">
-              <h3 className="font-semibold text-[#F5F5F5] flex items-center gap-2"><TrendingUp size={18} className="text-[#DC2626]" /> KPI Lifts</h3>
+              <h3 className="font-semibold text-[#F5F5F5] flex items-center gap-2"><TrendingUp size={18} className="text-[color:var(--accent)]" /> KPI Lifts</h3>
               {program.kpis.map(kpi => (
                 <div key={kpi.exercise} className="flex justify-between text-sm">
                   <span className="text-[#9A9A9A]">{kpi.exercise}</span>

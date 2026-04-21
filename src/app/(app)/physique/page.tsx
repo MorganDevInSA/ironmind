@@ -122,11 +122,11 @@ export default function PhysiquePage() {
 
   const measurementKeys: (keyof Measurements)[] = ['waist', 'chest', 'hips', 'leftArm', 'leftThigh'];
   const measurementColors: Record<string, string> = {
-    waist: '#EF4444',
-    chest: '#DC2626',
+    waist: 'var(--accent-light)',
+    chest: 'var(--accent)',
     hips: '#F59E0B',
     leftArm: '#10B981',
-    leftThigh: '#DC2626',
+    leftThigh: 'var(--accent-2)',
   };
 
   const measurementData = (recentCheckIns ?? [])
@@ -203,9 +203,9 @@ export default function PhysiquePage() {
 
       {/* Check-in form (collapsible) */}
       {showForm && (
-        <div className="glass-panel p-5 space-y-5 border-[3px] border-[rgba(220,38,38,0.28)]">
+        <div className="glass-panel p-5 space-y-5 border-[3px] border-[color:color-mix(in_srgb,var(--accent)_28%,transparent)]">
           <h3 className="font-semibold text-[#F5F5F5] flex items-center gap-2">
-            <Scale size={18} className="text-[#DC2626]" /> New Check-in
+            <Scale size={18} className="text-[color:var(--accent)]" /> New Check-in
           </h3>
 
           {!userId && (
@@ -220,7 +220,7 @@ export default function PhysiquePage() {
               <button
                 type="button"
                 onClick={() => reset()}
-                className="self-start text-xs font-semibold text-[#DC2626] hover:underline"
+                className="self-start text-xs font-semibold text-[color:var(--accent)] hover:underline"
               >
                 Dismiss
               </button>
@@ -294,7 +294,7 @@ export default function PhysiquePage() {
                   label={{ value: `Target ${targetWeight}kg`, position: 'insideTopRight', fontSize: 10, fill: '#10B981' }} />
               )}
               <Area type="monotone" dataKey="weight" stroke="#F59E0B" fill="url(#weightGrad)" strokeWidth={2.5}
-                dot={{ r: 4, fill: '#F59E0B', strokeWidth: 0 }} activeDot={{ r: 6, fill: '#DC2626' }} />
+                dot={{ r: 4, fill: '#F59E0B', strokeWidth: 0 }} activeDot={{ r: 6, fill: 'var(--accent)' }} />
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -304,7 +304,7 @@ export default function PhysiquePage() {
       {hasAnyMeasurements && (
         <div className="glass-panel p-5">
           <div className="flex items-center gap-2 mb-4">
-            <BarChart3 size={18} className="text-[#DC2626]" />
+            <BarChart3 size={18} className="text-[color:var(--accent)]" />
             <h3 className="font-semibold text-[#F5F5F5]">Measurements History</h3>
           </div>
           <ResponsiveContainer width="100%" height={220}>

@@ -2,16 +2,7 @@
 
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-
-/** Transparent wordmark: `public/ironmind_transparent_1_reverted.png` (300×301, RGBA) */
-export const IRONMIND_LOGO_SRC = '/ironmind_transparent_1_reverted.png';
-
-const BASE = {
-  src: IRONMIND_LOGO_SRC,
-  alt: 'IRONMIND',
-  width: 300,
-  height: 301,
-} as const;
+import { useUIStore } from '@/stores';
 
 export type IronmindLogoVariant =
   | 'sidebar-expanded'
@@ -29,6 +20,12 @@ export function IronmindLogo({
   className?: string;
   priority?: boolean;
 }) {
+  const theme = useUIStore((s) => s.theme);
+
+  const src = theme === 'hot-pink'
+    ? '/ironmind_logo_female.png'
+    : '/ironmind_logo_male.png';
+
   const variantClass =
     variant === 'sidebar-expanded'
       ? 'h-16 w-16 object-contain object-center'
@@ -50,7 +47,11 @@ export function IronmindLogo({
   return (
     <span className="inline-flex items-center justify-center shrink-0 [&>img]:max-h-full">
       <Image
-        {...BASE}
+        key={src}
+        src={src}
+        alt="IRONMIND"
+        width={300}
+        height={301}
         sizes={sizes}
         priority={priority}
         className={cn(variantClass, className)}

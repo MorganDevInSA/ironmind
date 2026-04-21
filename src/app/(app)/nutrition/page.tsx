@@ -26,9 +26,9 @@ function buildDefaultMeals(
 
 const DAY_TYPES: { value: DayType; label: string; color: string }[] = [
   { value: 'recovery', label: 'Recovery', color: 'text-[#6B6B6B]' },
-  { value: 'moderate', label: 'Moderate', color: 'text-[#DC2626]' },
+  { value: 'moderate', label: 'Moderate', color: 'text-[color:var(--accent)]' },
   { value: 'high', label: 'High', color: 'text-[#F59E0B]' },
-  { value: 'highest', label: 'Highest', color: 'text-[#EF4444]' },
+  { value: 'highest', label: 'Highest', color: 'text-[color:var(--accent-light)]' },
 ];
 
 function MacroBar({
@@ -226,7 +226,7 @@ export default function NutritionPage() {
               className={cn(
                 'py-2 rounded-lg text-sm font-semibold border transition-all',
                 dayType === dt.value
-                  ? 'border-[rgba(212,175,55,0.5)] bg-[rgba(212,175,55,0.1)] text-[#DC2626]'
+                  ? 'border-[rgba(212,175,55,0.5)] bg-[rgba(212,175,55,0.1)] text-[color:var(--accent)]'
                   : 'border-[rgba(80,96,128,0.2)] text-[#6B6B6B] hover:text-[#F5F5F5]'
               )}
             >
@@ -246,7 +246,7 @@ export default function NutritionPage() {
             label="Protein"
             actual={nutritionDay?.macroActuals.protein ?? 0}
             target={targets.protein}
-            color="bg-[#DC2626]"
+            color="bg-[color:var(--accent)]"
           />
           <MacroBar
             label="Carbs"
@@ -261,7 +261,7 @@ export default function NutritionPage() {
       <div className="glass-panel overflow-hidden">
         <div className="px-4 py-3 border-b border-[rgba(80,96,128,0.15)] flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Utensils size={18} className="text-[#DC2626]" />
+            <Utensils size={18} className="text-[color:var(--accent)]" />
             <h2 className="font-semibold text-[#F5F5F5]">Today&apos;s Meals</h2>
           </div>
           <span className="text-sm font-mono tabular-nums text-[#6B6B6B]">
@@ -405,9 +405,9 @@ export default function NutritionPage() {
           className="w-full flex items-center justify-between px-4 py-3 border-b border-[rgba(80,96,128,0.15)]"
         >
           <div className="flex items-center gap-2">
-            <MessageSquare size={18} className="text-[#DC2626]" />
+            <MessageSquare size={18} className="text-[color:var(--accent)]" />
             <span className="font-semibold text-[#F5F5F5]">Notes for Coach AI Review</span>
-            {agentNotes && <span className="w-2 h-2 rounded-full bg-[#DC2626] shrink-0" />}
+            {agentNotes && <span className="w-2 h-2 rounded-full bg-[color:var(--accent)] shrink-0" />}
           </div>
           {notesOpen ? (
             <ChevronUp size={16} className="text-[#6B6B6B]" />

@@ -33,7 +33,7 @@ const navItems = [
   { href: '/guide',        label: 'User Guide',   icon: BookOpen },
 ];
 
-const activeText = 'text-[#EF4444]';
+const activeText = 'text-[color:var(--accent-light)]';
 const idleText = 'text-[color:var(--text-detail)]';
 const hoverText = 'group-hover:text-[color:var(--text-0)]';
 
@@ -61,7 +61,7 @@ export function Sidebar() {
         <Link
           href="/guide"
           className={cn(
-            'flex items-center justify-center rounded-lg outline-none ring-offset-2 ring-offset-[#0d0d0d] focus-visible:ring-2 focus-visible:ring-[#DC2626]/55',
+            'flex items-center justify-center rounded-lg outline-none ring-offset-2 ring-offset-[#0d0d0d] focus-visible:ring-2 focus-visible:ring-[color:var(--accent)]/55',
             sidebarOpen ? 'w-full justify-center' : 'w-full'
           )}
         >
@@ -82,7 +82,7 @@ export function Sidebar() {
           sidebarOpen ? 'top-[6rem]' : 'top-[5rem]',
           'flex items-center justify-center',
           'bg-[color:var(--chrome-bg-toggle)] border border-[color:var(--chrome-border)]',
-          'text-[color:var(--text-1)] hover:text-[#DC2626] hover:border-[rgba(220,38,38,0.35)]',
+          'text-[color:var(--text-1)] hover:text-[color:var(--accent)] hover:border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)]',
           'shadow-[0_4px_12px_rgba(0,0,0,0.4)]',
           'transition-all duration-200 hover:scale-110'
         )}

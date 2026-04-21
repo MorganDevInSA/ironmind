@@ -46,13 +46,13 @@ export function TopBar() {
       <div className="flex items-center gap-3 min-w-0">
         <Link
           href="/dashboard"
-          className="lg:hidden shrink-0 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-[#DC2626]/55 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d0d0d]"
+          className="lg:hidden shrink-0 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent)]/55 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d0d0d]"
           aria-label="IRONMIND home"
         >
           <IronmindLogo variant="topbar" priority />
         </Link>
         <div className="min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#DC2626]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[color:var(--accent)]">
             {formatDisplayDate(new Date())}
           </p>
           {(() => {
@@ -60,7 +60,7 @@ export function TopBar() {
             const nameColor = profile?.sex === 'female' ? 'text-[#FF69B4]' : 'text-[#F0F0F0]';
             if (!name && !phase) return null;
             return (
-              <p className="text-xs font-semibold text-[#DC2626] mt-0.5 tracking-wide">
+              <p className="text-xs font-semibold text-[color:var(--accent)] mt-0.5 tracking-wide">
                 {name && <span className={nameColor}>{name}{phase ? ' — ' : ''}</span>}
                 {phase?.name}
               </p>
@@ -92,7 +92,7 @@ export function TopBar() {
           >
             <Bell size={18} />
             {alertCount > 0 && (
-              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-[#DC2626] rounded-full animate-pulse" />
+              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-[color:var(--accent)] rounded-full animate-pulse" />
             )}
           </button>
 
@@ -112,10 +112,10 @@ export function TopBar() {
                 ) : alerts?.map(alert => (
                   <div key={alert.id} className="px-4 py-3 flex items-start gap-3">
                     {alert.severity === 'critical'
-                      ? <AlertTriangle size={16} className="text-[#EF4444] shrink-0 mt-0.5" />
+                      ? <AlertTriangle size={16} className="text-[color:var(--accent-light)] shrink-0 mt-0.5" />
                       : alert.severity === 'warning'
                       ? <AlertTriangle size={16} className="text-[#F59E0B] shrink-0 mt-0.5" />
-                      : <Info size={16} className="text-[#DC2626] shrink-0 mt-0.5" />}
+                      : <Info size={16} className="text-[color:var(--accent)] shrink-0 mt-0.5" />}
                     <div>
                       <p className="text-sm font-medium text-[#F5F5F5]">{alert.title}</p>
                       <p className="text-xs text-[color:var(--text-1)] mt-0.5">{alert.message}</p>
@@ -130,7 +130,7 @@ export function TopBar() {
         {/* Profile */}
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-full flex items-center justify-center font-mono font-bold text-sm
-            bg-[rgba(220,38,38,0.12)] text-[#EF4444] border border-[rgba(220,38,38,0.35)]">
+            bg-[color:color-mix(in_srgb,var(--accent)_12%,transparent)] text-[color:var(--accent-light)] border border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)]">
             {profile?.currentWeight ? `${profile.currentWeight}` : '—'}
           </div>
           <div className="hidden sm:block">
