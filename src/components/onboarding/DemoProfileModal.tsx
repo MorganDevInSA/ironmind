@@ -102,12 +102,13 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
       } else {
         await seedMortonData(user.uid);
       }
-      await queryClient.invalidateQueries({ queryKey: queryKeys.profile.all });
-      await queryClient.invalidateQueries({ queryKey: queryKeys.nutrition.all });
-      await queryClient.invalidateQueries({ queryKey: queryKeys.coaching.all });
-      await queryClient.invalidateQueries({ queryKey: queryKeys.training.all });
-      await queryClient.invalidateQueries({ queryKey: queryKeys.supplements.all });
-      await queryClient.invalidateQueries({ queryKey: queryKeys.volume.all });
+      const qk = queryKeys(user.uid);
+      await queryClient.invalidateQueries({ queryKey: qk.profile.all });
+      await queryClient.invalidateQueries({ queryKey: qk.nutrition.all });
+      await queryClient.invalidateQueries({ queryKey: qk.coaching.all });
+      await queryClient.invalidateQueries({ queryKey: qk.training.all });
+      await queryClient.invalidateQueries({ queryKey: qk.supplements.all });
+      await queryClient.invalidateQueries({ queryKey: qk.volume.all });
       setDone(true);
       setTimeout(() => {
         onClose();

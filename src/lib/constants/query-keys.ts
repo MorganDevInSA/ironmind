@@ -1,66 +1,75 @@
 // Centralized TanStack Query key factory
-// All cache keys defined in one place, namespaced by domain
-// Prevents key collisions and makes invalidation predictable
+// All keys are scoped by userId — prevents cross-user cache bleed on sign-in/sign-out.
+// Every call site: queryKeys(userId).domain.key()
 
-export const queryKeys = {
-  profile: {
-    all: ['profile'] as const,
-    detail: () => [...queryKeys.profile.all, 'detail'] as const,
-  },
-  training: {
-    all: ['training'] as const,
-    programs: () => [...queryKeys.training.all, 'programs'] as const,
-    activeProgram: () => [...queryKeys.training.all, 'active-program'] as const,
-    workouts: (dateRange?: { from: string; to: string }) =>
-      [...queryKeys.training.all, 'workouts', dateRange] as const,
-    workout: (id: string) => [...queryKeys.training.all, 'workout', id] as const,
-    exercises: () => [...queryKeys.training.all, 'exercises'] as const,
-  },
-  nutrition: {
-    all: ['nutrition'] as const,
-    day: (date: string) => [...queryKeys.nutrition.all, 'day', date] as const,
-    history: (dateRange: { from: string; to: string }) =>
-      [...queryKeys.nutrition.all, 'history', dateRange] as const,
-    macroTargets: () => [...queryKeys.nutrition.all, 'macro-targets'] as const,
-    plan: () => [...queryKeys.nutrition.all, 'plan'] as const,
-  },
-  recovery: {
-    all: ['recovery'] as const,
-    entry: (date: string) => [...queryKeys.recovery.all, 'entry', date] as const,
-    trend: (days: number) => [...queryKeys.recovery.all, 'trend', days] as const,
-    latest: () => [...queryKeys.recovery.all, 'latest'] as const,
-  },
-  physique: {
-    all: ['physique'] as const,
-    checkIns: () => [...queryKeys.physique.all, 'check-ins'] as const,
-    weightTrend: (days: number) => [...queryKeys.physique.all, 'weight-trend', days] as const,
-    measurements: () => [...queryKeys.physique.all, 'measurements'] as const,
-  },
-  supplements: {
-    all: ['supplements'] as const,
-    protocol: () => [...queryKeys.supplements.all, 'protocol'] as const,
-    log: (date: string) => [...queryKeys.supplements.all, 'log', date] as const,
-    compliance: (days: number) => [...queryKeys.supplements.all, 'compliance', days] as const,
-  },
-  coaching: {
-    all: ['coaching'] as const,
-    phases: () => [...queryKeys.coaching.all, 'phases'] as const,
-    journal: (limit?: number) => [...queryKeys.coaching.all, 'journal', limit] as const,
-  },
-  volume: {
-    all: ['volume'] as const,
-    landmarks: () => [...queryKeys.volume.all, 'landmarks'] as const,
-    weekly: () => [...queryKeys.volume.all, 'weekly'] as const,
-  },
-  alerts: {
-    all: ['alerts'] as const,
-    active: () => [...queryKeys.alerts.all, 'active'] as const,
-  },
-  export: {
-    all: ['export'] as const,
-    summary: (options: unknown) => [...queryKeys.export.all, 'summary', options] as const,
-  },
-} as const;
+export function queryKeys(userId: string) {
+  return {
+    profile: {
+      all:      [userId, 'profile'] as const,
+      detail:   () => [userId, 'profile', 'detail'] as const,
+      isSeeded: () => [userId, 'profile', 'is-seeded'] as const,
+    },
+    training: {
+      all:           [userId, 'training'] as const,
+      programs:      () => [userId, 'training', 'programs'] as const,
+      activeProgram: () => [userId, 'training', 'active-program'] as const,
+      workouts:      (dateRange?: { from: string; to: string }) =>
+                       [userId, 'training', 'workouts', dateRange] as const,
+      workout:       (id: string) => [userId, 'training', 'workout', id] as const,
+      exercises:     () => [userId, 'training', 'exercises'] as const,
+    },
+    nutrition: {
+      all:        [userId, 'nutrition'] as const,
+      day:        (date: string) => [userId, 'nutrition', 'day', date] as const,
+      history:    (dateRange: { from: string; to: string }) =>
+                    [userId, 'nutrition', 'history', dateRange] as const,
+      recentDays: (days: number) => [userId, 'nutrition', 'recent-days', days] as const,
+      plan:       () => [userId, 'nutrition', 'plan'] as const,
+    },
+    recovery: {
+      all:              [userId, 'recovery'] as const,
+      entry:            (date: string) => [userId, 'recovery', 'entry', date] as const,
+      trend:            (days: number) => [userId, 'recovery', 'trend', days] as const,
+      latest:           () => [userId, 'recovery', 'latest'] as const,
+      averageReadiness: (days: number) => [userId, 'recovery', 'average-readiness', days] as const,
+    },
+    physique: {
+      all:            [userId, 'physique'] as const,
+      checkIns:       () => [userId, 'physique', 'check-ins'] as const,
+      recentCheckIns: (limit: number) => [userId, 'physique', 'recent-check-ins', limit] as const,
+      latestCheckIn:  () => [userId, 'physique', 'latest-check-in'] as const,
+      weightTrend:    (days: number) => [userId, 'physique', 'weight-trend', days] as const,
+      measurements:   () => [userId, 'physique', 'measurements'] as const,
+    },
+    supplements: {
+      all:        [userId, 'supplements'] as const,
+      protocol:   () => [userId, 'supplements', 'protocol'] as const,
+      log:        (date: string) => [userId, 'supplements', 'log', date] as const,
+      compliance: (days: number) => [userId, 'supplements', 'compliance', days] as const,
+    },
+    coaching: {
+      all:         [userId, 'coaching'] as const,
+      phases:      () => [userId, 'coaching', 'phases'] as const,
+      activePhase: () => [userId, 'coaching', 'active-phase'] as const,
+      journal:     (limit?: number) => [userId, 'coaching', 'journal', limit] as const,
+    },
+    volume: {
+      all:       [userId, 'volume'] as const,
+      landmarks: () => [userId, 'volume', 'landmarks'] as const,
+      weekly:    () => [userId, 'volume', 'weekly'] as const,
+      trend:     (muscleGroup: string, weeks: number) =>
+                   [userId, 'volume', 'trend', muscleGroup, weeks] as const,
+    },
+    alerts: {
+      all:     [userId, 'alerts'] as const,
+      active:  () => [userId, 'alerts', 'active'] as const,
+      summary: () => [userId, 'alerts', 'summary'] as const,
+    },
+    export: {
+      all:     [userId, 'export'] as const,
+      summary: (options: unknown) => [userId, 'export', 'summary', options] as const,
+    },
+  };
+}
 
-// Type-safe query key helper
-export type QueryKeys = typeof queryKeys;
+export type QueryKeys = ReturnType<typeof queryKeys>;

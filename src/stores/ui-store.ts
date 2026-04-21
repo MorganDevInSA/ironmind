@@ -24,6 +24,7 @@ interface UIState {
   setTheme: (theme: AppTheme) => void;
   customAccent: string;
   setCustomAccent: (hex: string) => void;
+  resetUIPreferences: () => void;
 
   // Workout state (ephemeral)
   activeWorkoutId: string | null;
@@ -52,6 +53,7 @@ export const useUIStore = create<UIState>()(
       setTheme: (theme) => set({ theme }),
       customAccent: '#DC2626',
       setCustomAccent: (hex) => set({ customAccent: hex }),
+      resetUIPreferences: () => set({ theme: 'crimson', customAccent: '#DC2626' }),
 
       activeWorkoutId: null,
       restTimerEnd: null,

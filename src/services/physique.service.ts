@@ -164,10 +164,14 @@ export async function getWeightChange(userId: string): Promise<{
 }
 
 // Upload progress photo
+// Requires NEXT_PUBLIC_ENABLE_PHOTO_UPLOAD=true and Firebase Storage (Blaze plan).
 export async function uploadProgressPhoto(
   userId: string,
   file: File
 ): Promise<string> {
+  if (process.env.NEXT_PUBLIC_ENABLE_PHOTO_UPLOAD !== 'true') {
+    throw new Error('Photo uploads are disabled. Set NEXT_PUBLIC_ENABLE_PHOTO_UPLOAD=true in .env.local after initialising Firebase Storage.');
+  }
   const path = generateFilePath(userId, 'photos', file.name);
   return uploadFile(path, file, { contentType: file.type });
 }

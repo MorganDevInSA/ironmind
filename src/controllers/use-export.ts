@@ -7,7 +7,7 @@ import type { ExportOptions } from '@/lib/types';
 
 export function useExportSummary(userId: string, options: ExportOptions) {
   return useQuery({
-    queryKey: queryKeys.export.summary(options),
+    queryKey: queryKeys(userId).export.summary(options),
     queryFn: () => generateSummary(userId, options),
     staleTime: staleTimes.exportSummary,
     enabled: !!userId,

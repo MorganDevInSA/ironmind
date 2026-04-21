@@ -6,7 +6,7 @@ import { getVolumeLandmarks, getWeeklyVolumeSummary, getVolumeTrend } from '@/se
 
 export function useVolumeLandmarks(userId: string) {
   return useQuery({
-    queryKey: queryKeys.volume.landmarks(),
+    queryKey: queryKeys(userId).volume.landmarks(),
     queryFn: () => getVolumeLandmarks(userId),
     staleTime: staleTimes.landmarks,
     enabled: !!userId,
@@ -15,7 +15,7 @@ export function useVolumeLandmarks(userId: string) {
 
 export function useWeeklyVolumeSummary(userId: string) {
   return useQuery({
-    queryKey: queryKeys.volume.weekly(),
+    queryKey: queryKeys(userId).volume.weekly(),
     queryFn: () => getWeeklyVolumeSummary(userId),
     staleTime: staleTimes.weeklyVolume,
     enabled: !!userId,
@@ -24,7 +24,7 @@ export function useWeeklyVolumeSummary(userId: string) {
 
 export function useVolumeTrend(userId: string, muscleGroup: string, weeks: number = 4) {
   return useQuery({
-    queryKey: [...queryKeys.volume.all, 'trend', muscleGroup, weeks],
+    queryKey: queryKeys(userId).volume.trend(muscleGroup, weeks),
     queryFn: () => getVolumeTrend(userId, muscleGroup, weeks),
     staleTime: staleTimes.weeklyVolume,
     enabled: !!userId && !!muscleGroup,

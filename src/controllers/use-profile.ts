@@ -7,7 +7,7 @@ import type { AthleteProfile } from '@/lib/types';
 
 export function useProfile(userId: string) {
   return useQuery({
-    queryKey: queryKeys.profile.detail(),
+    queryKey: queryKeys(userId).profile.detail(),
     queryFn: () => getProfile(userId),
     staleTime: staleTimes.profile,
     enabled: !!userId,
@@ -20,7 +20,7 @@ export function useUpdateProfile(userId: string) {
   return useMutation({
     mutationFn: (updates: Partial<AthleteProfile>) => updateProfile(userId, updates),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.profile.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys(userId).profile.all });
     },
   });
 }
@@ -28,7 +28,7 @@ export function useUpdateProfile(userId: string) {
 /** Firestore user doc has completed initial seed/import */
 export function useIsUserSeeded(userId: string, options?: { enabled?: boolean }) {
   return useQuery({
-    queryKey: [...queryKeys.profile.all, 'isSeeded'] as const,
+    queryKey: queryKeys(userId).profile.isSeeded(),
     queryFn: () => isUserSeeded(userId),
     enabled: !!userId && (options?.enabled ?? true),
     staleTime: 30 * 1000,

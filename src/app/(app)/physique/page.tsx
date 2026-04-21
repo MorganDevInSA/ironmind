@@ -5,7 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores';
 import { useSaveCheckIn, useRecentCheckIns, useProfile } from '@/controllers';
 import { today, formatDisplayDate } from '@/lib/utils';
-import { Scale, CheckCircle2, TrendingDown, TrendingUp, Minus, BarChart3, Plus } from 'lucide-react';
+import { Scale, CheckCircle2, TrendingDown, TrendingUp, Minus, BarChart3, Plus, Camera } from 'lucide-react';
+
+const PHOTO_UPLOAD_ENABLED = process.env.NEXT_PUBLIC_ENABLE_PHOTO_UPLOAD === 'true';
 import { cn } from '@/lib/utils';
 import {
   ResponsiveContainer, AreaChart, Area, LineChart, Line,
@@ -247,6 +249,22 @@ export default function PhysiquePage() {
               placeholder="How do you look? Any visible changes or comments for your coach AI?" rows={3}
               className="w-full bg-[rgba(16,22,34,0.6)] border border-[rgba(80,96,128,0.25)] rounded-lg p-3 text-sm text-[#F5F5F5] placeholder:text-[#6B6B6B]/50 focus:outline-none focus:border-[rgba(212,175,55,0.4)] resize-none" />
           </div>
+
+          {PHOTO_UPLOAD_ENABLED ? (
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-[#9A9A9A]">Progress photos (optional)</label>
+              <label className="flex items-center gap-3 p-3 rounded-lg border border-[rgba(80,96,128,0.25)] bg-[rgba(16,22,34,0.6)] cursor-pointer hover:border-[color:color-mix(in_srgb,var(--accent)_40%,transparent)] transition-colors">
+                <Camera size={16} className="text-[color:var(--accent)] shrink-0" />
+                <span className="text-sm text-[#9A9A9A]">Tap to add a photo</span>
+                <input type="file" accept="image/*" capture="environment" className="sr-only" />
+              </label>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg border border-[rgba(80,96,128,0.15)] bg-[rgba(16,22,34,0.4)]">
+              <Camera size={14} className="text-[#5E5E5E] shrink-0" />
+              <span className="text-xs text-[#5E5E5E]">Progress photos — coming soon</span>
+            </div>
+          )}
 
           <div className="flex gap-3">
             <button onClick={() => setShowForm(false)} className="btn-secondary flex-1">Cancel</button>

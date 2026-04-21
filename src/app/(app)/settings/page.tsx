@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAuthStore, useUIStore } from '@/stores';
 import { useProfile, useUpdateProfile } from '@/controllers';
 import { logout } from '@/lib/firebase';
@@ -27,8 +28,9 @@ const themeOptions: Array<{ value: AppTheme; label: string; description: string;
 
 export default function SettingsPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { user } = useAuthStore();
-  const { theme, setTheme, customAccent, setCustomAccent } = useUIStore();
+  const { theme, setTheme, customAccent, setCustomAccent, resetUIPreferences } = useUIStore();
   const userId = user?.uid ?? '';
 
   const { data: profile } = useProfile(userId);
@@ -54,6 +56,8 @@ export default function SettingsPage() {
   };
 
   const handleLogout = async () => {
+    queryClient.clear();
+    resetUIPreferences();
     await logout();
     router.push('/login');
   };

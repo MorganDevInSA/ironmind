@@ -7,7 +7,7 @@ import type { RecoveryEntry } from '@/lib/types';
 
 export function useRecoveryEntry(userId: string, date: string) {
   return useQuery({
-    queryKey: queryKeys.recovery.entry(date),
+    queryKey: queryKeys(userId).recovery.entry(date),
     queryFn: () => getRecoveryEntry(userId, date),
     staleTime: staleTimes.recovery,
     enabled: !!userId && !!date,
@@ -16,7 +16,7 @@ export function useRecoveryEntry(userId: string, date: string) {
 
 export function useRecentRecoveryEntries(userId: string, days: number = 14) {
   return useQuery({
-    queryKey: queryKeys.recovery.trend(days),
+    queryKey: queryKeys(userId).recovery.trend(days),
     queryFn: () => getRecentRecoveryEntries(userId, days),
     staleTime: staleTimes.recoveryTrend,
     enabled: !!userId,
@@ -25,7 +25,7 @@ export function useRecentRecoveryEntries(userId: string, days: number = 14) {
 
 export function useAverageReadiness(userId: string, days: number = 7) {
   return useQuery({
-    queryKey: queryKeys.recovery.all,
+    queryKey: queryKeys(userId).recovery.averageReadiness(days),
     queryFn: () => getAverageReadiness(userId, days),
     staleTime: staleTimes.recoveryTrend,
     enabled: !!userId,
@@ -39,9 +39,9 @@ export function useSaveRecoveryEntry(userId: string) {
     mutationFn: ({ date, entry }: { date: string; entry: Partial<RecoveryEntry> }) =>
       saveRecoveryEntry(userId, date, entry),
     onSuccess: (_, { date }) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.recovery.entry(date) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.recovery.latest() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.recovery.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys(userId).recovery.entry(date) });
+      queryClient.invalidateQueries({ queryKey: queryKeys(userId).recovery.latest() });
+      queryClient.invalidateQueries({ queryKey: queryKeys(userId).recovery.all });
     },
   });
 }

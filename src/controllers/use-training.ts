@@ -18,7 +18,7 @@ import type { Workout, Program } from '@/lib/types';
 // Programs
 export function usePrograms(userId: string) {
   return useQuery({
-    queryKey: queryKeys.training.programs(),
+    queryKey: queryKeys(userId).training.programs(),
     queryFn: () => getPrograms(userId),
     staleTime: staleTimes.programs,
     enabled: !!userId,
@@ -27,7 +27,7 @@ export function usePrograms(userId: string) {
 
 export function useActiveProgram(userId: string) {
   return useQuery({
-    queryKey: queryKeys.training.activeProgram(),
+    queryKey: queryKeys(userId).training.activeProgram(),
     queryFn: () => getActiveProgram(userId),
     staleTime: staleTimes.activeProgram,
     enabled: !!userId,
@@ -37,7 +37,7 @@ export function useActiveProgram(userId: string) {
 // Workouts
 export function useWorkouts(userId: string, dateRange?: { from: string; to: string }) {
   return useQuery({
-    queryKey: queryKeys.training.workouts(dateRange),
+    queryKey: queryKeys(userId).training.workouts(dateRange),
     queryFn: () => getWorkouts(userId, dateRange),
     staleTime: staleTimes.workouts,
     enabled: !!userId,
@@ -46,7 +46,7 @@ export function useWorkouts(userId: string, dateRange?: { from: string; to: stri
 
 export function useRecentWorkouts(userId: string, days: number = 14) {
   return useQuery({
-    queryKey: queryKeys.training.workouts({ from: '', to: '' }), // Will be calculated by service
+    queryKey: queryKeys(userId).training.workouts({ from: '', to: '' }),
     queryFn: () => getRecentWorkouts(userId, days),
     staleTime: staleTimes.workouts,
     enabled: !!userId,
@@ -55,7 +55,7 @@ export function useRecentWorkouts(userId: string, days: number = 14) {
 
 export function useWorkout(userId: string, workoutId: string) {
   return useQuery({
-    queryKey: queryKeys.training.workout(workoutId),
+    queryKey: queryKeys(userId).training.workout(workoutId),
     queryFn: () => getWorkout(userId, workoutId),
     staleTime: staleTimes.workouts,
     enabled: !!userId && !!workoutId,
@@ -69,7 +69,7 @@ export function useCreateWorkout(userId: string) {
   return useMutation({
     mutationFn: (workout: Omit<Workout, 'id'>) => createWorkout(userId, workout),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.training.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys(userId).training.all });
     },
   });
 }
@@ -81,8 +81,8 @@ export function useUpdateWorkout(userId: string) {
     mutationFn: ({ workoutId, updates }: { workoutId: string; updates: Partial<Workout> }) =>
       updateWorkout(userId, workoutId, updates),
     onSuccess: (_, { workoutId }) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.training.workout(workoutId) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.training.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys(userId).training.workout(workoutId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys(userId).training.all });
     },
   });
 }
@@ -93,7 +93,7 @@ export function useSaveWorkout(userId: string) {
   return useMutation({
     mutationFn: (workout: Workout) => saveWorkout(userId, workout),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.training.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys(userId).training.all });
     },
   });
 }
@@ -104,7 +104,7 @@ export function useDeleteWorkout(userId: string) {
   return useMutation({
     mutationFn: (workoutId: string) => deleteWorkout(userId, workoutId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.training.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys(userId).training.all });
     },
   });
 }
@@ -131,11 +131,11 @@ export function useSaveSet(userId: string, workoutId: string) {
       return workout;
     },
     onMutate: async ({ exerciseIndex, setIndex, set }) => {
-      await queryClient.cancelQueries({ queryKey: queryKeys.training.workout(workoutId) });
+      const qk = queryKeys(userId).training.workout(workoutId);
 
-      const previousWorkout = queryClient.getQueryData<Workout>(
-        queryKeys.training.workout(workoutId)
-      );
+      await queryClient.cancelQueries({ queryKey: qk });
+
+      const previousWorkout = queryClient.getQueryData<Workout>(qk);
 
       if (previousWorkout) {
         const updatedWorkout = { ...previousWorkout };
@@ -148,7 +148,7 @@ export function useSaveSet(userId: string, workoutId: string) {
         ];
         updatedWorkout.exercises[exerciseIndex].sets[setIndex] = set;
 
-        queryClient.setQueryData(queryKeys.training.workout(workoutId), updatedWorkout);
+        queryClient.setQueryData(qk, updatedWorkout);
       }
 
       return { previousWorkout };
@@ -156,13 +156,13 @@ export function useSaveSet(userId: string, workoutId: string) {
     onError: (_, __, context) => {
       if (context?.previousWorkout) {
         queryClient.setQueryData(
-          queryKeys.training.workout(workoutId),
+          queryKeys(userId).training.workout(workoutId),
           context.previousWorkout
         );
       }
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.training.workout(workoutId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys(userId).training.workout(workoutId) });
     },
   });
 }

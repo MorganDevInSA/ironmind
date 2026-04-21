@@ -2,14 +2,17 @@
 
 import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { logout, onAuthChange } from '@/lib/firebase';
-import { useAuthStore } from '@/stores';
+import { useAuthStore, useUIStore } from '@/stores';
 import { isUserSeeded } from '@/services/profile.service';
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const queryClient = useQueryClient();
   const { setUser, setLoading, isAuthenticated } = useAuthStore();
+  const { resetUIPreferences } = useUIStore();
 
   useEffect(() => {
     setLoading(true);
@@ -52,6 +55,8 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
           }
         }
       } else {
+        queryClient.clear();
+        resetUIPreferences();
         setUser(null);
         router.push('/login');
       }
@@ -60,7 +65,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     });
 
     return () => unsubscribe();
-  }, [router, pathname, setUser, setLoading]);
+  }, [router, pathname, queryClient, setUser, setLoading, resetUIPreferences]);
 
   if (!isAuthenticated) {
     return (

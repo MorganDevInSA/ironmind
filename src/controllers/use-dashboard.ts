@@ -20,58 +20,59 @@ import { today } from '@/lib/utils';
 // the dashboard renders instantly from cache with zero Firebase calls
 export function useDashboardData(userId: string) {
   const todayStr = today();
+  const qk = queryKeys(userId);
 
   const profile = useQuery({
-    queryKey: queryKeys.profile.detail(),
+    queryKey: qk.profile.detail(),
     queryFn: () => getProfile(userId),
     enabled: !!userId,
   });
 
   const activeProgram = useQuery({
-    queryKey: queryKeys.training.activeProgram(),
+    queryKey: qk.training.activeProgram(),
     queryFn: () => getActiveProgram(userId),
     enabled: !!userId,
   });
 
   const todayNutrition = useQuery({
-    queryKey: queryKeys.nutrition.day(todayStr),
+    queryKey: qk.nutrition.day(todayStr),
     queryFn: () => getNutritionDay(userId, todayStr),
     enabled: !!userId,
   });
 
   const todayRecovery = useQuery({
-    queryKey: queryKeys.recovery.entry(todayStr),
+    queryKey: qk.recovery.entry(todayStr),
     queryFn: () => getRecoveryEntry(userId, todayStr),
     enabled: !!userId,
   });
 
   const latestRecovery = useQuery({
-    queryKey: queryKeys.recovery.latest(),
+    queryKey: qk.recovery.latest(),
     queryFn: () => getLatestRecoveryEntry(userId),
     staleTime: staleTimes.recovery,
     enabled: !!userId,
   });
 
   const todaySupplements = useQuery({
-    queryKey: queryKeys.supplements.log(todayStr),
+    queryKey: qk.supplements.log(todayStr),
     queryFn: () => getSupplementLog(userId, todayStr),
     enabled: !!userId,
   });
 
   const weeklyVolume = useQuery({
-    queryKey: queryKeys.volume.weekly(),
+    queryKey: qk.volume.weekly(),
     queryFn: () => getWeeklyVolumeSummary(userId),
     enabled: !!userId && !!activeProgram.data,
   });
 
   const alerts = useQuery({
-    queryKey: queryKeys.alerts.active(),
+    queryKey: qk.alerts.active(),
     queryFn: () => getActiveAlerts(userId),
     enabled: !!userId,
   });
 
   const recentNotes = useQuery({
-    queryKey: queryKeys.coaching.journal(3),
+    queryKey: qk.coaching.journal(3),
     queryFn: () => getJournalEntries(userId, 3),
     enabled: !!userId,
   });

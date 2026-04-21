@@ -128,7 +128,7 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
       const force = accountAlreadySeeded && overwriteExistingData;
       const result = await importCoachData(userId, parsedData, force);
       if (result.success) {
-        await queryClient.invalidateQueries({ queryKey: queryKeys.profile.all });
+        await queryClient.invalidateQueries({ queryKey: queryKeys(userId).profile.all });
         setImportResult({ success: true, message: `${result.filesImported.length} files imported successfully.` });
         setSubStep('done');
       } else {

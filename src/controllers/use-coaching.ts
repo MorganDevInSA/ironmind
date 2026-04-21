@@ -7,7 +7,7 @@ import type { JournalEntry } from '@/lib/types';
 
 export function usePhases(userId: string) {
   return useQuery({
-    queryKey: queryKeys.coaching.phases(),
+    queryKey: queryKeys(userId).coaching.phases(),
     queryFn: () => getPhases(userId),
     staleTime: staleTimes.phases,
     enabled: !!userId,
@@ -16,7 +16,7 @@ export function usePhases(userId: string) {
 
 export function useActivePhase(userId: string) {
   return useQuery({
-    queryKey: queryKeys.coaching.phases(),
+    queryKey: queryKeys(userId).coaching.activePhase(),
     queryFn: () => getActivePhase(userId),
     staleTime: staleTimes.phases,
     enabled: !!userId,
@@ -25,7 +25,7 @@ export function useActivePhase(userId: string) {
 
 export function useJournalEntries(userId: string, limit?: number) {
   return useQuery({
-    queryKey: queryKeys.coaching.journal(limit),
+    queryKey: queryKeys(userId).coaching.journal(limit),
     queryFn: () => getJournalEntries(userId, limit),
     staleTime: staleTimes.journal,
     enabled: !!userId,
@@ -38,7 +38,7 @@ export function useCreateJournalEntry(userId: string) {
   return useMutation({
     mutationFn: (entry: Omit<JournalEntry, 'id'>) => createJournalEntry(userId, entry),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.coaching.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys(userId).coaching.all });
     },
   });
 }
@@ -50,7 +50,7 @@ export function useUpdateJournalEntry(userId: string) {
     mutationFn: ({ entryId, updates }: { entryId: string; updates: Partial<JournalEntry> }) =>
       updateJournalEntry(userId, entryId, updates),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.coaching.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys(userId).coaching.all });
     },
   });
 }

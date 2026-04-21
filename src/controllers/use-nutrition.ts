@@ -7,7 +7,7 @@ import type { NutritionDay } from '@/lib/types';
 
 export function useNutritionDay(userId: string, date: string) {
   return useQuery({
-    queryKey: queryKeys.nutrition.day(date),
+    queryKey: queryKeys(userId).nutrition.day(date),
     queryFn: () => getNutritionDay(userId, date),
     staleTime: staleTimes.nutritionDay,
     enabled: !!userId && !!date,
@@ -16,7 +16,7 @@ export function useNutritionDay(userId: string, date: string) {
 
 export function useNutritionHistory(userId: string, dateRange: { from: string; to: string }) {
   return useQuery({
-    queryKey: queryKeys.nutrition.history(dateRange),
+    queryKey: queryKeys(userId).nutrition.history(dateRange),
     queryFn: () => getNutritionHistory(userId, dateRange),
     staleTime: staleTimes.nutritionHistory,
     enabled: !!userId,
@@ -25,7 +25,7 @@ export function useNutritionHistory(userId: string, dateRange: { from: string; t
 
 export function useRecentNutritionDays(userId: string, days: number = 14) {
   return useQuery({
-    queryKey: queryKeys.nutrition.all,
+    queryKey: queryKeys(userId).nutrition.recentDays(days),
     queryFn: () => getRecentNutritionDays(userId, days),
     staleTime: staleTimes.nutritionHistory,
     enabled: !!userId,
@@ -34,7 +34,7 @@ export function useRecentNutritionDays(userId: string, days: number = 14) {
 
 export function useNutritionPlan(userId: string) {
   return useQuery({
-    queryKey: queryKeys.nutrition.plan(),
+    queryKey: queryKeys(userId).nutrition.plan(),
     queryFn: () => getNutritionPlan(userId),
     staleTime: staleTimes.nutritionHistory,
     enabled: !!userId,
@@ -48,8 +48,8 @@ export function useSaveNutritionDay(userId: string) {
     mutationFn: ({ date, data }: { date: string; data: Partial<NutritionDay> }) =>
       saveNutritionDay(userId, date, data),
     onSuccess: (_, { date }) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.nutrition.day(date) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.nutrition.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys(userId).nutrition.day(date) });
+      queryClient.invalidateQueries({ queryKey: queryKeys(userId).nutrition.all });
     },
   });
 }
