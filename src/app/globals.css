@@ -122,27 +122,6 @@ html[data-theme='hot-pink'] {
   --body-glow-3: rgba(255, 80, 180, 0.03);
 }
 
-html[data-theme='chlorine-blue'] {
-  --accent: #2EC5FF;
-  --accent-2: #1786B5;
-  --accent-light: #7BDDFF;
-  --crimson: var(--accent);
-  --crimson-light: var(--accent-light);
-  --crimson-dark: var(--accent-2);
-  --gold: var(--accent);
-  --gold-light: var(--accent-light);
-  --gold-dark: var(--accent-2);
-  --shadow-gold: 0 8px 32px rgba(46, 197, 255, 0.20);
-  --shadow-accent: 0 8px 32px rgba(46, 197, 255, 0.20);
-  --dashboard-overview-border: rgba(46, 197, 255, 0.26);
-  --panel-border: rgba(30, 80, 110, 0.40);
-  --chrome-border: rgba(30, 80, 110, 0.38);
-  --chrome-border-subtle: rgba(20, 60, 90, 0.72);
-  --body-glow-1: rgba(46, 197, 255, 0.06);
-  --body-glow-2: rgba(20, 100, 160, 0.04);
-  --body-glow-3: rgba(46, 197, 255, 0.03);
-}
-
 /* ============================================================
    BASE
 ============================================================ */
@@ -549,13 +528,15 @@ h4 { font-size: 1.125rem; }
     max-width: min(100%, 9rem);
     margin-left: auto;
     margin-right: auto;
-    height: 50px;
+    /* was 50px; −10% ≈ 45px */
+    height: 45px;
+    box-sizing: border-box;
     border-radius: 12px;
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 0 11px;
-    border: 1px solid rgba(65, 50, 50, 0.32);
+    padding: 0 10px;
+    border: 1px solid color-mix(in srgb, var(--accent) 38%, transparent);
     background: linear-gradient(180deg, rgba(22, 16, 16, 0.92) 0%, #0a0a0a 100%);
     cursor: pointer;
     user-select: none;
@@ -570,13 +551,14 @@ h4 { font-size: 1.125rem; }
 
   .nav-item:hover {
     background: linear-gradient(180deg, rgba(28, 22, 22, 0.96) 0%, #121212 100%);
-    border-color: rgba(90, 68, 68, 0.48);
+    border-color: color-mix(in srgb, var(--accent) 50%, transparent);
     transform: translateY(-1px);
   }
 
   .nav-item.active {
     background: radial-gradient(120% 140% at 50% 0%, color-mix(in srgb, var(--accent) 8%, transparent) 0%, #070707 58%);
-    border-color: color-mix(in srgb, var(--accent) 38%, transparent);
+    border-width: 2px;
+    border-color: color-mix(in srgb, var(--accent) 62%, transparent);
     box-shadow:
       0px 0px 14px color-mix(in srgb, var(--accent) 9%, transparent),
       inset 0px 1px 0 rgba(255, 255, 255, 0.04),

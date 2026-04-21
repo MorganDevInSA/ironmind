@@ -14,7 +14,8 @@ const themeOptions: Array<{ value: AppTheme; label: string; description: string;
     value: 'crimson',
     label: 'Crimson (Default)',
     description: 'Original IRONMIND red treatment.',
-    swatch: 'linear-gradient(135deg, var(--accent), var(--accent-2))',
+    /* Fixed colours — do not use var(--accent); custom theme overrides those on :root */
+    swatch: 'linear-gradient(135deg, #DC2626, #991B1B)',
   },
   {
     value: 'hot-pink',
@@ -22,18 +23,12 @@ const themeOptions: Array<{ value: AppTheme; label: string; description: string;
     description: 'Swap red accents for high-energy hot pink.',
     swatch: 'linear-gradient(135deg, #FF3EA5, #C21877)',
   },
-  {
-    value: 'chlorine-blue',
-    label: 'Chlorine Blue',
-    description: 'Swap red accents for sharp chlorine blue.',
-    swatch: 'linear-gradient(135deg, #2EC5FF, #1786B5)',
-  },
 ];
 
 export default function SettingsPage() {
   const router = useRouter();
   const { user } = useAuthStore();
-  const { theme, setTheme } = useUIStore();
+  const { theme, setTheme, customAccent, setCustomAccent } = useUIStore();
   const userId = user?.uid ?? '';
 
   const { data: profile } = useProfile(userId);
@@ -107,6 +102,43 @@ export default function SettingsPage() {
               </button>
             );
           })}
+          <div
+            className={`w-full p-3 rounded-lg border transition-colors ${
+              theme === 'custom'
+                ? 'border-[color:var(--accent)] bg-[color:color-mix(in_srgb,var(--accent)_14%,transparent)]'
+                : 'border-[rgba(65,50,50,0.38)] bg-[rgba(16,16,16,0.78)]'
+            }`}
+          >
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold text-[#F5F5F5]">Custom</p>
+                <p className="text-xs text-[#9A9A9A]">
+                  Choose an accent colour — it applies across the app as you adjust.
+                </p>
+              </div>
+              <div className="flex items-end gap-3 shrink-0">
+                <label className="flex flex-col gap-1 text-[10px] font-semibold uppercase tracking-wider text-[#6B6B6B]">
+                  Colour
+                  <input
+                    type="color"
+                    value={customAccent}
+                    onClick={() => setTheme('custom')}
+                    onFocus={() => setTheme('custom')}
+                    onChange={(e) => {
+                      setTheme('custom');
+                      setCustomAccent(e.target.value);
+                    }}
+                    className="h-10 w-[4.5rem] cursor-pointer rounded-md border border-white/25 bg-[#0a0a0a] p-0.5 shadow-inner"
+                    title="Accent colour"
+                    aria-label="Choose custom accent colour"
+                  />
+                </label>
+                <span className="font-mono text-xs tabular-nums text-[#9A9A9A] pb-1">
+                  {customAccent.toUpperCase()}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

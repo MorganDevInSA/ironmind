@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { X, Zap, Check, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/stores';
+import { useAuthStore, useUIStore } from '@/stores';
 import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/constants/query-keys';
 import { seedMortonData, seedSheriData, seedAlexData, seedJordanData } from '@/lib/seed';
@@ -94,6 +94,7 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
     try {
       if (selected === 'sheri') {
         await seedSheriData(user.uid);
+        useUIStore.getState().setTheme('hot-pink');
       } else if (selected === 'alex') {
         await seedAlexData(user.uid);
       } else if (selected === 'jordan') {
@@ -136,7 +137,7 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-[rgba(65,50,50,0.35)]">
           <div className="flex items-center gap-3">
-            <Zap size={18} className="text-[#F59E0B]" />
+            <Zap size={18} className="text-[color:var(--accent)]" />
             <div>
               <h2 className="text-base font-bold text-[#F0F0F0]">Choose a Demo Profile</h2>
               <p className="text-xs text-[#5E5E5E] mt-0.5">
@@ -157,7 +158,10 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
         {/* Profile grid */}
         <div className="p-5 flex flex-col gap-3 overflow-y-auto max-h-[60vh]">
           {alreadySeeded && (
-            <div className="p-3 rounded-lg text-xs border border-[rgba(245,158,11,0.30)] bg-[rgba(245,158,11,0.06)] text-[#F59E0B]">
+            <div
+              className="p-3 rounded-lg text-xs border border-[color:color-mix(in_srgb,var(--accent)_32%,transparent)]
+              bg-[color:color-mix(in_srgb,var(--accent)_8%,transparent)] text-[color:var(--accent-light)]"
+            >
               <strong>Note:</strong> You already have data loaded. Selecting a demo profile will replace it.
             </div>
           )}
@@ -174,7 +178,7 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
               onClick={() => setSelected(profile.id)}
               className={`w-full text-left p-4 rounded-[12px] border transition-all duration-200
                 ${selected === profile.id
-                  ? 'border-[rgba(220,38,38,0.50)] bg-[rgba(220,38,38,0.07)] shadow-[0_0_20px_rgba(220,38,38,0.12)]'
+                  ? 'border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_8%,transparent)] shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_12%,transparent)]'
                   : 'border-[rgba(65,50,50,0.40)] bg-[rgba(18,14,14,0.60)] hover:border-[rgba(65,50,50,0.70)] hover:bg-[rgba(22,16,16,0.80)]'
                 }`}
             >
@@ -226,7 +230,7 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
             disabled={!selected || loading || done}
             className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg font-semibold text-sm text-white
               bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-2)] border border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]
-              shadow-[0_8px_20px_rgba(220,38,38,0.22)]
+              shadow-[0_8px_20px_color-mix(in_srgb,var(--accent)_22%,transparent)]
               hover:brightness-110 active:scale-95 transition-all duration-200
               disabled:opacity-40 disabled:cursor-not-allowed"
           >

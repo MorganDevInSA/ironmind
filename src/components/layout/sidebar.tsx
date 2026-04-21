@@ -33,9 +33,9 @@ const navItems = [
   { href: '/guide',        label: 'User Guide',   icon: BookOpen },
 ];
 
-const activeText = 'text-[color:var(--accent-light)]';
-const idleText = 'text-[color:var(--text-detail)]';
-const hoverText = 'group-hover:text-[color:var(--text-0)]';
+/** All nav labels/icons use theme accent; active row gets weight + glow via classes */
+const accentIcon = 'text-[color:var(--accent-light)]';
+const accentLabel = 'text-[color:var(--accent-light)]';
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -97,14 +97,18 @@ export function Sidebar() {
                 size={20}
                 className={cn(
                   'shrink-0 transition-colors duration-[220ms]',
-                  isActive ? activeText : cn(idleText, hoverText)
+                  accentIcon,
+                  isActive &&
+                    'drop-shadow-[0_0_8px_color-mix(in_srgb,var(--accent)_50%,transparent)]',
+                  !isActive && 'opacity-90 group-hover:opacity-100'
                 )}
               />
               {sidebarOpen && (
                 <span
                   className={cn(
-                    'text-sm font-semibold tracking-wide transition-colors duration-[220ms] truncate',
-                    isActive ? activeText : cn(idleText, 'group-hover:text-[color:var(--text-0)]')
+                    'text-sm tracking-wide transition-colors duration-[220ms] truncate',
+                    accentLabel,
+                    isActive ? 'font-semibold' : 'font-medium opacity-90 group-hover:opacity-100'
                   )}
                 >
                   {item.label}

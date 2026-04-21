@@ -4,12 +4,16 @@ import { QueryProvider } from "@/components/providers/query-provider";
 import { Toaster } from "sonner";
 import { RegisterServiceWorker } from "@/components/pwa/register-service-worker";
 import { ThemeSync } from "@/components/theme/theme-sync";
+import { SheriThemeSync } from "@/components/theme/sheri-theme-sync";
 
 export const metadata: Metadata = {
   title: "IRONMIND — Elite Bodybuilding Performance",
   description: "Elite solo-athlete bodybuilding performance system. Track training, nutrition, recovery, and physique with data-driven precision.",
   keywords: ["bodybuilding", "fitness", "strength training", "nutrition tracking", "workout log"],
   authors: [{ name: "IRONMIND" }],
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
   manifest: "/manifest.json",
   icons: {
     apple: "/ironmind_transparent_1_reverted.png",
@@ -38,6 +42,7 @@ export default function RootLayout({
       <body className="min-h-full text-foreground font-sans">
         <QueryProvider>
           <ThemeSync />
+          <SheriThemeSync />
           {children}
           <RegisterServiceWorker />
           <Toaster

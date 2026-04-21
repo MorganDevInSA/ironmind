@@ -107,24 +107,30 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
         </p>
       </div>
 
-      {/* Skip to demo banner */}
-      <div className="rounded-[14px] border border-[rgba(245,158,11,0.30)] bg-[rgba(245,158,11,0.06)]
-        overflow-hidden">
+      {/* Skip to demo banner — theme accent */}
+      <div
+        className="rounded-[14px] border border-[color:color-mix(in_srgb,var(--accent)_32%,transparent)]
+        bg-[color:color-mix(in_srgb,var(--accent)_8%,transparent)] overflow-hidden"
+      >
         <button
           onClick={() => setDemoExpanded(v => !v)}
           className="w-full flex items-center justify-between gap-3 px-5 py-4 text-left"
         >
           <div className="flex items-center gap-3">
-            <Zap size={16} className="text-[#F59E0B] shrink-0" />
-            <span className="text-sm font-semibold text-[#F59E0B]">
+            <Zap size={16} className="text-[color:var(--accent)] shrink-0" />
+            <span className="text-sm font-semibold text-[color:var(--accent-light)]">
               Not ready to fill this in? Skip to demo data
             </span>
           </div>
-          {demoExpanded ? <ChevronUp size={15} className="text-[#F59E0B] shrink-0" /> : <ChevronDown size={15} className="text-[#F59E0B] shrink-0" />}
+          {demoExpanded ? (
+            <ChevronUp size={15} className="text-[color:var(--accent)] shrink-0" />
+          ) : (
+            <ChevronDown size={15} className="text-[color:var(--accent)] shrink-0" />
+          )}
         </button>
 
         {demoExpanded && (
-          <div className="px-5 pb-5 flex flex-col gap-4 border-t border-[rgba(245,158,11,0.20)]">
+          <div className="px-5 pb-5 flex flex-col gap-4 border-t border-[color:color-mix(in_srgb,var(--accent)_22%,transparent)]">
             <div className="pt-4 flex flex-col gap-2 text-sm text-[#9A9A9A] leading-relaxed">
               <p>
                 Demo data loads a pre-built athlete plan so you can explore every feature of
@@ -142,8 +148,8 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
                 ].map((text, i) => (
                   <li key={i} className="flex items-start gap-3">
                     <span className="mt-0.5 w-5 h-5 shrink-0 rounded-full flex items-center justify-center
-                      text-[9px] font-bold bg-[rgba(245,158,11,0.15)] border border-[rgba(245,158,11,0.35)]
-                      text-[#F59E0B]">
+                      text-[9px] font-bold bg-[color:color-mix(in_srgb,var(--accent)_15%,transparent)]
+                      border border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)] text-[color:var(--accent-light)]">
                       {i + 1}
                     </span>
                     <span>{text}</span>
@@ -158,9 +164,10 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
 
             <button
               onClick={() => setDemoModalOpen(true)}
-              className="flex items-center justify-center gap-2 px-5 py-3 rounded-lg font-semibold text-sm
-                text-[#1a1000] bg-gradient-to-r from-[#F59E0B] to-[#D97706]
-                border border-[rgba(245,158,11,0.5)] shadow-[0_8px_20px_rgba(245,158,11,0.20)]
+              className="flex items-center justify-center gap-2 px-5 py-3 rounded-lg font-semibold text-sm text-white
+                bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-2)]
+                border border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]
+                shadow-[0_8px_20px_color-mix(in_srgb,var(--accent)_22%,transparent)]
                 hover:brightness-110 active:scale-95 transition-all duration-200"
             >
               <Users size={15} />

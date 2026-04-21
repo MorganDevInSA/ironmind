@@ -4,8 +4,15 @@ import { useEffect } from 'react';
 
 export function RegisterServiceWorker() {
   useEffect(() => {
-    if (process.env.NODE_ENV !== 'production') return;
     if (!('serviceWorker' in navigator)) return;
+
+    // Drop any SW from a prior `next start` on this origin so `next dev` always loads fresh chunks.
+    if (process.env.NODE_ENV !== 'production') {
+      void navigator.serviceWorker.getRegistrations().then((regs) => {
+        for (const r of regs) void r.unregister();
+      });
+      return;
+    }
 
     const register = async () => {
       try {

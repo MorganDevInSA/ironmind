@@ -78,7 +78,7 @@ function Section({
           <span className="font-bold text-[#F0F0F0] text-sm tracking-wide">{title}</span>
           {badge && (
             <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full
-              bg-[rgba(245,158,11,0.15)] border border-[rgba(245,158,11,0.35)] text-[#F59E0B]">
+              bg-[color:color-mix(in_srgb,var(--accent)_15%,transparent)] border border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)] text-[color:var(--accent-light)]">
               {badge}
             </span>
           )}
@@ -117,7 +117,7 @@ function Callout({ icon: Icon, color, children }: {
   children: React.ReactNode;
 }) {
   const palette = {
-    amber:  'border-[rgba(245,158,11,0.30)] bg-[rgba(245,158,11,0.06)] text-[#F59E0B]',
+    amber:  'border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_6%,transparent)] text-[color:var(--accent-light)]',
     crimson: 'border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_6%,transparent)] text-[color:var(--accent-light)]',
     green:  'border-[rgba(34,197,94,0.30)] bg-[rgba(34,197,94,0.06)] text-[#22C55E]',
   };
@@ -179,12 +179,14 @@ export default function GuidePage() {
         })}
       </div>
 
-      {/* Demo data callout */}
-      <div className="rounded-[14px] border border-[rgba(245,158,11,0.30)] bg-[rgba(245,158,11,0.06)]
-        p-5 flex flex-col gap-3">
+      {/* Demo data callout — uses active theme accent */}
+      <div
+        className="rounded-[14px] border border-[color:color-mix(in_srgb,var(--accent)_32%,transparent)]
+        bg-[color:color-mix(in_srgb,var(--accent)_8%,transparent)] p-5 flex flex-col gap-3"
+      >
         <div className="flex items-center gap-2">
-          <Zap size={16} className="text-[#F59E0B] shrink-0" />
-          <span className="text-sm font-bold text-[#F59E0B]">Running on demo data?</span>
+          <Zap size={16} className="text-[color:var(--accent)] shrink-0" />
+          <span className="text-sm font-bold text-[color:var(--accent-light)]">Running on demo data?</span>
         </div>
         <p className="text-sm text-[#9A9A9A] leading-relaxed">
           When you first log in, IRONMIND can load a pre-built athlete plan so you can explore
@@ -195,9 +197,10 @@ export default function GuidePage() {
         <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={() => setDemoModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold text-sm
-              text-[#1a1000] bg-gradient-to-r from-[#F59E0B] to-[#D97706]
-              border border-[rgba(245,158,11,0.5)] shadow-[0_6px_16px_rgba(245,158,11,0.18)]
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold text-sm text-white
+              bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-2)]
+              border border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]
+              shadow-[0_6px_16px_color-mix(in_srgb,var(--accent)_22%,transparent)]
               hover:brightness-110 active:scale-95 transition-all duration-200"
           >
             <Zap size={14} />

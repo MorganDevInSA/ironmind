@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ironmind-shell-v1';
+const CACHE_NAME = 'ironmind-shell-v2';
 const APP_SHELL = ['/', '/manifest.json', '/icon-192x192.svg', '/icon-512x512.svg'];
 
 self.addEventListener('install', (event) => {
@@ -24,6 +24,14 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   if (event.request.url.includes('/api/')) return;
+  // Never intercept Next.js chunks/HMR — avoids stale 404s and wrong MIME types when
+  // switching dev ↔ production or after rebuilds (browser uses the network only).
+  try {
+    const path = new URL(event.request.url).pathname;
+    if (path.startsWith('/_next/')) return;
+  } catch {
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request).then((cached) => {

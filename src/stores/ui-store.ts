@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type AppTheme = 'crimson' | 'hot-pink' | 'chlorine-blue';
+export type AppTheme = 'crimson' | 'hot-pink' | 'custom';
 
 interface UIState {
   // Sidebar state
@@ -22,6 +22,8 @@ interface UIState {
   // Theme
   theme: AppTheme;
   setTheme: (theme: AppTheme) => void;
+  customAccent: string;
+  setCustomAccent: (hex: string) => void;
 
   // Workout state (ephemeral)
   activeWorkoutId: string | null;
@@ -48,6 +50,8 @@ export const useUIStore = create<UIState>()(
 
       theme: 'crimson',
       setTheme: (theme) => set({ theme }),
+      customAccent: '#DC2626',
+      setCustomAccent: (hex) => set({ customAccent: hex }),
 
       activeWorkoutId: null,
       restTimerEnd: null,
@@ -61,6 +65,7 @@ export const useUIStore = create<UIState>()(
       partialize: (state) => ({
         sidebarOpen: state.sidebarOpen,
         theme: state.theme,
+        customAccent: state.customAccent,
       }),
     }
   )
