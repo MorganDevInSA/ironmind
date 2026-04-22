@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "type": "prompt",
+        "prompt": "Inject standing instructions for chat shortcuts into the session context."
+      }
+    ],
+    "beforeSubmitPrompt": [
+      {
+        "command": ".cursor/hooks/cicd-shortcut.sh",
+        "matcher": "Complete CI/CD run",
+        "timeout": 5
+      }
+    ]
+  }
+}
