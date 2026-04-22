@@ -188,7 +188,7 @@ export default function GuidePage() {
       >
         <div className="flex items-center gap-2">
           <Zap size={16} className="text-[color:var(--accent)] shrink-0" />
-          <span className="text-sm font-bold text-[color:var(--accent-light)]">Running on demo data?</span>
+          <span className="text-sm font-bold text-[color:var(--text-0)]">Running on demo data?</span>
         </div>
         <p className="text-sm text-[color:var(--text-1)] leading-relaxed">
           When you first log in, IRONMIND can load a pre-built athlete plan so you can explore

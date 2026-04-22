@@ -222,6 +222,7 @@ These patterns are the result of iterative refinement and must be preserved:
 * **Accordion expand/collapse**: `.accordion-wrapper` + `.accordion-inner` with `data-open` attribute. CSS grid-row animation. Never use `{isOpen && ...}` conditional rendering.
 * **iOS-style spinner**: `.spinner` / `.spinner-lg` preferred over skeleton loaders. Conic gradient with `steps(12)`, themed via `var(--accent)`.
 * **Accent page titles**: All h1 page titles use `text-[color:var(--accent)]` for branded identity. Data values stay white.
+* **Text color hierarchy**: Accent is ONLY for h1 titles, icons, links, interactive elements, and micro-labels. Body text, bold/strong within paragraphs, section headings inside panels, user names, and informational metadata must be `--text-0` (white) or `--text-1`/`--text-2` (grey) for readability — especially on mobile.
 * **Knight Rider LED bars**: Readiness and weight indicators in top bar — themed pulse animation, hover tooltip.
 * **Native form theming**: `accent-color: var(--accent)` globally applied to checkboxes and radios.
 * **Single-column centered layout**: All pages use `max-w-4xl mx-auto` — no multi-column layouts on desktop.

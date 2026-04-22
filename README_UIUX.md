@@ -91,9 +91,12 @@ ratio. Each bar renders 10-12 segments with:
 The background itself is a design element: three layered `radial-gradient` passes using
 `--body-glow-*` tokens create a subtle, theme-aware ambient glow. Scrollbars are styled
 with accent gradients. Text selection uses `color-mix()` with the current accent. Page
-titles render in the active accent color for branded identity. These details are invisible
-individually but collectively produce the "this feels expensive" perception that separates
-polished products from functional ones.
+titles render in the active accent color for branded identity — but body text, bold text
+within paragraphs, and section headings inside panels stay white for readability. Accent is
+reserved for icons, links, interactive elements, and micro-labels; readable content always
+uses the neutral text hierarchy (`--text-0`, `--text-1`, `--text-2`). These details are
+invisible individually but collectively produce the "this feels expensive" perception that
+separates polished products from functional ones.
 
 ### Motion Design
 

@@ -118,6 +118,20 @@ The top bar includes **Knight Rider LED readiness/weight bars**: two LED indicat
 - **Numbers and metrics:** monospace with `tabular-nums`
 - **Label rows:** uppercase + tracking + `--text-2`
 
+### Text color hierarchy
+
+| Element | Color | Rationale |
+|---------|-------|-----------|
+| h1 page titles | `var(--accent)` | Brand anchor, short and large — accent is readable at this scale |
+| Section headings inside panels | `var(--text-0)` (white) | Readable structural headers — accent would hurt readability |
+| Bold/strong text within body | `var(--text-0)` (white) | Emphasis within readable content — never accent |
+| User names, phase info | `var(--text-0)` / `var(--text-1)` | Informational metadata — white for names, grey for context |
+| Body paragraphs | `var(--text-1)` | Secondary readable text |
+| Micro-labels ("Step X of 6") | `var(--accent)` | Tiny metadata labels (10px uppercase) — accent is a brand signal here |
+| Icons | `var(--accent)` | Visual markers, not readable text |
+| Links | `var(--accent)` | Interactive, clickable — accent signals affordance |
+| CTA button text | `var(--accent)` | Interactive link-style actions ("Open nutrition →") |
+
 ---
 
 ## 5.5) Native form theming

@@ -44,7 +44,7 @@ function Field({
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-center gap-3 mt-2 mb-4">
-      <h3 className="text-sm font-bold uppercase tracking-[0.25em] text-[color:var(--accent)]">{children}</h3>
+      <h3 className="text-sm font-bold uppercase tracking-[0.25em] text-[color:var(--text-0)]">{children}</h3>
       <div className="flex-1 h-px bg-[rgba(220,38,38,0.20)]" />
     </div>
   );
@@ -283,7 +283,7 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
         </p>
         {([0, 1, 2] as const).map(idx => (
           <div key={idx} className="p-4 rounded-xl border border-[rgba(65,50,50,0.30)] bg-[rgba(8,8,8,0.5)] flex flex-col gap-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--accent)]">Injury {idx + 1}</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--text-1)]">Injury {idx + 1}</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Field label="Injury Name">
                 <input className={inputCls} value={answers.injuries[idx].name} onChange={e => setInjury(idx, 'name', e.target.value)} placeholder="e.g. Left shoulder labrum" />

@@ -247,10 +247,16 @@ Or inline:
 ## Typography Patterns
 
 ```tsx
-// Page title (accent-colored)
+// Page title (accent-colored — ONLY h1 page titles)
 <h1 className="text-2xl font-bold text-[color:var(--accent)]">
   Title
 </h1>
+
+// Section heading inside a panel (white — NOT accent)
+<h3 className="font-semibold text-[color:var(--text-0)]">Section Title</h3>
+
+// Bold text within body copy (white — NOT accent)
+<strong className="text-[color:var(--text-0)]">important phrase</strong>
 
 // Data label (ALL CAPS)
 <span className="data-label">SETS / WEEK</span>
@@ -364,3 +370,4 @@ All components using CSS variables automatically update.
 | `text-accent` | `text-[color:var(--accent)]` (Tailwind utility uses hardcoded hex) |
 | `bg-accent` | `.btn-primary` or `bg-[color:var(--accent)]` |
 | `{isOpen && <div>...</div>}` for expandable content | Use `.accordion-wrapper` with `data-open` attribute |
+| Accent-colored body text, bold, or section headings | Use `text-[color:var(--text-0)]` for readable content; accent is for icons, links, h1 titles only |

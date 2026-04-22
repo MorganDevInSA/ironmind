@@ -229,7 +229,7 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
                       {profile.tag}
                     </span>
                   </div>
-                  <p className="text-xs font-semibold text-[color:var(--accent)] mb-1">{profile.goal}</p>
+                  <p className="text-xs font-semibold text-[color:var(--text-0)] mb-1">{profile.goal}</p>
                   <p className="text-xs text-[color:var(--text-2)] leading-relaxed">{profile.description}</p>
                   {selected === profile.id && (
                     <div className="mt-3 space-y-2 border-t border-[rgba(65,50,50,0.35)] pt-3">

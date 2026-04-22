@@ -144,6 +144,10 @@ Accent colors change per theme; neutrals remain fixed.
 - **Numbers**: Always `font-mono tabular-nums` — no exceptions
 - **Labels**: ALL CAPS, `tracking-[0.3em]`, `var(--text-2)`
 - **Headlines**: `font-heading`, tracking `-0.02em`
+- **h1 page titles**: `var(--accent)` — brand anchor
+- **Section headings inside panels**: `var(--text-0)` — never accent
+- **Bold/strong within body text**: `var(--text-0)` — never accent
+- **User names, phase info in chrome**: `var(--text-0)` / `var(--text-1)` — never accent
 
 ---
 

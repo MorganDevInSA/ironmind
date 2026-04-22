@@ -110,12 +110,12 @@ export function TopBar() {
               <p className="text-xs mt-0.5 tracking-wide">
                 {name && (
                   <>
-                    <span className="font-bold text-[color:var(--accent-light)]">{name}</span>
-                    {phase ? <span className="text-[color:var(--accent)] font-semibold"> — </span> : null}
+                    <span className="font-bold text-[color:var(--text-0)]">{name}</span>
+                    {phase ? <span className="text-[color:var(--text-2)] font-semibold"> — </span> : null}
                   </>
                 )}
                 {phase?.name && (
-                  <span className="font-semibold text-[color:var(--accent)]">{phase.name}</span>
+                  <span className="font-semibold text-[color:var(--text-1)]">{phase.name}</span>
                 )}
               </p>
             );

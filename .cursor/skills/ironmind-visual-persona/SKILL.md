@@ -140,7 +140,8 @@ Never use in IRONMIND:
 3. **Color**: Accent > Good (green) > Text. Reserve accent for the single most important thing per view.
 4. **Contrast**: Primary content uses `var(--text-0)`. Supporting uses `var(--text-1)`. Hints use `var(--text-2)`.
 5. **Spacing**: Use generous whitespace. Dense = overwhelming. Elite = spacious.
-6. **Page titles**: All h1 page titles use `var(--accent)` for branded identity. Data values and sub-headings remain `var(--text-0)`.
+6. **Page titles**: All h1 page titles use `var(--accent)` for branded identity.
+7. **Body text readability**: Bold text within paragraphs, section headings inside panels, user names, and informational metadata MUST be `--text-0` (white) or `--text-1`/`--text-2` (grey) — never accent. Accent on body text hurts readability, especially on mobile. Accent is for icons, links, interactive elements, and micro-labels — not readable content.
 
 ---
 

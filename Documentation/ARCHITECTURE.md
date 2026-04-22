@@ -309,7 +309,7 @@ From `.cursor/rules/IRONMIND.md`:
 - **Glass panels** — `.glass-panel` / `.glass-panel-strong` patterns; panel border width driven by CSS variables (e.g. `--panel-border-width`)
 - **Interactive panels** — `.glass-panel` hover/focus-within transitions to accent border + glow
 - **Accordion** — Expandable content uses `.accordion-wrapper` + `.accordion-inner` (CSS grid-row animation)
-- **Page titles** — h1 elements use `text-[color:var(--accent)]` for branded identity
+- **Page titles** — h1 elements use `text-[color:var(--accent)]` for branded identity; body text, bold, section headings inside panels use `--text-0` (white) for readability
 - **iOS spinner** — `.spinner` class is iOS-style conic gradient; prefer over `.skeleton` for loading
 - **LED indicators** — Knight Rider-style readiness/weight bars in top bar with themed pulse
 - **Mobile nav** — active indicator is `absolute`; parent `Link` must be `relative`

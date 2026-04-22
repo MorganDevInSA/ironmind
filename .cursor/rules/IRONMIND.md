@@ -64,9 +64,13 @@ Every numeric data value in the UI uses `font-mono tabular-nums`. No exceptions.
 - PR achievements and KPI badges
 - CTA / primary buttons
 - Phase/milestone badges
-- Key interactive elements
+- Key interactive elements (links, toggles, checkmarks)
 - Page h1 titles (branded identity)
 - LED readiness/weight indicators in the top bar
+- Icons (visual markers, not readable text)
+- Micro-labels (step numbers, "Step X of 6" — 10px uppercase metadata)
+
+**Never use accent for readable body text, bold text within paragraphs, section headings inside panels, user names, or informational metadata.** These must use `--text-0` (white) or `--text-1`/`--text-2` (grey) for readability — especially on mobile.
 
 Maximum 2–3 accent elements visible at once per view.
 
