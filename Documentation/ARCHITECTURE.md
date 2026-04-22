@@ -18,20 +18,20 @@ The app is built for **multiple independent athletes** (each Firebase Auth user 
 
 Versions below are taken from `package.json` at repo root. If `README.md` disagrees (e.g. Next or Tailwind major), **trust `package.json`**.
 
-| Layer | Technology |
-|--------|------------|
-| Framework | **Next.js 14** (App Router), React 18 |
-| Language | **TypeScript** (strict) |
-| Styling | **Tailwind CSS 3.x**, global tokens in `src/app/globals.css` |
-| Server / cache | **TanStack Query v5** (`@tanstack/react-query`) |
-| Client UI state | **Zustand** |
-| Backend | **Firebase** — Auth, Firestore, Storage (`firebase` SDK 12.x) |
-| Forms | React Hook Form + **Zod** |
-| Charts | **Recharts** |
-| Motion | **Framer Motion** |
-| Icons | **Lucide React** |
-| Toasts | **Sonner** |
-| Date | **date-fns** |
+| Layer           | Technology                                                    |
+| --------------- | ------------------------------------------------------------- |
+| Framework       | **Next.js 14.2** (App Router), React 18                       |
+| Language        | **TypeScript** (strict)                                       |
+| Styling         | **Tailwind CSS 3.x**, global tokens in `src/app/globals.css`  |
+| Server / cache  | **TanStack Query v5** (`@tanstack/react-query`)               |
+| Client UI state | **Zustand**                                                   |
+| Backend         | **Firebase** — Auth, Firestore, Storage (`firebase` SDK 12.x) |
+| Forms           | React Hook Form + **Zod**                                     |
+| Charts          | **Recharts**                                                  |
+| Motion          | **Framer Motion**                                             |
+| Icons           | **Lucide React**                                              |
+| Toasts          | **Sonner**                                                    |
+| Date            | **date-fns**                                                  |
 
 **Next.js note:** `AGENTS.md` points agents at `node_modules/next/dist/docs/` because this project’s Next may differ from training cutoffs — read project-local docs before assuming APIs.
 
@@ -98,12 +98,12 @@ flowchart LR
   S --> F
 ```
 
-| Layer | Location | Responsibility |
-|-------|-----------|----------------|
-| **Pages / components** | `src/app/**`, `src/components/**` | Rendering, UX, wiring **controller hooks** only |
-| **Controllers** | `src/controllers/use-*.ts` | `useQuery` / `useMutation`, cache keys, invalidation, `enabled: !!userId` |
-| **Services** | `src/services/*.service.ts` | Domain operations; call **`@/lib/firebase`** helpers only |
-| **Firebase helpers** | `src/lib/firebase/*` | Converters, `getDocument`, `queryDocuments`, `collections` paths |
+| Layer                  | Location                          | Responsibility                                                            |
+| ---------------------- | --------------------------------- | ------------------------------------------------------------------------- |
+| **Pages / components** | `src/app/**`, `src/components/**` | Rendering, UX, wiring **controller hooks** only                           |
+| **Controllers**        | `src/controllers/use-*.ts`        | `useQuery` / `useMutation`, cache keys, invalidation, `enabled: !!userId` |
+| **Services**           | `src/services/*.service.ts`       | Domain operations; call **`@/lib/firebase`** helpers only                 |
+| **Firebase helpers**   | `src/lib/firebase/*`              | Converters, `getDocument`, `queryDocuments`, `collections` paths          |
 
 **Violations to avoid**
 
@@ -126,11 +126,11 @@ flowchart LR
 
 ### 5.2 Route groups
 
-| Group | Purpose |
-|-------|---------|
-| `(auth)` | Login / register — unauthenticated flows |
-| `(onboarding)` | JSON upload / seed path for new users |
-| `(app)` | Authenticated shell: sidebar, top bar, mobile nav, `AuthGuard` |
+| Group          | Purpose                                                        |
+| -------------- | -------------------------------------------------------------- |
+| `(auth)`       | Login / register — unauthenticated flows                       |
+| `(onboarding)` | JSON upload / seed path for new users                          |
+| `(app)`        | Authenticated shell: sidebar, top bar, mobile nav, `AuthGuard` |
 
 ### 5.3 Authenticated shell (`src/app/(app)/layout.tsx`)
 
@@ -141,19 +141,19 @@ flowchart LR
 
 Paths below map to `page.tsx` files — **any new `Link` must target one of these** (see IRONMIND routing rule):
 
-| Route | Feature area |
-|-------|----------------|
-| `/dashboard` | Day overview, schedule widgets |
-| `/training`, `/training/programs`, `/training/exercises`, `/training/history`, `/training/workout` | Program + session execution |
-| `/nutrition` | Day-type macros, meals |
-| `/supplements` | Protocol + daily log |
-| `/recovery` | Readiness scoring and trends |
-| `/physique` | Weight, measurements, photos |
-| `/settings` | Profile / app settings |
-| `/export` | LLM-oriented markdown export |
-| `/more` | Mobile “more” hub |
-| `/onboarding` | Coach JSON import + seed |
-| `/login`, `/register` | Auth |
+| Route                                                                                              | Feature area                   |
+| -------------------------------------------------------------------------------------------------- | ------------------------------ |
+| `/dashboard`                                                                                       | Day overview, schedule widgets |
+| `/training`, `/training/programs`, `/training/exercises`, `/training/history`, `/training/workout` | Program + session execution    |
+| `/nutrition`                                                                                       | Day-type macros, meals         |
+| `/supplements`                                                                                     | Protocol + daily log           |
+| `/recovery`                                                                                        | Readiness scoring and trends   |
+| `/physique`                                                                                        | Weight, measurements, photos   |
+| `/settings`                                                                                        | Profile / app settings         |
+| `/export`                                                                                          | LLM-oriented markdown export   |
+| `/more`                                                                                            | Mobile “more” hub              |
+| `/onboarding`                                                                                      | Coach JSON import + seed       |
+| `/login`, `/register`                                                                              | Auth                           |
 
 ---
 
@@ -189,20 +189,20 @@ Use Zustand for **transient UI and auth identity**, not for Firestore document m
 
 All paths go through **`collections`** — never hand-roll `'users/...'` strings (enforced by rules):
 
-| Helper | Path pattern |
-|--------|----------------|
-| `collections.users` | `users` |
-| `collections.profiles(uid)` | `users/{uid}/profile` (document `data`) |
-| `collections.programs(uid)` | `users/{uid}/programs` |
-| `collections.workouts(uid)` | `users/{uid}/workouts` |
-| `collections.nutritionDays(uid)` | `users/{uid}/nutrition` |
-| `collections.supplementLogs(uid)` | `users/{uid}/supplements` |
-| `collections.supplementProtocol(uid)` | `users/{uid}/protocol` |
-| `collections.recoveryEntries(uid)` | `users/{uid}/recovery` |
-| `collections.checkIns(uid)` | `users/{uid}/checkins` |
-| `collections.phases(uid)` | `users/{uid}/phases` |
-| `collections.journalEntries(uid)` | `users/{uid}/journal` |
-| `collections.volumeLandmarks(uid)` | `users/{uid}/landmarks` |
+| Helper                                | Path pattern                            |
+| ------------------------------------- | --------------------------------------- |
+| `collections.users`                   | `users`                                 |
+| `collections.profiles(uid)`           | `users/{uid}/profile` (document `data`) |
+| `collections.programs(uid)`           | `users/{uid}/programs`                  |
+| `collections.workouts(uid)`           | `users/{uid}/workouts`                  |
+| `collections.nutritionDays(uid)`      | `users/{uid}/nutrition`                 |
+| `collections.supplementLogs(uid)`     | `users/{uid}/supplements`               |
+| `collections.supplementProtocol(uid)` | `users/{uid}/protocol`                  |
+| `collections.recoveryEntries(uid)`    | `users/{uid}/recovery`                  |
+| `collections.checkIns(uid)`           | `users/{uid}/checkins`                  |
+| `collections.phases(uid)`             | `users/{uid}/phases`                    |
+| `collections.journalEntries(uid)`     | `users/{uid}/journal`                   |
+| `collections.volumeLandmarks(uid)`    | `users/{uid}/landmarks`                 |
 
 ### 7.3 Firestore helpers (`src/lib/firebase/firestore.ts`)
 
@@ -221,18 +221,18 @@ All paths go through **`collections`** — never hand-roll `'users/...'` strings
 
 Exported services (`src/services/index.ts`): profile, training, nutrition, recovery, physique, supplements, coaching, volume, alerts, storage.
 
-| Domain | Service | Representative controller hooks | Primary UI |
-|--------|---------|---------------------------------|------------|
-| Profile | `profile.service.ts` | `use-profile` | Settings, dashboard header |
-| Training | `training.service.ts` | `use-training` | Training pages, workout |
-| Nutrition | `nutrition.service.ts` | `use-nutrition` | Nutrition |
-| Recovery | `recovery.service.ts` | `use-recovery` | Recovery |
-| Physique | `physique.service.ts` | `use-physique` | Physique |
-| Supplements | `supplements.service.ts` | `use-supplements` | Supplements |
-| Coaching | `coaching.service.ts` | `use-coaching` | Export note composer (journal-backed); no dedicated `/coaching` route |
-| Volume | `volume.service.ts` | `use-volume`, `use-dashboard` | Dashboard charts, landmarks |
-| Alerts | `alerts.service.ts` | `use-alerts` | Dashboard / notifications |
-| Export | (summary in `lib/export`) | `use-export` | Export page |
+| Domain      | Service                   | Representative controller hooks | Primary UI                                                            |
+| ----------- | ------------------------- | ------------------------------- | --------------------------------------------------------------------- |
+| Profile     | `profile.service.ts`      | `use-profile`                   | Settings, dashboard header                                            |
+| Training    | `training.service.ts`     | `use-training`                  | Training pages, workout                                               |
+| Nutrition   | `nutrition.service.ts`    | `use-nutrition`                 | Nutrition                                                             |
+| Recovery    | `recovery.service.ts`     | `use-recovery`                  | Recovery                                                              |
+| Physique    | `physique.service.ts`     | `use-physique`                  | Physique                                                              |
+| Supplements | `supplements.service.ts`  | `use-supplements`               | Supplements                                                           |
+| Coaching    | `coaching.service.ts`     | `use-coaching`                  | Export note composer (journal-backed); no dedicated `/coaching` route |
+| Volume      | `volume.service.ts`       | `use-volume`, `use-dashboard`   | Dashboard charts, landmarks                                           |
+| Alerts      | `alerts.service.ts`       | `use-alerts`                    | Dashboard / notifications                                             |
+| Export      | (summary in `lib/export`) | `use-export`                    | Export page                                                           |
 
 ---
 
@@ -348,14 +348,20 @@ Persistent layout chrome uses the same **warm dark** token hierarchy as the rest
 
 ## 14. Quality gates and workflows
 
-| Gate | Command / action |
-|------|-------------------|
-| Typecheck | `npx tsc --noEmit` — **zero errors** policy |
-| Lint | `npm run lint` |
-| Architecture | No page → service/firebase shortcuts |
-| Routing | All `href`s resolve to existing `page.tsx` |
-| Seed | Seed files wired and logged |
-| Alerts | All checks wired into `getActiveAlerts` |
+| Gate              | Command / action                                                                |
+| ----------------- | ------------------------------------------------------------------------------- |
+| **Full CI chain** | `npm run ci` — lint + typecheck + build (matches GitHub Actions)                |
+| Typecheck         | `npx tsc --noEmit` or `npm run typecheck` — **zero errors** policy              |
+| Lint              | `npm run lint` — ESLint with `--max-warnings=0`                                 |
+| Format            | `npm run format` (check) or `npm run format:fix` (auto-fix) — Prettier          |
+| Pre-commit hook   | `simple-git-hooks` + `lint-staged` — auto-fixes lint + prettier on staged files |
+| Architecture      | No page → service/firebase shortcuts                                            |
+| Routing           | All `href`s resolve to existing `page.tsx`                                      |
+| Seed              | Seed files wired and logged                                                     |
+| Alerts            | All checks wired into `getActiveAlerts`                                         |
+| Deploy            | `npm run publish` — CI verification → push → Vercel auto-deploys                |
+
+**CI runs automatically** on every push to `main` and every pull request via `.github/workflows/ci.yml`. See `README_CICD.md` for the full pipeline architecture.
 
 ---
 
@@ -363,33 +369,41 @@ Persistent layout chrome uses the same **warm dark** token hierarchy as the rest
 
 Use this table when planning work — **read the relevant skill before coding**.
 
-| Skill / doc | Path | Use when |
-|-------------|------|----------|
-| **IRONMIND rules** | `.cursor/rules/IRONMIND.md` | **Always** — design tokens, routing, Firebase names, alerts, seed, CSS import order |
-| **Data layer** | `.cursor/skills/ironmind-data-layer/SKILL.md` | New features, controllers, services, mutations, cache keys |
-| **Firebase patterns** | `.cursor/skills/ironmind-firebase-patterns/SKILL.md` | Firestore queries, converters, auth, constraints |
-| **TypeScript patterns** | `.cursor/skills/ironmind-typescript-patterns/SKILL.md` | Types, imports, strict patterns |
-| **Styling** | `.cursor/skills/ironmind-styling/SKILL.md` | Buttons, cards, panels, typography |
-| **Visual persona** | `.cursor/skills/ironmind-visual-persona/SKILL.md` | Brand, crimson discipline, forbidden colors |
-| **Animations** | `.cursor/skills/ironmind-animations/SKILL.md` | Motion, loading, hover |
-| **Senior architect persona** | `.cursor/personas/SENIOR-ARCHITECT.md` | System-level decisions, review mindset |
-| **Next.js agent note** | `AGENTS.md` | Next.js behavior differences — consult `node_modules/next/dist/docs/` |
-| **This architecture doc** | `Documentation/ARCHITECTURE.md` | Orientation, boundaries, Firestore map |
-| **Implementation review (2026-04-21)** | `Documentation/IMPLEMENTATION-REVIEW-2026-04-21.md` | Request-to-delivery trace for current UI/UX retrofit |
-| **Documentation index** | `Documentation/README.md` | Which doc to read for what |
-| **Logo brief & assets** | `Documentation/LOGO-BRIEF.md` | Brand prompts, `public/brand/` files, `brandAssets` |
+| Skill / doc                            | Path                                                   | Use when                                                                                                 |
+| -------------------------------------- | ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
+| **IRONMIND rules**                     | `.cursor/rules/IRONMIND.md`                            | **Always** — design tokens, routing, Firebase names, alerts, seed, CSS import order, CI pre-merge checks |
+| **Data layer**                         | `.cursor/skills/ironmind-data-layer/SKILL.md`          | New features, controllers, services, mutations, cache keys                                               |
+| **Firebase patterns**                  | `.cursor/skills/ironmind-firebase-patterns/SKILL.md`   | Firestore queries, converters, auth, constraints, committed rules + CI deploy flow                       |
+| **TypeScript patterns**                | `.cursor/skills/ironmind-typescript-patterns/SKILL.md` | Types, imports, strict patterns, `npm run ci` chain                                                      |
+| **CI/CD & platform**                   | `.cursor/skills/ironmind-cicd/SKILL.md`                | Deploy, Vercel/Firebase CLI, env vars, MCP, rollback, observability                                      |
+| **Styling**                            | `.cursor/skills/ironmind-styling/SKILL.md`             | Buttons, cards, panels, typography                                                                       |
+| **Visual persona**                     | `.cursor/skills/ironmind-visual-persona/SKILL.md`      | Brand, crimson discipline, forbidden colors                                                              |
+| **Animations**                         | `.cursor/skills/ironmind-animations/SKILL.md`          | Motion, loading, hover                                                                                   |
+| **Senior architect persona**           | `.cursor/personas/SENIOR-ARCHITECT.md`                 | System-level decisions, review mindset, build/release hygiene                                            |
+| **CI/CD persona**                      | `.cursor/personas/CICD-SCALING-CONSULTANT.md`          | Platform, MCP, scaling, monitoring, DevOps mindset                                                       |
+| **Next.js agent note**                 | `AGENTS.md`                                            | Next.js behavior differences — consult `node_modules/next/dist/docs/`                                    |
+| **This architecture doc**              | `Documentation/ARCHITECTURE.md`                        | Orientation, boundaries, Firestore map                                                                   |
+| **Data layer narrative**               | `README_DATA_LAYER.md`                                 | Three-layer rationale, cache strategy, why this matters                                                  |
+| **UI/UX narrative**                    | `README_UIUX.md`                                       | Design tokens, motion, accessibility, polish narrative                                                   |
+| **CI/CD narrative**                    | `README_CICD.md`                                       | Environments, MCP, pipeline, secrets, rollback, scaling                                                  |
+| **DevOps Control Center**              | `.cursor/plans/DEVOPS_CONTROL_CENTER.md`               | Live task list with exact commands — tick items as completed                                             |
+| **Implementation review (2026-04-21)** | `Documentation/IMPLEMENTATION-REVIEW-2026-04-21.md`    | Request-to-delivery trace for current UI/UX retrofit                                                     |
+| **Documentation index**                | `Documentation/README.md`                              | Which doc to read for what                                                                               |
+| **Logo brief & assets**                | `Documentation/LOGO-BRIEF.md`                          | Brand prompts, `public/brand/` files, `brandAssets`                                                      |
 
 ---
 
 ## 16. Environment variables
 
-Required for full Firebase operation (see `README.md`):
+**Three-environment separation:**
 
-Feature flags (when present; see `.env.local` examples in repo):
+| Environment           | Source                          | Pulled via                                                   | Used by                  |
+| --------------------- | ------------------------------- | ------------------------------------------------------------ | ------------------------ |
+| **Local (dev)**       | `.env.local` (git-ignored)      | `cp .env.example .env.local` or `vercel env pull .env.local` | `npm run dev`            |
+| **Preview (per PR)**  | Vercel project → Preview env    | Vercel injects automatically                                 | Vercel preview builds    |
+| **Production (main)** | Vercel project → Production env | Vercel injects automatically                                 | Vercel production builds |
 
-- `NEXT_PUBLIC_ENABLE_PHOTO_UPLOAD` — set to `true` only when Firebase Storage is provisioned.
-
-Core Firebase:
+**Required Firebase variables** (all `NEXT_PUBLIC_*` — client-safe):
 
 - `NEXT_PUBLIC_FIREBASE_API_KEY`
 - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
@@ -398,32 +412,41 @@ Core Firebase:
 - `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
 - `NEXT_PUBLIC_FIREBASE_APP_ID`
 
-Without these, Firebase initialization is skipped (`isMockMode`-style behavior in config).
+**Feature flags:**
+
+- `NEXT_PUBLIC_ENABLE_PHOTO_UPLOAD` — set to `true` only when Firebase Storage is provisioned (Blaze plan)
+
+Without these, Firebase initialization is skipped (`isMockMode` in `config.ts`). GitHub Actions requires the six Firebase keys as **GitHub Secrets** (mirroring Vercel production) for the build step.
+
+See `README_CICD.md` for the full secrets management strategy and `.cursor/skills/ironmind-cicd/SKILL.md` for CLI operations.
 
 ---
 
 ## 17. How to add a new feature (checklist)
 
 1. **Domain type** — Add/adjust interfaces in `src/lib/types/index.ts`.
-2. **Firestore** — If new collections are needed, extend `collections` in `config.ts` and document security rules (deployment concern).
+2. **Firestore** — If new collections are needed, extend `collections` in `config.ts` and document security rules in `firestore.rules` (CI deploys on merge to `main`).
 3. **Service** — Add functions in `src/services/<domain>.service.ts` with explicit return types.
 4. **Controller** — Add `useQuery`/`useMutation` hooks in `src/controllers/use-<domain>.ts`; register keys in `query-keys.ts` and `stale-times.ts`.
 5. **UI** — Add route under `src/app/(app)/.../page.tsx`; use controller hooks only; implement loading / error / empty states (IRONMIND completeness).
 6. **Seed / import** — If default data is required, update `lib/seed` **and** `seedUserData()`.
 7. **Alerts** — If new alert types, extend `SmartAlert` union **and** `getActiveAlerts` wiring.
-8. **Verify** — `tsc --noEmit`, lint, manual 375px layout.
+8. **Verify locally** — `npm run ci` (lint + typecheck + build).
+9. **Verify mobile** — Chrome DevTools → 375px width.
+10. **Commit & push** — Pre-commit hook auto-fixes lint + prettier.
+11. **Deploy** — `npm run publish` (runs CI → pushes → Vercel auto-deploys).
 
 ---
 
 ## 18. Glossary (domain)
 
-| Term | Meaning |
-|------|---------|
-| **Cycle day** | Position in the N-day rotating program (e.g. 14-day) |
-| **Day type** | Recovery / moderate / high / highest — drives macro templates |
-| **Landmarks** | MV / MEV / MAV / MRV volume bands per muscle |
-| **KPI** | Key lifts tracked across the cycle (e.g. DB bench, pull-ups) |
+| Term          | Meaning                                                       |
+| ------------- | ------------------------------------------------------------- |
+| **Cycle day** | Position in the N-day rotating program (e.g. 14-day)          |
+| **Day type**  | Recovery / moderate / high / highest — drives macro templates |
+| **Landmarks** | MV / MEV / MAV / MRV volume bands per muscle                  |
+| **KPI**       | Key lifts tracked across the cycle (e.g. DB bench, pull-ups)  |
 
 ---
 
-*Document version follows the repository; when in doubt, verify against source files cited above.*
+_Document version follows the repository; when in doubt, verify against source files cited above._

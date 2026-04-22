@@ -9,17 +9,17 @@ description: Correct Firebase and Firestore patterns for IRONMIND. Use when writ
 
 These are the ONLY functions exported from `src/lib/firebase/firestore.ts`. Use exactly these names:
 
-| Function | Signature | Use for |
-|----------|-----------|---------|
-| `getDocument<T>` | `(path, docId, converter?)` | Fetch single doc |
-| `setDocument<T>` | `(path, docId, data, converter?)` | Create or merge doc |
-| `updateDocument<T>` | `(path, docId, data)` | Partial update |
-| `addDocument<T>` | `(path, data, converter?)` | Add with auto-ID |
-| `deleteDocument` | `(path, docId)` | Delete doc |
-| `queryDocuments<T>` | `(path, constraints[], converter?)` | Query with filters |
-| `getAllDocuments<T>` | `(path, converter?)` | Fetch entire collection |
-| `getCollectionRef<T>` | `(path, converter?)` | Raw collection ref |
-| `getDocumentRef<T>` | `(path, docId, converter?)` | Raw document ref |
+| Function              | Signature                           | Use for                 |
+| --------------------- | ----------------------------------- | ----------------------- |
+| `getDocument<T>`      | `(path, docId, converter?)`         | Fetch single doc        |
+| `setDocument<T>`      | `(path, docId, data, converter?)`   | Create or merge doc     |
+| `updateDocument<T>`   | `(path, docId, data)`               | Partial update          |
+| `addDocument<T>`      | `(path, data, converter?)`          | Add with auto-ID        |
+| `deleteDocument`      | `(path, docId)`                     | Delete doc              |
+| `queryDocuments<T>`   | `(path, constraints[], converter?)` | Query with filters      |
+| `getAllDocuments<T>`  | `(path, converter?)`                | Fetch entire collection |
+| `getCollectionRef<T>` | `(path, converter?)`                | Raw collection ref      |
+| `getDocumentRef<T>`   | `(path, docId, converter?)`         | Raw document ref        |
 
 > ⚠️ `getDocuments` does NOT exist. Use `getAllDocuments`.
 
@@ -34,27 +34,27 @@ The correct pattern for type-safe Firestore operations with optional converters 
 export async function getDocument<T>(
   collectionPath: string,
   docId: string,
-  converter?: FirestoreDataConverter<T>
+  converter?: FirestoreDataConverter<T>,
 ): Promise<T | null> {
   if (!db) throw new Error('Firestore not initialized');
   const base = doc(db, collectionPath, docId);
   const docRef = converter ? base.withConverter(converter) : base;
   const snapshot = await getDoc(docRef as DocumentReference<T>);
-  return snapshot.exists() ? snapshot.data() as T : null;
+  return snapshot.exists() ? (snapshot.data() as T) : null;
 }
 
 // ✅ CORRECT pattern for queryDocuments
 export async function queryDocuments<T>(
   collectionPath: string,
   constraints: QueryConstraint[],
-  converter?: FirestoreDataConverter<T>
+  converter?: FirestoreDataConverter<T>,
 ): Promise<T[]> {
   if (!db) throw new Error('Firestore not initialized');
   const base = collection(db, collectionPath);
   const colRef = converter ? base.withConverter(converter) : base;
   const q = query(colRef as CollectionReference<T>, ...constraints);
   const snapshot = await getDocs(q);
-  return snapshot.docs.map(d => d.data() as T);
+  return snapshot.docs.map((d) => d.data() as T);
 }
 ```
 
@@ -69,11 +69,7 @@ Key insight: use `as DocumentReference<T>` / `as CollectionReference<T>` after t
 import type { QueryConstraint } from 'firebase/firestore';
 
 function buildConstraints(userId: string, limitCount: number): QueryConstraint[] {
-  return [
-    where('userId', '==', userId),
-    orderBy('createdAt', 'desc'),
-    limit(limitCount),
-  ];
+  return [where('userId', '==', userId), orderBy('createdAt', 'desc'), limit(limitCount)];
 }
 ```
 
@@ -95,19 +91,20 @@ await getDocument(`users/${userId}/profile`, 'data', converter);
 ```
 
 Available paths:
+
 ```ts
-collections.users                          // 'users'
-collections.profiles(uid)                 // 'users/{uid}/profile'
-collections.programs(uid)                 // 'users/{uid}/programs'
-collections.workouts(uid)                 // 'users/{uid}/workouts'
-collections.nutritionDays(uid)            // 'users/{uid}/nutrition'
-collections.supplementLogs(uid)           // 'users/{uid}/supplements'
-collections.recoveryEntries(uid)          // 'users/{uid}/recovery'
-collections.checkIns(uid)                 // 'users/{uid}/checkins'
-collections.phases(uid)                   // 'users/{uid}/phases'
-collections.journalEntries(uid)           // 'users/{uid}/journal'
-collections.volumeLandmarks(uid)          // 'users/{uid}/landmarks'
-collections.supplementProtocol(uid)       // 'users/{uid}/protocol'
+collections.users; // 'users'
+collections.profiles(uid); // 'users/{uid}/profile'
+collections.programs(uid); // 'users/{uid}/programs'
+collections.workouts(uid); // 'users/{uid}/workouts'
+collections.nutritionDays(uid); // 'users/{uid}/nutrition'
+collections.supplementLogs(uid); // 'users/{uid}/supplements'
+collections.recoveryEntries(uid); // 'users/{uid}/recovery'
+collections.checkIns(uid); // 'users/{uid}/checkins'
+collections.phases(uid); // 'users/{uid}/phases'
+collections.journalEntries(uid); // 'users/{uid}/journal'
+collections.volumeLandmarks(uid); // 'users/{uid}/landmarks'
+collections.supplementProtocol(uid); // 'users/{uid}/protocol'
 ```
 
 ---
@@ -141,6 +138,7 @@ Reference implementation: **`stripUndefinedDeep`** in `src/services/physique.ser
 ## Firestore Timestamps → ISO Strings
 
 The Firestore converter in `firestore.ts` automatically:
+
 - **Writes**: converts `Date` objects → Firestore `Timestamp`
 - **Reads**: converts Firestore `Timestamp` → ISO string (`string`)
 
@@ -149,13 +147,13 @@ This means ALL date/time fields in your TypeScript types **must be typed as `str
 ```ts
 // ✅ CORRECT type definition
 interface WorkoutSession {
-  date: string;      // ISO string — what you receive from Firestore
+  date: string; // ISO string — what you receive from Firestore
   createdAt: string; // ISO string
 }
 
 // ❌ WRONG
 interface WorkoutSession {
-  date: Date;        // Will actually be a string at runtime
+  date: Date; // Will actually be a string at runtime
 }
 ```
 
@@ -192,27 +190,56 @@ import { uploadBytes, getDownloadURL } from '@/lib/firebase';
 
 ---
 
-## Firestore Security Rules (Production)
+## Firestore Security Rules — Committed & CI-Deployed
 
-Apply before any public deployment:
+The live rules are in **`firestore.rules`** at the repo root, committed. They enforce owner-only access with a deny-all fallback:
 
 ```js
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /users/{userId}/{document=**} {
-      allow read, write: if request.auth != null 
-                         && request.auth.uid == userId;
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+    match /users/{userId}/{collection}/{document=**} {
+      allow read, write: if isOwner(userId);
+    }
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
 ```
+
+**Storage rules** are in `storage.rules` (same owner-only pattern for `users/{userId}/**`).
+**Indexes** are pre-declared in `firestore.indexes.json` — every composite query must have a matching index committed there.
+
+### Deploy flow (CI, not manual)
+
+Rules and indexes deploy from `.github/workflows/firebase-rules.yml` on push to `main` when any of these files change. The workflow uses a service account JSON (`FIREBASE_SERVICE_ACCOUNT` GitHub secret) with Rules Admin + Index Admin roles — minimum necessary permissions.
+
+For a one-off manual deploy from a trusted machine:
+
+```bash
+# Rules only
+npm run deploy:rules
+# Indexes only
+npm run deploy:indexes
+# Or directly:
+firebase deploy --only firestore:rules,firestore:indexes,storage:rules --project ironmindmp
+```
+
+**Never** edit rules in the Firebase console — changes will be overwritten by the next CI deploy. Edit `firestore.rules` and merge. See **`ironmind-cicd`** skill for the full pipeline.
 
 ---
 
 ## Offline Persistence
 
 IndexedDB persistence is enabled in `src/lib/firebase/config.ts`. This means:
+
 - First load requires network for seeding
 - Subsequent loads can use cached data
 - `'unavailable'` errors are expected when offline — handle gracefully, never throw to UI
@@ -220,12 +247,11 @@ IndexedDB persistence is enabled in `src/lib/firebase/config.ts`. This means:
 
 ```ts
 // ✅ Non-blocking seed pattern
-seedUserData(uid)
-  .catch((err) => {
-    if (err?.code === 'unavailable') {
-      console.warn('Offline — seed deferred to next login');
-    } else {
-      console.error('Seed error:', err);
-    }
-  });
+seedUserData(uid).catch((err) => {
+  if (err?.code === 'unavailable') {
+    console.warn('Offline — seed deferred to next login');
+  } else {
+    console.error('Seed error:', err);
+  }
+});
 ```

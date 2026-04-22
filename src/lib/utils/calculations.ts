@@ -1,4 +1,4 @@
-import type { ExerciseSet, Workout, RecoveryEntry, VolumeLandmarks, LandmarkRange } from '@/lib/types';
+import type { ExerciseSet, Workout, RecoveryEntry, LandmarkRange } from '@/lib/types';
 
 // 1RM Estimation using Epley formula
 export function estimate1RM(weight: number, reps: number): number {
@@ -9,19 +9,19 @@ export function estimate1RM(weight: number, reps: number): number {
 // Volume calculations
 export function calculateWorkoutVolume(workout: Workout): number {
   return workout.exercises.reduce((total, exercise) => {
-    return total + exercise.sets.filter(s => s.completed).length;
+    return total + exercise.sets.filter((s) => s.completed).length;
   }, 0);
 }
 
 export function calculateExerciseVolume(sets: ExerciseSet[]): number {
-  return sets.filter(s => s.completed).length;
+  return sets.filter((s) => s.completed).length;
 }
 
 // Progressive overload check
 export function isProgressiveOverload(
   current: { weight: number; reps: number },
   previous: { weight: number; reps: number },
-  threshold = 0
+  threshold = 0,
 ): boolean {
   const currentVolume = current.weight * current.reps;
   const previousVolume = previous.weight * previous.reps;
@@ -31,15 +31,15 @@ export function isProgressiveOverload(
 // Readiness score calculation
 export function calculateReadinessScore(entry: RecoveryEntry): number {
   // Base calculation from plan
-  const baseScore = (
-    (entry.sleepQuality * 0.25) +
-    (normalizeSleepHours(entry.sleepHours) * 0.20) +
-    (normalizeHRV(entry.hrv) * 0.15) +
-    (entry.mood * 0.10) +
-    ((10 - entry.stress) * 0.10) +
-    (entry.energy * 0.10) +
-    ((10 - entry.doms) * 0.10)
-  ) * 10;
+  const baseScore =
+    (entry.sleepQuality * 0.25 +
+      normalizeSleepHours(entry.sleepHours) * 0.2 +
+      normalizeHRV(entry.hrv) * 0.15 +
+      entry.mood * 0.1 +
+      (10 - entry.stress) * 0.1 +
+      entry.energy * 0.1 +
+      (10 - entry.doms) * 0.1) *
+    10;
 
   // Legacy pelvic comfort penalty — only applied for historical entries that have it
   if (entry.pelvicComfort != null) {
@@ -75,16 +75,25 @@ export function calculateMacroCompliance(actual: number, target: number): number
 }
 
 // Volume landmark analysis
-export function getVolumeStatus(current: number, landmarks: LandmarkRange): {
+export function getVolumeStatus(
+  current: number,
+  landmarks: LandmarkRange,
+): {
   status: 'below-mev' | 'mev-mav' | 'mav-mrv' | 'above-mrv';
   progress: number;
 } {
   if (current < landmarks.mev) {
     return { status: 'below-mev', progress: (current / landmarks.mev) * 100 };
   } else if (current < landmarks.mav) {
-    return { status: 'mev-mav', progress: ((current - landmarks.mev) / (landmarks.mav - landmarks.mev)) * 100 };
+    return {
+      status: 'mev-mav',
+      progress: ((current - landmarks.mev) / (landmarks.mav - landmarks.mev)) * 100,
+    };
   } else if (current < landmarks.mrv) {
-    return { status: 'mav-mrv', progress: ((current - landmarks.mav) / (landmarks.mrv - landmarks.mav)) * 100 };
+    return {
+      status: 'mav-mrv',
+      progress: ((current - landmarks.mav) / (landmarks.mrv - landmarks.mav)) * 100,
+    };
   } else {
     return { status: 'above-mrv', progress: 100 };
   }
@@ -101,7 +110,7 @@ export function estimateTDEE(
   weight: number, // kg
   height: number, // cm
   age: number,
-  activityLevel: 'sedentary' | 'light' | 'moderate' | 'active' | 'very-active'
+  activityLevel: 'sedentary' | 'light' | 'moderate' | 'active' | 'very-active',
 ): number {
   // Mifflin-St Jeor Equation
   const bmr = 10 * weight + 6.25 * height - 5 * age + 5; // Male
@@ -130,9 +139,8 @@ export function calculateWeightTrend(weights: { date: string; weight: number }[]
   const avg = last7.reduce((sum, w) => sum + w.weight, 0) / 7;
 
   const previous7 = weights.slice(-14, -7);
-  const prevAvg = previous7.length === 7
-    ? previous7.reduce((sum, w) => sum + w.weight, 0) / 7
-    : avg;
+  const prevAvg =
+    previous7.length === 7 ? previous7.reduce((sum, w) => sum + w.weight, 0) / 7 : avg;
 
   return {
     trend: avg,
@@ -144,12 +152,11 @@ export function calculateWeightTrend(weights: { date: string; weight: number }[]
 export function detectPersonalRecord(
   exerciseId: string,
   currentSet: ExerciseSet,
-  history: ExerciseSet[]
+  history: ExerciseSet[],
 ): boolean {
   const previousBest = history
-    .filter(s => s.completed && s.type === 'working')
+    .filter((s) => s.completed && s.type === 'working')
     .reduce((best, set) => {
-      const currentVolume = currentSet.weight * currentSet.reps;
       const setVolume = set.weight * set.reps;
       return setVolume > best ? setVolume : best;
     }, 0);
@@ -177,7 +184,11 @@ export function calculateTrend(values: number[]): 'improving' | 'stable' | 'decl
 }
 
 // Set performance rating
-export function rateSetPerformance(weight: number, reps: number, rpe: number): 'excellent' | 'good' | 'acceptable' | 'poor' {
+export function rateSetPerformance(
+  weight: number,
+  reps: number,
+  rpe: number,
+): 'excellent' | 'good' | 'acceptable' | 'poor' {
   // Based on RPE - lower is better (more reps in reserve)
   if (rpe <= 7) return 'excellent';
   if (rpe <= 8) return 'good';

@@ -1,18 +1,43 @@
 # IRONMIND — Cursor context
 
-This directory is the **authoritative agent context** for the `ironmind` repo: rules the editor can load, skills (workflows and patterns), and the senior architect persona. Substantive app changes should stay aligned with these files plus `Documentation/` at the repo root.
+This directory is the **authoritative agent context** for the `ironmind` repo: rules the editor can load, skills (workflows and patterns), personas, plans, and MCP configuration. Substantive app changes should stay aligned with these files plus `Documentation/` and the three root-level README deep-dives (`README_DATA_LAYER.md`, `README_UIUX.md`, `README_CICD.md`).
 
-| Path | Role |
-|------|------|
-| **`rules/IRONMIND.md`** | Enforced project rules — architecture stack, Firebase naming, seeds, alerts, routing, CSS import order, design tokens, checklist |
-| **`personas/SENIOR-ARCHITECT.md`** | Mindset, domain vocabulary, twin mandates (UX vs data substrate), navigation map |
-| **`skills/ironmind-typescript-patterns/SKILL.md`** | TS strict conventions, imports, unions |
-| **`skills/ironmind-firebase-patterns/SKILL.md`** | Firestore helpers, converters, constraints, **`undefined`** write hygiene |
-| **`skills/ironmind-data-layer/SKILL.md`** | Controllers/services, **`queryKeys`**, dashboard composites, mutations, seed |
-| **`skills/ironmind-styling/SKILL.md`** | Buttons, panels, typography, mono numerics |
-| **`skills/ironmind-visual-persona/SKILL.md`** | Brand voice, forbidden palettes, hierarchy |
-| **`skills/ironmind-animations/SKILL.md`** | Motion; prefer **crimson** token colors in snippets |
+| Path                                                | Role                                                                                                                                                                                                                          |
+| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`mcp.json`**                                      | MCP servers configured for this project — **Vercel** (hosted endpoint), **Firebase** (local `firebase-tools mcp`), **Context7** (version-aware docs). Committed so every collaborator inherits the same agent tooling surface |
+| **`rules/IRONMIND.md`**                             | Enforced project rules — architecture stack, Firebase naming, seeds, alerts, routing, CSS import order, design tokens, page checklist, pre-merge verification chain                                                           |
+| **`rules/architecture.md`**                         | Three-layer architecture, import rules, Firebase function names, query constraints, seed rules, TypeScript policy                                                                                                             |
+| **`rules/tokens.md`**                               | Full color palette, typography scale, spacing, shadows, theme system                                                                                                                                                          |
+| **`rules/page-checklist.md`**                       | Loading/error/empty states, mobile testing, accessibility, QA + verification commands                                                                                                                                         |
+| **`personas/SENIOR-ARCHITECT.md`**                  | Full-stack ownership — architecture, data flow, feature completeness, TypeScript, Firebase, build/release hygiene                                                                                                             |
+| **`personas/UI-CONSULTANT.md`**                     | Visual polish, interaction quality, responsiveness, accessibility, theming, micro-interactions                                                                                                                                |
+| **`personas/DATA-CONSULTTANT.md`**                  | Data layer, storage, business logic, scalability, Firestore modeling, caching                                                                                                                                                 |
+| **`personas/CICD-SCALING-CONSULTANT.md`**           | Deployment, CI/CD, Vercel/Firebase hosting, env management, MCP integration, monitoring, scaling readiness                                                                                                                    |
+| **`plans/DEVOPS_CONTROL_CENTER.md`**                | **Live CI/CD + platform task list** — source of truth for what's configured, what's pending, with exact commands per task. Read this first for infra work                                                                     |
+| **`plans/ironmind_data_layer_hardening_*.plan.md`** | Historical plan for the three-layer data architecture rollout (completed April 2026)                                                                                                                                          |
+| **`skills/ironmind-typescript-patterns/SKILL.md`**  | TS strict conventions, imports, unions, `npm run typecheck` loop                                                                                                                                                              |
+| **`skills/ironmind-firebase-patterns/SKILL.md`**    | Firestore helpers, converters, constraints, `undefined` write hygiene, committed rules + index reference                                                                                                                      |
+| **`skills/ironmind-data-layer/SKILL.md`**           | Controllers/services, `queryKeys`, dashboard composites, mutations, seed                                                                                                                                                      |
+| **`skills/ironmind-styling/SKILL.md`**              | Buttons, panels, typography, mono numerics                                                                                                                                                                                    |
+| **`skills/ironmind-visual-persona/SKILL.md`**       | Brand voice, forbidden palettes, hierarchy                                                                                                                                                                                    |
+| **`skills/ironmind-animations/SKILL.md`**           | Motion; prefer **crimson** token colors in snippets                                                                                                                                                                           |
+| **`skills/ironmind-states/SKILL.md`**               | Loading, error, empty state patterns                                                                                                                                                                                          |
+| **`skills/ironmind-a11y/SKILL.md`**                 | Focus rings, keyboard navigation, ARIA, screen readers                                                                                                                                                                        |
+| **`skills/ironmind-cicd/SKILL.md`**                 | **CI/CD, deploy, env, MCP, rollback, observability** patterns — read for any infrastructure or delivery-pipeline change                                                                                                       |
 
 Skills use **YAML frontmatter** (`name`, `description`) so Cursor can attach them when relevant.
 
-Last consolidated review: **2026-04-18** — seed/nutrition note corrected, recovery `latest` query documented, Firestore `undefined` rule linked, typography aligned to `globals.css` (Rajdhani), animation examples moved off legacy gold/blue. **Dashboard** — `.dashboard-overview` centered shell (`4px` full border, `1.25rem` radius) and `.exercise-index-badge` contrast pattern documented in **`IRONMIND.md`**, **`ironmind-styling`**, **`Documentation/ARCHITECTURE.md` §13.4**. **App chrome** — `--chrome-bg` / `--chrome-bg-topbar` / `--chrome-bg-toggle` for header, sidebar, and mobile nav (warm darks; no `#2e2e2e` bars); documented in **`IRONMIND.md`**, **`ironmind-styling`**, **`ironmind-visual-persona`**, **`Documentation/ARCHITECTURE.md` §13.5**.
+## Root-level reference READMEs
+
+These explain the three pillars of the system in consultant-style narrative form. Read the one that matches the area you're working in:
+
+| File                       | Area                                                                                                   |
+| -------------------------- | ------------------------------------------------------------------------------------------------------ |
+| **`README_DATA_LAYER.md`** | Three-tier data architecture, TanStack cache, error contracts, Firebase abstraction                    |
+| **`README_UIUX.md`**       | Design tokens, panels, accordions, motion, typography, accessibility                                   |
+| **`README_CICD.md`**       | Environments, MCP, typed platform config, delivery pipeline, secrets, rollback, observability, scaling |
+
+## Consolidation log
+
+- **2026-04-23** — Added CI/CD pillar: `personas/CICD-SCALING-CONSULTANT.md`, `skills/ironmind-cicd/SKILL.md`, `plans/DEVOPS_CONTROL_CENTER.md`, `mcp.json` (Vercel + Firebase + Context7), `README_CICD.md` at repo root. Vercel CLI 52 + Firebase CLI 15 installed locally with user-owned npm prefix. Workspace linked to Vercel project `morgans-projects-bc4d5795/ironmind`.
+- **2026-04-18** — Seed/nutrition note corrected, recovery `latest` query documented, Firestore `undefined` rule linked, typography aligned to `globals.css` (Rajdhani), animation examples moved off legacy gold/blue. **Dashboard** — `.dashboard-overview` centered shell (4px full border, 1.25rem radius) and `.exercise-index-badge` contrast pattern documented in `IRONMIND.md`, `ironmind-styling`, `Documentation/ARCHITECTURE.md §13.4`. **App chrome** — `--chrome-bg` / `--chrome-bg-topbar` / `--chrome-bg-toggle` for header, sidebar, and mobile nav (warm darks; no `#2e2e2e` bars); documented in `IRONMIND.md`, `ironmind-styling`, `ironmind-visual-persona`, `Documentation/ARCHITECTURE.md §13.5`.

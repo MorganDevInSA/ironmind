@@ -13,7 +13,7 @@ import {
   deleteWorkout,
   getRecentWorkouts,
 } from '@/services';
-import type { Workout, Program } from '@/lib/types';
+import type { Workout } from '@/lib/types';
 import { onMutationError } from './_shared/on-error';
 
 // Programs
@@ -162,7 +162,7 @@ export function useSaveSet(userId: string, workoutId: string) {
       if (context?.previousWorkout) {
         queryClient.setQueryData(
           queryKeys(userId).training.workout(workoutId),
-          context.previousWorkout
+          context.previousWorkout,
         );
       }
       onMutationError(error);

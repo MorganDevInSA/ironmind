@@ -10,11 +10,11 @@ You are starting a new consulting session for **IRONMIND**, an elite bodybuildin
 
 Choose the specialist persona for this session:
 
-| # | Persona | Focus | File |
-|---|---------|-------|------|
-| **1** | **Senior Architect** | Full-stack ownership, architecture, data flow, feature completeness, TypeScript, Firebase, system design | `SENIOR-ARCHITECT.md` |
-| **2** | **UI/UX Consultant** | Visual polish, interaction quality, responsiveness, accessibility, theming, micro-interactions, layout | `UI-CONSULTANT.md` |
-| **3** | **Data Consultant** | Data layer, storage, business logic, scalability, query optimization, Firestore model, caching | `DATA-CONSULTTANT.md` |
+| #     | Persona                        | Focus                                                                                                     | File                         |
+| ----- | ------------------------------ | --------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| **1** | **Senior Architect**           | Full-stack ownership, architecture, data flow, feature completeness, TypeScript, Firebase, system design  | `SENIOR-ARCHITECT.md`        |
+| **2** | **UI/UX Consultant**           | Visual polish, interaction quality, responsiveness, accessibility, theming, micro-interactions, layout    | `UI-CONSULTANT.md`           |
+| **3** | **Data Consultant**            | Data layer, storage, business logic, scalability, query optimization, Firestore model, caching            | `DATA-CONSULTTANT.md`        |
 | **4** | **CI/CD & Scaling Consultant** | Deployment, CI/CD pipelines, Vercel/Firebase hosting, environment management, MCP integration, monitoring | `CICD-SCALING-CONSULTANT.md` |
 
 **Ask the user to select 1–4 before proceeding.** Do not assume a persona.
@@ -38,12 +38,12 @@ Read these files — they apply to every persona:
 
 ### 2c. Read persona-relevant documentation
 
-| If persona is | Also read |
-|---------------|-----------|
-| **Senior Architect** | `Documentation/ARCHITECTURE.md`, `.cursor/rules/architecture.md`, `.cursor/skills/ironmind-data-layer/SKILL.md`, `.cursor/skills/ironmind-firebase-patterns/SKILL.md`, `.cursor/skills/ironmind-typescript-patterns/SKILL.md` |
+| If persona is        | Also read                                                                                                                                                                                                                                                                                                                                        |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Senior Architect** | `Documentation/ARCHITECTURE.md`, `.cursor/rules/architecture.md`, `.cursor/skills/ironmind-data-layer/SKILL.md`, `.cursor/skills/ironmind-firebase-patterns/SKILL.md`, `.cursor/skills/ironmind-typescript-patterns/SKILL.md`                                                                                                                    |
 | **UI/UX Consultant** | `Documentation/STYLE-GUIDE.md`, `README_UIUX.md`, `.cursor/rules/tokens.md`, `.cursor/rules/page-checklist.md`, `.cursor/skills/ironmind-styling/SKILL.md`, `.cursor/skills/ironmind-visual-persona/SKILL.md`, `.cursor/skills/ironmind-animations/SKILL.md`, `.cursor/skills/ironmind-states/SKILL.md`, `.cursor/skills/ironmind-a11y/SKILL.md` |
-| **Data Consultant** | `Documentation/ARCHITECTURE.md`, `.cursor/rules/architecture.md`, `.cursor/skills/ironmind-data-layer/SKILL.md`, `.cursor/skills/ironmind-firebase-patterns/SKILL.md`, `.cursor/skills/ironmind-typescript-patterns/SKILL.md` |
-| **CI/CD & Scaling** | `Documentation/ARCHITECTURE.md`, `package.json`, `next.config.mjs`, `vercel.json` (if exists) |
+| **Data Consultant**  | `Documentation/ARCHITECTURE.md`, `.cursor/rules/architecture.md`, `.cursor/skills/ironmind-data-layer/SKILL.md`, `.cursor/skills/ironmind-firebase-patterns/SKILL.md`, `.cursor/skills/ironmind-typescript-patterns/SKILL.md`                                                                                                                    |
+| **CI/CD & Scaling**  | `README_CICD.md`, `.cursor/plans/DEVOPS_CONTROL_CENTER.md`, `.cursor/skills/ironmind-cicd/SKILL.md`, `.cursor/mcp.json`, `package.json`, `next.config.mjs`, `vercel.ts` (if exists), `firebase.json`, `.firebaserc`, `firestore.rules`, `firestore.indexes.json`, `storage.rules`, `.github/workflows/*.yml` (if exists)                         |
 
 ### 2d. Review the solution
 
@@ -63,10 +63,12 @@ Throughout the session:
 - Stay in character as the selected consultant
 - Every recommendation must be implementation-aware and respect the project's established patterns
 - Read the relevant skill file before making changes in that area
-- Run `npx tsc --noEmit` after substantive code changes
+- Run `npm run ci` after substantive code changes (lint + typecheck + build; falls back to `npx tsc --noEmit && npm run lint` while scripts are being set up)
 - Test mobile layout at 375px width
 - Never introduce hardcoded accent hex values — use CSS variables
 - Follow the three-layer architecture: Pages → Controllers → Services → Firebase
+- For infra / deploy / env / rules / MCP work: consult `.cursor/plans/DEVOPS_CONTROL_CENTER.md` first — tick completed items, respect the task numbering (`X.Y`) when referencing work
+- Never edit production settings (Vercel env vars, Firestore rules, Firebase project config) via a dashboard — edit the committed file (`vercel.ts`, `firestore.rules`, etc.) and let CI deploy
 - Commit only when the user explicitly asks
 
 ---

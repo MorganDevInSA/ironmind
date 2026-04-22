@@ -2,17 +2,34 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/stores';
-import { useNutritionDay, useSaveNutritionDay, useActiveProgram, useNutritionPlan } from '@/controllers';
+import {
+  useNutritionDay,
+  useSaveNutritionDay,
+  useActiveProgram,
+  useNutritionPlan,
+} from '@/controllers';
 import { today, formatDisplayDate, getCycleDay } from '@/lib/utils';
 import { mortonNutritionPlan } from '@/lib/seed/nutrition';
-import { getDefaultPlanLine, getPlanLineOptions, mergePlanLineOptions } from '@/lib/nutrition/meal-plan-options';
-import { Utensils, CheckCircle2, Circle, MessageSquare, Save, ChevronDown, ChevronUp } from 'lucide-react';
+import {
+  getDefaultPlanLine,
+  getPlanLineOptions,
+  mergePlanLineOptions,
+} from '@/lib/nutrition/meal-plan-options';
+import {
+  Utensils,
+  CheckCircle2,
+  Circle,
+  MessageSquare,
+  Save,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { DayType, Meal, MacroTargetRange } from '@/lib/types';
 
 function buildDefaultMeals(
   schedule: typeof mortonNutritionPlan.mealSchedule,
-  isLiftDay: boolean
+  isLiftDay: boolean,
 ): Meal[] {
   return schedule
     .filter((slot) => !(slot.liftDayOnly && !isLiftDay))
@@ -55,7 +72,10 @@ function MacroBar({
         </span>
       </div>
       <div className="h-1.5 bg-[rgba(18,14,14,0.72)] rounded-full overflow-hidden">
-        <div className={cn('h-full rounded-full transition-all', color)} style={{ width: `${pct}%` }} />
+        <div
+          className={cn('h-full rounded-full transition-all', color)}
+          style={{ width: `${pct}%` }}
+        />
       </div>
     </div>
   );
@@ -114,7 +134,12 @@ export default function NutritionPage() {
               ...(m.planLine?.trim() ? { planLine: m.planLine.trim() } : {}),
             })),
             macroTargets,
-            macroActuals: nutritionDay?.macroActuals ?? { calories: 0, protein: 0, carbs: 0, fat: 0 },
+            macroActuals: nutritionDay?.macroActuals ?? {
+              calories: 0,
+              protein: 0,
+              carbs: 0,
+              fat: 0,
+            },
             complianceScore,
             agentNotes: nextNotes.trim() ? nextNotes.trim() : undefined,
           },
@@ -124,10 +149,10 @@ export default function NutritionPage() {
             setSaved(true);
             setTimeout(() => setSaved(false), 2000);
           },
-        }
+        },
       );
     },
-    [agentNotes, dayType, nutritionDay?.macroActuals, saveDay, todayStr]
+    [agentNotes, dayType, nutritionDay?.macroActuals, saveDay, todayStr, activePlan],
   );
 
   useEffect(() => {
@@ -200,7 +225,7 @@ export default function NutritionPage() {
             'flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-semibold transition-all',
             saved
               ? 'border-[color:color-mix(in_srgb,var(--accent)_40%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_12%,transparent)] text-[color:var(--accent-light)]'
-              : 'border-[rgba(65,50,50,0.35)] text-[color:var(--text-1)] hover:border-[color:color-mix(in_srgb,var(--accent)_40%,transparent)] hover:text-[color:var(--text-0)]'
+              : 'border-[rgba(65,50,50,0.35)] text-[color:var(--text-1)] hover:border-[color:color-mix(in_srgb,var(--accent)_40%,transparent)] hover:text-[color:var(--text-0)]',
           )}
         >
           {isSaving ? (
@@ -218,7 +243,9 @@ export default function NutritionPage() {
         <div className="space-y-5">
           {/* Day type selector */}
           <div className="glass-panel p-4 space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-wider text-[color:var(--text-2)]">Day Type</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-[color:var(--text-2)]">
+              Day Type
+            </p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {DAY_TYPES.map((dt) => (
                 <button
@@ -229,7 +256,7 @@ export default function NutritionPage() {
                     'py-2 rounded-lg text-sm font-semibold border transition-all',
                     dayType === dt.value
                       ? 'is-selected text-[color:var(--accent-light)]'
-                      : 'border-[color:var(--chrome-border)] text-[color:var(--text-2)] hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]'
+                      : 'border-[color:var(--chrome-border)] text-[color:var(--text-2)] hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]',
                   )}
                 >
                   {dt.label}
@@ -268,8 +295,12 @@ export default function NutritionPage() {
             >
               <div className="flex items-center gap-2">
                 <MessageSquare size={18} className="text-[color:var(--accent)]" />
-                <span className="font-semibold text-[color:var(--text-0)]">Notes for Coach AI Review</span>
-                {agentNotes && <span className="w-2 h-2 rounded-full bg-[color:var(--accent)] shrink-0" />}
+                <span className="font-semibold text-[color:var(--text-0)]">
+                  Notes for Coach AI Review
+                </span>
+                {agentNotes && (
+                  <span className="w-2 h-2 rounded-full bg-[color:var(--accent)] shrink-0" />
+                )}
               </div>
               {notesOpen ? (
                 <ChevronUp size={16} className="text-[color:var(--text-2)]" />
@@ -281,8 +312,8 @@ export default function NutritionPage() {
             {notesOpen && (
               <div className="p-4 space-y-3">
                 <p className="text-xs text-[color:var(--text-2)]">
-                  Add anything your coach AI should know about today&apos;s nutrition — cravings, digestion,
-                  energy crashes, deviation from plan, or context for decisions.
+                  Add anything your coach AI should know about today&apos;s nutrition — cravings,
+                  digestion, energy crashes, deviation from plan, or context for decisions.
                 </p>
                 <textarea
                   value={agentNotes}
@@ -318,7 +349,9 @@ export default function NutritionPage() {
           <div className="h-0.5 bg-[rgba(18,14,14,0.72)]">
             <div
               className="h-full bg-[color:var(--accent)] transition-all duration-500"
-              style={{ width: meals.length > 0 ? `${(completedCount / meals.length) * 100}%` : '0%' }}
+              style={{
+                width: meals.length > 0 ? `${(completedCount / meals.length) * 100}%` : '0%',
+              }}
             />
           </div>
 
@@ -326,17 +359,21 @@ export default function NutritionPage() {
             {meals.map((meal) => {
               const slotDef = schedule.find((s) => s.slot === meal.slot);
               const defaultLine = slotDef ? getDefaultPlanLine(slotDef, isLiftDay, dayType) : '';
-              const baseOptions = slotDef ? getPlanLineOptions(slotDef, isLiftDay ?? false, dayType) : [];
-              const isKnownDefault = !meal.planLine?.trim() || baseOptions.includes(meal.planLine.trim());
-              const displayLine = isKnownDefault
-                ? defaultLine
-                : meal.planLine!.trim();
+              const baseOptions = slotDef
+                ? getPlanLineOptions(slotDef, isLiftDay ?? false, dayType)
+                : [];
+              const isKnownDefault =
+                !meal.planLine?.trim() || baseOptions.includes(meal.planLine.trim());
+              const displayLine = isKnownDefault ? defaultLine : meal.planLine!.trim();
               const optionList = mergePlanLineOptions(baseOptions, displayLine);
               const isOpen = expanded === meal.slot;
               const showPicker = optionList.length > 1;
 
               return (
-                <div key={meal.slot} className={cn('transition-all', meal.completed && 'opacity-75')}>
+                <div
+                  key={meal.slot}
+                  className={cn('transition-all', meal.completed && 'opacity-75')}
+                >
                   <div className="flex items-start sm:items-center px-4 py-3.5 gap-2 sm:gap-3">
                     <button
                       type="button"
@@ -363,14 +400,19 @@ export default function NutritionPage() {
                           <span
                             className={cn(
                               'font-semibold capitalize text-sm shrink-0',
-                              meal.completed ? 'text-[color:var(--text-2)]' : 'text-[color:var(--text-0)]'
+                              meal.completed
+                                ? 'text-[color:var(--text-2)]'
+                                : 'text-[color:var(--text-0)]',
                             )}
                           >
                             {meal.slot.replace('-', ' ')}
                           </span>
                         </div>
                         {!isOpen && (
-                          <p className="text-xs text-[color:var(--text-2)] mt-1 line-clamp-2" title={displayLine}>
+                          <p
+                            className="text-xs text-[color:var(--text-2)] mt-1 line-clamp-2"
+                            title={displayLine}
+                          >
                             {displayLine}
                           </p>
                         )}
@@ -388,7 +430,7 @@ export default function NutritionPage() {
                               'w-full text-xs sm:text-sm rounded-lg border bg-[rgba(18,14,14,0.75)] px-2 py-2',
                               'border-[rgba(65,50,50,0.35)] text-[color:var(--text-0)]',
                               'focus:outline-none focus:ring-2 focus:ring-[rgba(220,38,38,0.45)]',
-                              'disabled:opacity-50'
+                              'disabled:opacity-50',
                             )}
                           >
                             {optionList.map((opt) => (
@@ -399,7 +441,10 @@ export default function NutritionPage() {
                           </select>
                         </label>
                       ) : (
-                        <p className="text-xs text-[color:var(--text-1)] max-w-md truncate" title={displayLine}>
+                        <p
+                          className="text-xs text-[color:var(--text-1)] max-w-md truncate"
+                          title={displayLine}
+                        >
                           {displayLine}
                         </p>
                       )}
@@ -421,7 +466,9 @@ export default function NutritionPage() {
                           <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--text-2)] mb-1">
                             Active plan line
                           </p>
-                          <p className="text-sm text-[color:var(--text-detail)] whitespace-pre-wrap">{displayLine}</p>
+                          <p className="text-sm text-[color:var(--text-detail)] whitespace-pre-wrap">
+                            {displayLine}
+                          </p>
                           {slotDef && (
                             <p className="text-[11px] text-[color:var(--text-2)] mt-2">
                               Default for today ({isLiftDay ? 'lift' : 'recovery'}): {defaultLine}
@@ -445,7 +492,6 @@ export default function NutritionPage() {
             })}
           </div>
         </div>
-
       </div>
     </div>
   );

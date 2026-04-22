@@ -1,11 +1,5 @@
-import type { VolumeLandmarks, Workout } from '@/lib/types';
-import {
-  getDocument,
-  setDocument,
-  queryDocuments,
-  orderBy,
-  createConverter,
-} from '@/lib/firebase';
+import type { VolumeLandmarks } from '@/lib/types';
+import { getDocument, setDocument, createConverter } from '@/lib/firebase';
 import { collections } from '@/lib/firebase/config';
 import { getWorkouts } from './training.service';
 import { withService } from '@/lib/errors';
@@ -13,47 +7,43 @@ import { withService } from '@/lib/errors';
 const converter = createConverter<VolumeLandmarks>();
 
 // Get volume landmarks
-export async function getVolumeLandmarks(
-  userId: string
-): Promise<VolumeLandmarks | null> {
+export async function getVolumeLandmarks(userId: string): Promise<VolumeLandmarks | null> {
   return withService('volume', 'read volume landmarks', () =>
-    getDocument<VolumeLandmarks>(
-      collections.volumeLandmarks(userId),
-      'data',
-      converter
-    )
+    getDocument<VolumeLandmarks>(collections.volumeLandmarks(userId), 'data', converter),
   );
 }
 
 // Save/update volume landmarks
 export async function updateVolumeLandmarks(
   userId: string,
-  landmarks: Partial<VolumeLandmarks>
+  landmarks: Partial<VolumeLandmarks>,
 ): Promise<void> {
   return withService('volume', 'update volume landmarks', () =>
     setDocument<VolumeLandmarks>(
       collections.volumeLandmarks(userId),
       'data',
       landmarks as VolumeLandmarks,
-      converter
-    )
+      converter,
+    ),
   );
 }
 
 // Calculate weekly volume per muscle group
 export async function getWeeklyVolumeSummary(
   userId: string,
-  weekStart?: string
-): Promise<{
-  muscleGroup: string;
-  currentSets: number;
-  targetSets: number;
-  mv: number;
-  mev: number;
-  mav: number;
-  mrv: number;
-  status: 'below-mev' | 'mev-mav' | 'mav-mrv' | 'above-mrv';
-}[]> {
+  weekStart?: string,
+): Promise<
+  {
+    muscleGroup: string;
+    currentSets: number;
+    targetSets: number;
+    mv: number;
+    mev: number;
+    mav: number;
+    mrv: number;
+    status: 'below-mev' | 'mev-mav' | 'mav-mrv' | 'above-mrv';
+  }[]
+> {
   return withService('volume', 'calculate weekly volume', async () => {
     const landmarks = await getVolumeLandmarks(userId);
     if (!landmarks) return [];
@@ -71,7 +61,7 @@ export async function getWeeklyVolumeSummary(
 
     for (const workout of workouts) {
       for (const exercise of workout.exercises) {
-        const completedSets = exercise.sets.filter(s => s.completed).length;
+        const completedSets = exercise.sets.filter((s) => s.completed).length;
 
         if (!volumeByMuscle[exercise.muscleGroup]) {
           volumeByMuscle[exercise.muscleGroup] = 0;
@@ -104,7 +94,7 @@ export async function getWeeklyVolumeSummary(
 export async function getVolumeTrend(
   userId: string,
   muscleGroup: string,
-  weeks: number = 4
+  weeks: number = 4,
 ): Promise<{ week: string; sets: number }[]> {
   return withService('volume', 'read volume trend', async () => {
     const trend: { week: string; sets: number }[] = [];
@@ -124,7 +114,7 @@ export async function getVolumeTrend(
       for (const workout of workouts) {
         for (const exercise of workout.exercises) {
           if (exercise.muscleGroup === muscleGroup) {
-            sets += exercise.sets.filter(s => s.completed).length;
+            sets += exercise.sets.filter((s) => s.completed).length;
           }
         }
       }
@@ -140,33 +130,32 @@ export async function getVolumeTrend(
 }
 
 // Check if volume is within optimal range (MAV)
-export async function isVolumeOptimal(
-  userId: string,
-  muscleGroup: string
-): Promise<boolean> {
+export async function isVolumeOptimal(userId: string, muscleGroup: string): Promise<boolean> {
   return withService('volume', 'check volume optimal', async () => {
     const summary = await getWeeklyVolumeSummary(userId);
-    const muscle = summary.find(m => m.muscleGroup === muscleGroup);
+    const muscle = summary.find((m) => m.muscleGroup === muscleGroup);
 
     if (!muscle) return false;
 
-    return muscle.status === 'mav-mrv' ||
-      (muscle.currentSets >= muscle.mev && muscle.currentSets <= muscle.mav);
+    return (
+      muscle.status === 'mav-mrv' ||
+      (muscle.currentSets >= muscle.mev && muscle.currentSets <= muscle.mav)
+    );
   });
 }
 
 // Get volume recommendations
-export async function getVolumeRecommendations(
-  userId: string
-): Promise<{
-  muscleGroup: string;
-  recommendation: 'increase' | 'decrease' | 'maintain';
-  reason: string;
-}[]> {
+export async function getVolumeRecommendations(userId: string): Promise<
+  {
+    muscleGroup: string;
+    recommendation: 'increase' | 'decrease' | 'maintain';
+    reason: string;
+  }[]
+> {
   return withService('volume', 'calculate recommendations', async () => {
     const summary = await getWeeklyVolumeSummary(userId);
 
-    return summary.map(muscle => {
+    return summary.map((muscle) => {
       let recommendation: 'increase' | 'decrease' | 'maintain';
       let reason: string;
 
@@ -199,7 +188,7 @@ export async function getVolumeRecommendations(
 // Initialize volume landmarks with defaults
 export async function initializeVolumeLandmarks(
   userId: string,
-  defaults: VolumeLandmarks
+  defaults: VolumeLandmarks,
 ): Promise<void> {
   return withService('volume', 'initialize volume landmarks', async () => {
     const existing = await getVolumeLandmarks(userId);

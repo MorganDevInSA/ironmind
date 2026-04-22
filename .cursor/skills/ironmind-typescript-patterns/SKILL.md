@@ -24,13 +24,14 @@ import type { ExportOptions } from '@/lib/types';
 
 Always verify that the exported member exists in the target module.
 
-| Wrong import | Correct import |
-|-------------|---------------|
-| `getDocuments` from `@/lib/firebase` | `getAllDocuments` from `@/lib/firebase` |
-| `queryClient` from `@tanstack/react-query` | `QueryClient` (class) or shared instance |
-| `./types` in `src/lib/seed/` | Define the interface inline or in `src/lib/types/index.ts` |
+| Wrong import                               | Correct import                                             |
+| ------------------------------------------ | ---------------------------------------------------------- |
+| `getDocuments` from `@/lib/firebase`       | `getAllDocuments` from `@/lib/firebase`                    |
+| `queryClient` from `@tanstack/react-query` | `QueryClient` (class) or shared instance                   |
+| `./types` in `src/lib/seed/`               | Define the interface inline or in `src/lib/types/index.ts` |
 
 Before adding an import, confirm the export exists:
+
 ```bash
 # Quick check
 grep -n "export" src/lib/firebase/firestore.ts | grep "function"
@@ -58,10 +59,11 @@ constraints.push(limit(50));
 The `SmartAlert.type` union is defined in `src/lib/types/index.ts`. The only valid values are:
 
 ```ts
-type: 'spillover' | 'fatigue' | 'calorie_emergency' | 'pelvic_comfort' | 'progression' | 'info'
+type: 'spillover' | 'fatigue' | 'calorie_emergency' | 'pelvic_comfort' | 'progression' | 'info';
 ```
 
 **`'info'` IS in the union** (added after audit). Never assign a string literal to `SmartAlert.type` that is not in this list. When adding a new alert category:
+
 1. Add the literal to the union in `src/lib/types/index.ts` first
 2. Then use it in `alerts.service.ts`
 
@@ -98,7 +100,7 @@ type CardProps = { children: ReactNode };
 
 ```ts
 // ❌ WRONG — TS7006 implicit any
-items.map((muscle) => muscle.name); 
+items.map((muscle) => muscle.name);
 
 // ✅ CORRECT
 items.map((muscle: VolumeSummaryItem) => muscle.name);
@@ -124,6 +126,7 @@ import type { NutritionPlanSeed } from '@/lib/types';
 ## Rule 9 — Verify seed orchestrator after adding seed data
 
 When a new seed file is created (e.g. `seed/nutrition.ts`), it MUST be:
+
 1. Imported in `src/lib/seed/index.ts`
 2. Called inside `seedUserData()`
 3. Its data written to Firestore via the appropriate service
@@ -141,13 +144,21 @@ Seed data that is defined but not called is dead code and will result in empty p
 // ✅ morganNutritionPlan    → saveNutritionDay() — ADD THIS
 ```
 
-## Rule 10 — Run `tsc --noEmit` before committing
+## Rule 10 — Run the CI chain before committing
 
-Always check for type errors before marking work as done:
+Always verify the full pipeline before marking work as done:
 
 ```bash
 cd /home/morgan/Desktop/Coach/ironmind
-npx tsc --noEmit
+npm run ci                  # lint + typecheck + build — matches GitHub Actions
 ```
 
-Zero errors is the only acceptable state.
+If the `ci` script is not yet present in `package.json` (see `.cursor/plans/DEVOPS_CONTROL_CENTER.md` task 4.1), run each stage individually:
+
+```bash
+npm run lint                # eslint . --max-warnings=0
+npx tsc --noEmit            # type check
+npm run build               # production build
+```
+
+Zero errors, zero warnings is the only acceptable state. The pre-commit hook (`simple-git-hooks` + `lint-staged`, task 4.5) auto-fixes lint on staged files, but does not run `tsc` — always run typecheck manually when making type changes.

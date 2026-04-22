@@ -14,7 +14,6 @@ import {
   Timestamp,
   DocumentData,
   QueryDocumentSnapshot,
-  DocumentSnapshot,
   FirestoreDataConverter,
   CollectionReference,
   DocumentReference,
@@ -34,9 +33,7 @@ export function stripUndefinedDeep<T>(value: T): T {
   if (value === null || typeof value !== 'object') return value;
   if (value instanceof Date) return value;
   if (Array.isArray(value)) {
-    return value
-      .map(stripUndefinedDeep)
-      .filter((v) => v !== undefined) as unknown as T;
+    return value.map(stripUndefinedDeep).filter((v) => v !== undefined) as unknown as T;
   }
   const out: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
@@ -81,13 +78,15 @@ export function createConverter<T>(): FirestoreDataConverter<T> {
 export async function getDocument<T>(
   collectionPath: string,
   docId: string,
-  converter?: FirestoreDataConverter<T>
+  converter?: FirestoreDataConverter<T>,
 ): Promise<T | null> {
   if (!db) throw new Error('Firestore not initialized');
 
-  const docRef = (converter
-    ? doc(db, collectionPath, docId).withConverter(converter)
-    : doc(db, collectionPath, docId)) as DocumentReference<T>;
+  const docRef = (
+    converter
+      ? doc(db, collectionPath, docId).withConverter(converter)
+      : doc(db, collectionPath, docId)
+  ) as DocumentReference<T>;
 
   const snapshot = await getDoc(docRef);
   return snapshot.exists() ? (snapshot.data() as T) : null;
@@ -97,13 +96,15 @@ export async function setDocument<T>(
   collectionPath: string,
   docId: string,
   data: WithFieldValue<T>,
-  converter?: FirestoreDataConverter<T>
+  converter?: FirestoreDataConverter<T>,
 ): Promise<void> {
   if (!db) throw new Error('Firestore not initialized');
   const safe = stripUndefinedDeep(data) as WithFieldValue<T>;
-  const docRef = (converter
-    ? doc(db, collectionPath, docId).withConverter(converter)
-    : doc(db, collectionPath, docId)) as DocumentReference<T>;
+  const docRef = (
+    converter
+      ? doc(db, collectionPath, docId).withConverter(converter)
+      : doc(db, collectionPath, docId)
+  ) as DocumentReference<T>;
 
   await setDoc(docRef, safe, { merge: true });
 }
@@ -111,7 +112,7 @@ export async function setDocument<T>(
 export async function updateDocument<T>(
   collectionPath: string,
   docId: string,
-  data: Partial<T>
+  data: Partial<T>,
 ): Promise<void> {
   if (!db) throw new Error('Firestore not initialized');
   const safe = stripUndefinedDeep(data) as DocumentData;
@@ -122,13 +123,15 @@ export async function updateDocument<T>(
 export async function addDocument<T>(
   collectionPath: string,
   data: WithFieldValue<T>,
-  converter?: FirestoreDataConverter<T>
+  converter?: FirestoreDataConverter<T>,
 ): Promise<string> {
   if (!db) throw new Error('Firestore not initialized');
   const safe = stripUndefinedDeep(data) as WithFieldValue<T>;
-  const colRef = (converter
-    ? collection(db, collectionPath).withConverter(converter)
-    : collection(db, collectionPath)) as CollectionReference<T>;
+  const colRef = (
+    converter
+      ? collection(db, collectionPath).withConverter(converter)
+      : collection(db, collectionPath)
+  ) as CollectionReference<T>;
 
   const docRef = await addDoc(colRef, safe);
   return docRef.id;
@@ -145,31 +148,35 @@ export async function deleteDocument(collectionPath: string, docId: string): Pro
 export async function queryDocuments<T>(
   collectionPath: string,
   constraints: QueryConstraint[],
-  converter?: FirestoreDataConverter<T>
+  converter?: FirestoreDataConverter<T>,
 ): Promise<T[]> {
   if (!db) throw new Error('Firestore not initialized');
 
-  const colRef = (converter
-    ? collection(db, collectionPath).withConverter(converter)
-    : collection(db, collectionPath)) as CollectionReference<T>;
+  const colRef = (
+    converter
+      ? collection(db, collectionPath).withConverter(converter)
+      : collection(db, collectionPath)
+  ) as CollectionReference<T>;
 
   const q = query(colRef, ...constraints);
   const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => doc.data() as T);
+  return snapshot.docs.map((doc) => doc.data() as T);
 }
 
 export async function getAllDocuments<T>(
   collectionPath: string,
-  converter?: FirestoreDataConverter<T>
+  converter?: FirestoreDataConverter<T>,
 ): Promise<T[]> {
   if (!db) throw new Error('Firestore not initialized');
 
-  const colRef = (converter
-    ? collection(db, collectionPath).withConverter(converter)
-    : collection(db, collectionPath)) as CollectionReference<T>;
+  const colRef = (
+    converter
+      ? collection(db, collectionPath).withConverter(converter)
+      : collection(db, collectionPath)
+  ) as CollectionReference<T>;
 
   const snapshot = await getDocs(colRef);
-  return snapshot.docs.map(doc => doc.data() as T);
+  return snapshot.docs.map((doc) => doc.data() as T);
 }
 
 // Query constraint helpers
@@ -190,24 +197,24 @@ export function fromTimestamp(timestamp: Timestamp): string {
 // Collection reference helper
 export function getCollectionRef<T>(
   collectionPath: string,
-  converter?: FirestoreDataConverter<T>
+  converter?: FirestoreDataConverter<T>,
 ): CollectionReference<T> {
   if (!db) throw new Error('Firestore not initialized');
 
   return converter
     ? collection(db, collectionPath).withConverter(converter)
-    : collection(db, collectionPath) as CollectionReference<T>;
+    : (collection(db, collectionPath) as CollectionReference<T>);
 }
 
 // Document reference helper
 export function getDocumentRef<T>(
   collectionPath: string,
   docId: string,
-  converter?: FirestoreDataConverter<T>
+  converter?: FirestoreDataConverter<T>,
 ): DocumentReference<T> {
   if (!db) throw new Error('Firestore not initialized');
 
   return converter
     ? doc(db, collectionPath, docId).withConverter(converter)
-    : doc(db, collectionPath, docId) as DocumentReference<T>;
+    : (doc(db, collectionPath, docId) as DocumentReference<T>);
 }

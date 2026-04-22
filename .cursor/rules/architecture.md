@@ -51,11 +51,11 @@ import type { ExportOptions } from '@/lib/types';
 
 ### Correct Module Paths
 
-| Wrong import | Correct import |
-|-------------|---------------|
-| `getDocuments` from `@/lib/firebase` | `getAllDocuments` from `@/lib/firebase` |
-| `queryClient` from `@tanstack/react-query` | `QueryClient` (class) or shared instance |
-| `./types` in `src/lib/seed/` | Define inline or in `src/lib/types/index.ts` |
+| Wrong import                               | Correct import                               |
+| ------------------------------------------ | -------------------------------------------- |
+| `getDocuments` from `@/lib/firebase`       | `getAllDocuments` from `@/lib/firebase`      |
+| `queryClient` from `@tanstack/react-query` | `QueryClient` (class) or shared instance     |
+| `./types` in `src/lib/seed/`               | Define inline or in `src/lib/types/index.ts` |
 
 ---
 
@@ -63,15 +63,15 @@ import type { ExportOptions } from '@/lib/types';
 
 Use EXACTLY these names from `src/lib/firebase/firestore.ts`:
 
-| Function | Signature | Use for |
-|----------|-----------|---------|
-| `getDocument<T>` | `(path, docId, converter?)` | Fetch single doc |
-| `setDocument<T>` | `(path, docId, data, converter?)` | Create or merge doc |
-| `updateDocument<T>` | `(path, docId, data)` | Partial update |
-| `addDocument<T>` | `(path, data, converter?)` | Add with auto-ID |
-| `deleteDocument` | `(path, docId)` | Delete doc |
-| `queryDocuments<T>` | `(path, constraints[], converter?)` | Query with filters |
-| `getAllDocuments<T>` | `(path, converter?)` | Fetch entire collection |
+| Function             | Signature                           | Use for                 |
+| -------------------- | ----------------------------------- | ----------------------- |
+| `getDocument<T>`     | `(path, docId, converter?)`         | Fetch single doc        |
+| `setDocument<T>`     | `(path, docId, data, converter?)`   | Create or merge doc     |
+| `updateDocument<T>`  | `(path, docId, data)`               | Partial update          |
+| `addDocument<T>`     | `(path, data, converter?)`          | Add with auto-ID        |
+| `deleteDocument`     | `(path, docId)`                     | Delete doc              |
+| `queryDocuments<T>`  | `(path, constraints[], converter?)` | Query with filters      |
+| `getAllDocuments<T>` | `(path, converter?)`                | Fetch entire collection |
 
 > ⚠️ `getDocuments` does NOT exist. Use `getAllDocuments`.
 
@@ -115,10 +115,11 @@ await getDocument(`users/${userId}/profile`, 'data', converter);
 Valid `SmartAlert.type` values (defined in `src/lib/types/index.ts`):
 
 ```ts
-'spillover' | 'fatigue' | 'calorie_emergency' | 'pelvic_comfort' | 'progression' | 'info'
+'spillover' | 'fatigue' | 'calorie_emergency' | 'pelvic_comfort' | 'progression' | 'info';
 ```
 
 To add a new alert type:
+
 1. Add the literal to the union in `src/lib/types/index.ts` first
 2. Then use it in `alerts.service.ts`
 3. Call it inside `getActiveAlerts()` — no dead check functions
@@ -130,6 +131,7 @@ To add a new alert type:
 ### No `undefined` Values
 
 Firestore rejects `undefined` field values. For partial writes:
+
 - Build objects with only defined keys, or
 - Strip `undefined` recursively before write
 
@@ -138,6 +140,7 @@ Reference pattern: `stripUndefinedDeep` in `src/services/physique.service.ts`.
 ### Timestamps → ISO Strings
 
 The Firestore converter automatically converts:
+
 - **Writes**: `Date` → Firestore `Timestamp`
 - **Reads**: Firestore `Timestamp` → ISO string
 
@@ -182,11 +185,13 @@ src/app/(app)/some/path/page.tsx
 
 ## TypeScript Policy
 
-- Run `npx tsc --noEmit` after every substantive change
-- Zero errors required
+- Run `npm run ci` (or `npx tsc --noEmit` standalone) after every substantive change
+- Zero errors required — CI enforces this with `--max-warnings=0`
 - Never use `as any` or `// @ts-ignore`
 - All service functions have explicit return types
 - Callback parameters must be typed (no implicit `any`)
+
+The `npm run ci` script chains `lint → typecheck → build`, matching the GitHub Actions `verify` job exactly. If any stage fails locally, it will fail in CI — fix before pushing.
 
 ---
 
@@ -194,8 +199,11 @@ src/app/(app)/some/path/page.tsx
 
 For detailed patterns, read the relevant skill:
 
-| Area | Skill |
-|------|-------|
-| TypeScript errors | `ironmind-typescript-patterns` |
-| Firebase operations | `ironmind-firebase-patterns` |
-| Query structure | `ironmind-data-layer` |
+| Area                           | Skill                          |
+| ------------------------------ | ------------------------------ |
+| TypeScript errors              | `ironmind-typescript-patterns` |
+| Firebase operations            | `ironmind-firebase-patterns`   |
+| Query structure                | `ironmind-data-layer`          |
+| Deploy / CI / env / rules push | `ironmind-cicd`                |
+
+For infra changes (Vercel config, GitHub Actions, Firestore rules deploy, env var setup, MCP tooling): read `.cursor/skills/ironmind-cicd/SKILL.md` and `.cursor/plans/DEVOPS_CONTROL_CENTER.md`. Infra changes go through committed files, never dashboard clicks.

@@ -1,6 +1,6 @@
 # IRONMIND — Elite Bodybuilding Performance System
 
-A world-class bodybuilding training application for elite athletes who self-coach. Built with Next.js 15, TypeScript, Tailwind CSS, shadcn/ui, and Firebase.
+A world-class bodybuilding training application for elite athletes who self-coach. Built with Next.js 14, TypeScript, Tailwind CSS, and Firebase.
 
 ## Features
 
@@ -15,15 +15,16 @@ A world-class bodybuilding training application for elite athletes who self-coac
 
 ## Tech Stack
 
-- **Framework**: Next.js 15 (App Router)
-- **Language**: TypeScript (strict)
-- **Styling**: Tailwind CSS v4
-- **UI Components**: shadcn/ui (Radix UI primitives)
-- **State Management**: Zustand (UI) + TanStack Query (server state)
+- **Framework**: Next.js 14 (App Router)
+- **Language**: TypeScript (strict mode)
+- **Styling**: Tailwind CSS v3
+- **State Management**: Zustand (UI) + TanStack Query v5 (server state)
 - **Forms**: React Hook Form + Zod
-- **Backend**: Firebase (Auth, Firestore, Storage)
+- **Backend**: Firebase 12 (Auth, Firestore, Storage)
 - **Charts**: Recharts
-- **Fonts**: Inter + Space Grotesk
+- **Animation**: Framer Motion
+- **Icons**: Lucide React
+- **Fonts**: Rajdhani (UI) + JetBrains Mono (data)
 
 ## Architecture
 
@@ -55,63 +56,91 @@ Covers: cache invalidation strategy, optimistic updates, structured error handli
 
 Covers: design token system, responsive architecture, motion design, accessibility implementation, and component composition strategy.
 
-## Getting Started
+### CI/CD & Platform Infrastructure
 
-1. Clone the repository
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Set up Firebase environment variables in `.env.local`:
-   ```
-   NEXT_PUBLIC_FIREBASE_API_KEY=your_key
-   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_domain
-   NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project
-   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_bucket
-   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender
-   NEXT_PUBLIC_FIREBASE_APP_ID=your_app
-   ```
-4. Run the development server:
-   ```bash
-   npm run dev
-   ```
+- **Typed configuration** via `vercel.ts`, `firebase.json`, `.github/workflows/`
+- **Three-environment separation**: local (emulators) → preview (per PR) → production (main)
+- **MCP integration**: Vercel + Firebase + Context7 in `.cursor/mcp.json` for agent-driven infra ops
+- **Automated delivery**: GitHub Actions CI (lint + typecheck + build), Dependabot, pre-commit hooks
+- **One-command publish**: `npm run publish` — local verification → push → auto-deploy
 
-## Deploy To Vercel
+**→ [Read the full CI/CD & Platform documentation](./README_CICD.md)**
 
-### One-time setup
+Covers: environment model, MCP tooling, typed platform config, delivery pipeline, secrets hygiene, rollback procedures, observability, and scaling readiness.
 
-1. Push this repo to GitHub.
-2. Go to [Vercel](https://vercel.com/new) and import the GitHub repository.
-3. In Vercel project settings, add the same Firebase env vars used in `.env.local`:
-   - `NEXT_PUBLIC_FIREBASE_API_KEY`
-   - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
-   - `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
-   - `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`
-   - `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
-   - `NEXT_PUBLIC_FIREBASE_APP_ID`
-4. Deploy. Vercel will run `npm install` and `npm run build` automatically.
-
-### Optional CLI deploy
+## Quickstart
 
 ```bash
-npm i -g vercel
-vercel
-vercel --prod
+# 1. Clone and install
+git clone git@github.com:MorganDevInSA/ironmind.git
+cd ironmind
+npm ci
+
+# 2. Set up environment (choose one)
+cp .env.example .env.local      # then fill in Firebase values
+# OR (if Vercel CLI is installed and linked):
+vercel env pull .env.local
+
+# 3. Start dev server
+npm run dev
+
+# 4. Open http://localhost:3000
 ```
 
-## PWA / Add To Home Screen
+On first login, the app auto-seeds with demo data. See "Seed Data" section below for details.
 
-This project now includes:
+## Deploy & Publish
 
-- `public/manifest.json` for install metadata
-- `public/sw.js` service worker for app-shell style offline caching
-- `src/components/pwa/register-service-worker.tsx` auto registration in production
+IRONMIND uses GitHub-triggered Vercel deployments with local verification before push. The entire flow is automated.
 
-On mobile, open the deployed site in Chrome or Safari and use **Add to Home Screen**.
+### One-command publish (production or preview)
+
+```bash
+npm run publish
+```
+
+This command:
+
+1. Verifies git is clean (commits or stash first)
+2. Runs `npm run ci` locally (lint → typecheck → build) — aborts on failure
+3. Pushes current branch to GitHub
+4. Prints the live URL (production if on `main`, preview URL otherwise)
+
+Vercel auto-deploys within ~60 seconds. No manual CLI deploy needed — the GitHub push triggers it.
+
+### CI Pipeline
+
+Every push to `main` and every pull request triggers `.github/workflows/ci.yml`:
+
+- Install (Node 22, npm ci with cache)
+- Lint (ESLint with `--max-warnings=0`)
+- Typecheck (`tsc --noEmit`)
+- Build (`next build` with Firebase env vars from GitHub Secrets)
+
+Pre-commit hooks (via `simple-git-hooks` + `lint-staged`) auto-fix lint + prettier on staged files before commit.
+
+### Rollback
+
+```bash
+vercel rollback                          # rollback to previous production deployment
+vercel promote <deployment-url>          # promote a specific preview to production
+```
+
+### Firebase Rules & Indexes
+
+Committed in `firestore.rules`, `firestore.indexes.json`, `storage.rules` at repo root. CI workflow (`.github/workflows/firebase-rules.yml`, pending setup) auto-deploys on push to `main` when these files change.
+
+Manual deploy (trusted machine only):
+
+```bash
+npm run deploy:rules      # firestore + storage rules
+npm run deploy:indexes    # firestore indexes
+```
 
 ## Seed Data
 
 On first login, the app automatically seeds Firestore with Morgan's real data:
+
 - Athlete profile (age, goals, injury constraints)
 - 14-day rotating program with all exercises
 - Supplement protocol with 5 timing windows
@@ -137,36 +166,32 @@ MIT
 
 ---
 
-## Deploying Firebase Security Rules
+## Local Development Tools
 
-Before going to production, deploy Firestore and Storage security rules:
+### Firebase Emulators
 
-```bash
-# Install Firebase CLI (if not already installed)
-npm install -g firebase-tools
-
-# Login to Firebase
-firebase login
-
-# Initialize project (only needed once)
-# Update .firebaserc with your project ID first
-firebase use default
-
-# Deploy rules
-firebase deploy --only firestore:rules
-firebase deploy --only storage
-
-# Deploy indexes (recommended)
-firebase deploy --only firestore:indexes
-```
-
-**Local emulator testing:**
+Test Firestore/Storage rules and operations locally without touching production:
 
 ```bash
-firebase emulators:start
-# UI available at http://localhost:4000
+npm run emulators
+# UI: http://localhost:4000
 # Firestore: localhost:8080
 # Storage: localhost:9199
 ```
 
-Update `.env.local` to point to emulators during development if needed.
+### Full CI Chain Locally
+
+Before pushing, verify the full pipeline passes:
+
+```bash
+npm run ci        # lint + typecheck + build (what CI runs)
+```
+
+### Code Quality Scripts
+
+```bash
+npm run lint          # ESLint (--max-warnings=0)
+npm run typecheck     # TypeScript (tsc --noEmit)
+npm run format        # Check Prettier formatting
+npm run format:fix    # Auto-fix Prettier formatting
+```

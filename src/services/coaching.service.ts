@@ -1,7 +1,6 @@
 import type { Phase, JournalEntry } from '@/lib/types';
 import {
   getDocument,
-  setDocument,
   addDocument,
   updateDocument,
   deleteDocument,
@@ -25,8 +24,8 @@ export async function getPhases(userId: string): Promise<Phase[]> {
     queryDocuments<Phase>(
       collections.phases(userId),
       [orderBy('startDate', 'desc')],
-      phaseConverter
-    )
+      phaseConverter,
+    ),
   );
 }
 
@@ -35,7 +34,7 @@ export async function getActivePhase(userId: string): Promise<Phase | null> {
     const phases = await queryDocuments<Phase>(
       collections.phases(userId),
       [where('isActive', '==', true), limit(1)],
-      phaseConverter
+      phaseConverter,
     );
     return phases[0] || null;
   });
@@ -43,45 +42,27 @@ export async function getActivePhase(userId: string): Promise<Phase | null> {
 
 export async function getPhase(userId: string, phaseId: string): Promise<Phase | null> {
   return withService('coaching', 'read phase', () =>
-    getDocument<Phase>(
-      collections.phases(userId),
-      phaseId,
-      phaseConverter
-    )
+    getDocument<Phase>(collections.phases(userId), phaseId, phaseConverter),
   );
 }
 
-export async function createPhase(
-  userId: string,
-  phase: Omit<Phase, 'id'>
-): Promise<string> {
+export async function createPhase(userId: string, phase: Omit<Phase, 'id'>): Promise<string> {
   return withService('coaching', 'create phase', () =>
-    addDocument<Phase>(
-      collections.phases(userId),
-      phase as Phase,
-      phaseConverter
-    )
+    addDocument<Phase>(collections.phases(userId), phase as Phase, phaseConverter),
   );
 }
 
 export async function updatePhase(
   userId: string,
   phaseId: string,
-  updates: Partial<Phase>
+  updates: Partial<Phase>,
 ): Promise<void> {
   return withService('coaching', 'update phase', () =>
-    updateDocument<Phase>(
-      collections.phases(userId),
-      phaseId,
-      updates
-    )
+    updateDocument<Phase>(collections.phases(userId), phaseId, updates),
   );
 }
 
-export async function setActivePhase(
-  userId: string,
-  phaseId: string
-): Promise<void> {
+export async function setActivePhase(userId: string, phaseId: string): Promise<void> {
   return withService('coaching', 'set active phase', async () => {
     const phases = await getPhases(userId);
     for (const phase of phases) {
@@ -95,7 +76,7 @@ export async function setActivePhase(
 
 export async function deletePhase(userId: string, phaseId: string): Promise<void> {
   return withService('coaching', 'delete phase', () =>
-    deleteDocument(collections.phases(userId), phaseId)
+    deleteDocument(collections.phases(userId), phaseId),
   );
 }
 
@@ -103,7 +84,7 @@ export async function deletePhase(userId: string, phaseId: string): Promise<void
 
 export async function getJournalEntries(
   userId: string,
-  limitCount?: number
+  limitCount?: number,
 ): Promise<JournalEntry[]> {
   return withService('coaching', 'read journal entries', () => {
     const constraints: QueryConstraint[] = [orderBy('date', 'desc')];
@@ -114,85 +95,74 @@ export async function getJournalEntries(
     return queryDocuments<JournalEntry>(
       collections.journalEntries(userId),
       constraints,
-      journalConverter
+      journalConverter,
     );
   });
 }
 
 export async function getJournalEntry(
   userId: string,
-  entryId: string
+  entryId: string,
 ): Promise<JournalEntry | null> {
   return withService('coaching', 'read journal entry', () =>
-    getDocument<JournalEntry>(
-      collections.journalEntries(userId),
-      entryId,
-      journalConverter
-    )
+    getDocument<JournalEntry>(collections.journalEntries(userId), entryId, journalConverter),
   );
 }
 
 export async function createJournalEntry(
   userId: string,
-  entry: Omit<JournalEntry, 'id'>
+  entry: Omit<JournalEntry, 'id'>,
 ): Promise<string> {
   return withService('coaching', 'create journal entry', () =>
     addDocument<JournalEntry>(
       collections.journalEntries(userId),
       entry as JournalEntry,
-      journalConverter
-    )
+      journalConverter,
+    ),
   );
 }
 
 export async function updateJournalEntry(
   userId: string,
   entryId: string,
-  updates: Partial<JournalEntry>
+  updates: Partial<JournalEntry>,
 ): Promise<void> {
   return withService('coaching', 'update journal entry', () =>
-    updateDocument<JournalEntry>(
-      collections.journalEntries(userId),
-      entryId,
-      updates
-    )
+    updateDocument<JournalEntry>(collections.journalEntries(userId), entryId, updates),
   );
 }
 
 export async function deleteJournalEntry(userId: string, entryId: string): Promise<void> {
   return withService('coaching', 'delete journal entry', () =>
-    deleteDocument(collections.journalEntries(userId), entryId)
+    deleteDocument(collections.journalEntries(userId), entryId),
   );
 }
 
 // Get journal entries by tag
-export async function getJournalEntriesByTag(
-  userId: string,
-  tag: string
-): Promise<JournalEntry[]> {
+export async function getJournalEntriesByTag(userId: string, tag: string): Promise<JournalEntry[]> {
   return withService('coaching', 'read journal entries by tag', () =>
     queryDocuments<JournalEntry>(
       collections.journalEntries(userId),
       [where('tags', 'array-contains', tag), orderBy('date', 'desc')],
-      journalConverter
-    )
+      journalConverter,
+    ),
   );
 }
 
 // Search journal entries
 export async function searchJournalEntries(
   userId: string,
-  searchTerm: string
+  searchTerm: string,
 ): Promise<JournalEntry[]> {
   return withService('coaching', 'search journal entries', async () => {
     const entries = await getJournalEntries(userId);
     const lowerTerm = searchTerm.toLowerCase();
 
     return entries.filter(
-      entry =>
+      (entry) =>
         entry.title.toLowerCase().includes(lowerTerm) ||
         entry.content.toLowerCase().includes(lowerTerm) ||
-        entry.tags.some(tag => tag.toLowerCase().includes(lowerTerm))
+        entry.tags.some((tag) => tag.toLowerCase().includes(lowerTerm)),
     );
   });
 }
@@ -225,17 +195,13 @@ export async function getJournalEntryCount(userId: string): Promise<number> {
 export async function getJournalEntriesInRange(
   userId: string,
   from: string,
-  to: string
+  to: string,
 ): Promise<JournalEntry[]> {
   return withService('coaching', 'read journal entries in range', () =>
     queryDocuments<JournalEntry>(
       collections.journalEntries(userId),
-      [
-        where('date', '>=', from),
-        where('date', '<=', to),
-        orderBy('date', 'desc'),
-      ],
-      journalConverter
-    )
+      [where('date', '>=', from), where('date', '<=', to), orderBy('date', 'desc')],
+      journalConverter,
+    ),
   );
 }

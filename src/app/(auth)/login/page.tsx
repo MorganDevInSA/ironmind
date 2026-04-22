@@ -4,7 +4,14 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { brandAssets } from '@/lib/constants/brand-assets';
-import { logout, resendEmailVerification, signInWithEmail, signInWithFacebook, signInWithGoogle, signInWithMicrosoft } from '@/lib/firebase';
+import {
+  logout,
+  resendEmailVerification,
+  signInWithEmail,
+  signInWithFacebook,
+  signInWithGoogle,
+  signInWithMicrosoft,
+} from '@/lib/firebase';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -48,7 +55,7 @@ export default function LoginPage() {
     try {
       await signInWithGoogle();
       router.push('/dashboard');
-    } catch (err) {
+    } catch {
       setError('Failed to sign in with Google');
     } finally {
       setIsLoading(false);
@@ -139,9 +146,7 @@ export default function LoginPage() {
 
           <form onSubmit={handleEmailLogin} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-1">
-                Email
-              </label>
+              <label className="block text-sm font-medium text-text-secondary mb-1">Email</label>
               <input
                 type="email"
                 value={email}
@@ -153,9 +158,7 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-1">
-                Password
-              </label>
+              <label className="block text-sm font-medium text-text-secondary mb-1">Password</label>
               <input
                 type="password"
                 value={password}

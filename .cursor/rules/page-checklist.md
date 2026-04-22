@@ -153,15 +153,22 @@ Every page must pass this checklist before being marked complete.
 ## Quick Verification Commands
 
 ```bash
-# TypeScript errors
-npx tsc --noEmit
+# Full CI chain (matches GitHub Actions verify job)
+npm run ci                    # lint + typecheck + build
 
-# Lint errors
-npm run lint
+# Individual stages
+npm run lint                  # eslint . --max-warnings=0
+npx tsc --noEmit              # type check
+npm run build                 # production build
 
 # Mobile preview (if using dev tools)
 # Chrome DevTools → Toggle device toolbar → iPhone SE (375px)
+
+# Firebase emulators (for testing rules changes)
+npm run emulators             # firestore :8080, storage :9199, UI :4000
 ```
+
+For deploy-adjacent changes (rules, indexes, env vars, MCP config): see `.cursor/skills/ironmind-cicd/SKILL.md` and tick the matching item in `.cursor/plans/DEVOPS_CONTROL_CENTER.md`.
 
 ---
 
@@ -182,13 +189,8 @@ export default function MyPage() {
   if (error) {
     return (
       <div className="glass-panel p-6 text-center">
-        <p className="text-[color:var(--bad)] mb-4">
-          Failed to load data
-        </p>
-        <button 
-          onClick={() => window.location.reload()} 
-          className="btn-secondary"
-        >
+        <p className="text-[color:var(--bad)] mb-4">Failed to load data</p>
+        <button onClick={() => window.location.reload()} className="btn-secondary">
           Retry
         </button>
       </div>
@@ -201,9 +203,7 @@ export default function MyPage() {
         <div className="text-[color:var(--text-2)] mb-2">
           <EmptyIcon className="w-12 h-12 mx-auto" />
         </div>
-        <p className="text-[color:var(--text-1)] mb-4">
-          No data yet
-        </p>
+        <p className="text-[color:var(--text-1)] mb-4">No data yet</p>
         <Link href="/add" className="btn-primary">
           Add First Entry
         </Link>
@@ -211,10 +211,6 @@ export default function MyPage() {
     );
   }
 
-  return (
-    <div>
-      {/* Render data */}
-    </div>
-  );
+  return <div>{/* Render data */}</div>;
 }
 ```

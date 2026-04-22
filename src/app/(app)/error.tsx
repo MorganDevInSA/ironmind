@@ -3,7 +3,6 @@
 import { AlertCircle, RefreshCw } from 'lucide-react';
 
 export default function AppError({
-  error,
   reset,
 }: {
   error: Error & { digest?: string };
@@ -21,10 +20,7 @@ export default function AppError({
         <p className="text-[color:var(--text-1)] mb-6">
           An unexpected error occurred. Please try again.
         </p>
-        <button
-          onClick={reset}
-          className="btn-primary inline-flex items-center gap-2"
-        >
+        <button onClick={reset} className="btn-primary inline-flex items-center gap-2">
           <RefreshCw className="w-4 h-4" />
           Try Again
         </button>

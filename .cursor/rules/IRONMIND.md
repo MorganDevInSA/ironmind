@@ -18,11 +18,13 @@ These rules are enforced on every edit in this project. No exceptions.
 
 This project's rules are split into focused files. Read the relevant file when working in that area.
 
-| File | Contents |
-|------|----------|
-| **[architecture.md](./architecture.md)** | Three-layer data architecture, import rules, Firebase patterns, TypeScript policy |
-| **[tokens.md](./tokens.md)** | Full color palette, typography scale, spacing, shadows, theme system |
-| **[page-checklist.md](./page-checklist.md)** | Loading/error/empty states, mobile testing, accessibility, QA checklist |
+| File                                         | Contents                                                                              |
+| -------------------------------------------- | ------------------------------------------------------------------------------------- |
+| **[architecture.md](./architecture.md)**     | Three-layer data architecture, import rules, Firebase patterns, TypeScript policy     |
+| **[tokens.md](./tokens.md)**                 | Full color palette, typography scale, spacing, shadows, theme system                  |
+| **[page-checklist.md](./page-checklist.md)** | Loading/error/empty states, mobile testing, accessibility, QA + verification commands |
+
+For CI/CD, deployment, environment, and MCP work, see `.cursor/skills/ironmind-cicd/SKILL.md` and `.cursor/plans/DEVOPS_CONTROL_CENTER.md` — infra is never edited via dashboards; always through committed config.
 
 ---
 
@@ -60,6 +62,7 @@ Every numeric data value in the UI uses `font-mono tabular-nums`. No exceptions.
 ### Crimson Is Precious
 
 `var(--accent)` is used ONLY for:
+
 - Active nav item text and border
 - PR achievements and KPI badges
 - CTA / primary buttons
@@ -77,6 +80,7 @@ Maximum 2–3 accent elements visible at once per view.
 ### Interactive Panels
 
 All `.glass-panel`, `.glass-panel-strong`, and `.dashboard-overview` elements have hover/focus-within states:
+
 - Resting: 6% accent border opacity, no glow
 - Hover/focus-within: 62% accent border, subtle accent glow
 - Transition: border-color 200ms ease-out, box-shadow 300ms ease-out
@@ -90,16 +94,17 @@ Never use `{isOpen && <div>...</div>}` for expand/collapse — always render the
 
 When working on specific areas, read and apply the relevant skill:
 
-| Skill | When to Use |
-|-------|-------------|
-| `ironmind-typescript-patterns` | TypeScript errors, imports, type definitions |
-| `ironmind-firebase-patterns` | Firestore operations, queries, auth, storage |
-| `ironmind-data-layer` | Controllers, services, query keys, mutations, seed data |
-| `ironmind-styling` | Buttons, cards, badges, typography, component recipes |
-| `ironmind-visual-persona` | Brand identity, color psychology, forbidden elements |
-| `ironmind-animations` | Motion, hover effects, loading states, transitions |
-| `ironmind-states` | Skeleton loaders, error cards, empty state patterns |
-| `ironmind-a11y` | Focus rings, keyboard navigation, ARIA, screen readers |
+| Skill                          | When to Use                                                                                               |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| `ironmind-typescript-patterns` | TypeScript errors, imports, type definitions                                                              |
+| `ironmind-firebase-patterns`   | Firestore operations, queries, auth, storage                                                              |
+| `ironmind-data-layer`          | Controllers, services, query keys, mutations, seed data                                                   |
+| `ironmind-styling`             | Buttons, cards, badges, typography, component recipes                                                     |
+| `ironmind-visual-persona`      | Brand identity, color psychology, forbidden elements                                                      |
+| `ironmind-animations`          | Motion, hover effects, loading states, transitions                                                        |
+| `ironmind-states`              | Skeleton loaders, error cards, empty state patterns                                                       |
+| `ironmind-a11y`                | Focus rings, keyboard navigation, ARIA, screen readers                                                    |
+| `ironmind-cicd`                | Deployment, Vercel/Firebase CLI, CI workflows, env vars, MCP, rollback, observability, rules/index deploy |
 
 ---
 
@@ -108,17 +113,30 @@ When working on specific areas, read and apply the relevant skill:
 Before marking any work complete:
 
 ```bash
-# TypeScript
-npx tsc --noEmit
+# Full CI chain (mirrors GitHub Actions `verify` job)
+npm run ci                  # runs lint + typecheck + build
+
+# Individual stages if ci script is not yet in package.json
+npm run lint                # eslint . --max-warnings=0
+npx tsc --noEmit            # type check
+npm run build               # production build
 
 # Mobile test
 # Chrome DevTools → Device toolbar → 375px width
 ```
 
 Verify:
+
+- [ ] `npm run ci` passes locally (or all three stages above if ci script is pending)
 - [ ] Loading state exists
-- [ ] Error state exists  
+- [ ] Error state exists
 - [ ] Empty state exists (not blank)
 - [ ] All links point to existing routes
 - [ ] All buttons have handlers
 - [ ] Mobile layout works at 375px
+
+For any infrastructure/deploy change, also verify:
+
+- [ ] Change is in a committed file (`vercel.ts`, `firestore.rules`, `.github/workflows/*.yml`) — never a dashboard-only edit
+- [ ] If it's a tracked task in `.cursor/plans/DEVOPS_CONTROL_CENTER.md`, tick the box and note the outcome
+- [ ] Secrets stay in Vercel env vars / GitHub Secrets — never in the repo
