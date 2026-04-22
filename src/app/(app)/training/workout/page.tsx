@@ -290,64 +290,64 @@ export default function WorkoutPage() {
                 </div>
               </button>
 
-              {isOpen && (
-                <div className="px-4 pb-4 space-y-2">
-                  {/* Column headers */}
-                  <div className="grid grid-cols-[2.5rem_1fr_1fr_5rem] gap-2 px-1">
-                    <span className="text-xs text-[color:var(--text-2)]">Set</span>
-                    <span className="text-xs text-[color:var(--text-2)]">Weight kg</span>
-                    <span className="text-xs text-[color:var(--text-2)]">Reps</span>
-                    <span className="text-xs text-[color:var(--text-2)] text-center">Time</span>
-                  </div>
-
-                  {sets.map((log, i) => (
-                    <div key={i} className={cn(
-                      'grid grid-cols-[2.5rem_1fr_1fr_5rem] gap-2 items-center p-2 rounded-lg border transition-all',
-                      log.timeStamped
-                        ? 'border-[rgba(16,185,129,0.3)] bg-[rgba(16,185,129,0.06)]'
-                        : 'border-[rgba(65,50,50,0.2)] bg-[rgba(18,14,14,0.4)]'
-                    )}>
-                      <span className="text-xs font-mono text-[color:var(--text-2)] text-center">{i + 1}</span>
-
-                      <input
-                        type="number"
-                        step="0.5"
-                        min="0"
-                        value={log.weight}
-                        onChange={e => updateSet(exercise.exerciseId, i, 'weight', e.target.value)}
-                        placeholder={i > 0 ? (sets[i - 1].weight || '—') : '—'}
-                        className="w-full bg-[rgba(18,14,14,0.7)] border border-[rgba(65,50,50,0.25)] rounded px-2 py-1.5 text-sm text-[color:var(--text-0)] font-mono tabular-nums placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color-mix(in srgb,var(--accent) 40%,transparent0.4)]"
-                      />
-
-                      <input
-                        type="number"
-                        min="0"
-                        value={log.reps}
-                        onChange={e => updateSet(exercise.exerciseId, i, 'reps', e.target.value)}
-                        placeholder="—"
-                        className="w-full bg-[rgba(18,14,14,0.7)] border border-[rgba(65,50,50,0.25)] rounded px-2 py-1.5 text-sm text-[color:var(--text-0)] font-mono tabular-nums placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color-mix(in srgb,var(--accent) 40%,transparent0.4)]"
-                      />
-
-                      {/* Time stamp button */}
-                      <button
-                        onClick={() => stampSet(exercise.exerciseId, i)}
-                        className={cn(
-                          'w-full h-8 rounded-lg text-xs font-mono font-semibold border transition-all',
-                          log.timeStamped
-                            ? 'border-[rgba(16,185,129,0.4)] bg-[rgba(16,185,129,0.12)] text-[#10B981]'
-                            : 'border-[rgba(65,50,50,0.3)] text-[color:var(--text-2)] hover:border-[color-mix(in srgb,var(--accent) 40%,transparent0.4)] hover:text-[color:var(--text-0)]'
-                        )}
-                      >
-                        {log.timeStamped ?? '—'}
-                      </button>
+              <div className="accordion-wrapper" data-open={isOpen}>
+                <div className="accordion-inner">
+                  <div className="px-4 pb-4 space-y-2">
+                    <div className="grid grid-cols-[2.5rem_1fr_1fr_5rem] gap-2 px-1">
+                      <span className="text-xs text-[color:var(--text-2)]">Set</span>
+                      <span className="text-xs text-[color:var(--text-2)]">Weight kg</span>
+                      <span className="text-xs text-[color:var(--text-2)]">Reps</span>
+                      <span className="text-xs text-[color:var(--text-2)] text-center">Time</span>
                     </div>
-                  ))}
 
-                  {exercise.notes && (
-                    <p className="text-xs text-[color:var(--text-2)] italic pt-1 px-1">{exercise.notes}</p>
-                  )}
+                    {sets.map((log, i) => (
+                      <div key={i} className={cn(
+                        'grid grid-cols-[2.5rem_1fr_1fr_5rem] gap-2 items-center p-2 rounded-lg border transition-all',
+                        log.timeStamped
+                          ? 'border-[rgba(16,185,129,0.3)] bg-[rgba(16,185,129,0.06)]'
+                          : 'border-[rgba(65,50,50,0.2)] bg-[rgba(18,14,14,0.4)]'
+                      )}>
+                        <span className="text-xs font-mono text-[color:var(--text-2)] text-center">{i + 1}</span>
+
+                        <input
+                          type="number"
+                          step="0.5"
+                          min="0"
+                          value={log.weight}
+                          onChange={e => updateSet(exercise.exerciseId, i, 'weight', e.target.value)}
+                          placeholder={i > 0 ? (sets[i - 1].weight || '—') : '—'}
+                          className="w-full bg-[rgba(18,14,14,0.7)] border border-[rgba(65,50,50,0.25)] rounded px-2 py-1.5 text-sm text-[color:var(--text-0)] font-mono tabular-nums placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color-mix(in srgb,var(--accent) 40%,transparent0.4)]"
+                        />
+
+                        <input
+                          type="number"
+                          min="0"
+                          value={log.reps}
+                          onChange={e => updateSet(exercise.exerciseId, i, 'reps', e.target.value)}
+                          placeholder="—"
+                          className="w-full bg-[rgba(18,14,14,0.7)] border border-[rgba(65,50,50,0.25)] rounded px-2 py-1.5 text-sm text-[color:var(--text-0)] font-mono tabular-nums placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color-mix(in srgb,var(--accent) 40%,transparent0.4)]"
+                        />
+
+                        <button
+                          onClick={() => stampSet(exercise.exerciseId, i)}
+                          className={cn(
+                            'w-full h-8 rounded-lg text-xs font-mono font-semibold border transition-all',
+                            log.timeStamped
+                              ? 'border-[rgba(16,185,129,0.4)] bg-[rgba(16,185,129,0.12)] text-[#10B981]'
+                              : 'border-[rgba(65,50,50,0.3)] text-[color:var(--text-2)] hover:border-[color-mix(in srgb,var(--accent) 40%,transparent0.4)] hover:text-[color:var(--text-0)]'
+                          )}
+                        >
+                          {log.timeStamped ?? '—'}
+                        </button>
+                      </div>
+                    ))}
+
+                    {exercise.notes && (
+                      <p className="text-xs text-[color:var(--text-2)] italic pt-1 px-1">{exercise.notes}</p>
+                    )}
+                  </div>
                 </div>
-              )}
+              </div>
             </div>
           );
         })}

@@ -8,9 +8,9 @@ Every page must pass this checklist before being marked complete.
 
 ### Loading State
 
-- [ ] Shows skeleton or spinner while data loads
-- [ ] Skeleton matches the shape of real content
-- [ ] Uses `.skeleton` class from globals.css
+- [ ] Shows themed iOS-style spinner while data loads
+- [ ] Uses `.spinner` or `.spinner-lg` class from globals.css
+- [ ] Skeleton class exists but prefer `.spinner` for page-level loading
 - [ ] Does not flash (min 200ms display if data loads quickly)
 
 ### Error State
@@ -45,6 +45,13 @@ Every page must pass this checklist before being marked complete.
 - [ ] Required fields are marked
 - [ ] Form submits on Enter key (where appropriate)
 - [ ] Success feedback after submit (toast or redirect)
+
+### Accordion Panels
+
+- [ ] Expandable panels use `.accordion-wrapper` with `data-open` attribute
+- [ ] Content wrapped in `.accordion-inner` for overflow + opacity transition
+- [ ] Mutual exclusion handled by single `useState<string | null>` — only one panel open at a time
+- [ ] Never use `{isOpen && ...}` conditional rendering for expandable content — always render the accordion wrapper
 
 ### Navigation
 
@@ -166,10 +173,8 @@ export default function MyPage() {
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        <div className="skeleton h-8 w-1/3 rounded" />
-        <div className="skeleton h-32 rounded-[14px]" />
-        <div className="skeleton h-32 rounded-[14px]" />
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="spinner spinner-lg" />
       </div>
     );
   }

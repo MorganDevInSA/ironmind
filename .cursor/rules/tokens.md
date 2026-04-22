@@ -47,17 +47,21 @@ Accent colors change per theme; neutrals remain fixed.
 |-------|-------|-----|
 | `--panel` | `rgba(18, 14, 14, 0.78)` | Standard glass panel |
 | `--panel-strong` | `rgba(18, 14, 14, 0.94)` | Modal/overlay panel |
-| `--panel-border` | `rgba(65, 50, 50, 0.40)` | Panel border |
-| `--panel-border-width` | `3px` | Default border thickness |
+| `--panel-border` | `color-mix(in srgb, var(--accent) 6%, transparent)` | Panel border |
+| `--panel-border-width` | `1px` | Default border thickness |
+| `--panel-border-hover` | `color-mix(in srgb, var(--accent) 62%, transparent)` | Panel border on hover/focus-within |
+| `--panel-glow` | `0 0 14px color-mix(in srgb, var(--accent) 9%, transparent)` | Panel glow on hover |
 
-### Text (Fixed)
+### Text (Fixed — theme-tinted overrides)
 
-| Token | Value | Use |
-|-------|-------|-----|
+| Token | Default | Use |
+|-------|---------|-----|
 | `--text-0` | `#F0F0F0` | Primary text |
 | `--text-1` | `#9A9A9A` | Secondary text |
 | `--text-2` | `#5E5E5E` | Muted text, labels |
 | `--text-detail` | `#BABABA` | Readable secondary on dark |
+
+> **Note:** `--text-1`, `--text-2`, and `--text-detail` are overridden per theme for accent tinting. For example, in the hot-pink theme: `--text-1: #CC80A8`, `--text-2: #9A5478`, `--text-detail: #D898B8`. Always reference the tokens — never hardcode text color values.
 
 ### Accent (Theme-Aware)
 
@@ -171,9 +175,6 @@ Use Tailwind's default spacing scale. Key values:
 
 | Token | Value | Use |
 |-------|-------|-----|
-| `--dashboard-overview-radius` | `1.25rem` | Overview container radius |
-| `--dashboard-overview-border` | `rgba(220, 38, 38, 0.26)` | Overview border (theme-aware) |
-| `--dashboard-overview-border-width` | `4px` | Overview border thickness |
 | `--dashboard-overview-max-width` | `72rem` | Max width on large screens |
 | `--exercise-index-bg` | `rgba(22, 18, 18, 0.96)` | Exercise number badge |
 | `--exercise-index-border` | `rgba(220, 38, 38, 0.42)` | Exercise badge border |
@@ -206,7 +207,10 @@ Replace on sight — these are legacy values:
 | `rgba(59, 130, 246, ...)` | `color-mix(in srgb, var(--accent) X%, transparent)` |
 | `rgba(16, 22, 34, ...)` | `rgba(18, 14, 14, ...)` |
 | `bg-surface` | `bg-[color:var(--bg-2)]` |
-| `text-accent` | `text-[color:var(--accent)]` |
+| `text-accent` | `text-[color:var(--accent)]` (Tailwind utility resolves to hardcoded hex, bypasses theme) |
+| `bg-accent` | Use `.btn-primary` class or `bg-[color:var(--accent)]` |
+| `border-accent` | `border-[color:var(--accent)]` |
+| `focus:border-accent` | `focus:border-[color:var(--accent)]` |
 
 ---
 

@@ -11,6 +11,8 @@ Every data-driven component needs three states: loading, error, and empty.
 
 ## Loading States
 
+> **Preferred loading pattern**: Use the themed iOS-style `.spinner` (or `.spinner-lg` for full-page) instead of skeleton loaders. The `.skeleton` class still exists for specific use cases but `.spinner` is the default.
+
 ### Skeleton Loader (Full Card)
 
 Use for cards and panels while data loads:
@@ -80,13 +82,18 @@ function SkeletonList({ count = 5 }: { count?: number }) {
 
 ### Spinner (Inline)
 
-For buttons and small loading indicators:
+iOS-style conic gradient spinner with `steps(12)`, themed via `var(--accent)`.
+
+Size variants:
+
+- `.spinner-sm` — 1rem (16px), for inline/button use
+- `.spinner` — 1.5rem (24px), default
+- `.spinner-lg` — 2.5rem (40px), for page-level loading
 
 ```tsx
-<div className="spinner" />
-
-// Or inline with size control
-<div className="spinner w-4 h-4" />
+<div className="spinner-sm" />   {/* inline / button */}
+<div className="spinner" />      {/* default */}
+<div className="spinner-lg" />   {/* full-page loading */}
 ```
 
 ### Full Page Loading
@@ -94,11 +101,8 @@ For buttons and small loading indicators:
 ```tsx
 function PageLoader() {
   return (
-    <div className="flex items-center justify-center min-h-[400px]">
-      <div className="text-center space-y-4">
-        <div className="spinner w-8 h-8 mx-auto" />
-        <p className="text-[color:var(--text-2)] text-sm">Loading...</p>
-      </div>
+    <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="spinner spinner-lg" />
     </div>
   );
 }
@@ -106,9 +110,11 @@ function PageLoader() {
 
 ### Loading Guidelines
 
-- Skeleton should match the shape of real content
+- Prefer `.spinner` for page-level loading; use `.skeleton` only for content-shaped placeholders in complex layouts
 - Minimum 200ms display to prevent flash
-- Use `.skeleton` class from globals.css (already theme-aware)
+- The spinner is iOS-style (12-segment conic gradient) and automatically themed via `var(--accent)`
+- Use `.skeleton` class from globals.css (already theme-aware) when skeleton placeholders are needed
+- Native checkboxes and radios are globally themed via `accent-color: var(--accent)` in globals.css
 - Never show a blank page while loading
 
 ---
@@ -326,10 +332,8 @@ export default function MyPage() {
   // Loading
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        <SkeletonMetricCard />
-        <SkeletonMetricCard />
-        <SkeletonList count={3} />
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="spinner spinner-lg" />
       </div>
     );
   }

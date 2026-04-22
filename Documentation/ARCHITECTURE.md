@@ -147,7 +147,7 @@ Paths below map to `page.tsx` files — **any new `Link` must target one of thes
 | `/training`, `/training/programs`, `/training/exercises`, `/training/history`, `/training/workout` | Program + session execution |
 | `/nutrition` | Day-type macros, meals |
 | `/supplements` | Protocol + daily log |
-| `/recovery` | Readiness / pelvic comfort |
+| `/recovery` | Readiness scoring and trends |
 | `/physique` | Weight, measurements, photos |
 | `/settings` | Profile / app settings |
 | `/export` | LLM-oriented markdown export |
@@ -278,7 +278,7 @@ Current onboarding flow is **6 steps**:
 
 ## 11. Alerts architecture (`src/services/alerts.service.ts`)
 
-`getActiveAlerts(userId)` aggregates rule checks (shoulder spillover, day-13 fatigue, calorie emergency, pelvic comfort, progression, recovery, supplement compliance, etc.).
+`getActiveAlerts(userId)` aggregates rule checks (shoulder spillover, day-13 fatigue, calorie emergency, progression, recovery, supplement compliance, etc.).
 
 **Invariant:** Every `check*` function must be referenced from `getActiveAlerts()` — no orphaned checks (IRONMIND.md).
 
@@ -307,6 +307,11 @@ From `.cursor/rules/IRONMIND.md`:
 - **Numeric data** uses `font-mono tabular-nums`
 - **Crimson accent** is scarce — CTAs, active nav, PRs, key badges (not body copy)
 - **Glass panels** — `.glass-panel` / `.glass-panel-strong` patterns; panel border width driven by CSS variables (e.g. `--panel-border-width`)
+- **Interactive panels** — `.glass-panel` hover/focus-within transitions to accent border + glow
+- **Accordion** — Expandable content uses `.accordion-wrapper` + `.accordion-inner` (CSS grid-row animation)
+- **Page titles** — h1 elements use `text-[color:var(--accent)]` for branded identity
+- **iOS spinner** — `.spinner` class is iOS-style conic gradient; prefer over `.skeleton` for loading
+- **LED indicators** — Knight Rider-style readiness/weight bars in top bar with themed pulse
 - **Mobile nav** — active indicator is `absolute`; parent `Link` must be `relative`
 
 ### 13.3 `Documentation/STYLE-GUIDE.md`
@@ -315,7 +320,7 @@ From `.cursor/rules/IRONMIND.md`:
 
 ### 13.4 Dashboard layout & exercise list readability
 
-- **Overview shell:** The authenticated dashboard wraps its primary content in **`.dashboard-overview`** (`globals.css`). It is **horizontally centered** (`max-width` + auto margins), uses a **full-depth crimson border on all sides** ( **`4px`** ), **rounded corners** (`1.25rem`), and a subtle warm-dark translucent fill so the panel does not visually collide with the viewport edge (the app layout’s `<main>` still supplies padding).
+- **Overview shell:** The authenticated dashboard wraps its primary content in **`.dashboard-overview`** (`globals.css`). It is **horizontally centered** (`max-width` + auto margins) with **rounded corners** (`1.25rem`) and a subtle warm-dark translucent fill. `.dashboard-overview` uses the same panel border system as `.glass-panel`: subtle resting border (6% accent), accent glow on hover/focus-within, 1px border width.
 - **Ordered exercises:** Row indices use **`.exercise-index-badge`** — **dark tile + primary text + thin crimson border**. Avoid **grey-on-saturated-red** number chips (low contrast); follow **`IRONMIND.md`** and the **ironmind-styling** skill.
 
 ### 13.5 App chrome (header, sidebar, mobile nav)
@@ -324,6 +329,7 @@ Persistent layout chrome uses the same **warm dark** token hierarchy as the rest
 
 - **Tokens** (`globals.css` `:root`): `--chrome-bg` (sidebar & mobile nav, matches `--bg-1`), `--chrome-bg-topbar` (sticky header — **same value as `--chrome-bg`** so header and sidebar share one shade), `--chrome-bg-toggle` (sidebar rail control, matches `--bg-0`).
 - **Components:** `top-bar.tsx`, `sidebar.tsx`, `mobile-nav.tsx` — backgrounds via `bg-[color:var(--chrome-…)]`; idle/hover chrome text via `var(--text-1)` / `var(--text-0)` (see **`.cursor/rules/IRONMIND.md`**).
+- **LED indicators:** The top bar's Knight Rider-style LED readiness and weight bars replace the old numeric readiness display and profile section. Two synced pulse-animated bars with hover tooltips, themed via accent CSS variables.
 
 ### 13.6 Brand imagery (logos)
 

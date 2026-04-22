@@ -32,7 +32,7 @@ IRONMIND supports multiple color themes via CSS custom properties. The default i
 1. **Always use CSS variables** for accent colors — never hardcode hex values
 2. **Use `var(--accent)`** for primary accent, `var(--accent-light)` for highlights, `var(--accent-2)` for dark tones
 3. **Use `color-mix()`** for opacity variants: `color-mix(in srgb, var(--accent) 20%, transparent)`
-4. **Neutral colors are fixed** — backgrounds (`--bg-0`, `--bg-1`, `--bg-2`) and text (`--text-0`, `--text-1`, `--text-2`) don't change per theme
+4. **Neutral colors are mostly fixed** — backgrounds (`--bg-0`, `--bg-1`, `--bg-2`) and `--text-0` don't change per theme. Note that `--text-1`, `--text-2`, and `--text-detail` ARE now theme-tinted (brighter, accent-blended) in hot-pink and custom themes. They are NOT purely fixed neutrals anymore.
 
 ### Available Themes
 
@@ -40,6 +40,7 @@ IRONMIND supports multiple color themes via CSS custom properties. The default i
 |-------|--------------|--------|----------|
 | **Crimson** | (default) | `#DC2626` | Default — blood, intensity, power |
 | **Hot Pink** | `hot-pink` | `#FF3EA5` | Alternative — high energy, modern edge |
+| **Custom** | `custom` | User-chosen hex | Full personalization — `tinycolor2` derives full token set |
 
 To apply a theme: `<html data-theme="hot-pink">`.
 
@@ -59,9 +60,9 @@ To apply a theme: `<html data-theme="hot-pink">`.
 | `--text-1` | `#9A9A9A` | Precision, neutral support | Secondary text |
 | `--text-2` | `#5E5E5E` | Silence, structure | Labels, hints |
 
-**Color ratio rule**: 85% dark neutrals · 12% text · 3% accent.
+**Color ratio rule**: 85% dark neutrals · 12% text · 3% accent at rest.
 
-Accent is precious — use only where it matters. Overusing it dilutes the impact.
+The 3% accent rule holds for *resting* state; accent is now more visible because page titles are accented, interactive panels glow on hover, and LED indicators pulse in the header. Interactive states can push accent to ~8% momentarily. Accent is still precious — but it now marks identity and responsiveness, not just rare highlights.
 
 ---
 
@@ -139,6 +140,7 @@ Never use in IRONMIND:
 3. **Color**: Accent > Good (green) > Text. Reserve accent for the single most important thing per view.
 4. **Contrast**: Primary content uses `var(--text-0)`. Supporting uses `var(--text-1)`. Hints use `var(--text-2)`.
 5. **Spacing**: Use generous whitespace. Dense = overwhelming. Elite = spacious.
+6. **Page titles**: All h1 page titles use `var(--accent)` for branded identity. Data values and sub-headings remain `var(--text-0)`.
 
 ---
 
@@ -170,6 +172,16 @@ Never use in IRONMIND:
   ● 87%               ← large number center
 [=========-]         ← colored arc, accent when ≥90%
 Nutrition Adherence  ← label below
+```
+
+### LED Bar Pattern
+
+```
+┌─────────────────────────┐
+│ ██████████░░  74  │  ← readiness (accent-light)
+│ ████████░░░░  95  │  ← weight (accent-2)
+└─────────────────────────┘
+Hover → tooltip with label + score
 ```
 
 ---

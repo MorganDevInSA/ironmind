@@ -18,7 +18,9 @@ Blood, strength, sweat, growth. Pure dark with accent fire.
 /* Panels */
 --panel: rgba(18, 14, 14, 0.78);
 --panel-strong: rgba(18, 14, 14, 0.94);
---panel-border: rgba(65, 50, 50, 0.40);
+--panel-border: color-mix(in srgb, var(--accent) 6%, transparent);
+--panel-border-hover: color-mix(in srgb, var(--accent) 62%, transparent);
+--panel-glow: 0 0 14px color-mix(in srgb, var(--accent) 9%, transparent);
 
 /* Text (neutral, theme-independent) */
 --text-0: #F0F0F0;         /* Primary text */
@@ -52,8 +54,8 @@ All classes are defined in `globals.css` and are theme-aware.
 
 | Class | Use |
 |-------|-----|
-| `.glass-panel` | Standard card with blur, border, shadow |
-| `.glass-panel-strong` | Modal/overlay with stronger opacity |
+| `.glass-panel` | Standard card with blur, border, shadow. Hover/focus-within: border → `--panel-border-hover` with `--panel-glow` (200ms ease-out border, 300ms ease-out shadow) |
+| `.glass-panel-strong` | Modal/overlay with stronger opacity. Same hover/focus-within transitions as `.glass-panel` |
 | `.dashboard-overview` | Main dashboard container (centered, bordered) |
 | `.dashboard-card-surface` | Cards inside dashboard grid |
 | `.card-hover` | Add hover lift + accent border glow |
@@ -107,8 +109,13 @@ All classes are defined in `globals.css` and are theme-aware.
 |-------|-----|
 | `.exercise-index-badge` | Ordered exercise number |
 | `.divider` | Horizontal accent gradient line |
-| `.skeleton` | Loading shimmer effect |
-| `.spinner` | Rotating loading indicator |
+| `.skeleton` | Loading shimmer effect (deprecated — prefer `.spinner`) |
+| `.spinner` | iOS-style activity indicator (conic gradient, `steps(12)`). Size variants: `.spinner-sm` (1rem), `.spinner-lg` (2.5rem) |
+| `.accordion-wrapper` | Grid-based expand/collapse container — toggle via `data-open="true"` |
+| `.accordion-inner` | Inner wrapper for overflow + opacity transition (place inside `.accordion-wrapper`) |
+| `.knight-led` | LED bar indicator dot (base) |
+| `.knight-led-lit` | Active LED with `knight-pulse` animation (primary hue) |
+| `.knight-led-lit-alt` | Active LED with `knight-pulse` animation (secondary hue) |
 | `.tooltip` | Floating tooltip box |
 | `.live-dot` | Pulsing live indicator |
 | `.spotlight-hover` | Hover sweep effect |
@@ -240,8 +247,8 @@ Or inline:
 ## Typography Patterns
 
 ```tsx
-// Page title
-<h1 className="text-[1.875rem] font-bold font-heading tracking-tight text-[color:var(--text-0)]">
+// Page title (accent-colored)
+<h1 className="text-2xl font-bold text-[color:var(--accent)]">
   Title
 </h1>
 
@@ -283,6 +290,8 @@ Use `.nav-item` class:
   focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--accent)_10%,transparent)]
   focus:outline-none transition-all duration-200" />
 ```
+
+Native checkbox/radio inputs are globally themed via `accent-color: var(--accent)` in `globals.css` — no extra styling needed.
 
 ---
 
@@ -352,3 +361,6 @@ All components using CSS variables automatically update.
 | `shadow-[0_8px_32px_rgba(220,38,38,0.2)]` | `shadow-[var(--shadow-accent)]` |
 | Creating new button styles | Use `.btn-primary`, `.btn-secondary`, `.btn-ghost` |
 | Inline panel styling | Use `.glass-panel`, `.glass-panel-strong` |
+| `text-accent` | `text-[color:var(--accent)]` (Tailwind utility uses hardcoded hex) |
+| `bg-accent` | `.btn-primary` or `bg-[color:var(--accent)]` |
+| `{isOpen && <div>...</div>}` for expandable content | Use `.accordion-wrapper` with `data-open` attribute |

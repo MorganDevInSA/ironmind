@@ -1337,7 +1337,7 @@ export default function DashboardPage() {
   if (isLoading) {
     return (
       <div className="dashboard-overview flex min-h-[40vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[color:var(--accent)] border-t-transparent" aria-hidden />
+        <div className="spinner spinner-lg" aria-hidden />
       </div>
     );
   }

@@ -32,8 +32,10 @@
   --surface-2: rgba(28, 20, 20, 0.95);
   --panel: rgba(18, 14, 14, 0.78);
   --panel-strong: rgba(18, 14, 14, 0.94);
-  --panel-border: color-mix(in srgb, var(--accent) 14%, transparent);
+  --panel-border: color-mix(in srgb, var(--accent) 6%, transparent);
   --panel-border-width: 1px;
+  --panel-border-hover: color-mix(in srgb, var(--accent) 62%, transparent);
+  --panel-glow: 0 0 14px color-mix(in srgb, var(--accent) 9%, transparent);
 
   /*
    * Readable secondary copy on dark surfaces (meal details, sidebar idle, meta lines).
@@ -117,7 +119,7 @@ html[data-theme='hot-pink'] {
   --text-detail: #D898B8;
   --shadow-gold: 0 8px 32px rgba(255, 62, 165, 0.20);
   --shadow-accent: 0 8px 32px rgba(255, 62, 165, 0.20);
-  --panel-border: color-mix(in srgb, var(--accent) 62%, transparent);
+  --panel-border: color-mix(in srgb, var(--accent) 6%, transparent);
   --chrome-border: rgba(100, 50, 80, 0.38);
   --chrome-border-subtle: rgba(80, 40, 60, 0.72);
   --body-glow-1: rgba(255, 62, 165, 0.06);
@@ -223,6 +225,19 @@ h4 { font-size: 1.125rem; }
       inset 0 1px 0 rgba(255, 255, 255, 0.04),
       inset 0 -1px 0 rgba(0, 0, 0, 0.58);
     border-radius: 14px;
+    transition:
+      border-color 200ms ease-out,
+      box-shadow 300ms ease-out;
+  }
+
+  .glass-panel:hover,
+  .glass-panel:focus-within {
+    border-color: var(--panel-border-hover);
+    box-shadow:
+      var(--panel-glow),
+      0 4px 16px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.58);
   }
 
   .glass-panel-strong {
@@ -236,6 +251,19 @@ h4 { font-size: 1.125rem; }
       inset 0 1px 0 rgba(255, 255, 255, 0.04),
       inset 0 -1px 0 rgba(0, 0, 0, 0.58);
     border-radius: 14px;
+    transition:
+      border-color 200ms ease-out,
+      box-shadow 300ms ease-out;
+  }
+
+  .glass-panel-strong:hover,
+  .glass-panel-strong:focus-within {
+    border-color: var(--panel-border-hover);
+    box-shadow:
+      var(--panel-glow),
+      var(--shadow-strong),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.58);
   }
 
   .dashboard-overview {
@@ -253,6 +281,19 @@ h4 { font-size: 1.125rem; }
       inset 0 1px 0 rgba(255, 255, 255, 0.04),
       inset 0 -1px 0 rgba(0, 0, 0, 0.58);
     padding: 1.25rem;
+    transition:
+      border-color 200ms ease-out,
+      box-shadow 300ms ease-out;
+  }
+
+  .dashboard-overview:hover,
+  .dashboard-overview:focus-within {
+    border-color: var(--panel-border-hover);
+    box-shadow:
+      var(--panel-glow),
+      0 4px 16px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.58);
   }
 
   /*
@@ -672,7 +713,7 @@ h4 { font-size: 1.125rem; }
     border-left: 2px solid rgba(220, 38, 38, 0.35);
   }
 
-  /* --- Skeleton --------------------------------------------- */
+  /* --- Skeleton (deprecated — prefer .spinner) -------------- */
 
   .skeleton {
     background: rgba(18, 14, 14, 0.92);
@@ -702,19 +743,69 @@ h4 { font-size: 1.125rem; }
     color: var(--text-1);
   }
 
-  /* --- Spinner ---------------------------------------------- */
+  /* --- Spinner (iOS-style activity indicator) --------------- */
 
   .spinner {
+    --_s: 1.5rem;
+    position: relative;
     display: inline-block;
-    width: 1.5rem;
-    height: 1.5rem;
-    border-radius: 9999px;
-    animation: spin 0.6s linear infinite;
-    border: 3px solid color-mix(in srgb, var(--accent) 20%, rgba(65, 50, 50, 0.6));
-    border-top-color: var(--accent);
+    width: var(--_s);
+    height: var(--_s);
   }
 
-  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-conic-gradient(
+      from 0deg,
+      color-mix(in srgb, var(--accent) 10%, transparent) 0deg 22.5deg,
+      color-mix(in srgb, var(--accent) 18%, transparent) 22.5deg 45deg,
+      color-mix(in srgb, var(--accent) 26%, transparent) 45deg 67.5deg,
+      color-mix(in srgb, var(--accent) 34%, transparent) 67.5deg 90deg,
+      color-mix(in srgb, var(--accent) 42%, transparent) 90deg 112.5deg,
+      color-mix(in srgb, var(--accent) 50%, transparent) 112.5deg 135deg,
+      color-mix(in srgb, var(--accent) 60%, transparent) 135deg 157.5deg,
+      color-mix(in srgb, var(--accent) 70%, transparent) 157.5deg 180deg,
+      color-mix(in srgb, var(--accent) 78%, transparent) 180deg 202.5deg,
+      color-mix(in srgb, var(--accent) 84%, transparent) 202.5deg 225deg,
+      color-mix(in srgb, var(--accent) 92%, transparent) 225deg 247.5deg,
+      var(--accent) 247.5deg 270deg,
+      color-mix(in srgb, var(--accent) 10%, transparent) 270deg 360deg
+    );
+    -webkit-mask: radial-gradient(closest-side, transparent 55%, #000 56%);
+    mask: radial-gradient(closest-side, transparent 55%, #000 56%);
+    border-radius: 9999px;
+    animation: ios-spin 1s steps(12) infinite;
+  }
+
+  .spinner-lg { --_s: 2.5rem; }
+  .spinner-sm { --_s: 1rem; }
+
+  @keyframes ios-spin { to { transform: rotate(360deg); } }
+
+  /* --- Accordion (grid-row expand/collapse) ------------------ */
+
+  .accordion-wrapper {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 250ms ease-out;
+  }
+
+  .accordion-wrapper[data-open='true'] {
+    grid-template-rows: 1fr;
+  }
+
+  .accordion-inner {
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 200ms ease-out 0ms;
+  }
+
+  .accordion-wrapper[data-open='true'] .accordion-inner {
+    opacity: 1;
+    transition: opacity 200ms ease-out 80ms;
+  }
 
   /* --- Tab button ------------------------------------------- */
 
@@ -758,6 +849,34 @@ h4 { font-size: 1.125rem; }
 /* ============================================================
    KEYFRAME ANIMATIONS
 ============================================================ */
+
+@keyframes knight-pulse {
+  0%, 100% { opacity: 0.45; filter: brightness(0.8); }
+  50%      { opacity: 1;    filter: brightness(1.5) saturate(1.4); }
+}
+
+.knight-led {
+  background: rgba(255, 255, 255, 0.05);
+  opacity: 0.25;
+}
+
+.knight-led-lit {
+  background: var(--accent-light);
+  box-shadow:
+    0 0 5px var(--accent),
+    0 0 12px color-mix(in srgb, var(--accent) 55%, transparent);
+  opacity: 1;
+  animation: knight-pulse 1.8s ease-in-out infinite;
+}
+
+.knight-led-lit-alt {
+  background: var(--accent-2);
+  box-shadow:
+    0 0 5px var(--accent-2),
+    0 0 10px color-mix(in srgb, var(--accent-2) 45%, transparent);
+  opacity: 1;
+  animation: knight-pulse 1.8s ease-in-out infinite;
+}
 
 @keyframes pulse-soft {
   0%, 100% { opacity: 1; }

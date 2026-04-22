@@ -101,6 +101,15 @@ All keyframes in `globals.css` use CSS variables for theme compatibility:
   45% { left: 120%; }
   100% { left: 120%; }
 }
+
+@keyframes knight-pulse {
+  0%, 100% { opacity: 0.45; filter: brightness(0.8); }
+  50%      { opacity: 1;    filter: brightness(1.5) saturate(1.4); }
+}
+
+@keyframes ios-spin {
+  to { transform: rotate(360deg); }
+}
 ```
 
 ### Utility Classes
@@ -113,6 +122,8 @@ All keyframes in `globals.css` use CSS variables for theme compatibility:
 .animate-fade-in-up { animation: fade-in-up var(--duration-slow) var(--ease-out); }
 .animate-scale-in   { animation: scale-in var(--duration-normal) var(--ease-out); }
 .animate-count-up   { animation: count-up var(--duration-slow) var(--ease-out); }
+.knight-led-lit     { animation: knight-pulse 1.8s ease-in-out infinite; }
+.knight-led-lit-alt { animation: knight-pulse 1.8s ease-in-out infinite; } /* secondary hue */
 ```
 
 ---
@@ -208,21 +219,29 @@ function SkeletonCard() {
 }
 ```
 
-### Spinner (Theme-Aware)
+### Spinner (iOS-Style, Theme-Aware)
 
-Use `.spinner` class from `globals.css`:
+The `.spinner` class uses a conic gradient with `steps(12)` for an iOS-style activity indicator, themed via `color-mix` with `var(--accent)`. It replaced the old border-spinner pattern.
 
 ```tsx
 <div className="spinner" />
 ```
 
-Or inline with theme variables:
+Size variants:
+
+| Class | Size |
+|-------|------|
+| `.spinner-sm` | 1rem |
+| `.spinner` (default) | 1.5rem |
+| `.spinner-lg` | 2.5rem |
 
 ```tsx
-<div className="inline-block w-6 h-6 rounded-full animate-spin
-  border-[3px] border-[color:color-mix(in_srgb,var(--accent)_20%,var(--panel-border))]
-  border-t-[color:var(--accent)]" />
+<div className="spinner-sm" />  {/* Inline / compact */}
+<div className="spinner" />     {/* Default */}
+<div className="spinner-lg" />  {/* Page-level / overlay */}
 ```
+
+> **Note:** `.skeleton` still exists for placeholder shimmer blocks but `.spinner` is preferred for page-level loading states.
 
 ### Progress Bar (Theme-Aware)
 
@@ -237,6 +256,67 @@ Or inline with theme variables:
   />
 </div>
 ```
+
+---
+
+## Accordion Transitions
+
+Grid-row accordion for smooth height animation without measuring content:
+
+```css
+.accordion-wrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 250ms ease-out;
+}
+.accordion-wrapper[data-open='true'] {
+  grid-template-rows: 1fr;
+}
+.accordion-inner {
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 200ms ease-out 0ms;
+}
+.accordion-wrapper[data-open='true'] .accordion-inner {
+  opacity: 1;
+  transition: opacity 200ms ease-out 80ms;
+}
+```
+
+The 80ms delay on opacity creates a "handoff" feel — height starts expanding before content fades in.
+
+Usage:
+
+```tsx
+<div className="accordion-wrapper" data-open={isOpen}>
+  <div className="accordion-inner">
+    {/* Collapsible content */}
+  </div>
+</div>
+```
+
+---
+
+## LED Bar Indicators
+
+Knight Rider–style LED bar used in the top bar for readiness/weight metrics. Each LED is a small dot; active LEDs pulse with the `knight-pulse` keyframe.
+
+```tsx
+<div className="flex items-center gap-1">
+  {leds.map((active, i) => (
+    <span
+      key={i}
+      className={`knight-led ${active ? 'knight-led-lit' : ''}`}
+    />
+  ))}
+</div>
+```
+
+- `.knight-led` — Base dot (dim, themed background)
+- `.knight-led-lit` — Active LED with `knight-pulse` animation (primary accent)
+- `.knight-led-lit-alt` — Active LED with `knight-pulse` animation (secondary hue, e.g. for alternate metrics)
+
+The animation runs at 1.8s ease-in-out infinite, pulsing between 0.45 and full opacity with a brightness/saturation boost at peak.
 
 ---
 

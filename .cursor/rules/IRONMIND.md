@@ -10,7 +10,7 @@ These rules are enforced on every edit in this project. No exceptions.
 
 **Stack**: Next.js 14 (App Router) · TypeScript strict · Tailwind CSS v3 · shadcn/ui · Firebase (Auth + Firestore + Storage) · TanStack Query · Zustand · Framer Motion · Recharts · Lucide Icons.
 
-**Themes**: Crimson (default), Hot Pink — all accent colors use CSS variables for theme support.
+**Themes**: Crimson (default), Hot Pink, Custom (user-chosen hex via tinycolor2) — all accent colors use CSS variables for theme support.
 
 ---
 
@@ -50,6 +50,8 @@ Pages/Components  →  Controllers (use-*.ts)  →  Services (*.service.ts)  →
 - Use CSS variables for accent colors: `var(--accent)`, `var(--accent-light)`, `var(--accent-2)`
 - Use `color-mix()` for opacity: `color-mix(in srgb, var(--accent) 20%, transparent)`
 - Never hardcode accent hex values (`#DC2626`, etc.)
+- Native `<input type="checkbox">` and `<input type="radio">` are globally themed via `accent-color: var(--accent)` in globals.css
+- NEVER use Tailwind's `text-accent`, `bg-accent`, `border-accent`, `focus:border-accent` utilities — they resolve to hardcoded hex from `tailwind.config.js` and bypass the CSS variable theme system. Use `text-[color:var(--accent)]` etc. instead.
 
 ### Numbers Are Monospace
 
@@ -63,8 +65,20 @@ Every numeric data value in the UI uses `font-mono tabular-nums`. No exceptions.
 - CTA / primary buttons
 - Phase/milestone badges
 - Key interactive elements
+- Page h1 titles (branded identity)
+- LED readiness/weight indicators in the top bar
 
 Maximum 2–3 accent elements visible at once per view.
+
+### Interactive Panels
+
+All `.glass-panel`, `.glass-panel-strong`, and `.dashboard-overview` elements have hover/focus-within states:
+- Resting: 6% accent border opacity, no glow
+- Hover/focus-within: 62% accent border, subtle accent glow
+- Transition: border-color 200ms ease-out, box-shadow 300ms ease-out
+
+Expandable content uses the `.accordion-wrapper` + `.accordion-inner` pattern (CSS grid-row animation).
+Never use `{isOpen && <div>...</div>}` for expand/collapse — always render the accordion wrapper.
 
 ---
 

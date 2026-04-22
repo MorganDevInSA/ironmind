@@ -414,30 +414,32 @@ export default function NutritionPage() {
                     </button>
                   </div>
 
-                  {isOpen && (
-                    <div className="px-4 pb-4 pl-[3.25rem] space-y-3">
-                      <div className="p-3 bg-[rgba(18,14,14,0.5)] rounded-lg border border-[rgba(65,50,50,0.15)]">
-                        <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--text-2)] mb-1">
-                          Active plan line
-                        </p>
-                        <p className="text-sm text-[color:var(--text-detail)] whitespace-pre-wrap">{displayLine}</p>
-                        {slotDef && (
-                          <p className="text-[11px] text-[color:var(--text-2)] mt-2">
-                            Default for today ({isLiftDay ? 'lift' : 'recovery'}): {defaultLine}
+                  <div className="accordion-wrapper" data-open={isOpen}>
+                    <div className="accordion-inner">
+                      <div className="px-4 pb-4 pl-[3.25rem] space-y-3">
+                        <div className="p-3 bg-[rgba(18,14,14,0.5)] rounded-lg border border-[rgba(65,50,50,0.15)]">
+                          <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--text-2)] mb-1">
+                            Active plan line
                           </p>
+                          <p className="text-sm text-[color:var(--text-detail)] whitespace-pre-wrap">{displayLine}</p>
+                          {slotDef && (
+                            <p className="text-[11px] text-[color:var(--text-2)] mt-2">
+                              Default for today ({isLiftDay ? 'lift' : 'recovery'}): {defaultLine}
+                            </p>
+                          )}
+                        </div>
+                        {!meal.completed && (
+                          <button
+                            type="button"
+                            onClick={() => toggleMeal(meal.slot)}
+                            className="text-xs font-semibold text-[color:var(--accent)] hover:text-[color:var(--accent-light)] transition-colors"
+                          >
+                            ✓ Mark as eaten
+                          </button>
                         )}
                       </div>
-                      {!meal.completed && (
-                        <button
-                          type="button"
-                          onClick={() => toggleMeal(meal.slot)}
-                          className="text-xs font-semibold text-[color:var(--accent)] hover:text-[color:var(--accent-light)] transition-colors"
-                        >
-                          ✓ Mark as eaten
-                        </button>
-                      )}
                     </div>
-                  )}
+                  </div>
                 </div>
               );
             })}

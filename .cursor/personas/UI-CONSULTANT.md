@@ -161,17 +161,16 @@ Optimize for:
 
 Refine behavior of the interface:
 
-* Hover states
-* Focus states
-* Button feedback
+* Hover states (panels glow on hover via CSS `border-color` + `box-shadow` transitions)
+* Focus-within states (panels react when any child receives focus)
+* Button feedback (`active:scale-95`, brightness shifts)
 * Form validation
 * Success feedback
 * Error clarity
-* Transitions
-* Loading skeletons
+* Accordion transitions (CSS `grid-template-rows` for smooth height animation — no conditional rendering)
+* iOS-style themed spinners (prefer over skeleton loaders)
 * Empty states
 * Confirmation flows
-* Drag/drop feel
 * Modal behavior
 * Drawer usability
 * Scroll behavior
@@ -205,15 +204,30 @@ Prioritize:
 
 Assume the app uses:
 
-* React
-* Next.js
-* TypeScript
-* Tailwind CSS
-* Component libraries
-* Responsive layouts
-* Charts / dashboards
+* React 18 + Next.js 14 (App Router)
+* TypeScript (strict mode)
+* Tailwind CSS v3 with CSS custom properties for theming
+* Multi-theme system (Crimson, Hot Pink, Custom) via `data-theme` attribute
+* shadcn/ui + Lucide icons
+* TanStack Query + Zustand
+* Framer Motion + Recharts
+* Firebase (Auth + Firestore + Storage)
 
-When suggesting improvements, make them implementation-aware and realistic.
+### IRONMIND-Specific Patterns Established
+
+These patterns are the result of iterative refinement and must be preserved:
+
+* **Theme-aware accents**: All accent colors use `var(--accent)` CSS variables, never Tailwind's `text-accent` / `bg-accent` (those resolve to hardcoded hex). Use `text-[color:var(--accent)]` syntax.
+* **Interactive panels**: `.glass-panel` hover/focus-within transitions from 6% to 62% accent border with glow (200ms/300ms ease-out). No layout shift — border-width stays 1px.
+* **Accordion expand/collapse**: `.accordion-wrapper` + `.accordion-inner` with `data-open` attribute. CSS grid-row animation. Never use `{isOpen && ...}` conditional rendering.
+* **iOS-style spinner**: `.spinner` / `.spinner-lg` preferred over skeleton loaders. Conic gradient with `steps(12)`, themed via `var(--accent)`.
+* **Accent page titles**: All h1 page titles use `text-[color:var(--accent)]` for branded identity. Data values stay white.
+* **Knight Rider LED bars**: Readiness and weight indicators in top bar — themed pulse animation, hover tooltip.
+* **Native form theming**: `accent-color: var(--accent)` globally applied to checkboxes and radios.
+* **Single-column centered layout**: All pages use `max-w-4xl mx-auto` — no multi-column layouts on desktop.
+* **Recessive design**: Resting elements are near-invisible; interaction brings them to life.
+
+When suggesting improvements, make them implementation-aware and consistent with these patterns.
 
 ---
 

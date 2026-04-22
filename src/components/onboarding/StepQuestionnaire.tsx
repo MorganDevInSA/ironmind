@@ -129,54 +129,56 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
           )}
         </button>
 
-        {demoExpanded && (
-          <div className="px-5 pb-5 flex flex-col gap-4 border-t border-[color:color-mix(in_srgb,var(--accent)_22%,transparent)]">
-            <div className="pt-4 flex flex-col gap-2 text-sm text-[color:var(--text-1)] leading-relaxed">
-              <p>
-                Demo data loads a pre-built athlete plan so you can explore every feature of
-                IRONMIND right away. You can replace it with your own personalised data at
-                any time from <strong className="text-[color:var(--text-0)]">Settings → Import Coach Data</strong>.
-              </p>
-              <p className="font-semibold text-[color:var(--text-0)] mt-1">When you&apos;re ready to go custom, here&apos;s the full process:</p>
-              <ol className="flex flex-col gap-2 pl-1">
-                {[
-                  'Go back to Step 1 and paste the Coach Persona prompt into a new ChatGPT / Claude / Gemini chat.',
-                  'Complete this questionnaire and click "Save & Download JSON".',
-                  'Go to Step 3, paste the data-generation prompt into the same chat, then paste your questionnaire JSON below it.',
-                  'The AI will output 6 JSON files. Save each one with the exact filename shown (e.g. athlete_profile.json).',
-                  'Return to the app → Settings → Import Coach Data and upload all 6 files. Your personalised program replaces the demo.',
-                ].map((text, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <span className="mt-0.5 w-5 h-5 shrink-0 rounded-full flex items-center justify-center
-                      text-[9px] font-bold bg-[rgba(16,16,16,0.78)]
-                      border border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)] text-[color:var(--accent-light)]">
-                      {i + 1}
-                    </span>
-                    <span>{text}</span>
-                  </li>
-                ))}
-              </ol>
-              <p className="text-xs text-[color:var(--text-2)] mt-1">
-                Need a refresher anytime? The <strong className="text-[color:var(--text-0)]">User Guide</strong> in the app
-                sidebar walks through the full process with all prompts available to copy.
-              </p>
+        <div className="accordion-wrapper" data-open={demoExpanded}>
+          <div className="accordion-inner">
+            <div className="px-5 pb-5 flex flex-col gap-4 border-t border-[color:color-mix(in_srgb,var(--accent)_22%,transparent)]">
+              <div className="pt-4 flex flex-col gap-2 text-sm text-[color:var(--text-1)] leading-relaxed">
+                <p>
+                  Demo data loads a pre-built athlete plan so you can explore every feature of
+                  IRONMIND right away. You can replace it with your own personalised data at
+                  any time from <strong className="text-[color:var(--text-0)]">Settings → Import Coach Data</strong>.
+                </p>
+                <p className="font-semibold text-[color:var(--text-0)] mt-1">When you&apos;re ready to go custom, here&apos;s the full process:</p>
+                <ol className="flex flex-col gap-2 pl-1">
+                  {[
+                    'Go back to Step 1 and paste the Coach Persona prompt into a new ChatGPT / Claude / Gemini chat.',
+                    'Complete this questionnaire and click "Save & Download JSON".',
+                    'Go to Step 3, paste the data-generation prompt into the same chat, then paste your questionnaire JSON below it.',
+                    'The AI will output 6 JSON files. Save each one with the exact filename shown (e.g. athlete_profile.json).',
+                    'Return to the app → Settings → Import Coach Data and upload all 6 files. Your personalised program replaces the demo.',
+                  ].map((text, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <span className="mt-0.5 w-5 h-5 shrink-0 rounded-full flex items-center justify-center
+                        text-[9px] font-bold bg-[rgba(16,16,16,0.78)]
+                        border border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)] text-[color:var(--accent-light)]">
+                        {i + 1}
+                      </span>
+                      <span>{text}</span>
+                    </li>
+                  ))}
+                </ol>
+                <p className="text-xs text-[color:var(--text-2)] mt-1">
+                  Need a refresher anytime? The <strong className="text-[color:var(--text-0)]">User Guide</strong> in the app
+                  sidebar walks through the full process with all prompts available to copy.
+                </p>
+              </div>
+
+              <button
+                onClick={() => setDemoModalOpen(true)}
+                className="flex items-center justify-center gap-2 px-5 py-3 rounded-lg font-semibold text-sm text-white
+                  bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-2)]
+                  border border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]
+                  shadow-[0_8px_20px_color-mix(in_srgb,var(--accent)_22%,transparent)]
+                  hover:brightness-110 active:scale-95 transition-all duration-200"
+              >
+                <Users size={15} />
+                Choose a demo profile
+              </button>
+
+              <DemoProfileModal open={demoModalOpen} onClose={() => setDemoModalOpen(false)} />
             </div>
-
-            <button
-              onClick={() => setDemoModalOpen(true)}
-              className="flex items-center justify-center gap-2 px-5 py-3 rounded-lg font-semibold text-sm text-white
-                bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-2)]
-                border border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]
-                shadow-[0_8px_20px_color-mix(in_srgb,var(--accent)_22%,transparent)]
-                hover:brightness-110 active:scale-95 transition-all duration-200"
-            >
-              <Users size={15} />
-              Choose a demo profile
-            </button>
-
-            <DemoProfileModal open={demoModalOpen} onClose={() => setDemoModalOpen(false)} />
           </div>
-        )}
+        </div>
       </div>
 
       {/* Form */}

@@ -86,11 +86,13 @@ function Section({
         {open ? <ChevronUp size={15} className="text-[color:var(--text-2)] shrink-0" /> : <ChevronDown size={15} className="text-[color:var(--text-2)] shrink-0" />}
       </button>
 
-      {open && (
-        <div className="px-5 pb-6 pt-1 border-t border-[rgba(65,50,50,0.30)] flex flex-col gap-4">
-          {children}
+      <div className="accordion-wrapper" data-open={open}>
+        <div className="accordion-inner">
+          <div className="px-5 pb-6 pt-1 border-t border-[rgba(65,50,50,0.30)] flex flex-col gap-4">
+            {children}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
