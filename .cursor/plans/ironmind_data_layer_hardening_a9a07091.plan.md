@@ -61,7 +61,7 @@ todos:
     status: completed
   - id: final-verify
     content: "Final verification: tsc --noEmit, npm run lint, npm run build, architecture rg audit, query key audit, manual smoke tests (desktop + 375px mobile, theme switch, offline mode)"
-    status: in_progress
+    status: completed
 isProject: false
 ---
 
