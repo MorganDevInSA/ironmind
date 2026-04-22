@@ -4,15 +4,12 @@ import { useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores';
 import { useIsUserSeeded } from '@/controllers';
-import { useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '@/lib/constants/query-keys';
 import {
   parseAndValidateFiles,
-  importCoachData,
   type ImportFile,
   type ParsedCoachData,
 } from '@/services/import.service';
-import { seedUserData } from '@/lib/seed';
+import { useImportCoachData, useSeedDemoData } from '@/controllers/use-import';
 import {
   Upload,
   CheckCircle2,
@@ -63,7 +60,6 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
     Object.fromEntries(EXPECTED_FILES.map(f => [f.name, { status: 'idle', content: null, error: null }]))
   );
   const [isDragging, setIsDragging] = useState(false);
-  const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState<{ success: boolean; message: string } | null>(null);
   const [subStep, setSubStep] = useState<'upload' | 'confirm' | 'done'>('upload');
   const [parsedData, setParsedData] = useState<ParsedCoachData | null>(null);
@@ -73,6 +69,9 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
   const { data: accountAlreadySeeded = false, isPending: seededCheckPending } = useIsUserSeeded(userId, {
     enabled: subStep === 'confirm' && !!userId,
   });
+
+  const importMutation = useImportCoachData(userId);
+  const seedMutation = useSeedDemoData(userId);
 
   const loadFile = useCallback((file: File) => {
     const name = file.name.toLowerCase();
@@ -120,39 +119,37 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
     setSubStep('confirm');
   };
 
-  const handleImport = async () => {
+  const handleImport = () => {
     if (!parsedData) return;
     if (accountAlreadySeeded && !overwriteExistingData) return;
-    setImporting(true);
-    try {
-      const force = accountAlreadySeeded && overwriteExistingData;
-      const result = await importCoachData(userId, parsedData, force);
-      if (result.success) {
-        await queryClient.invalidateQueries({ queryKey: queryKeys(userId).profile.all });
-        setImportResult({ success: true, message: `${result.filesImported.length} files imported successfully.` });
-        setSubStep('done');
-      } else {
-        const msg = result.errors.map(e => `${e.filename}: ${e.error}`).join(' · ');
-        setImportResult({ success: false, message: msg });
-      }
-    } catch (e) {
-      setImportResult({ success: false, message: String(e) });
-    } finally {
-      setImporting(false);
-    }
+    
+    const force = accountAlreadySeeded && overwriteExistingData;
+    importMutation.mutate({ data: parsedData, force }, {
+      onSuccess: (result) => {
+        if (result.success) {
+          setImportResult({ success: true, message: `${result.filesImported.length} files imported successfully.` });
+          setSubStep('done');
+        } else {
+          const msg = result.errors.map(e => `${e.filename}: ${e.error}`).join(' · ');
+          setImportResult({ success: false, message: msg });
+        }
+      },
+      onError: (error) => {
+        setImportResult({ success: false, message: String(error) });
+      },
+    });
   };
 
-  const handleUseDemoData = async () => {
-    setImporting(true);
-    try {
-      await seedUserData(userId);
-      setImportResult({ success: true, message: 'Demo data loaded.' });
-      setSubStep('done');
-    } catch (e) {
-      setImportResult({ success: false, message: String(e) });
-    } finally {
-      setImporting(false);
-    }
+  const handleUseDemoData = () => {
+    seedMutation.mutate(undefined, {
+      onSuccess: () => {
+        setImportResult({ success: true, message: 'Demo data loaded.' });
+        setSubStep('done');
+      },
+      onError: (error) => {
+        setImportResult({ success: false, message: String(error) });
+      },
+    });
   };
 
   /* ── Done ─────────────────────────────────────────────────── */
@@ -244,14 +241,14 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
           </button>
           <button
             onClick={handleImport}
-            disabled={importing || seededCheckPending || (accountAlreadySeeded && !overwriteExistingData)}
+            disabled={importMutation.isPending || seededCheckPending || (accountAlreadySeeded && !overwriteExistingData)}
             className="flex-1 flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg font-semibold text-sm text-white
               bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-2)] border border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]
               shadow-[0_8px_20px_rgba(220,38,38,0.22)]
               hover:brightness-110 active:scale-95 transition-all duration-200
               disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {importing
+            {importMutation.isPending
               ? <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin inline-block" /> Importing…</>
               : <><CheckCircle2 size={18} /> Confirm &amp; Import</>}
           </button>

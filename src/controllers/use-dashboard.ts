@@ -24,24 +24,28 @@ export function useDashboardData(userId: string) {
   const profile = useQuery({
     queryKey: qk.profile.detail(),
     queryFn: () => getProfile(userId),
+    staleTime: staleTimes.profile,
     enabled: !!userId,
   });
 
   const activeProgram = useQuery({
     queryKey: qk.training.activeProgram(),
     queryFn: () => getActiveProgram(userId),
+    staleTime: staleTimes.activeProgram,
     enabled: !!userId,
   });
 
   const todayNutrition = useQuery({
     queryKey: qk.nutrition.day(todayStr),
     queryFn: () => getNutritionDay(userId, todayStr),
+    staleTime: staleTimes.nutritionDay,
     enabled: !!userId,
   });
 
   const todayRecovery = useQuery({
     queryKey: qk.recovery.entry(todayStr),
     queryFn: () => getRecoveryEntry(userId, todayStr),
+    staleTime: staleTimes.recovery,
     enabled: !!userId,
   });
 
@@ -55,18 +59,21 @@ export function useDashboardData(userId: string) {
   const todaySupplements = useQuery({
     queryKey: qk.supplements.log(todayStr),
     queryFn: () => getSupplementLog(userId, todayStr),
+    staleTime: staleTimes.supplementLog,
     enabled: !!userId,
   });
 
   const weeklyVolume = useQuery({
     queryKey: qk.volume.weekly(),
     queryFn: () => getWeeklyVolumeSummary(userId),
+    staleTime: staleTimes.weeklyVolume,
     enabled: !!userId && !!activeProgram.data,
   });
 
   const alerts = useQuery({
     queryKey: qk.alerts.active(),
     queryFn: () => getActiveAlerts(userId),
+    staleTime: staleTimes.alerts,
     enabled: !!userId,
   });
 

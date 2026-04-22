@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useProfile, useRecoveryEntry, useActivePhase, useActiveAlerts } from '@/controllers';
 import { useAuthStore } from '@/stores';
+import { useOnlineStore } from '@/stores/online-store';
 import { formatDisplayDate, today } from '@/lib/utils';
 import { calculateReadinessScore } from '@/lib/utils/calculations';
 import { Bell, AlertTriangle, Info, X } from 'lucide-react';
@@ -55,6 +56,7 @@ function getWeightLabel(current: number, target: number): string {
 
 export function TopBar() {
   const { user } = useAuthStore();
+  const isOnline = useOnlineStore((s) => s.isOnline);
   const userId = user?.uid ?? '';
   const todayStr = today();
 
@@ -121,6 +123,16 @@ export function TopBar() {
             );
           })()}
         </div>
+
+        {/* Offline indicator */}
+        {!isOnline && (
+          <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-[rgba(245,158,11,0.12)] border border-[rgba(245,158,11,0.35)]">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#F59E0B] animate-pulse" />
+            <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#F59E0B]">
+              Offline
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Right — LED metrics + conditional bell */}

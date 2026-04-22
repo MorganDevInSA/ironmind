@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys, staleTimes } from '@/lib/constants';
 import { getActivePhase, getJournalEntries, createJournalEntry } from '@/services';
 import type { JournalEntry } from '@/lib/types';
+import { onMutationError } from './_shared/on-error';
 
 export function useActivePhase(userId: string) {
   return useQuery({
@@ -31,5 +32,6 @@ export function useCreateJournalEntry(userId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys(userId).coaching.all });
     },
+    onError: onMutationError,
   });
 }

@@ -1,27 +1,18 @@
-import type { SmartAlert, Workout, RecoveryEntry, CheckIn } from '@/lib/types';
+import type { SmartAlert } from '@/lib/types';
 import { getRecentWorkouts, getActiveProgram } from './training.service';
 import { getRecentRecoveryEntries, getPelvicComfortFlags } from './recovery.service';
-import { getRecentCheckIns, checkConsecutiveWeightDrops } from './physique.service';
+import { checkConsecutiveWeightDrops } from './physique.service';
 import { getProtocol } from './supplements.service';
+import { withService } from '@/lib/errors';
 
 // Generate smart alerts based on data analysis
 export async function getActiveAlerts(userId: string): Promise<SmartAlert[]> {
-  const alerts: SmartAlert[] = [];
-  const now = new Date().toISOString();
+  return withService('alerts', 'generate active alerts', async () => {
+    const alerts: SmartAlert[] = [];
+    const now = new Date().toISOString();
 
-  // Check for shoulder spillover (if Day 5 performance drops)
-  const spilloverAlert = await checkShoulderSpillover(userId);
-  if (spilloverAlert) {
-    alerts.push({
-      id: 'spillover-alert',
-      type: 'spillover',
-      severity: 'warning',
-      title: 'Shoulder Spillover Detected',
-      message: spilloverAlert.message,
-      action: spilloverAlert.action,
-      createdAt: now,
-    });
-  }
+  // TODO(alerts): implement shoulder spillover detection when Day 5 KPI
+  // history is available (needs 2+ full cycles of db-incline-press data).
 
   // Check for Day 13 fatigue
   const fatigueAlert = await checkDay13Fatigue(userId);
@@ -92,17 +83,11 @@ export async function getActiveAlerts(userId: string): Promise<SmartAlert[]> {
     }
   }
 
-  return alerts.sort((a, b) => {
-    const severityOrder = { critical: 0, warning: 1, info: 2 };
-    return severityOrder[a.severity] - severityOrder[b.severity];
+    return alerts.sort((a, b) => {
+      const severityOrder = { critical: 0, warning: 1, info: 2 };
+      return severityOrder[a.severity] - severityOrder[b.severity];
+    });
   });
-}
-
-// Check for shoulder spillover (Day 5 incline press stalls)
-async function checkShoulderSpillover(userId: string): Promise<{ message: string; action: string } | null> {
-  // This would check if Day 5 (Chest/Biceps) performance has dropped vs previous cycles
-  // For now, return null - would need cycle-aware logic
-  return null;
 }
 
 // Check Day 13 fatigue warning
@@ -218,15 +203,10 @@ async function checkRecoveryIssues(userId: string): Promise<SmartAlert[]> {
   return alerts;
 }
 
-// Get alert count by severity
-export async function getAlertSummary(userId: string): Promise<{
-  total: number;
-  critical: number;
-  warning: number;
-  info: number;
-}> {
-  const alerts = await getActiveAlerts(userId);
-
+// Get alert count by severity (sync - operates on already-fetched alerts)
+export function summarizeAlerts(alerts: SmartAlert[]): {
+  total: number; critical: number; warning: number; info: number;
+} {
   return {
     total: alerts.length,
     critical: alerts.filter(a => a.severity === 'critical').length,

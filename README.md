@@ -27,15 +27,33 @@ A world-class bodybuilding training application for elite athletes who self-coac
 
 ## Architecture
 
-### Service / Controller / Cache Pattern
+IRONMIND implements production-grade patterns across its data and UI layers, demonstrating enterprise-level architectural discipline typically found in funded startups with dedicated engineering teams.
+
+### Three-Layer Data Architecture
 
 ```
 Pages -> Controllers -> TanStack Cache -> Services -> Firebase
 ```
 
-- **Services** (`src/services/`): Plain TypeScript modules, single point of contact with Firebase
+- **Services** (`src/services/`): Domain logic + Firebase operations, fully testable in isolation
 - **Controllers** (`src/controllers/`): TanStack Query hooks with cache-first data access
-- **Cache Strategy**: Per-domain stale times, optimistic updates, composite hooks
+- **Hard boundaries**: Pages never import services directly, enforced by automated audits
+
+**→ [Read the full Data Layer Architecture documentation](./README_DATA_LAYER.md)**
+
+Covers: cache invalidation strategy, optimistic updates, structured error handling, query key design, Firebase abstraction layer, and why this matters for scalability.
+
+### Design-Engineered UI System
+
+- **60+ CSS design tokens** enabling runtime theme switching without component changes
+- **Interactive panel states** with asymmetric hover transitions (200ms border, 300ms glow)
+- **iOS-style spinners** derived from `var(--accent)` via `color-mix()`
+- **Knight Rider LED indicators** with staggered 60ms pulse animations
+- **Accordion animations** using CSS `grid-template-rows` (no JavaScript measurement)
+
+**→ [Read the full UI/UX Architecture documentation](./README_UIUX.md)**
+
+Covers: design token system, responsive architecture, motion design, accessibility implementation, and component composition strategy.
 
 ## Getting Started
 
@@ -116,3 +134,39 @@ src/
 ## License
 
 MIT
+
+---
+
+## Deploying Firebase Security Rules
+
+Before going to production, deploy Firestore and Storage security rules:
+
+```bash
+# Install Firebase CLI (if not already installed)
+npm install -g firebase-tools
+
+# Login to Firebase
+firebase login
+
+# Initialize project (only needed once)
+# Update .firebaserc with your project ID first
+firebase use default
+
+# Deploy rules
+firebase deploy --only firestore:rules
+firebase deploy --only storage
+
+# Deploy indexes (recommended)
+firebase deploy --only firestore:indexes
+```
+
+**Local emulator testing:**
+
+```bash
+firebase emulators:start
+# UI available at http://localhost:4000
+# Firestore: localhost:8080
+# Storage: localhost:9199
+```
+
+Update `.env.local` to point to emulators during development if needed.

@@ -5,7 +5,8 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { logout, onAuthChange } from '@/lib/firebase';
 import { useAuthStore, useUIStore } from '@/stores';
-import { isUserSeeded } from '@/services/profile.service';
+import { queryKeys } from '@/lib/constants';
+import { isUserSeeded } from '@/services';
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -39,7 +40,10 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
         // On first login, redirect to onboarding instead of auto-seeding
         try {
-          const seeded = await isUserSeeded(firebaseUser.uid);
+          const seeded = await queryClient.fetchQuery({
+            queryKey: queryKeys(firebaseUser.uid).profile.isSeeded(),
+            queryFn: () => isUserSeeded(firebaseUser.uid),
+          });
           if (!seeded && !pathname.startsWith('/onboarding')) {
             router.replace('/onboarding');
           }

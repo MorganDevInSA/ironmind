@@ -1,3 +1,4 @@
+import type { QueryClient } from '@tanstack/react-query';
 import type { CheckIn, ExportOptions, Program, Workout } from '@/lib/types';
 import { getProfile } from '@/services/profile.service';
 import { getActiveProgram, getRecentWorkouts } from '@/services/training.service';
@@ -9,6 +10,24 @@ import { getJournalEntries } from '@/services/coaching.service';
 import { getWeeklyVolumeSummary, getVolumeLandmarks } from '@/services/volume.service';
 import { getActiveAlerts } from '@/services/alerts.service';
 import { today, formatDisplayDate, getCycleDay } from '@/lib/utils';
+import { queryKeys as qk } from '@/lib/constants/query-keys';
+
+/**
+ * Attempts to read from TanStack Query cache before falling back to a fresh fetch.
+ * If data is cached, returns it immediately. Otherwise, fetches and caches.
+ */
+async function readCached<T>(
+  queryClient: QueryClient | undefined,
+  queryKey: readonly unknown[],
+  fetcher: () => Promise<T>
+): Promise<T> {
+  if (!queryClient) return fetcher();
+  
+  const cached = queryClient.getQueryData<T>(queryKey as unknown[]);
+  if (cached !== undefined) return cached;
+  
+  return await queryClient.fetchQuery({ queryKey: queryKey as unknown[], queryFn: fetcher });
+}
 
 /** Safe cell text for markdown pipes */
 function mdCell(value: unknown): string {
@@ -78,13 +97,16 @@ function formatWorkoutDetail(workout: Workout): string {
 
 export async function generateSummary(
   userId: string,
-  options: ExportOptions
+  options: ExportOptions,
+  queryClient?: QueryClient
 ): Promise<string> {
   const generatedAtIso = new Date().toISOString();
   const exportDate = formatDisplayDate(new Date());
   const checkInLimit = Math.min(48, Math.max(12, options.historyDays));
   const journalLimit = 20;
 
+  const queryKeys = qk(userId);
+  
   const [
     profile,
     program,
@@ -100,19 +122,19 @@ export async function generateSummary(
     volumeLandmarks,
     alerts,
   ] = await Promise.all([
-    options.includeProfile ? getProfile(userId) : Promise.resolve(null),
-    options.includeProgram ? getActiveProgram(userId) : Promise.resolve(null),
-    options.includeWorkouts ? getRecentWorkouts(userId, options.historyDays) : Promise.resolve([]),
-    options.includeNutrition ? getRecentNutritionDays(userId, options.historyDays) : Promise.resolve([]),
-    options.includeRecovery ? getRecentRecoveryEntries(userId, options.historyDays) : Promise.resolve([]),
-    options.includePhysique ? getRecentCheckIns(userId, checkInLimit) : Promise.resolve([]),
-    options.includePhysique ? getWeightTrend(userId, options.historyDays) : Promise.resolve([]),
-    options.includeSupplements ? getSupplementCompliance(userId, options.historyDays) : Promise.resolve([]),
-    options.includeSupplements ? getProtocol(userId) : Promise.resolve(null),
-    options.includeCoachingNotes ? getJournalEntries(userId, journalLimit) : Promise.resolve([]),
-    options.includeProgram ? getWeeklyVolumeSummary(userId) : Promise.resolve([]),
-    options.includeProgram ? getVolumeLandmarks(userId) : Promise.resolve(null),
-    options.includeAlerts ? getActiveAlerts(userId) : Promise.resolve([]),
+    options.includeProfile ? readCached(queryClient, queryKeys.profile.detail(), () => getProfile(userId)) : Promise.resolve(null),
+    options.includeProgram ? readCached(queryClient, queryKeys.training.activeProgram(), () => getActiveProgram(userId)) : Promise.resolve(null),
+    options.includeWorkouts ? readCached(queryClient, queryKeys.training.recentWorkouts(options.historyDays), () => getRecentWorkouts(userId, options.historyDays)) : Promise.resolve([]),
+    options.includeNutrition ? readCached(queryClient, queryKeys.nutrition.recentDays(options.historyDays), () => getRecentNutritionDays(userId, options.historyDays)) : Promise.resolve([]),
+    options.includeRecovery ? readCached(queryClient, queryKeys.recovery.trend(options.historyDays), () => getRecentRecoveryEntries(userId, options.historyDays)) : Promise.resolve([]),
+    options.includePhysique ? readCached(queryClient, queryKeys.physique.recentCheckIns(checkInLimit), () => getRecentCheckIns(userId, checkInLimit)) : Promise.resolve([]),
+    options.includePhysique ? readCached(queryClient, queryKeys.physique.weightTrend(options.historyDays), () => getWeightTrend(userId, options.historyDays)) : Promise.resolve([]),
+    options.includeSupplements ? readCached(queryClient, queryKeys.supplements.compliance(options.historyDays), () => getSupplementCompliance(userId, options.historyDays)) : Promise.resolve([]),
+    options.includeSupplements ? readCached(queryClient, queryKeys.supplements.protocol(), () => getProtocol(userId)) : Promise.resolve(null),
+    options.includeCoachingNotes ? readCached(queryClient, queryKeys.coaching.journal(journalLimit), () => getJournalEntries(userId, journalLimit)) : Promise.resolve([]),
+    options.includeProgram ? readCached(queryClient, queryKeys.volume.weekly(), () => getWeeklyVolumeSummary(userId)) : Promise.resolve([]),
+    options.includeProgram ? readCached(queryClient, queryKeys.volume.landmarks(), () => getVolumeLandmarks(userId)) : Promise.resolve(null),
+    options.includeAlerts ? readCached(queryClient, queryKeys.alerts.active(), () => getActiveAlerts(userId)) : Promise.resolve([]),
   ]);
 
   const includedSections: string[] = [];

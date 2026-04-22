@@ -24,6 +24,28 @@ import {
 } from 'firebase/firestore';
 import { db } from './config';
 
+/**
+ * Firestore rejects `undefined` values. Strip them recursively from any
+ * object/array before every write. Applied automatically by setDocument,
+ * updateDocument, and addDocument.
+ */
+export function stripUndefinedDeep<T>(value: T): T {
+  if (value === undefined) return value;
+  if (value === null || typeof value !== 'object') return value;
+  if (value instanceof Date) return value;
+  if (Array.isArray(value)) {
+    return value
+      .map(stripUndefinedDeep)
+      .filter((v) => v !== undefined) as unknown as T;
+  }
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+    const next = stripUndefinedDeep(v);
+    if (next !== undefined) out[k] = next;
+  }
+  return out as T;
+}
+
 // Type-safe converter factory
 export function createConverter<T>(): FirestoreDataConverter<T> {
   return {
@@ -78,12 +100,12 @@ export async function setDocument<T>(
   converter?: FirestoreDataConverter<T>
 ): Promise<void> {
   if (!db) throw new Error('Firestore not initialized');
-
+  const safe = stripUndefinedDeep(data) as WithFieldValue<T>;
   const docRef = (converter
     ? doc(db, collectionPath, docId).withConverter(converter)
     : doc(db, collectionPath, docId)) as DocumentReference<T>;
 
-  await setDoc(docRef, data, { merge: true });
+  await setDoc(docRef, safe, { merge: true });
 }
 
 export async function updateDocument<T>(
@@ -92,9 +114,9 @@ export async function updateDocument<T>(
   data: Partial<T>
 ): Promise<void> {
   if (!db) throw new Error('Firestore not initialized');
-
+  const safe = stripUndefinedDeep(data) as DocumentData;
   const docRef = doc(db, collectionPath, docId);
-  await updateDoc(docRef, data as DocumentData);
+  await updateDoc(docRef, safe);
 }
 
 export async function addDocument<T>(
@@ -103,12 +125,12 @@ export async function addDocument<T>(
   converter?: FirestoreDataConverter<T>
 ): Promise<string> {
   if (!db) throw new Error('Firestore not initialized');
-
+  const safe = stripUndefinedDeep(data) as WithFieldValue<T>;
   const colRef = (converter
     ? collection(db, collectionPath).withConverter(converter)
     : collection(db, collectionPath)) as CollectionReference<T>;
 
-  const docRef = await addDoc(colRef, data);
+  const docRef = await addDoc(colRef, safe);
   return docRef.id;
 }
 

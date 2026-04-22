@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys, staleTimes } from '@/lib/constants';
 import { getCheckIns, getRecentCheckIns, saveCheckIn, getWeightTrend, getLatestCheckIn } from '@/services';
 import type { CheckIn } from '@/lib/types';
+import { onMutationError } from './_shared/on-error';
 
 export function useCheckIns(userId: string) {
   return useQuery({
@@ -50,5 +51,6 @@ export function useSaveCheckIn(userId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys(userId).physique.all });
     },
+    onError: onMutationError,
   });
 }

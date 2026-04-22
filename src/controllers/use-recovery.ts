@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys, staleTimes } from '@/lib/constants';
 import { getRecoveryEntry, saveRecoveryEntry, getRecentRecoveryEntries, getAverageReadiness } from '@/services';
 import type { RecoveryEntry } from '@/lib/types';
+import { onMutationError } from './_shared/on-error';
 
 export function useRecoveryEntry(userId: string, date: string) {
   return useQuery({
@@ -43,5 +44,6 @@ export function useSaveRecoveryEntry(userId: string) {
       queryClient.invalidateQueries({ queryKey: queryKeys(userId).recovery.latest() });
       queryClient.invalidateQueries({ queryKey: queryKeys(userId).recovery.all });
     },
+    onError: onMutationError,
   });
 }

@@ -12,7 +12,8 @@ import { createProgram, setActiveProgram } from './training.service';
 import { saveProtocol } from './supplements.service';
 import { createPhase, setActivePhase, createJournalEntry } from './coaching.service';
 import { updateVolumeLandmarks } from './volume.service';
-import { saveNutritionDay } from './nutrition.service';
+import { saveNutritionDay, saveNutritionPlan } from './nutrition.service';
+import { withService } from '@/lib/errors';
 
 export interface ImportFile {
   filename: string;
@@ -119,17 +120,18 @@ export async function importCoachData(
   data: ParsedCoachData,
   force = false
 ): Promise<ImportResult> {
-  const filesImported: string[] = [];
-  const errors: { filename: string; error: string }[] = [];
+  return withService('import', 'import coach data', async () => {
+    const filesImported: string[] = [];
+    const errors: { filename: string; error: string }[] = [];
 
-  const alreadySeeded = await isUserSeeded(userId);
-  if (alreadySeeded && !force) {
-    return {
-      success: false,
-      filesImported: [],
-      errors: [{ filename: 'all', error: 'User already has data. Use force re-import from Settings to overwrite.' }],
-    };
-  }
+    const alreadySeeded = await isUserSeeded(userId);
+    if (alreadySeeded && !force) {
+      return {
+        success: false,
+        filesImported: [],
+        errors: [{ filename: 'all', error: 'User already has data. Use force re-import from Settings to overwrite.' }],
+      };
+    }
 
   if (data.athleteProfile) {
     try {
@@ -184,6 +186,8 @@ export async function importCoachData(
 
   if (data.nutritionPlan) {
     try {
+      await saveNutritionPlan(userId, data.nutritionPlan);
+
       const today = new Date().toISOString().split('T')[0];
       const { macroTargetsByDayType } = data.nutritionPlan;
       await saveNutritionDay(userId, today, {
@@ -216,13 +220,14 @@ export async function importCoachData(
     }
   }
 
-  if (errors.length === 0) {
-    await markUserSeeded(userId);
-  }
+    if (errors.length === 0) {
+      await markUserSeeded(userId);
+    }
 
-  return {
-    success: errors.length === 0,
-    filesImported,
-    errors,
-  };
+    return {
+      success: errors.length === 0,
+      filesImported,
+      errors,
+    };
+  });
 }

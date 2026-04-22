@@ -104,8 +104,8 @@ export default function ExportPage() {
           setNoteContent('');
           toast.success('Export note saved.');
         },
-        onError: (error) => {
-          toast.error(`Failed to save note: ${error.message}`);
+        onError: (error: unknown) => {
+          toast.error(`Failed to save note: ${error instanceof Error ? error.message : String(error)}`);
         },
       }
     );

@@ -14,6 +14,7 @@ import {
   getRecentWorkouts,
 } from '@/services';
 import type { Workout, Program } from '@/lib/types';
+import { onMutationError } from './_shared/on-error';
 
 // Programs
 export function usePrograms(userId: string) {
@@ -46,7 +47,7 @@ export function useWorkouts(userId: string, dateRange?: { from: string; to: stri
 
 export function useRecentWorkouts(userId: string, days: number = 14) {
   return useQuery({
-    queryKey: queryKeys(userId).training.workouts({ from: '', to: '' }),
+    queryKey: queryKeys(userId).training.recentWorkouts(days),
     queryFn: () => getRecentWorkouts(userId, days),
     staleTime: staleTimes.workouts,
     enabled: !!userId,
@@ -71,6 +72,7 @@ export function useCreateWorkout(userId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys(userId).training.all });
     },
+    onError: onMutationError,
   });
 }
 
@@ -84,6 +86,7 @@ export function useUpdateWorkout(userId: string) {
       queryClient.invalidateQueries({ queryKey: queryKeys(userId).training.workout(workoutId) });
       queryClient.invalidateQueries({ queryKey: queryKeys(userId).training.all });
     },
+    onError: onMutationError,
   });
 }
 
@@ -95,6 +98,7 @@ export function useSaveWorkout(userId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys(userId).training.all });
     },
+    onError: onMutationError,
   });
 }
 
@@ -106,6 +110,7 @@ export function useDeleteWorkout(userId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys(userId).training.all });
     },
+    onError: onMutationError,
   });
 }
 
@@ -153,13 +158,14 @@ export function useSaveSet(userId: string, workoutId: string) {
 
       return { previousWorkout };
     },
-    onError: (_, __, context) => {
+    onError: (error, _, context) => {
       if (context?.previousWorkout) {
         queryClient.setQueryData(
           queryKeys(userId).training.workout(workoutId),
           context.previousWorkout
         );
       }
+      onMutationError(error);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys(userId).training.workout(workoutId) });

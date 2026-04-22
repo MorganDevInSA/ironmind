@@ -9,15 +9,17 @@ export function queryKeys(userId: string) {
       detail:   () => [userId, 'profile', 'detail'] as const,
       isSeeded: () => [userId, 'profile', 'is-seeded'] as const,
     },
-    training: {
-      all:           [userId, 'training'] as const,
-      programs:      () => [userId, 'training', 'programs'] as const,
-      activeProgram: () => [userId, 'training', 'active-program'] as const,
-      workouts:      (dateRange?: { from: string; to: string }) =>
-                       [userId, 'training', 'workouts', dateRange] as const,
-      workout:       (id: string) => [userId, 'training', 'workout', id] as const,
-      exercises:     () => [userId, 'training', 'exercises'] as const,
-    },
+  training: {
+    all:            [userId, 'training'] as const,
+    programs:       () => [userId, 'training', 'programs'] as const,
+    activeProgram:  () => [userId, 'training', 'active-program'] as const,
+    workouts:       (dateRange?: { from: string; to: string }) =>
+                      [userId, 'training', 'workouts', dateRange] as const,
+    recentWorkouts: (days: number) =>
+                      [userId, 'training', 'recent-workouts', days] as const,
+    workout:        (id: string) => [userId, 'training', 'workout', id] as const,
+    exercises:      () => [userId, 'training', 'exercises'] as const,
+  },
     nutrition: {
       all:        [userId, 'nutrition'] as const,
       day:        (date: string) => [userId, 'nutrition', 'day', date] as const,

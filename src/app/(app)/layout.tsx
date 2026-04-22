@@ -4,6 +4,7 @@ import { AuthGuard } from '@/components/auth/auth-guard';
 import { Sidebar } from '@/components/layout/sidebar';
 import { MobileNav } from '@/components/layout/mobile-nav';
 import { TopBar } from '@/components/layout/top-bar';
+import { OnlineListener } from '@/components/providers/online-listener';
 import { useUIStore } from '@/stores';
 
 export default function AppLayout({
@@ -15,6 +16,7 @@ export default function AppLayout({
 
   return (
     <AuthGuard>
+      <OnlineListener />
       <div className="min-h-screen">
         {/* Desktop Sidebar */}
         <div className="hidden lg:block">

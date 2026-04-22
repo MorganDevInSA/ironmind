@@ -19,6 +19,19 @@ Firebase     src/lib/firebase/          (SDK wrappers)
 3. **Services call lib/firebase helpers only** — never call raw Firebase SDK in services
 4. **All date fields are `string` (ISO)** — Firestore converter outputs strings, never `Date`
 
+### Allowed Exceptions
+
+**Controllers may import service functions directly in these cases:**
+
+1. **use-import.ts** — imports `importCoachData`, `seedUserData` to wrap as mutations
+2. **auth-guard.tsx** — may call `isUserSeeded` via `queryClient.fetchQuery` (already wrapped in TanStack Query)
+
+**Pages/Components may import seed/import utilities:**
+
+1. **Onboarding components** — may import `parseAndValidateFiles` for client-side validation before sending data to a controller
+
+> All other Firebase/service imports in components must go through controllers.
+
 ---
 
 ## Import Rules

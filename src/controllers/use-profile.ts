@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys, staleTimes } from '@/lib/constants';
 import { getProfile, updateProfile, isUserSeeded } from '@/services';
 import type { AthleteProfile } from '@/lib/types';
+import { onMutationError } from './_shared/on-error';
 
 export function useProfile(userId: string) {
   return useQuery({
@@ -22,6 +23,7 @@ export function useUpdateProfile(userId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys(userId).profile.all });
     },
+    onError: onMutationError,
   });
 }
 

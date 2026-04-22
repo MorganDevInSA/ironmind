@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { queryKeys, staleTimes } from '@/lib/constants';
-import { getActiveAlerts, getAlertSummary } from '@/services';
+import { getActiveAlerts, summarizeAlerts } from '@/services';
 
 export function useActiveAlerts(userId: string) {
   return useQuery({
@@ -13,11 +13,11 @@ export function useActiveAlerts(userId: string) {
   });
 }
 
+/** Derived — zero extra fetches. Reads from the active alerts cache. */
 export function useAlertSummary(userId: string) {
-  return useQuery({
-    queryKey: queryKeys(userId).alerts.summary(),
-    queryFn: () => getAlertSummary(userId),
-    staleTime: staleTimes.alerts,
-    enabled: !!userId,
-  });
+  const query = useActiveAlerts(userId);
+  return {
+    ...query,
+    data: query.data ? summarizeAlerts(query.data) : undefined,
+  };
 }

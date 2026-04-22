@@ -51,7 +51,7 @@ export default function SettingsPage() {
         setTargetWeight('');
         setCurrentWeight('');
       },
-      onError: (e) => toast.error(`Failed: ${e.message}`),
+      onError: (e: unknown) => toast.error(`Failed: ${e instanceof Error ? e.message : String(e)}`),
     });
   };
 

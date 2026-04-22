@@ -8,3 +8,4 @@ export * from './coaching.service';
 export * from './volume.service';
 export * from './alerts.service';
 export * from './storage.service';
+export * from './import.service';

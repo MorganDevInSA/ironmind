@@ -29,11 +29,6 @@ module.exports = {
         'text-secondary':   '#888888',
         'text-muted':       '#555555',
 
-        /* Accents — Crimson */
-        accent:             '#DC2626',
-        'accent-hover':     '#B91C1C',
-        'accent-2':         '#991B1B',
-
         /* Status */
         destructive:        '#EF4444',
         good:               '#22C55E',
@@ -42,16 +37,7 @@ module.exports = {
         warning:            '#F59E0B',
         warn:               '#F59E0B',
 
-        /* Crimson scale — replaces gold */
-        gold:               '#DC2626',
-        'gold-light':       '#EF4444',
-        'gold-dark':        '#991B1B',
-        crimson:            '#DC2626',
-        'crimson-light':    '#EF4444',
-        'crimson-dark':     '#991B1B',
-
-        /* Ring */
-        ring:               '#DC2626',
+        /* GUARD: Never add accent/crimson/gold here — use CSS var(--accent) for theme-aware colors */
       },
 
       fontFamily: {

@@ -191,8 +191,8 @@ h4 { font-size: 1.125rem; }
 /* Modal scrollable */
 .modal-scrollable::-webkit-scrollbar { width: 8px; }
 .modal-scrollable::-webkit-scrollbar-track { background: rgba(20, 14, 14, 0.3); border-radius: 4px; }
-.modal-scrollable::-webkit-scrollbar-thumb { background: rgba(220, 38, 38, 0.5); border-radius: 4px; }
-.modal-scrollable::-webkit-scrollbar-thumb:hover { background: rgba(220, 38, 38, 0.7); }
+.modal-scrollable::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--accent) 50%, transparent); border-radius: 4px; }
+.modal-scrollable::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--accent) 70%, transparent); }
 
 /* ============================================================
    FOCUS & SELECTION
@@ -351,7 +351,7 @@ h4 { font-size: 1.125rem; }
   }
 
   .card-hover:hover {
-    border-color: rgba(220, 38, 38, 0.30);
+    border-color: color-mix(in srgb, var(--accent) 30%, transparent);
     box-shadow: var(--shadow-gold);
     transform: translateY(-2px);
   }
@@ -367,7 +367,7 @@ h4 { font-size: 1.125rem; }
     inset: 0;
     border-radius: 14px;
     padding: 1px;
-    background: linear-gradient(135deg, rgba(220, 38, 38, 0.25), transparent 30%, transparent 70%, rgba(220, 38, 38, 0.25));
+    background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 25%, transparent), transparent 30%, transparent 70%, color-mix(in srgb, var(--accent) 25%, transparent));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
@@ -401,7 +401,7 @@ h4 { font-size: 1.125rem; }
   }
 
   .btn-secondary:hover {
-    border-color: rgba(220, 38, 38, 0.45);
+    border-color: color-mix(in srgb, var(--accent) 45%, transparent);
     color: var(--text-0);
   }
 
@@ -475,11 +475,11 @@ h4 { font-size: 1.125rem; }
     font-family: 'Cinzel', serif;
     font-weight: 700;
     letter-spacing: 0.08em;
-    background: linear-gradient(135deg, #FF4040, #DC2626, #991B1B);
+    background: linear-gradient(135deg, var(--accent-light), var(--accent), var(--accent-2));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    filter: drop-shadow(0 2px 12px rgba(220, 38, 38, 0.4)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
+    filter: drop-shadow(0 2px 12px color-mix(in srgb, var(--accent) 40%, transparent)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
   }
 
   .brand-text-embossed {
@@ -488,11 +488,11 @@ h4 { font-size: 1.125rem; }
     letter-spacing: 0.1em;
     color: #EF4444;
     text-shadow:
-      0 1px 0 rgba(239, 68, 68, 0.8),
-      0 2px 0 rgba(220, 38, 38, 0.7),
-      0 3px 0 rgba(153, 27, 27, 0.6),
+      0 1px 0 color-mix(in srgb, var(--accent-light) 80%, transparent),
+      0 2px 0 color-mix(in srgb, var(--accent) 70%, transparent),
+      0 3px 0 color-mix(in srgb, var(--accent-2) 60%, transparent),
       0 4px 8px rgba(0, 0, 0, 0.6),
-      0 0 20px rgba(220, 38, 38, 0.5);
+      0 0 20px color-mix(in srgb, var(--accent) 50%, transparent);
   }
 
   /* --- Status Badges ---------------------------------------- */
@@ -529,10 +529,10 @@ h4 { font-size: 1.125rem; }
   }
 
   .status-badge.gold {
-    background: rgba(220, 38, 38, 0.12);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
     color: var(--crimson-light);
-    border-color: rgba(220, 38, 38, 0.35);
-    text-shadow: 0 0 8px rgba(220, 38, 38, 0.4);
+    border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+    text-shadow: 0 0 8px color-mix(in srgb, var(--accent) 40%, transparent);
   }
 
   .status-badge.info {
@@ -551,10 +551,10 @@ h4 { font-size: 1.125rem; }
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.15em;
-    background: rgba(220, 38, 38, 0.12);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
     color: var(--crimson-light);
-    border: 1px solid rgba(220, 38, 38, 0.35);
-    text-shadow: 0 0 8px rgba(220, 38, 38, 0.4);
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+    text-shadow: 0 0 8px color-mix(in srgb, var(--accent) 40%, transparent);
   }
 
   /* --- Accent border-left (alert/coaching cards) ------------ */
@@ -685,7 +685,7 @@ h4 { font-size: 1.125rem; }
   .data-table { width: 100%; font-size: 0.875rem; }
 
   .data-table thead {
-    border-bottom: 1px solid rgba(220, 38, 38, 0.25);
+    border-bottom: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
   }
 
   .data-table th {
@@ -710,7 +710,7 @@ h4 { font-size: 1.125rem; }
   }
 
   .data-table tr:hover td:first-child {
-    border-left: 2px solid rgba(220, 38, 38, 0.35);
+    border-left: 2px solid color-mix(in srgb, var(--accent) 35%, transparent);
   }
 
   /* --- Skeleton (deprecated — prefer .spinner) -------------- */
@@ -739,7 +739,7 @@ h4 { font-size: 1.125rem; }
     z-index: 50;
     pointer-events: none;
     background: rgba(12, 8, 8, 0.96);
-    border: 1px solid rgba(220, 38, 38, 0.35);
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
     color: var(--text-1);
   }
 
@@ -841,7 +841,7 @@ h4 { font-size: 1.125rem; }
   .chart-container .recharts-tooltip-cursor path {
     stroke: rgba(239, 68, 68, 0.9) !important;
     stroke-width: 1.8 !important;
-    filter: drop-shadow(0 0 4px rgba(220, 38, 38, 0.5));
+    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--accent) 50%, transparent));
   }
 
 }
@@ -992,7 +992,7 @@ h4 { font-size: 1.125rem; }
   position: relative;
   border-radius: 14px;
   padding: 1px;
-  background: linear-gradient(135deg, rgba(220, 38, 38, 0.25), transparent 40%, transparent 60%, rgba(220, 38, 38, 0.25));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 25%, transparent), transparent 40%, transparent 60%, color-mix(in srgb, var(--accent) 25%, transparent));
 }
 .gradient-border > * { border-radius: 13px; }
 
