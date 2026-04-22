@@ -40,7 +40,7 @@ function PasswordInput({
         required
         className="w-full px-3 py-2.5 pr-10 rounded-lg text-sm
           bg-[#131313] border border-[rgba(65,50,50,0.50)]
-          text-[#F0F0F0] placeholder:text-[#5E5E5E]
+          text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)]
           focus:border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)] focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--accent)_10%,transparent)]
           focus:outline-none transition-all duration-200"
       />
@@ -48,7 +48,7 @@ function PasswordInput({
         type="button"
         onClick={() => setVisible(v => !v)}
         tabIndex={-1}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#5E5E5E] hover:text-[#9A9A9A] transition-colors"
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-[color:var(--text-2)] hover:text-[color:var(--text-1)] transition-colors"
         aria-label={visible ? 'Hide password' : 'Show password'}
       >
         {visible ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -126,11 +126,11 @@ export default function RegisterPage() {
 
   const inputCls = `w-full px-3 py-2.5 rounded-lg text-sm
     bg-[#131313] border border-[rgba(65,50,50,0.50)]
-    text-[#F0F0F0] placeholder:text-[#5E5E5E]
+    text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)]
     focus:border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)] focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--accent)_10%,transparent)]
     focus:outline-none transition-all duration-200`;
 
-  const labelCls = 'block text-xs font-semibold uppercase tracking-[0.2em] text-[#5E5E5E] mb-1.5';
+  const labelCls = 'block text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)] mb-1.5';
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4
@@ -140,13 +140,13 @@ export default function RegisterPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <IronmindLogo variant="auth" priority className="mb-3" />
-          <p className="text-sm text-[#5E5E5E] mt-2 uppercase tracking-[0.2em]">Create your account</p>
+          <p className="text-sm text-[color:var(--text-2)] mt-2 uppercase tracking-[0.2em]">Create your account</p>
         </div>
 
         {/* Card */}
         <div className="rounded-[14px] p-6 bg-[rgba(18,14,14,0.94)] backdrop-blur-xl
           border border-[rgba(65,50,50,0.40)] shadow-[0_16px_40px_rgba(0,0,0,0.60)]">
-          <h2 className="text-xl font-bold font-heading tracking-tight text-[#F0F0F0] mb-6">Sign Up</h2>
+          <h2 className="text-xl font-bold font-heading tracking-tight text-[color:var(--text-0)] mb-6">Sign Up</h2>
 
           {error && (
             <div className="mb-4 p-3 rounded-lg text-sm bg-[rgba(239,68,68,0.10)] border border-[rgba(239,68,68,0.30)] text-[#EF4444]">
@@ -205,9 +205,9 @@ export default function RegisterPage() {
                           : 'bg-[rgba(65,50,50,0.40)] border border-[rgba(65,50,50,0.50)]'}`}>
                         {r.pass
                           ? <Check size={9} className="text-[#22C55E]" />
-                          : <X size={9} className="text-[#5E5E5E]" />}
+                          : <X size={9} className="text-[color:var(--text-2)]" />}
                       </div>
-                      <span className={`text-xs transition-colors duration-200 ${r.pass ? 'text-[#22C55E]' : 'text-[#5E5E5E]'}`}>
+                      <span className={`text-xs transition-colors duration-200 ${r.pass ? 'text-[#22C55E]' : 'text-[color:var(--text-2)]'}`}>
                         {r.label}
                       </span>
                     </div>
@@ -262,7 +262,7 @@ export default function RegisterPage() {
             <>
               <div className="my-6 flex items-center gap-4">
                 <div className="flex-1 h-px bg-[rgba(65,50,50,0.40)]" />
-                <span className="text-xs text-[#5E5E5E] uppercase tracking-[0.15em]">or continue with</span>
+                <span className="text-xs text-[color:var(--text-2)] uppercase tracking-[0.15em]">or continue with</span>
                 <div className="flex-1 h-px bg-[rgba(65,50,50,0.40)]" />
               </div>
 
@@ -272,7 +272,7 @@ export default function RegisterPage() {
                   onClick={handleFacebookRegister}
                   disabled={isLoading}
                   className="w-full py-2.5 rounded-lg text-sm font-medium
-                    bg-[#131313] border border-[rgba(65,50,50,0.50)] text-[#F0F0F0]
+                    bg-[#131313] border border-[rgba(65,50,50,0.50)] text-[color:var(--text-0)]
                     hover:bg-[rgba(65,50,50,0.30)] transition-colors disabled:opacity-50
                     flex items-center justify-center gap-2"
                 >
@@ -287,7 +287,7 @@ export default function RegisterPage() {
                   onClick={handleMicrosoftRegister}
                   disabled={isLoading}
                   className="w-full py-2.5 rounded-lg text-sm font-medium
-                    bg-[#131313] border border-[rgba(65,50,50,0.50)] text-[#F0F0F0]
+                    bg-[#131313] border border-[rgba(65,50,50,0.50)] text-[color:var(--text-0)]
                     hover:bg-[rgba(65,50,50,0.30)] transition-colors disabled:opacity-50
                     flex items-center justify-center gap-2"
                 >
@@ -304,7 +304,7 @@ export default function RegisterPage() {
           )}
         </div>
 
-        <p className="text-center text-sm text-[#5E5E5E] mt-6">
+        <p className="text-center text-sm text-[color:var(--text-2)] mt-6">
           Already have an account?{' '}
           <a href="/login" className="text-[color:var(--accent)] hover:text-[color:var(--accent-light)] underline underline-offset-2 transition-colors">
             Sign in

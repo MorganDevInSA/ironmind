@@ -51,13 +51,13 @@ export function StepProcessMap({ onNext }: StepProcessMapProps) {
         <span className="inline-block text-[10px] font-semibold uppercase tracking-[0.35em] text-[color:var(--accent)] mb-3">
           Setup Process
         </span>
-        <h1 className="text-3xl sm:text-4xl font-bold font-heading tracking-tight text-[#F0F0F0] mb-3">
+        <h1 className="text-3xl sm:text-4xl font-bold font-heading tracking-tight text-[color:var(--text-0)] mb-3">
           Welcome to{' '}
           <span className="bg-gradient-to-r from-[color:var(--accent-light)] via-[color:var(--accent)] to-[color:var(--accent-2)] bg-clip-text text-transparent [filter:drop-shadow(0_2px_12px_color-mix(in_srgb,var(--accent)_40%,transparent))]">
             IRONMIND
           </span>
         </h1>
-        <p className="text-[#9A9A9A] text-base max-w-xl mx-auto">
+        <p className="text-[color:var(--text-1)] text-base max-w-xl mx-auto">
           Follow this 6-step process to personalize your theme, initialize your AI bodybuilding
           coach, and fully populate your coaching app with data tailored to you.
         </p>
@@ -66,7 +66,7 @@ export function StepProcessMap({ onNext }: StepProcessMapProps) {
       {/* Flowchart — horizontal scroll on small screens, full-width grid on large */}
       <div className="-mx-4 sm:mx-0">
         {/* Scroll hint label (mobile only) */}
-        <p className="sm:hidden text-[10px] text-[#5E5E5E] text-center mb-2 tracking-widest uppercase">
+        <p className="sm:hidden text-[10px] text-[color:var(--text-2)] text-center mb-2 tracking-widest uppercase">
           ← scroll →
         </p>
 
@@ -87,10 +87,10 @@ export function StepProcessMap({ onNext }: StepProcessMapProps) {
                       {node.number}
                     </div>
                     <Icon size={20} className="text-[color:var(--accent)]" />
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#F0F0F0] text-center leading-tight">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[color:var(--text-0)] text-center leading-tight">
                       {node.label}
                     </span>
-                    <p className="text-[9px] text-[#5E5E5E] text-center leading-snug">
+                    <p className="text-[9px] text-[color:var(--text-2)] text-center leading-snug">
                       {node.description}
                     </p>
                   </div>
@@ -114,7 +114,7 @@ export function StepProcessMap({ onNext }: StepProcessMapProps) {
 
       {/* Summary text */}
       <div className="rounded-[14px] p-5 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)]
-        shadow-[0_10px_24px_rgba(0,0,0,0.45)] text-[#9A9A9A] text-sm leading-relaxed text-center">
+        shadow-[0_10px_24px_rgba(0,0,0,0.45)] text-[color:var(--text-1)] text-sm leading-relaxed text-center">
         This process turns a general AI into your personal elite bodybuilding coach, then seeds
         your IRONMIND app with a fully individualised program, nutrition plan, and supplement
         protocol. Each session you log sharpens the coach&apos;s ability to analyse and adapt.

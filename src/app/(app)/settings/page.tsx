@@ -63,19 +63,19 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-lg">
+    <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#F5F5F5]">Settings</h1>
-        <p className="text-[#6B6B6B]">Manage your profile and plan</p>
+        <h1 className="text-2xl font-bold text-[color:var(--accent)]">Settings</h1>
+        <p className="text-[color:var(--text-2)]">Manage your profile and plan</p>
       </div>
 
       {/* Theme */}
       <div className="glass-panel p-5 space-y-4">
         <div className="flex items-center gap-3">
           <Palette size={20} className="text-[color:var(--accent)]" />
-          <h2 className="font-semibold text-[#F5F5F5]">Theme</h2>
+          <h2 className="font-semibold text-[color:var(--text-0)]">Theme</h2>
         </div>
-        <p className="text-sm text-[#6B6B6B]">
+        <p className="text-sm text-[color:var(--text-2)]">
           Choose your accent palette. This updates buttons, highlights, and key UI accents.
         </p>
         <div className="space-y-2">
@@ -86,10 +86,9 @@ export default function SettingsPage() {
                 key={option.value}
                 type="button"
                 onClick={() => setTheme(option.value)}
-                style={active ? { backgroundColor: 'color-mix(in srgb, var(--accent) 14%, transparent)' } : undefined}
                 className={`w-full p-3 rounded-lg border text-left transition-colors ${
                   active
-                    ? 'border-[color:var(--accent)]'
+                    ? 'border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)] bg-[rgba(16,16,16,0.78)]'
                     : 'border-[rgba(65,50,50,0.38)] bg-[rgba(16,16,16,0.78)] hover:border-[rgba(120,120,120,0.45)]'
                 }`}
               >
@@ -99,8 +98,8 @@ export default function SettingsPage() {
                     style={{ background: option.swatch }}
                   />
                   <div>
-                    <p className="text-sm font-semibold text-[#F5F5F5]">{option.label}</p>
-                    <p className="text-xs text-[#9A9A9A]">{option.description}</p>
+                    <p className="text-sm font-semibold text-[color:var(--text-0)]">{option.label}</p>
+                    <p className="text-xs text-[color:var(--text-1)]">{option.description}</p>
                   </div>
                 </div>
               </button>
@@ -109,19 +108,19 @@ export default function SettingsPage() {
           <div
             className={`w-full p-3 rounded-lg border transition-colors ${
               theme === 'custom'
-                ? 'border-[color:var(--accent)] bg-[color:color-mix(in_srgb,var(--accent)_14%,transparent)]'
+                ? 'border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)] bg-[rgba(16,16,16,0.78)]'
                 : 'border-[rgba(65,50,50,0.38)] bg-[rgba(16,16,16,0.78)]'
             }`}
           >
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-[#F5F5F5]">Custom</p>
-                <p className="text-xs text-[#9A9A9A]">
+                <p className="text-sm font-semibold text-[color:var(--text-0)]">Custom</p>
+                <p className="text-xs text-[color:var(--text-1)]">
                   Choose an accent colour — it applies across the app as you adjust.
                 </p>
               </div>
               <div className="flex items-end gap-3 shrink-0">
-                <label className="flex flex-col gap-1 text-[10px] font-semibold uppercase tracking-wider text-[#6B6B6B]">
+                <label className="flex flex-col gap-1 text-[10px] font-semibold uppercase tracking-wider text-[color:var(--text-2)]">
                   Colour
                   <input
                     type="color"
@@ -137,7 +136,7 @@ export default function SettingsPage() {
                     aria-label="Choose custom accent colour"
                   />
                 </label>
-                <span className="font-mono text-xs tabular-nums text-[#9A9A9A] pb-1">
+                <span className="font-mono text-xs tabular-nums text-[color:var(--text-1)] pb-1">
                   {customAccent.toUpperCase()}
                 </span>
               </div>
@@ -149,23 +148,23 @@ export default function SettingsPage() {
       {/* Profile */}
       <div className="glass-panel p-5 space-y-4">
         <div className="flex items-center gap-3">
-          <User size={20} className="text-[#6B6B6B]" />
-          <h2 className="font-semibold text-[#F5F5F5]">Profile</h2>
+          <User size={20} className="text-[color:var(--text-2)]" />
+          <h2 className="font-semibold text-[color:var(--text-0)]">Profile</h2>
         </div>
 
         <div className="space-y-1">
-          <p className="text-xs text-[#6B6B6B]">Email</p>
-          <p className="text-[#F5F5F5]">{user?.email}</p>
+          <p className="text-xs text-[color:var(--text-2)]">Email</p>
+          <p className="text-[color:var(--text-0)]">{user?.email}</p>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
-            <p className="text-xs text-[#6B6B6B]">Current Weight</p>
-            <p className="font-mono tabular-nums text-[#F5F5F5]">{profile?.currentWeight ?? '—'} kg</p>
+            <p className="text-xs text-[color:var(--text-2)]">Current Weight</p>
+            <p className="font-mono tabular-nums text-[color:var(--text-0)]">{profile?.currentWeight ?? '—'} kg</p>
           </div>
           <div className="space-y-1">
-            <p className="text-xs text-[#6B6B6B]">Target Weight</p>
-            <p className="font-mono tabular-nums text-[#F5F5F5]">{profile?.targetWeight ?? '—'} kg</p>
+            <p className="text-xs text-[color:var(--text-2)]">Target Weight</p>
+            <p className="font-mono tabular-nums text-[color:var(--text-0)]">{profile?.targetWeight ?? '—'} kg</p>
           </div>
         </div>
       </div>
@@ -174,30 +173,30 @@ export default function SettingsPage() {
       <div className="glass-panel p-5 space-y-4">
         <div className="flex items-center gap-3">
           <Target size={20} className="text-[color:var(--accent)]" />
-          <h2 className="font-semibold text-[#F5F5F5]">Update Weights</h2>
+          <h2 className="font-semibold text-[color:var(--text-0)]">Update Weights</h2>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
-            <label className="text-xs text-[#6B6B6B]">Current (kg)</label>
+            <label className="text-xs text-[color:var(--text-2)]">Current (kg)</label>
             <input
               type="number"
               step="0.1"
               value={currentWeight}
               onChange={e => setCurrentWeight(e.target.value)}
               placeholder={profile?.currentWeight?.toString() ?? ''}
-              className="w-full bg-[rgba(16,22,34,0.6)] border border-[rgba(80,96,128,0.25)] rounded-lg p-3 text-[#F5F5F5] placeholder:text-[#6B6B6B]/50 focus:outline-none focus:border-[rgba(212,175,55,0.4)]"
+              className="w-full bg-[rgba(18,14,14,0.6)] border border-[rgba(65,50,50,0.25)] rounded-lg p-3 text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color:color-mix(in_srgb,var(--accent)_40%,transparent)]"
             />
           </div>
           <div className="space-y-1">
-            <label className="text-xs text-[#6B6B6B]">Target (kg)</label>
+            <label className="text-xs text-[color:var(--text-2)]">Target (kg)</label>
             <input
               type="number"
               step="0.1"
               value={targetWeight}
               onChange={e => setTargetWeight(e.target.value)}
               placeholder={profile?.targetWeight?.toString() ?? ''}
-              className="w-full bg-[rgba(16,22,34,0.6)] border border-[rgba(80,96,128,0.25)] rounded-lg p-3 text-[#F5F5F5] placeholder:text-[#6B6B6B]/50 focus:outline-none focus:border-[rgba(212,175,55,0.4)]"
+              className="w-full bg-[rgba(18,14,14,0.6)] border border-[rgba(65,50,50,0.25)] rounded-lg p-3 text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color:color-mix(in_srgb,var(--accent)_40%,transparent)]"
             />
           </div>
         </div>
@@ -215,12 +214,12 @@ export default function SettingsPage() {
       <div className="glass-panel p-5 space-y-4">
         <div className="flex items-center gap-3">
           <Upload size={20} className="text-[color:var(--accent)]" />
-          <h2 className="font-semibold text-[#F5F5F5]">Re-import Plan</h2>
+          <h2 className="font-semibold text-[color:var(--text-0)]">Re-import Plan</h2>
         </div>
-        <p className="text-sm text-[#6B6B6B]">
+        <p className="text-sm text-[color:var(--text-2)]">
           Upload new JSON files generated by your coach AI to update your training plan, nutrition targets, or volume landmarks.
           If you already have data in IronMind, open the review step and check{' '}
-          <span className="text-[#9A9A9A]">Replace existing IronMind data</span> before confirming import.
+          <span className="text-[color:var(--text-1)]">Replace existing IronMind data</span> before confirming import.
         </p>
         <button
           onClick={() => router.push('/onboarding')}
@@ -233,12 +232,12 @@ export default function SettingsPage() {
       {/* Sign out */}
       <div className="glass-panel p-5">
         <div className="flex items-center gap-3 mb-4">
-          <Settings size={20} className="text-[#6B6B6B]" />
-          <h2 className="font-semibold text-[#F5F5F5]">Account</h2>
+          <Settings size={20} className="text-[color:var(--text-2)]" />
+          <h2 className="font-semibold text-[color:var(--text-0)]">Account</h2>
         </div>
         <button
           onClick={handleLogout}
-          className="w-full py-2.5 bg-[color:color-mix(in_srgb,var(--accent)_12%,transparent)] border border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)] text-[color:var(--accent-light)] font-medium rounded-lg hover:bg-[color:color-mix(in_srgb,var(--accent)_20%,transparent)] transition-colors flex items-center justify-center gap-2"
+          className="w-full py-2.5 bg-[rgba(16,16,16,0.78)] border border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)] text-[color:var(--accent-light)] font-medium rounded-lg hover:border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)] transition-colors flex items-center justify-center gap-2"
         >
           <LogOut size={18} /> Sign Out
         </button>

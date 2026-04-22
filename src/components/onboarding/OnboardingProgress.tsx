@@ -17,8 +17,8 @@ export function OnboardingProgress({ steps, current }: OnboardingProgressProps) 
               i === current
                 ? 'text-[color:var(--accent-light)]'
                 : i < current
-                  ? 'text-[#5E5E5E]'
-                  : 'text-[#3A3A3A]'
+                  ? 'text-[color:var(--text-2)]'
+                  : 'text-[color:var(--text-2)]'
             }`}
           >
             {label}

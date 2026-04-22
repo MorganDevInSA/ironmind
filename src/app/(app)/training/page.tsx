@@ -20,23 +20,23 @@ export default function TrainingPage() {
   const todaySession = program?.sessions.find(s => s.dayNumber === cycleDay);
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#6B6B6B] mb-1">Training</p>
-        <h1 className="text-2xl font-bold text-[#F5F5F5]">Train</h1>
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[color:var(--text-2)] mb-1">Training</p>
+        <h1 className="text-2xl font-bold text-[color:var(--accent)]">Train</h1>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="space-y-4">
         {/* Today's Session */}
         <div className="glass-panel p-5">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-lg bg-[rgba(59,130,246,0.1)] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-lg bg-[color-mix(in srgb,var(--accent) 10%,transparent0.1)] flex items-center justify-center">
               <Dumbbell className="text-[color:var(--accent)]" size={20} />
             </div>
             <div>
-              <h2 className="font-semibold text-[#F5F5F5]">Today&apos;s Session</h2>
+              <h2 className="font-semibold text-[color:var(--text-0)]">Today&apos;s Session</h2>
               {program && cycleDay && (
-                <p className="text-sm text-[#6B6B6B]">Day {cycleDay} of {program.cycleLengthDays}</p>
+                <p className="text-sm text-[color:var(--text-2)]">Day {cycleDay} of {program.cycleLengthDays}</p>
               )}
             </div>
           </div>
@@ -44,8 +44,8 @@ export default function TrainingPage() {
           {todaySession ? (
             <div className="space-y-4">
               <div>
-                <p className="text-lg font-semibold text-[#F5F5F5]">{todaySession.name}</p>
-                <p className="text-sm text-[#6B6B6B]">
+                <p className="text-lg font-semibold text-[color:var(--text-0)]">{todaySession.name}</p>
+                <p className="text-sm text-[color:var(--text-2)]">
                   {todaySession.type === 'lift'
                     ? `${todaySession.exercises?.length ?? 0} exercises`
                     : todaySession.type}
@@ -60,7 +60,7 @@ export default function TrainingPage() {
             </div>
           ) : (
             <div className="space-y-3">
-              <p className="text-[#6B6B6B]">No active program. Import your plan first.</p>
+              <p className="text-[color:var(--text-2)]">No active program. Import your plan first.</p>
               <Link href="/onboarding" className="btn-secondary flex items-center justify-center gap-2">
                 Import Plan
               </Link>
@@ -70,35 +70,35 @@ export default function TrainingPage() {
 
         {/* Quick Links */}
         <div className="glass-panel p-5">
-          <h2 className="font-semibold text-[#F5F5F5] mb-4">Quick Actions</h2>
+          <h2 className="font-semibold text-[color:var(--text-0)] mb-4">Quick Actions</h2>
           <div className="space-y-1">
             <Link
               href="/training/programs"
-              className="flex items-center gap-3 p-3 rounded-lg hover:bg-[rgba(16,22,34,0.6)] transition-colors"
+              className="flex items-center gap-3 p-3 rounded-lg hover:bg-[rgba(18,14,14,0.6)] transition-colors"
             >
               <Calendar size={18} className="text-[color:var(--accent)]" />
-              <span className="text-[#9A9A9A]">Programs</span>
+              <span className="text-[color:var(--text-1)]">Programs</span>
             </Link>
             <Link
               href="/training/exercises"
-              className="flex items-center gap-3 p-3 rounded-lg hover:bg-[rgba(16,22,34,0.6)] transition-colors"
+              className="flex items-center gap-3 p-3 rounded-lg hover:bg-[rgba(18,14,14,0.6)] transition-colors"
             >
               <Dumbbell size={18} className="text-[color:var(--accent)]" />
-              <span className="text-[#9A9A9A]">Exercise Database</span>
+              <span className="text-[color:var(--text-1)]">Exercise Database</span>
             </Link>
             <Link
               href="/training/history"
-              className="flex items-center gap-3 p-3 rounded-lg hover:bg-[rgba(16,22,34,0.6)] transition-colors"
+              className="flex items-center gap-3 p-3 rounded-lg hover:bg-[rgba(18,14,14,0.6)] transition-colors"
             >
               <History size={18} className="text-[color:var(--accent)]" />
-              <span className="text-[#9A9A9A]">Workout History</span>
+              <span className="text-[color:var(--text-1)]">Workout History</span>
             </Link>
             <Link
               href="/training/programs"
-              className="flex items-center gap-3 p-3 rounded-lg hover:bg-[rgba(16,22,34,0.6)] transition-colors"
+              className="flex items-center gap-3 p-3 rounded-lg hover:bg-[rgba(18,14,14,0.6)] transition-colors"
             >
               <TrendingUp size={18} className="text-[color:var(--accent)]" />
-              <span className="text-[#9A9A9A]">Progress</span>
+              <span className="text-[color:var(--text-1)]">Progress</span>
             </Link>
           </div>
         </div>

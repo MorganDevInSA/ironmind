@@ -94,9 +94,11 @@ export function TopBar() {
         <div className="relative">
           <button
             onClick={() => setAlertsOpen(o => !o)}
+            aria-label={`Alerts${alertCount > 0 ? ` (${alertCount} unread)` : ''}`}
+            aria-expanded={alertsOpen}
             className="relative p-2 text-[color:var(--text-1)] hover:text-[color:var(--text-0)] transition-colors duration-200 rounded-lg hover:bg-[rgba(0,0,0,0.35)]"
           >
-            <Bell size={18} />
+            <Bell size={18} aria-hidden="true" />
             {alertCount > 0 && (
               <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-[color:var(--accent)] rounded-full animate-pulse" />
             )}
@@ -105,9 +107,9 @@ export function TopBar() {
           {alertsOpen && (
             <div className="absolute right-0 top-full mt-2 w-80 glass-panel z-50 overflow-hidden">
               <div className="flex items-center justify-between px-4 py-3 border-b border-[rgba(65,50,50,0.28)]">
-                <span className="text-sm font-semibold text-[#F5F5F5]">Alerts</span>
-                <button onClick={() => setAlertsOpen(false)} className="text-[color:var(--text-1)] hover:text-[color:var(--text-0)]">
-                  <X size={16} />
+                <span className="text-sm font-semibold text-[color:var(--text-0)]">Alerts</span>
+                <button onClick={() => setAlertsOpen(false)} aria-label="Close alerts" className="text-[color:var(--text-1)] hover:text-[color:var(--text-0)]">
+                  <X size={16} aria-hidden="true" />
                 </button>
               </div>
               <div className="max-h-64 overflow-y-auto divide-y divide-[rgba(65,50,50,0.18)]">
@@ -123,7 +125,7 @@ export function TopBar() {
                       ? <AlertTriangle size={16} className="text-[#F59E0B] shrink-0 mt-0.5" />
                       : <Info size={16} className="text-[color:var(--accent)] shrink-0 mt-0.5" />}
                     <div>
-                      <p className="text-sm font-medium text-[#F5F5F5]">{alert.title}</p>
+                      <p className="text-sm font-medium text-[color:var(--text-0)]">{alert.title}</p>
                       <p className="text-xs text-[color:var(--text-1)] mt-0.5">{alert.message}</p>
                     </div>
                   </div>
@@ -136,7 +138,7 @@ export function TopBar() {
         {/* Profile */}
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-full flex items-center justify-center font-mono font-bold text-sm
-            bg-[color:color-mix(in_srgb,var(--accent)_12%,transparent)] text-[color:var(--accent-light)] border border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)]">
+            bg-[rgba(16,16,16,0.78)] text-[color:var(--accent-light)] border border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)]">
             {profile?.currentWeight ? `${profile.currentWeight}` : '—'}
           </div>
           <div className="hidden sm:block">

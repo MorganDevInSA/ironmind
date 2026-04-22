@@ -19,12 +19,12 @@ interface StepQuestionnaireProps {
 
 const inputCls = `w-full px-4 py-3 rounded-lg
   bg-[#131313] border border-[rgba(65,50,50,0.40)]
-  text-[#F0F0F0] placeholder:text-[#5E5E5E]
+  text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)]
   focus:border-[rgba(220,38,38,0.50)]
   focus:shadow-[0_0_0_3px_rgba(220,38,38,0.10)]
   focus:outline-none transition-all duration-200 text-sm`;
 
-const labelCls = 'block text-xs font-semibold uppercase tracking-[0.2em] text-[#5E5E5E] mb-1.5';
+const labelCls = 'block text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)] mb-1.5';
 
 function Field({
   label,
@@ -97,12 +97,12 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
         <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[color:var(--accent)]">
           Step 3 of 6
         </span>
-        <h2 className="mt-2 text-2xl sm:text-3xl font-bold font-heading tracking-tight text-[#F0F0F0]">
+        <h2 className="mt-2 text-2xl sm:text-3xl font-bold font-heading tracking-tight text-[color:var(--text-0)]">
           Athlete Questionnaire
         </h2>
-            <p className="mt-2 text-sm text-[#9A9A9A]">
+            <p className="mt-2 text-sm text-[color:var(--text-1)]">
           Fill in as much as you can. Leave unknown fields blank — they become{' '}
-          <code className="text-[color:var(--accent-light)] text-xs bg-[color:color-mix(in_srgb,var(--accent)_10%,transparent)] px-1.5 py-0.5 rounded">null</code>{' '}
+          <code className="text-[color:var(--accent-light)] text-xs bg-[rgba(16,16,16,0.78)] border border-[color:color-mix(in_srgb,var(--accent)_25%,transparent)] px-1.5 py-0.5 rounded">null</code>{' '}
           in the output. The more detail you provide, the better your personalised program.
         </p>
       </div>
@@ -110,7 +110,7 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
       {/* Skip to demo banner — theme accent */}
       <div
         className="rounded-[14px] border border-[color:color-mix(in_srgb,var(--accent)_32%,transparent)]
-        bg-[color:color-mix(in_srgb,var(--accent)_8%,transparent)] overflow-hidden"
+        bg-[rgba(18,14,14,0.78)] overflow-hidden"
       >
         <button
           onClick={() => setDemoExpanded(v => !v)}
@@ -131,13 +131,13 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
 
         {demoExpanded && (
           <div className="px-5 pb-5 flex flex-col gap-4 border-t border-[color:color-mix(in_srgb,var(--accent)_22%,transparent)]">
-            <div className="pt-4 flex flex-col gap-2 text-sm text-[#9A9A9A] leading-relaxed">
+            <div className="pt-4 flex flex-col gap-2 text-sm text-[color:var(--text-1)] leading-relaxed">
               <p>
                 Demo data loads a pre-built athlete plan so you can explore every feature of
                 IRONMIND right away. You can replace it with your own personalised data at
-                any time from <strong className="text-[#F0F0F0]">Settings → Import Coach Data</strong>.
+                any time from <strong className="text-[color:var(--text-0)]">Settings → Import Coach Data</strong>.
               </p>
-              <p className="font-semibold text-[#F0F0F0] mt-1">When you&apos;re ready to go custom, here&apos;s the full process:</p>
+              <p className="font-semibold text-[color:var(--text-0)] mt-1">When you&apos;re ready to go custom, here&apos;s the full process:</p>
               <ol className="flex flex-col gap-2 pl-1">
                 {[
                   'Go back to Step 1 and paste the Coach Persona prompt into a new ChatGPT / Claude / Gemini chat.',
@@ -148,7 +148,7 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
                 ].map((text, i) => (
                   <li key={i} className="flex items-start gap-3">
                     <span className="mt-0.5 w-5 h-5 shrink-0 rounded-full flex items-center justify-center
-                      text-[9px] font-bold bg-[color:color-mix(in_srgb,var(--accent)_15%,transparent)]
+                      text-[9px] font-bold bg-[rgba(16,16,16,0.78)]
                       border border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)] text-[color:var(--accent-light)]">
                       {i + 1}
                     </span>
@@ -156,8 +156,8 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
                   </li>
                 ))}
               </ol>
-              <p className="text-xs text-[#5E5E5E] mt-1">
-                Need a refresher anytime? The <strong className="text-[#F0F0F0]">User Guide</strong> in the app
+              <p className="text-xs text-[color:var(--text-2)] mt-1">
+                Need a refresher anytime? The <strong className="text-[color:var(--text-0)]">User Guide</strong> in the app
                 sidebar walks through the full process with all prompts available to copy.
               </p>
             </div>
@@ -276,7 +276,7 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
 
         {/* Injuries */}
         <SectionTitle>Injuries &amp; Health Constraints</SectionTitle>
-        <p className="text-xs text-[#9A9A9A] -mt-3 mb-1">
+        <p className="text-xs text-[color:var(--text-1)] -mt-3 mb-1">
           Be specific — the AI uses this to exclude movements and find safe substitutions.
         </p>
         {([0, 1, 2] as const).map(idx => (
@@ -531,7 +531,7 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
       {/* Download CTA */}
       <div className="rounded-[14px] p-5 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)]
         shadow-[0_10px_24px_rgba(0,0,0,0.45)] flex flex-col gap-3">
-        <p className="text-sm text-[#9A9A9A]">
+        <p className="text-sm text-[color:var(--text-1)]">
           When you&apos;re done, download your questionnaire as JSON. You&apos;ll paste it into the
           AI in the next step alongside the data-generation prompt.
         </p>
@@ -556,9 +556,9 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
       <div className="flex items-center justify-between">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm text-[#9A9A9A]
+          className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm text-[color:var(--text-1)]
             bg-[rgba(22,16,16,0.9)] border border-[rgba(65,50,50,0.45)]
-            hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[#F0F0F0]
+            hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]
             active:scale-95 transition-all duration-200"
         >
           <ArrowLeft size={15} />

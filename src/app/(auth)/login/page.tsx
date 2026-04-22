@@ -146,7 +146,7 @@ export default function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2 bg-surface-elevated border border-border rounded-lg text-foreground focus:outline-none focus:border-accent"
+                className="w-full px-3 py-2 bg-surface-elevated border border-border rounded-lg text-foreground focus:outline-none focus:border-[color:var(--accent)]"
                 placeholder="you@example.com"
                 required
               />
@@ -160,7 +160,7 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2 bg-surface-elevated border border-border rounded-lg text-foreground focus:outline-none focus:border-accent"
+                className="w-full px-3 py-2 bg-surface-elevated border border-border rounded-lg text-foreground focus:outline-none focus:border-[color:var(--accent)]"
                 placeholder="••••••••"
                 required
               />
@@ -169,7 +169,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-2.5 bg-accent text-white font-medium rounded-lg hover:bg-accent-hover transition-colors disabled:opacity-50"
+              className="btn-primary w-full py-2.5 disabled:opacity-50"
             >
               {isLoading ? 'Signing in...' : 'Sign In'}
             </button>
@@ -251,7 +251,7 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-text-muted mt-6">
           Don&apos;t have an account?{' '}
-          <a href="/register" className="text-accent hover:underline">
+          <a href="/register" className="text-[color:var(--accent)] hover:underline">
             Sign up
           </a>
         </p>

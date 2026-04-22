@@ -46,8 +46,8 @@ interface FileState { status: FileStatus; content: string | null; error: string 
 function Row({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
   return (
     <div className="flex justify-between items-start gap-4 text-sm">
-      <span className="text-[#7F91AD] shrink-0">{label}</span>
-      <span className={cn('text-[#F5F5F5] text-right', mono && 'font-mono tabular-nums')}>{value}</span>
+      <span className="text-[color:var(--text-1)] shrink-0">{label}</span>
+      <span className={cn('text-[color:var(--text-0)] text-right', mono && 'font-mono tabular-nums')}>{value}</span>
     </div>
   );
 }
@@ -166,8 +166,8 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
             <CheckCircle2 size={32} className="text-[#10B981]" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-[#F5F5F5] mb-2">You&apos;re set up.</h2>
-            <p className="text-[#9A9A9A]">{importResult?.message}</p>
+            <h2 className="text-2xl font-bold text-[color:var(--text-0)] mb-2">You&apos;re set up.</h2>
+            <p className="text-[color:var(--text-1)]">{importResult?.message}</p>
           </div>
           <button
             onClick={() => router.push('/dashboard')}
@@ -190,7 +190,7 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
       <div className="flex flex-col gap-7 py-4">
         <div>
           <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[color:var(--accent)]">Step 6 of 6</span>
-          <h2 className="mt-2 text-2xl font-bold font-heading tracking-tight text-[#F0F0F0]">Review Your Plan</h2>
+          <h2 className="mt-2 text-2xl font-bold font-heading tracking-tight text-[color:var(--text-0)]">Review Your Plan</h2>
         </div>
 
         <div className="rounded-[14px] p-6 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)]
@@ -220,9 +220,10 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
               type="checkbox"
               checked={overwriteExistingData}
               onChange={(e) => setOverwriteExistingData(e.target.checked)}
-              className="mt-1 rounded border-[rgba(80,96,128,0.5)]"
+              className="mt-1 rounded border-[rgba(65,50,50,0.5)]"
+              style={{ accentColor: 'var(--accent)' }}
             />
-            <span className="text-sm text-[#F5F5F5]">
+            <span className="text-sm text-[color:var(--text-0)]">
               <span className="font-semibold text-[#F59E0B]">Replace existing IronMind data</span>
               {' — '}
               Your account already has a saved plan. Check this to import this coach pack and set it as your
@@ -234,9 +235,9 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
         <div className="flex gap-3">
           <button
             onClick={() => { setOverwriteExistingData(false); setSubStep('upload'); }}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm text-[#9A9A9A]
+            className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm text-[color:var(--text-1)]
               bg-[rgba(22,16,16,0.9)] border border-[rgba(65,50,50,0.45)]
-              hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[#F0F0F0]
+              hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]
               active:scale-95 transition-all duration-200"
           >
             <RotateCcw size={16} /> Back
@@ -271,17 +272,17 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
         <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[color:var(--accent)]">
           Step 6 of 6
         </span>
-        <h2 className="mt-2 text-2xl sm:text-3xl font-bold font-heading tracking-tight text-[#F0F0F0]">
+        <h2 className="mt-2 text-2xl sm:text-3xl font-bold font-heading tracking-tight text-[color:var(--text-0)]">
           Import Your Data Pack
         </h2>
-        <p className="mt-2 text-sm text-[#9A9A9A]">
+        <p className="mt-2 text-sm text-[color:var(--text-1)]">
           Upload the 6 JSON files your AI generated. Works from phone, tablet, or desktop.
         </p>
       </div>
 
       {/* Icon header */}
       <div className="flex justify-center">
-        <div className="w-14 h-14 rounded-2xl bg-[color:color-mix(in_srgb,var(--accent)_10%,transparent)] border border-[rgba(220,38,38,0.30)]
+        <div className="w-14 h-14 rounded-2xl bg-[rgba(16,16,16,0.78)] border border-[rgba(220,38,38,0.30)]
           flex items-center justify-center">
           <Dumbbell size={28} className="text-[color:var(--accent)]" />
         </div>
@@ -296,17 +297,17 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
         className={cn(
           'rounded-2xl border-2 border-dashed p-6 text-center transition-all',
           isDragging
-            ? 'border-[color:var(--accent)] bg-[color:color-mix(in_srgb,var(--accent)_8%,transparent)]'
+            ? 'border-[color:var(--accent)] bg-[rgba(16,16,16,0.78)]'
             : 'border-[rgba(65,50,50,0.40)] bg-[rgba(16,14,14,0.4)]'
         )}
       >
         <label htmlFor="bulk-upload" className="cursor-pointer block space-y-2">
-          <Upload size={24} className="mx-auto text-[#5E5E5E]" />
-          <p className="text-sm text-[#9A9A9A]">
-            <span className="font-semibold text-[#F0F0F0]">Tap to select all 6 files at once</span>
+          <Upload size={24} className="mx-auto text-[color:var(--text-2)]" />
+          <p className="text-sm text-[color:var(--text-1)]">
+            <span className="font-semibold text-[color:var(--text-0)]">Tap to select all 6 files at once</span>
             {' '}or drag them here
           </p>
-          <p className="text-xs text-[#5E5E5E]">{loadedCount} / {EXPECTED_FILES.length} loaded</p>
+          <p className="text-xs text-[color:var(--text-2)]">{loadedCount} / {EXPECTED_FILES.length} loaded</p>
           <input
             id="bulk-upload"
             type="file"
@@ -341,17 +342,17 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
                   ? <CheckCircle2 size={22} className="text-[#10B981]" />
                   : state.status === 'error'
                   ? <XCircle size={22} className="text-[color:var(--accent-light)]" />
-                  : <FileJson size={22} className="text-[#5E5E5E]" />}
+                  : <FileJson size={22} className="text-[color:var(--text-2)]" />}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-[#F0F0F0]">{file.label}</p>
-                <p className="text-xs text-[#5E5E5E] truncate">
+                <p className="text-sm font-semibold text-[color:var(--text-0)]">{file.label}</p>
+                <p className="text-xs text-[color:var(--text-2)] truncate">
                   {state.error ?? (state.status === 'loaded' ? file.name : file.description)}
                 </p>
               </div>
               <span className={cn(
                 'shrink-0 text-xs font-bold uppercase tracking-wider',
-                state.status === 'loaded' ? 'text-[#10B981]' : state.status === 'error' ? 'text-[color:var(--accent-light)]' : 'text-[#5E5E5E]'
+                state.status === 'loaded' ? 'text-[#10B981]' : state.status === 'error' ? 'text-[color:var(--accent-light)]' : 'text-[color:var(--text-2)]'
               )}>
                 {state.status === 'loaded' ? '✓' : state.status === 'error' ? 'Fix' : 'Pick'}
               </span>
@@ -378,21 +379,21 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
 
         <div className="flex items-center gap-3">
           <div className="flex-1 h-px bg-[rgba(65,50,50,0.40)]" />
-          <span className="text-xs text-[#5E5E5E]">or</span>
+          <span className="text-xs text-[color:var(--text-2)]">or</span>
           <div className="flex-1 h-px bg-[rgba(65,50,50,0.40)]" />
         </div>
 
         <button
           onClick={() => setDemoModalOpen(true)}
-          className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm text-[#9A9A9A]
+          className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm text-[color:var(--text-1)]
             bg-[rgba(22,16,16,0.9)] border border-[rgba(65,50,50,0.45)]
-            hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[#F0F0F0]
+            hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]
             active:scale-95 transition-all duration-200"
         >
           <Users size={15} />
           Choose a demo profile instead
         </button>
-        <p className="text-xs text-center text-[#5E5E5E]">
+        <p className="text-xs text-center text-[color:var(--text-2)]">
           Explore with a pre-built plan. Replace with your own data any time from Settings.
         </p>
       </div>
@@ -403,9 +404,9 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
       <div className="flex">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm text-[#9A9A9A]
+          className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm text-[color:var(--text-1)]
             bg-[rgba(22,16,16,0.9)] border border-[rgba(65,50,50,0.45)]
-            hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[#F0F0F0]
+            hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]
             active:scale-95 transition-all duration-200"
         >
           <ArrowLeft size={15} />

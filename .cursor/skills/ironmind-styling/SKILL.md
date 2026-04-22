@@ -1,257 +1,274 @@
 ---
 name: ironmind-styling
-description: Apply IRONMIND crimson/black UI styling. Use when implementing buttons, cards, panels, badges, typography, data displays, or any UI element. References this file for the full token system.
+description: Apply IRONMIND UI styling with theme-aware patterns. Use when implementing buttons, cards, panels, badges, typography, data displays, or any UI element. All accent colors use CSS variables for multi-theme support.
 ---
 
-# IRONMIND UI/UX Styling — Crimson Theme
+# IRONMIND UI/UX Styling
 
-Blood, strength, sweat, growth. Pure dark with crimson fire.
+Blood, strength, sweat, growth. Pure dark with accent fire.
 
-## Color Tokens (Quick Reference)
+## Design Token Quick Reference
 
-```
-Backgrounds: #080808 | #0D0D0D | #131313
-Text:        #F0F0F0 | #9A9A9A | #5E5E5E   ← neutral grey, no blue tint
-Accent:      #DC2626 (crimson) — replaces ALL gold and blue
-Status:      #22C55E (good) | #F59E0B (warn) | #EF4444 (bad)
-Panels:      rgba(18,14,14,0.78) blur-xl | border: rgba(65,50,50,0.40)
-```
+```css
+/* Backgrounds */
+--bg-0: #080808;           /* Deepest black */
+--bg-1: #0D0D0D;           /* App background */
+--bg-2: #131313;           /* Elevated surfaces */
 
-### App chrome (header, sidebar, mobile nav)
+/* Panels */
+--panel: rgba(18, 14, 14, 0.78);
+--panel-strong: rgba(18, 14, 14, 0.94);
+--panel-border: rgba(65, 50, 50, 0.40);
 
-Use **`globals.css`** chrome variables so rails stay **warm-dark** and aligned with `--bg-*`:
+/* Text (neutral, theme-independent) */
+--text-0: #F0F0F0;         /* Primary text */
+--text-1: #9A9A9A;         /* Secondary text */
+--text-2: #5E5E5E;         /* Muted/labels */
+--text-detail: #BABABA;    /* Readable secondary on dark */
 
-| Token | Role |
-|-------|------|
-| `--chrome-bg` | Sidebar & mobile bottom nav background (`#0D0D0D`, same tier as `--bg-1`) |
-| `--chrome-bg-topbar` | Sticky top bar (**`var(--chrome-bg)`** — same shade as sidebar) |
-| `--chrome-bg-toggle` | Sidebar collapse pill (`#080808`, same as `--bg-0`) |
+/* Accent (theme-aware — changes with data-theme) */
+--accent: #DC2626;         /* Primary accent */
+--accent-light: #EF4444;   /* Bright accent */
+--accent-2: #991B1B;       /* Dark accent */
 
-In JSX: `className="bg-[color:var(--chrome-bg)]"` (and matching variants). Idle labels/icons: `text-[color:var(--text-1)]`, hover to `text-[color:var(--text-0)]`. **Avoid** `#2e2e2e` bars and stray `#6B6B6B` / `#8A8A8A` in chrome — use the tokens above.
+/* Status (fixed) */
+--good: #22C55E;
+--warn: #F59E0B;
+--bad: #EF4444;
 
----
-
-## Buttons
-
-### Primary (Crimson CTA)
-
-```tsx
-<button className="px-6 py-3 rounded-lg font-semibold text-white border
-  bg-gradient-to-r from-[#DC2626] to-[#B91C1C] border-[rgba(220,38,38,0.5)]
-  shadow-[0_12px_22px_rgba(220,38,38,0.25)]
-  hover:brightness-110 active:scale-95 transition-all duration-200">
-  Action
-</button>
-```
-
-### Secondary
-
-```tsx
-<button className="px-6 py-3 rounded-lg font-semibold text-[#9A9A9A]
-  bg-[rgba(22,16,16,0.9)] border border-[rgba(65,50,50,0.45)]
-  hover:border-[rgba(220,38,38,0.45)] hover:text-[#F0F0F0]
-  active:scale-95 transition-all duration-200">
-  Action
-</button>
-```
-
-### Crimson Premium CTA
-
-```tsx
-<button className="px-6 py-3 rounded-lg font-semibold text-white
-  bg-gradient-to-r from-[#DC2626] to-[#991B1B]
-  border border-[rgba(220,38,38,0.5)] shadow-[0_8px_24px_rgba(220,38,38,0.20)]
-  hover:brightness-110 active:scale-95 transition-all duration-200">
-  Start Workout
-</button>
-```
-
-### Ghost
-
-```tsx
-<button className="px-4 py-2 rounded-lg font-medium text-[#5E5E5E]
-  hover:text-[#F0F0F0] hover:bg-[rgba(22,16,16,0.6)]
-  active:scale-95 transition-all duration-200">
-  Action
-</button>
+/* Chrome */
+--chrome-bg: #141414;
+--chrome-bg-topbar: var(--chrome-bg);
+--chrome-border: rgba(65, 50, 50, 0.38);
 ```
 
 ---
 
-## Cards & Panels
+## Semantic CSS Classes
 
-### Glass Panel (standard card)
+All classes are defined in `globals.css` and are theme-aware.
+
+### Panels
+
+| Class | Use |
+|-------|-----|
+| `.glass-panel` | Standard card with blur, border, shadow |
+| `.glass-panel-strong` | Modal/overlay with stronger opacity |
+| `.dashboard-overview` | Main dashboard container (centered, bordered) |
+| `.dashboard-card-surface` | Cards inside dashboard grid |
+| `.card-hover` | Add hover lift + accent border glow |
+| `.gradient-border` | Wrapper for accent gradient border effect |
+| `.trading-panel` | Strength panel with gradient border shimmer |
+
+### Buttons
+
+| Class | Use |
+|-------|-----|
+| `.btn-primary` | Main CTA — accent gradient, shadow |
+| `.btn-secondary` | Secondary action — muted, accent hover |
+| `.btn-ghost` | Minimal — text only, hover background |
+| `.btn-gold` | Alias for `.btn-primary` (legacy name) |
+
+### Typography
+
+| Class | Use |
+|-------|-----|
+| `.data-label` | Uppercase muted label (10px, tracking) |
+| `.data-value` | Large monospace number (30px) |
+| `.data-value-lg` | Extra large number (36px) |
+| `.data-value-sm` | Small monospace number (20px) |
+| `.brand-text` | Gradient text for brand/logo |
+| `.brand-text-embossed` | 3D embossed brand text |
+
+### Status Badges
+
+| Class | Use |
+|-------|-----|
+| `.status-badge.good` | Green success state |
+| `.status-badge.warn` | Amber warning state |
+| `.status-badge.bad` | Red error state |
+| `.status-badge.gold` | Accent milestone/PR |
+| `.status-badge.info` | Blue informational |
+| `.metric-badge` | Pill badge for KPIs |
+
+### Navigation
+
+| Class | Use |
+|-------|-----|
+| `.nav-item` | Sidebar/mobile nav button |
+| `.nav-item.active` | Active nav state with shimmer |
+| `.is-selected` | Selected state glow for tabs/toggles |
+| `.tab-button` | Tab navigation button |
+| `.tab-button.active` | Active tab with accent underline |
+
+### Utilities
+
+| Class | Use |
+|-------|-----|
+| `.exercise-index-badge` | Ordered exercise number |
+| `.divider` | Horizontal accent gradient line |
+| `.skeleton` | Loading shimmer effect |
+| `.spinner` | Rotating loading indicator |
+| `.tooltip` | Floating tooltip box |
+| `.live-dot` | Pulsing live indicator |
+| `.spotlight-hover` | Hover sweep effect |
+
+---
+
+## Component Recipes (Inline Tailwind)
+
+When semantic classes don't exist, use these theme-aware patterns.
+
+### Glass Panel (Custom)
 
 ```tsx
 <div className="relative rounded-[14px] p-6
-  bg-[rgba(18,14,14,0.78)] backdrop-blur-xl
-  border border-[rgba(65,50,50,0.40)]
-  shadow-[0_10px_24px_rgba(0,0,0,0.45)]">
+  bg-[color:var(--panel)] backdrop-blur-xl
+  border border-[color:var(--panel-border)]
+  shadow-[var(--shadow-soft)]">
   Content
 </div>
 ```
 
-### Hover Card (crimson border on hover)
+### Hover Card with Accent Glow
+
+```tsx
+<div className="glass-panel card-hover p-6 cursor-pointer">
+  Content
+</div>
+```
+
+Or inline:
 
 ```tsx
 <div className="relative rounded-[14px] p-6
-  bg-[rgba(18,14,14,0.78)] backdrop-blur-xl
-  border border-[rgba(65,50,50,0.40)]
-  shadow-[0_10px_24px_rgba(0,0,0,0.45)]
-  hover:border-[rgba(220,38,38,0.30)] hover:shadow-[0_8px_32px_rgba(220,38,38,0.20)]
+  bg-[color:var(--panel)] backdrop-blur-xl
+  border border-[color:var(--panel-border)]
+  shadow-[var(--shadow-soft)]
+  hover:border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)]
+  hover:shadow-[var(--shadow-accent)]
+  hover:-translate-y-0.5
   transition-all duration-200 cursor-pointer">
   Content
 </div>
 ```
 
-### Strong Panel (modals, alerts)
+### Primary Button (Inline)
 
 ```tsx
-<div className="relative rounded-[14px] p-6
-  bg-[rgba(18,14,14,0.94)] backdrop-blur-xl
-  border border-[rgba(65,50,50,0.40)]
-  shadow-[0_16px_40px_rgba(0,0,0,0.60)]">
-  Content
-</div>
+<button className="px-6 py-3 rounded-lg font-semibold text-white
+  bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-2)]
+  border border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]
+  shadow-[var(--shadow-accent)]
+  hover:brightness-110 active:scale-95 transition-all duration-200">
+  Action
+</button>
 ```
 
-### Dashboard overview shell (`.dashboard-overview`)
+### Secondary Button (Inline)
 
-Use on the **dashboard** main column only (wrap header + cycle tabs + schedule + cards):
+```tsx
+<button className="px-6 py-3 rounded-lg font-semibold text-[color:var(--text-1)]
+  bg-[rgba(22,16,16,0.9)] border border-[color:var(--panel-border)]
+  hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)]
+  hover:text-[color:var(--text-0)]
+  active:scale-95 transition-all duration-200">
+  Action
+</button>
+```
 
-- **Centered:** `max-width` / `margin-inline: auto` so the panel does not stretch edge-to-edge on ultrawide layouts.
-- **Border:** **All sides**, **`4px`** crimson (`--dashboard-overview-border` / `--dashboard-overview-border-width`), not a partial “corner” outline.
-- **Radius:** **`1.25rem`** (`--dashboard-overview-radius`) — clearly rounded corners.
-- **Implementation:** single class on the wrapper in `src/app/(app)/dashboard/page.tsx`; tokens live in **`src/app/globals.css`** (`:root` + `@layer components`).
+### Ghost Button (Inline)
 
-### Exercise index badge (`.exercise-index-badge`)
-
-For **numbered exercise rows** (session preview, program lists):
-
-- **Background:** `--exercise-index-bg` — deep warm charcoal, **not** a bright crimson fill.
-- **Text:** `var(--text-0)` — high contrast; **never** mid-grey numerals on red fills.
-- **Border:** `--exercise-index-border` — subtle crimson ring.
+```tsx
+<button className="px-4 py-2 rounded-lg font-medium text-[color:var(--text-2)]
+  hover:text-[color:var(--text-0)] hover:bg-[rgba(22,16,16,0.6)]
+  active:scale-95 transition-all duration-200">
+  Action
+</button>
+```
 
 ---
 
 ## Metric / Data Cards
 
 ```tsx
-<div className="rounded-[14px] p-5 flex flex-col gap-3
-  bg-[rgba(18,14,14,0.78)] backdrop-blur-xl
-  border border-[rgba(65,50,50,0.40)]
-  shadow-[0_10px_24px_rgba(0,0,0,0.45)]">
-
+<div className="glass-panel p-5 flex flex-col gap-3">
+  {/* Header */}
   <div className="flex items-center justify-between">
-    <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#5E5E5E]">
-      MUSCLE VOLUME
-    </span>
-    <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest
-      px-3 py-1 rounded-full bg-[rgba(220,38,38,0.12)] text-[#EF4444]
-      border border-[rgba(220,38,38,0.35)] [text-shadow:0_0_8px_rgba(220,38,38,0.4)]">
-      ON TRACK
-    </span>
+    <span className="data-label">MUSCLE VOLUME</span>
+    <span className="metric-badge">ON TRACK</span>
   </div>
 
-  <div className="text-4xl font-bold text-[#F0F0F0] font-mono tabular-nums">
-    42
-  </div>
+  {/* Value */}
+  <div className="data-value">42</div>
 
-  <div className="text-sm text-[#9A9A9A]">sets this week</div>
+  {/* Secondary */}
+  <div className="text-sm text-[color:var(--text-1)]">sets this week</div>
 </div>
 ```
 
 ---
 
-## Status Badges
+## Status Badges (Inline Patterns)
 
 ```tsx
-// Active / Good
-<span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md
-  text-xs font-semibold uppercase tracking-wide border
-  bg-emerald-500/[0.12] text-emerald-400 border-emerald-500/[0.35]">
-  Done
-</span>
+// Success
+<span className="status-badge good">Done</span>
 
 // Warning
-<span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md
-  text-xs font-semibold uppercase tracking-wide border
-  bg-amber-500/[0.12] text-amber-400 border-amber-500/[0.35]">
-  Warning
-</span>
+<span className="status-badge warn">Warning</span>
 
 // Error
-<span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md
-  text-xs font-semibold uppercase tracking-wide border
-  bg-red-500/[0.12] text-red-400 border-red-500/[0.35]">
-  Error
-</span>
+<span className="status-badge bad">Error</span>
 
-// Crimson / PR / KPI
+// Accent (PR/KPI)
+<span className="status-badge gold">PR</span>
+
+// Custom inline
 <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md
   text-xs font-semibold uppercase tracking-wide border
-  bg-[rgba(220,38,38,0.12)] text-[#EF4444] border-[rgba(220,38,38,0.35)]
-  [text-shadow:0_0_8px_rgba(220,38,38,0.4)]">
-  PR
+  bg-[color:color-mix(in_srgb,var(--accent)_12%,transparent)]
+  text-[color:var(--accent-light)]
+  border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)]
+  [text-shadow:0_0_8px_color-mix(in_srgb,var(--accent)_40%,transparent)]">
+  MILESTONE
 </span>
 ```
 
 ---
 
-## Typography
+## Typography Patterns
 
 ```tsx
 // Page title
-<h1 className="text-[1.875rem] font-bold font-heading tracking-tight text-[#F0F0F0]">
+<h1 className="text-[1.875rem] font-bold font-heading tracking-tight text-[color:var(--text-0)]">
   Title
 </h1>
 
 // Data label (ALL CAPS)
-<span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#5E5E5E]">
-  SETS / WEEK
-</span>
+<span className="data-label">SETS / WEEK</span>
 
 // Large data value
-<span className="text-4xl font-bold text-[#F0F0F0] font-mono tabular-nums">
-  12,450
-</span>
+<span className="data-value">12,450</span>
 
-// Brand text (crimson gradient)
-<span className="font-heading font-bold tracking-wide
-  bg-gradient-to-r from-[#FF4040] via-[#DC2626] to-[#991B1B]
-  bg-clip-text text-transparent
-  [filter:drop-shadow(0_2px_12px_rgba(220,38,38,0.4))]">
-  IRONMIND
-</span>
+// Brand text (accent gradient)
+<span className="brand-text">IRONMIND</span>
 ```
 
 ---
 
 ## Navigation Items
 
+Use `.nav-item` class:
+
 ```tsx
-<button className="w-full h-[54px] rounded-[14px] flex items-center gap-3 px-[18px]
-  bg-[rgba(28,22,22,0.55)] border border-white/[0.05]
-  text-[#9A9A9A] transition-all duration-[220ms]
-  hover:bg-[rgba(38,28,28,0.75)] hover:border-white/[0.10] hover:-translate-y-px
-  active:scale-95
-  data-[active=true]:bg-[rgba(22,10,10,0.94)]
-  data-[active=true]:border-[rgba(220,38,38,0.40)]
-  data-[active=true]:shadow-[0_0_14px_rgba(220,38,38,0.12)]
-  data-[active=true]:text-[#EF4444]"
-  data-active={isActive}>
+<button 
+  className={`nav-item ${isActive ? 'active' : ''}`}
+  data-active={isActive}
+>
   <Icon className="w-5 h-5" />
   <span className="text-sm font-semibold tracking-wide">Label</span>
 </button>
-```
-
----
-
-## Divider
-
-```tsx
-<hr className="h-px my-4 border-0
-  bg-gradient-to-r from-transparent via-[rgba(220,38,38,0.30)] to-transparent" />
 ```
 
 ---
@@ -260,10 +277,10 @@ For **numbered exercise rows** (session preview, program lists):
 
 ```tsx
 <input className="w-full px-4 py-3 rounded-lg
-  bg-[#131313] border border-[rgba(65,50,50,0.40)]
-  text-[#F0F0F0] placeholder:text-[#5E5E5E]
-  focus:border-[rgba(220,38,38,0.50)]
-  focus:shadow-[0_0_0_3px_rgba(220,38,38,0.10)]
+  bg-[color:var(--bg-2)] border border-[color:var(--panel-border)]
+  text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)]
+  focus:border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]
+  focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--accent)_10%,transparent)]
   focus:outline-none transition-all duration-200" />
 ```
 
@@ -271,20 +288,22 @@ For **numbered exercise rows** (session preview, program lists):
 
 ## Data Tables
 
+Use `.data-table` class or inline:
+
 ```tsx
-<table className="w-full text-sm">
+<table className="data-table">
   <thead>
-    <tr className="border-b border-[rgba(220,38,38,0.20)]">
-      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#5E5E5E]">
-        Col
-      </th>
+    <tr>
+      <th>Exercise</th>
+      <th>Sets</th>
+      <th>Reps</th>
     </tr>
   </thead>
   <tbody>
-    <tr className="border-b border-[rgba(65,50,50,0.25)]
-      hover:bg-[rgba(22,16,16,0.55)] hover:border-l-2 hover:border-l-[rgba(220,38,38,0.35)]
-      transition-all duration-150">
-      <td className="px-4 py-4 text-[#9A9A9A]">Data</td>
+    <tr>
+      <td>Squat</td>
+      <td className="font-mono tabular-nums">4</td>
+      <td className="font-mono tabular-nums">8</td>
     </tr>
   </tbody>
 </table>
@@ -292,41 +311,44 @@ For **numbered exercise rows** (session preview, program lists):
 
 ---
 
-## Globals.css Additions
+## Dividers
 
-```css
-:root {
-  --bg-0: #080808;
-  --bg-1: #0D0D0D;
-  --bg-2: #131313;
-  --chrome-bg: #0d0d0d;
-  --chrome-bg-topbar: var(--chrome-bg);
-  --chrome-bg-toggle: #080808;
-  --panel: rgba(18, 14, 14, 0.78);
-  --panel-strong: rgba(18, 14, 14, 0.94);
-  --panel-border: rgba(65, 50, 50, 0.40);
-  --text-0: #F0F0F0;
-  --text-1: #9A9A9A;
-  --text-2: #5E5E5E;
-  --accent: #DC2626;
-  --accent-2: #991B1B;
-  --good: #22C55E;
-  --bad: #EF4444;
-  --warn: #F59E0B;
-  --crimson: #DC2626;
-  --crimson-light: #EF4444;
-  --crimson-dark: #991B1B;
-  --gold: #DC2626;        /* aliased — kept for back-compat */
-  --gold-light: #EF4444;
-  --gold-dark: #991B1B;
-  --shadow-gold: 0 8px 32px rgba(220, 38, 38, 0.20);
-}
+Use `.divider` class:
 
-body {
-  background:
-    radial-gradient(1200px 600px at 10% -10%, rgba(180, 20, 20, 0.06), transparent 60%),
-    radial-gradient(900px 500px at 110% 10%,  rgba(120, 10, 10, 0.04), transparent 55%),
-    linear-gradient(160deg, #080808, #0D0D0D 45%, #131313 100%);
-  background-attachment: fixed;
-}
+```tsx
+<hr className="divider" />
 ```
+
+Or inline:
+
+```tsx
+<hr className="h-px my-4 border-0
+  bg-gradient-to-r from-transparent via-[color:color-mix(in_srgb,var(--accent)_30%,transparent)] to-transparent" />
+```
+
+---
+
+## Theme Switching
+
+To change theme at runtime:
+
+```tsx
+document.documentElement.dataset.theme = 'hot-pink';
+// or remove for default:
+delete document.documentElement.dataset.theme;
+```
+
+All components using CSS variables automatically update.
+
+---
+
+## Anti-Patterns to Avoid
+
+| Don't | Do Instead |
+|-------|------------|
+| `bg-[#DC2626]` | `bg-[color:var(--accent)]` |
+| `text-[#EF4444]` | `text-[color:var(--accent-light)]` |
+| `border-[rgba(220,38,38,0.3)]` | `border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)]` |
+| `shadow-[0_8px_32px_rgba(220,38,38,0.2)]` | `shadow-[var(--shadow-accent)]` |
+| Creating new button styles | Use `.btn-primary`, `.btn-secondary`, `.btn-ghost` |
+| Inline panel styling | Use `.glass-panel`, `.glass-panel-strong` |

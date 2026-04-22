@@ -72,7 +72,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="spinner mx-auto mb-4" />
-          <p className="text-[#6B6B6B] text-sm">Loading…</p>
+          <p className="text-[color:var(--text-2)] text-sm">Loading…</p>
         </div>
       </div>
     );

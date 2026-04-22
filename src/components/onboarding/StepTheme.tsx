@@ -45,17 +45,17 @@ export function StepTheme({ onNext, onBack }: StepThemeProps) {
         <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[color:var(--accent)]">
           Step 1 of 6
         </span>
-        <h2 className="mt-2 text-2xl sm:text-3xl font-bold font-heading tracking-tight text-[#F0F0F0]">
+        <h2 className="mt-2 text-2xl sm:text-3xl font-bold font-heading tracking-tight text-[color:var(--text-0)]">
           Choose Your Theme
         </h2>
-        <p className="mt-2 text-sm text-[#9A9A9A]">
+        <p className="mt-2 text-sm text-[color:var(--text-1)]">
           Pick your visual mode before onboarding. Your choice updates highlights, glows, and key
           accents across the app in real time.
         </p>
       </div>
 
       <div className="rounded-[14px] p-5 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)] shadow-[0_10px_24px_rgba(0,0,0,0.45)] space-y-3">
-        <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.25em] text-[#5E5E5E]">
+        <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.25em] text-[color:var(--text-2)]">
           <Palette size={13} className="text-[color:var(--accent)]" />
           Theme Presets
         </div>
@@ -79,8 +79,8 @@ export function StepTheme({ onNext, onBack }: StepThemeProps) {
                   style={{ background: option.swatch }}
                 />
                 <div>
-                  <p className="text-sm font-semibold text-[#F5F5F5]">{option.label}</p>
-                  <p className="text-xs text-[#9A9A9A]">{option.description}</p>
+                  <p className="text-sm font-semibold text-[color:var(--text-0)]">{option.label}</p>
+                  <p className="text-xs text-[color:var(--text-1)]">{option.description}</p>
                 </div>
               </div>
             </button>
@@ -91,12 +91,12 @@ export function StepTheme({ onNext, onBack }: StepThemeProps) {
       <div className="rounded-[14px] p-5 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)] shadow-[0_10px_24px_rgba(0,0,0,0.45)] space-y-3">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-sm font-semibold text-[#F5F5F5]">Custom Accent</p>
-            <p className="text-xs text-[#9A9A9A]">
+            <p className="text-sm font-semibold text-[color:var(--text-0)]">Custom Accent</p>
+            <p className="text-xs text-[color:var(--text-1)]">
               Set any accent color and IRONMIND will generate the matching glow and border tones.
             </p>
           </div>
-          <span className="font-mono text-xs tabular-nums text-[#9A9A9A]">{customHex}</span>
+          <span className="font-mono text-xs tabular-nums text-[color:var(--text-1)]">{customHex}</span>
         </div>
         <div className="flex items-center gap-3">
           <input
@@ -118,7 +118,7 @@ export function StepTheme({ onNext, onBack }: StepThemeProps) {
               'rounded-lg border px-3 py-2 text-xs font-semibold uppercase tracking-wider transition-colors',
               theme === 'custom'
                 ? 'is-selected text-[color:var(--accent-light)]'
-                : 'border-[rgba(65,50,50,0.38)] text-[#9A9A9A] hover:text-[#F0F0F0]'
+                : 'border-[rgba(65,50,50,0.38)] text-[color:var(--text-1)] hover:text-[color:var(--text-0)]'
             )}
           >
             Use Custom
@@ -129,9 +129,9 @@ export function StepTheme({ onNext, onBack }: StepThemeProps) {
       <div className="flex items-center justify-between">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm text-[#9A9A9A]
+          className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm text-[color:var(--text-1)]
             bg-[rgba(22,16,16,0.9)] border border-[rgba(65,50,50,0.45)]
-            hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[#F0F0F0]
+            hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]
             active:scale-95 transition-all duration-200"
         >
           <ArrowLeft size={15} />
@@ -142,7 +142,7 @@ export function StepTheme({ onNext, onBack }: StepThemeProps) {
           onClick={onNext}
           className="flex items-center gap-2 px-6 py-2.5 rounded-lg font-semibold text-sm text-white
             bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-2)] border border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]
-            shadow-[0_8px_20px_rgba(220,38,38,0.22)]
+            shadow-[var(--shadow-accent)]
             hover:brightness-110 active:scale-95 transition-all duration-200"
         >
           Continue

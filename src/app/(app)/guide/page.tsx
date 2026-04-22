@@ -33,8 +33,8 @@ function CopyButton({ text, label = 'Copy' }: { text: string; label?: string }) 
     <button
       onClick={handleCopy}
       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold
-        bg-[color:color-mix(in_srgb,var(--accent)_12%,transparent)] border border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)] text-[color:var(--accent-light)]
-        hover:bg-[color:color-mix(in_srgb,var(--accent)_20%,transparent)] active:scale-95 transition-all duration-200"
+        bg-[rgba(16,16,16,0.78)] border border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)] text-[color:var(--accent-light)]
+        hover:border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)] active:scale-95 transition-all duration-200"
     >
       {copied ? <Check size={12} /> : <Copy size={12} />}
       {copied ? 'Copied!' : label}
@@ -66,24 +66,24 @@ function Section({
       bg-[rgba(18,14,14,0.78)] shadow-[0_10px_24px_rgba(0,0,0,0.45)]">
       <button
         onClick={() => setOpen(v => !v)}
-        className="w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-[color:color-mix(in_srgb,var(--accent)_4%,transparent)] transition-colors"
+        className="w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-[rgba(22,16,16,0.55)] transition-colors"
       >
         <div className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center text-xs font-bold
-          bg-[color:color-mix(in_srgb,var(--accent)_15%,transparent)] border border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)] text-[color:var(--accent-light)]
+          bg-[rgba(16,16,16,0.78)] border border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)] text-[color:var(--accent-light)]
           [text-shadow:0_0_8px_color-mix(in_srgb,var(--accent)_40%,transparent)]">
           {number}
         </div>
         <Icon size={18} className="text-[color:var(--accent)] shrink-0" />
         <div className="flex-1 flex items-center gap-3">
-          <span className="font-bold text-[#F0F0F0] text-sm tracking-wide">{title}</span>
+          <span className="font-bold text-[color:var(--text-0)] text-sm tracking-wide">{title}</span>
           {badge && (
             <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full
-              bg-[color:color-mix(in_srgb,var(--accent)_15%,transparent)] border border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)] text-[color:var(--accent-light)]">
+              bg-[rgba(16,16,16,0.78)] border border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)] text-[color:var(--accent-light)]">
               {badge}
             </span>
           )}
         </div>
-        {open ? <ChevronUp size={15} className="text-[#5E5E5E] shrink-0" /> : <ChevronDown size={15} className="text-[#5E5E5E] shrink-0" />}
+        {open ? <ChevronUp size={15} className="text-[color:var(--text-2)] shrink-0" /> : <ChevronDown size={15} className="text-[color:var(--text-2)] shrink-0" />}
       </button>
 
       {open && (
@@ -101,10 +101,10 @@ function Step({ num, children }: { num: number; children: React.ReactNode }) {
   return (
     <div className="flex items-start gap-3">
       <span className="mt-0.5 w-5 h-5 shrink-0 rounded-full flex items-center justify-center
-        text-[9px] font-bold bg-[color:color-mix(in_srgb,var(--accent)_12%,transparent)] border border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)] text-[color:var(--accent-light)]">
+        text-[9px] font-bold bg-[rgba(16,16,16,0.78)] border border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)] text-[color:var(--accent-light)]">
         {num}
       </span>
-      <p className="text-sm text-[#9A9A9A] leading-relaxed">{children}</p>
+      <p className="text-sm text-[color:var(--text-1)] leading-relaxed">{children}</p>
     </div>
   );
 }
@@ -117,14 +117,14 @@ function Callout({ icon: Icon, color, children }: {
   children: React.ReactNode;
 }) {
   const palette = {
-    amber:  'border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_6%,transparent)] text-[color:var(--accent-light)]',
-    crimson: 'border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_6%,transparent)] text-[color:var(--accent-light)]',
-    green:  'border-[rgba(34,197,94,0.30)] bg-[rgba(34,197,94,0.06)] text-[#22C55E]',
+    amber:  'border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)] bg-[rgba(16,16,16,0.78)] text-[color:var(--accent-light)]',
+    crimson: 'border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)] bg-[rgba(16,16,16,0.78)] text-[color:var(--accent-light)]',
+    green:  'border-[rgba(34,197,94,0.30)] bg-[rgba(16,16,16,0.78)] text-[#22C55E]',
   };
   return (
     <div className={`flex items-start gap-3 p-4 rounded-lg border ${palette[color]}`}>
       <Icon size={15} className="shrink-0 mt-0.5" />
-      <div className="text-sm text-[#9A9A9A] leading-relaxed">{children}</div>
+      <div className="text-sm text-[color:var(--text-1)] leading-relaxed">{children}</div>
     </div>
   );
 }
@@ -135,17 +135,17 @@ export default function GuidePage() {
   const [demoModalOpen, setDemoModalOpen] = useState(false);
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8 flex flex-col gap-6">
+    <div className="max-w-4xl mx-auto px-4 py-8 flex flex-col gap-6">
 
       {/* Header */}
       <div>
         <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[color:var(--accent)]">
           User Guide
         </span>
-        <h1 className="mt-2 text-3xl font-bold font-heading tracking-tight text-[#F0F0F0]">
+        <h1 className="mt-2 text-3xl font-bold font-heading tracking-tight text-[color:var(--accent)]">
           Getting Started with IRONMIND
         </h1>
-        <p className="mt-2 text-sm text-[#9A9A9A]">
+        <p className="mt-2 text-sm text-[color:var(--text-1)]">
           Everything you need to set up your AI coach, generate your personalised plan, and
           get the most from IRONMIND — whether you&apos;re starting from scratch or already
           running on demo data.
@@ -171,7 +171,7 @@ export default function GuidePage() {
                 transition-all duration-200"
             >
               <Icon size={18} className="text-[color:var(--accent)]" />
-              <span className="text-[10px] font-semibold uppercase tracking-wide text-[#9A9A9A] leading-tight">
+              <span className="text-[10px] font-semibold uppercase tracking-wide text-[color:var(--text-1)] leading-tight">
                 {item.label}
               </span>
             </Link>
@@ -182,15 +182,15 @@ export default function GuidePage() {
       {/* Demo data callout — uses active theme accent */}
       <div
         className="rounded-[14px] border border-[color:color-mix(in_srgb,var(--accent)_32%,transparent)]
-        bg-[color:color-mix(in_srgb,var(--accent)_8%,transparent)] p-5 flex flex-col gap-3"
+        bg-[rgba(18,14,14,0.78)] p-5 flex flex-col gap-3"
       >
         <div className="flex items-center gap-2">
           <Zap size={16} className="text-[color:var(--accent)] shrink-0" />
           <span className="text-sm font-bold text-[color:var(--accent-light)]">Running on demo data?</span>
         </div>
-        <p className="text-sm text-[#9A9A9A] leading-relaxed">
+        <p className="text-sm text-[color:var(--text-1)] leading-relaxed">
           When you first log in, IRONMIND can load a pre-built athlete plan so you can explore
-          every feature immediately. This is <strong className="text-[#F0F0F0]">demo data — not your data.</strong>{' '}
+          every feature immediately. This is <strong className="text-[color:var(--text-0)]">demo data — not your data.</strong>{' '}
           Follow the 5-step process below to generate your own personalised plan and import it.
           Your demo data is replaced the moment you import your own files.
         </p>
@@ -208,9 +208,9 @@ export default function GuidePage() {
           </button>
           <Link
             href="/settings"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold text-sm text-[#9A9A9A]
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold text-sm text-[color:var(--text-1)]
               bg-[rgba(22,16,16,0.9)] border border-[rgba(65,50,50,0.45)]
-              hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[#F0F0F0]
+              hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]
               active:scale-95 transition-all duration-200"
           >
             Import your own data →
@@ -222,28 +222,28 @@ export default function GuidePage() {
 
       {/* ── Step 1 ── */}
       <Section icon={Brain} number="01" title="Activate Your AI Coach" defaultOpen>
-        <p className="text-sm text-[#9A9A9A] leading-relaxed">
+        <p className="text-sm text-[color:var(--text-1)] leading-relaxed">
           Start by giving your AI chatbot the coach persona. This transforms ChatGPT, Claude,
           or Gemini into a world-class professional bodybuilding coach that understands
           periodisation, injury constraints, masters athletes, and evidence-based nutrition.
         </p>
 
         <div className="flex flex-col gap-2">
-          <Step num={1}>Open <strong className="text-[#F0F0F0]">ChatGPT</strong>, <strong className="text-[#F0F0F0]">Claude</strong>, or <strong className="text-[#F0F0F0]">Gemini</strong> in your browser.</Step>
-          <Step num={2}>Start a <strong className="text-[#F0F0F0]">brand-new chat</strong> — do not reuse an existing thread.</Step>
+          <Step num={1}>Open <strong className="text-[color:var(--text-0)]">ChatGPT</strong>, <strong className="text-[color:var(--text-0)]">Claude</strong>, or <strong className="text-[color:var(--text-0)]">Gemini</strong> in your browser.</Step>
+          <Step num={2}>Start a <strong className="text-[color:var(--text-0)]">brand-new chat</strong> — do not reuse an existing thread.</Step>
             <Step num={3}>Go to the <Link href="/onboarding" className="text-[color:var(--accent)] hover:text-[color:var(--accent-light)] underline underline-offset-2">Setup Wizard → Step 1</Link>, copy the Coach Persona Prompt, and paste it as your first message.</Step>
-          <Step num={4}>The AI confirms it is operating as your coach. <strong className="text-[#F0F0F0]">Keep this chat open</strong> — you will return to it in Step 3.</Step>
+          <Step num={4}>The AI confirms it is operating as your coach. <strong className="text-[color:var(--text-0)]">Keep this chat open</strong> — you will return to it in Step 3.</Step>
         </div>
 
         <Callout icon={Brain} color="crimson">
-          <strong className="text-[#F0F0F0]">Tip:</strong> ChatGPT with GPT-4o produces the most consistent JSON output in Step 3.
+          <strong className="text-[color:var(--text-0)]">Tip:</strong> ChatGPT with GPT-4o produces the most consistent JSON output in Step 3.
           Claude Sonnet is also excellent. Gemini works but may need light reformatting.
         </Callout>
       </Section>
 
       {/* ── Step 2 ── */}
       <Section icon={ClipboardList} number="02" title="Complete Your Athlete Questionnaire">
-        <p className="text-sm text-[#9A9A9A] leading-relaxed">
+        <p className="text-sm text-[color:var(--text-1)] leading-relaxed">
           The questionnaire is the AI&apos;s brief. Every answer directly shapes your program,
           nutrition targets, and supplement windows. The more detail you provide, the more
           individualised your output.
@@ -251,30 +251,30 @@ export default function GuidePage() {
 
         <div className="flex flex-col gap-2">
           <Step num={1}>Go to the <Link href="/onboarding" className="text-[color:var(--accent)] hover:text-[color:var(--accent-light)] underline underline-offset-2">Setup Wizard → Step 2</Link> and fill in the form.</Step>
-          <Step num={2}>Leave fields blank where you genuinely don&apos;t know — they become <code className="text-[color:var(--accent-light)] text-xs bg-[color:color-mix(in_srgb,var(--accent)_10%,transparent)] px-1.5 py-0.5 rounded">null</code> and the AI works around them.</Step>
-          <Step num={3}>Pay special attention to <strong className="text-[#F0F0F0]">Injuries &amp; Health Constraints</strong> — be specific. The AI uses this to exclude dangerous movements before building anything.</Step>
-          <Step num={4}>Click <strong className="text-[#F0F0F0]">Save &amp; Download JSON</strong>. Your questionnaire is saved as <code className="text-[#9A9A9A] text-xs">questionnaire-answers.json</code> and copied to clipboard automatically.</Step>
+          <Step num={2}>Leave fields blank where you genuinely don&apos;t know — they become <code className="text-[color:var(--accent-light)] text-xs bg-[rgba(16,16,16,0.78)] px-1.5 py-0.5 rounded border border-[color:color-mix(in_srgb,var(--accent)_25%,transparent)]">null</code> and the AI works around them.</Step>
+          <Step num={3}>Pay special attention to <strong className="text-[color:var(--text-0)]">Injuries &amp; Health Constraints</strong> — be specific. The AI uses this to exclude dangerous movements before building anything.</Step>
+          <Step num={4}>Click <strong className="text-[color:var(--text-0)]">Save &amp; Download JSON</strong>. Your questionnaire is saved as <code className="text-[color:var(--text-1)] text-xs">questionnaire-answers.json</code> and copied to clipboard automatically.</Step>
         </div>
 
         <Callout icon={Zap} color="amber">
-          <strong className="text-[#F0F0F0]">Not ready yet?</strong> Click <strong className="text-[#F0F0F0]">Skip to demo data</strong> in the questionnaire step to load a pre-built plan instantly.
+          <strong className="text-[color:var(--text-0)]">Not ready yet?</strong> Click <strong className="text-[color:var(--text-0)]">Skip to demo data</strong> in the questionnaire step to load a pre-built plan instantly.
           You can come back and generate your own data at any time from Settings.
         </Callout>
       </Section>
 
       {/* ── Step 3 ── */}
       <Section icon={FileJson} number="03" title="Generate Your 6 JSON Files">
-        <p className="text-sm text-[#9A9A9A] leading-relaxed">
+        <p className="text-sm text-[color:var(--text-1)] leading-relaxed">
           The data-generation prompt instructs the AI to produce 6 JSON files that
           power every part of IRONMIND: your program, nutrition plan, supplement protocol,
           phase targets, volume landmarks, and athlete profile.
         </p>
 
         <div className="flex flex-col gap-2">
-          <Step num={1}>Return to the <strong className="text-[#F0F0F0]">same chat</strong> where you pasted the coach persona (Step 1).</Step>
+          <Step num={1}>Return to the <strong className="text-[color:var(--text-0)]">same chat</strong> where you pasted the coach persona (Step 1).</Step>
           <Step num={2}>Go to <Link href="/onboarding" className="text-[color:var(--accent)] hover:text-[color:var(--accent-light)] underline underline-offset-2">Setup Wizard → Step 3</Link>, copy the Data Generation Prompt, and paste it into the chat.</Step>
-          <Step num={3}>Paste your <code className="text-[#9A9A9A] text-xs">questionnaire-answers.json</code> content below the prompt (replace the <code className="text-[#9A9A9A] text-xs">[PASTE QUESTIONNAIRE JSON HERE]</code> placeholder).</Step>
-          <Step num={4}>The AI will output <strong className="text-[#F0F0F0]">6 JSON blocks</strong>, each preceded by its filename. Save each one with the <strong className="text-[#F0F0F0]">exact filename</strong> listed below:</Step>
+          <Step num={3}>Paste your <code className="text-[color:var(--text-1)] text-xs">questionnaire-answers.json</code> content below the prompt (replace the <code className="text-[color:var(--text-1)] text-xs">[PASTE QUESTIONNAIRE JSON HERE]</code> placeholder).</Step>
+          <Step num={4}>The AI will output <strong className="text-[color:var(--text-0)]">6 JSON blocks</strong>, each preceded by its filename. Save each one with the <strong className="text-[color:var(--text-0)]">exact filename</strong> listed below:</Step>
         </div>
 
         {/* File list */}
@@ -292,24 +292,24 @@ export default function GuidePage() {
               <FileJson size={14} className="text-[color:var(--accent)] mt-0.5 shrink-0" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-xs font-mono font-semibold text-[#F0F0F0]">{name}</span>
+                  <span className="text-xs font-mono font-semibold text-[color:var(--text-0)]">{name}</span>
                   <CopyButton text={name} label="Copy name" />
                 </div>
-                <p className="text-[10px] text-[#5E5E5E] mt-0.5">{desc}</p>
+                <p className="text-[10px] text-[color:var(--text-2)] mt-0.5">{desc}</p>
               </div>
             </div>
           ))}
         </div>
 
         <Callout icon={Brain} color="crimson">
-          <strong className="text-[#F0F0F0]">Filename matters.</strong> The import system matches files by exact name.
+          <strong className="text-[color:var(--text-0)]">Filename matters.</strong> The import system matches files by exact name.
           If the AI outputs code blocks without filenames, check the header comment above each block (e.g. <code className="text-xs">// FILE: athlete_profile.json</code>) and save accordingly.
         </Callout>
       </Section>
 
       {/* ── Step 4 ── */}
       <Section icon={Upload} number="04" title="Import Your Files to IRONMIND">
-        <p className="text-sm text-[#9A9A9A] leading-relaxed">
+        <p className="text-sm text-[color:var(--text-1)] leading-relaxed">
           Once you have all 6 files, import them to fully personalise your app.
           You can do this during initial setup or at any time from Settings.
         </p>
@@ -317,35 +317,35 @@ export default function GuidePage() {
         <div className="flex flex-col gap-2">
           <Step num={1}>Go to <Link href="/onboarding" className="text-[color:var(--accent)] hover:text-[color:var(--accent-light)] underline underline-offset-2">Setup Wizard → Step 5</Link> — or <Link href="/settings" className="text-[color:var(--accent)] hover:text-[color:var(--accent-light)] underline underline-offset-2">Settings → Import Coach Data</Link> if already in the app.</Step>
           <Step num={2}>Use the drag-and-drop zone or tap individual file slots to upload all 6 JSON files.</Step>
-          <Step num={3}>Click <strong className="text-[#F0F0F0]">Review &amp; Import</strong> — the app validates the files and shows a summary.</Step>
+          <Step num={3}>Click <strong className="text-[color:var(--text-0)]">Review &amp; Import</strong> — the app validates the files and shows a summary.</Step>
           <Step num={4}>Confirm the import. Your program, nutrition plan, supplements, phase, and volume landmarks are immediately active.</Step>
-          <Step num={5}>If you already have data loaded (e.g. demo data), tick <strong className="text-[#F0F0F0]">Replace existing data</strong> to overwrite it.</Step>
+          <Step num={5}>If you already have data loaded (e.g. demo data), tick <strong className="text-[color:var(--text-0)]">Replace existing data</strong> to overwrite it.</Step>
         </div>
 
         <Callout icon={Zap} color="green">
-          <strong className="text-[#F0F0F0]">Prefer demo data first?</strong> Click <strong className="text-[#F0F0F0]">Load demo data instead</strong> on the import step to skip straight to the dashboard.
+          <strong className="text-[color:var(--text-0)]">Prefer demo data first?</strong> Click <strong className="text-[color:var(--text-0)]">Load demo data instead</strong> on the import step to skip straight to the dashboard.
           Import your real files whenever you&apos;re ready — nothing is permanent.
         </Callout>
       </Section>
 
       {/* ── Step 5 ── */}
       <Section icon={TrendingUp} number="05" title="Ongoing AI Coach Analysis" badge="Use anytime">
-        <p className="text-sm text-[#9A9A9A] leading-relaxed">
+        <p className="text-sm text-[color:var(--text-1)] leading-relaxed">
           As you log workouts, nutrition, and recovery, IRONMIND builds a full training history.
           Export this data and paste it into AI to get elite coaching advice — trend analysis,
           volume adjustments, nutrition tweaks, and session-specific guidance.
         </p>
 
         <div className="flex flex-col gap-2">
-          <Step num={1}>In IRONMIND, go to <Link href="/export" className="text-[color:var(--accent)] hover:text-[color:var(--accent-light)] underline underline-offset-2">Export</Link> and click <strong className="text-[#F0F0F0]">Generate Report</strong> to create your Athlete Status Report.</Step>
+          <Step num={1}>In IRONMIND, go to <Link href="/export" className="text-[color:var(--accent)] hover:text-[color:var(--accent-light)] underline underline-offset-2">Export</Link> and click <strong className="text-[color:var(--text-0)]">Generate Report</strong> to create your Athlete Status Report.</Step>
           <Step num={2}>Open your AI chat. If starting fresh, paste the Coach Persona Prompt first (Setup Wizard Step 1). If returning to an existing thread, paste the Context Retention Prompt (Setup Wizard Step 4) with your export below it.</Step>
-          <Step num={3}>Copy and paste the <strong className="text-[#F0F0F0]">Analysis Prompt</strong> from Setup Wizard Step 4, followed by your full export text.</Step>
+          <Step num={3}>Copy and paste the <strong className="text-[color:var(--text-0)]">Analysis Prompt</strong> from Setup Wizard Step 4, followed by your full export text.</Step>
           <Step num={4}>The AI will produce a structured coaching response: Assessment → Plan → Metrics to Track → Why This Works → Next Step.</Step>
         </div>
 
         <div className="rounded-lg border border-[rgba(65,50,50,0.30)] bg-[rgba(8,8,8,0.7)] p-4 flex flex-col gap-2">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#5E5E5E]">Context Retention Prompt — use when returning to an existing chat</p>
-          <p className="text-xs font-mono text-[#5E5E5E] leading-relaxed line-clamp-3">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[color:var(--text-2)]">Context Retention Prompt — use when returning to an existing chat</p>
+          <p className="text-xs font-mono text-[color:var(--text-2)] leading-relaxed line-clamp-3">
             Before I continue, here is my current athlete data and all previous coaching context so you maintain full continuity…
           </p>
           <Link
@@ -358,7 +358,7 @@ export default function GuidePage() {
         </div>
 
         <Callout icon={TrendingUp} color="green">
-          <strong className="text-[#F0F0F0]">Best practice:</strong> Run an export analysis after every training week. Consistent data over time
+          <strong className="text-[color:var(--text-0)]">Best practice:</strong> Run an export analysis after every training week. Consistent data over time
           gives the AI far more signal than a single snapshot — it can spot trends, catch
           fatigue patterns, and adjust volume before you hit a wall.
         </Callout>
@@ -367,7 +367,7 @@ export default function GuidePage() {
       {/* ── FAQ ── */}
       <div className="rounded-[14px] p-5 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)]
         shadow-[0_10px_24px_rgba(0,0,0,0.45)] flex flex-col gap-4">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#5E5E5E]">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[color:var(--text-2)]">
           Common Questions
         </p>
 
@@ -394,8 +394,8 @@ export default function GuidePage() {
           },
         ].map(({ q, a }) => (
           <div key={q} className="border-t border-[rgba(65,50,50,0.25)] pt-4 first:border-t-0 first:pt-0">
-            <p className="text-sm font-semibold text-[#F0F0F0] mb-1">{q}</p>
-            <p className="text-sm text-[#9A9A9A] leading-relaxed">{a}</p>
+            <p className="text-sm font-semibold text-[color:var(--text-0)] mb-1">{q}</p>
+            <p className="text-sm text-[color:var(--text-1)] leading-relaxed">{a}</p>
           </div>
         ))}
       </div>
@@ -414,9 +414,9 @@ export default function GuidePage() {
         </Link>
         <Link
           href="/dashboard"
-          className="flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm text-[#9A9A9A]
+          className="flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm text-[color:var(--text-1)]
             bg-[rgba(22,16,16,0.9)] border border-[rgba(65,50,50,0.45)]
-            hover:border-[rgba(220,38,38,0.45)] hover:text-[#F0F0F0]
+            hover:border-[rgba(220,38,38,0.45)] hover:text-[color:var(--text-0)]
             active:scale-95 transition-all duration-200"
         >
           Back to Dashboard

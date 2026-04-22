@@ -152,22 +152,22 @@ export default function WorkoutPage() {
   if (!program || !session) {
     return (
       <div className="space-y-4">
-        <button onClick={() => router.back()} className="flex items-center gap-2 text-[#6B6B6B] hover:text-[#F5F5F5]">
+        <button onClick={() => router.back()} className="flex items-center gap-2 text-[color:var(--text-2)] hover:text-[color:var(--text-0)]">
           <ArrowLeft size={18} /> Back
         </button>
-        <div className="glass-panel p-8 text-center"><p className="text-[#6B6B6B]">No session found for today.</p></div>
+        <div className="glass-panel p-8 text-center"><p className="text-[color:var(--text-2)]">No session found for today.</p></div>
       </div>
     );
   }
   if (session.type !== 'lift') {
     return (
       <div className="space-y-4">
-        <button onClick={() => router.back()} className="flex items-center gap-2 text-[#6B6B6B] hover:text-[#F5F5F5]">
+        <button onClick={() => router.back()} className="flex items-center gap-2 text-[color:var(--text-2)] hover:text-[color:var(--text-0)]">
           <ArrowLeft size={18} /> Back
         </button>
         <div className="glass-panel p-8 text-center space-y-3">
-          <p className="text-lg font-semibold text-[#F5F5F5]">{session.name}</p>
-          <p className="text-[#6B6B6B]">Today is a {session.type} day.</p>
+          <p className="text-lg font-semibold text-[color:var(--text-0)]">{session.name}</p>
+          <p className="text-[color:var(--text-2)]">Today is a {session.type} day.</p>
           <button onClick={() => router.push('/recovery')} className="btn-primary mt-2">Log Recovery</button>
         </div>
       </div>
@@ -181,12 +181,12 @@ export default function WorkoutPage() {
       return s + logs.reduce((ss, l) => ss + (l.timeStamped ? (parseFloat(l.weight) || 0) * (parseFloat(l.reps) || 0) : 0), 0);
     }, 0);
     return (
-      <div className="space-y-4 max-w-2xl mx-auto">
+      <div className="space-y-4 max-w-4xl mx-auto">
         <div className="glass-panel p-6 text-center space-y-4 border-[3px] border-[rgba(16,185,129,0.3)]">
           <CheckCircle2 size={40} className="text-[#10B981] mx-auto" />
           <div>
-            <h2 className="text-xl font-bold text-[#F5F5F5]">Session Complete</h2>
-            <p className="text-[#6B6B6B]">{session.name} · {fmtTime(elapsed)}</p>
+            <h2 className="text-xl font-bold text-[color:var(--text-0)]">Session Complete</h2>
+            <p className="text-[color:var(--text-2)]">{session.name} · {fmtTime(elapsed)}</p>
           </div>
           <div className="grid grid-cols-3 gap-3">
             {[
@@ -194,13 +194,13 @@ export default function WorkoutPage() {
               { label: 'Sets',    value: `${completedSets}/${totalSets}` },
               { label: 'Density', value: `${Math.round(totalVolume / Math.max(1, elapsed / 60))} kg/min` },
             ].map(s => (
-              <div key={s.label} className="bg-[rgba(16,22,34,0.6)] rounded-lg p-3">
-                <p className="text-xs text-[#6B6B6B] mb-1">{s.label}</p>
-                <p className="font-mono tabular-nums font-bold text-[#F5F5F5]">{s.value}</p>
+              <div key={s.label} className="bg-[rgba(18,14,14,0.6)] rounded-lg p-3">
+                <p className="text-xs text-[color:var(--text-2)] mb-1">{s.label}</p>
+                <p className="font-mono tabular-nums font-bold text-[color:var(--text-0)]">{s.value}</p>
               </div>
             ))}
           </div>
-          <p className="text-xs text-[#6B6B6B]">Full density breakdown available on the Dashboard.</p>
+          <p className="text-xs text-[color:var(--text-2)]">Full density breakdown available on the Dashboard.</p>
         </div>
         <button onClick={() => router.push('/dashboard')} className="btn-primary w-full">Back to Dashboard</button>
       </div>
@@ -209,24 +209,24 @@ export default function WorkoutPage() {
 
   /* ── Active session ─────────────────────────────────────────── */
   return (
-    <div className="space-y-4 max-w-2xl mx-auto pb-8">
+    <div className="space-y-4 max-w-4xl mx-auto pb-8">
 
       {/* Sticky header */}
       <div className="sticky top-14 z-20 glass-panel px-4 py-3 flex items-center gap-3">
-        <button onClick={() => router.back()} className="p-1.5 text-[#6B6B6B] hover:text-[#F5F5F5]">
+        <button onClick={() => router.back()} className="p-1.5 text-[color:var(--text-2)] hover:text-[color:var(--text-0)]">
           <ArrowLeft size={18} />
         </button>
         <div className="flex-1 min-w-0">
-          <p className="text-xs text-[#6B6B6B] font-semibold uppercase tracking-wider">
+          <p className="text-xs text-[color:var(--text-2)] font-semibold uppercase tracking-wider">
             Day {cycleDay} of {program.cycleLengthDays}
           </p>
-          <h1 className="text-base font-bold text-[#F5F5F5] truncate">{session.name}</h1>
+          <h1 className="text-base font-bold text-[color:var(--text-0)] truncate">{session.name}</h1>
         </div>
         <div className={cn(
           'flex items-center gap-1.5 px-3 py-1 rounded-full font-mono tabular-nums text-sm font-bold',
           started
             ? 'bg-[rgba(16,185,129,0.12)] border border-[rgba(16,185,129,0.35)] text-[#10B981]'
-            : 'bg-[rgba(80,96,128,0.12)] border border-[rgba(80,96,128,0.25)] text-[#6B6B6B]'
+            : 'bg-[rgba(65,50,50,0.12)] border border-[rgba(65,50,50,0.25)] text-[color:var(--text-2)]'
         )}>
           <Timer size={14} />
           {fmtTime(elapsed)}
@@ -235,14 +235,14 @@ export default function WorkoutPage() {
       </div>
 
       {/* Progress bar */}
-        <div className="h-1 bg-[rgba(16,22,34,0.72)] rounded-full overflow-hidden mx-1">
+        <div className="h-1 bg-[rgba(18,14,14,0.72)] rounded-full overflow-hidden mx-1">
         <div className="h-full bg-[color:var(--accent)] rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
       </div>
 
       {/* Session note */}
       {session.notes && (
         <div className="glass-panel p-3 border-l-4 border-[#F59E0B]">
-          <p className="text-sm text-[#6B6B6B]">{session.notes}</p>
+          <p className="text-sm text-[color:var(--text-2)]">{session.notes}</p>
         </div>
       )}
 
@@ -264,19 +264,19 @@ export default function WorkoutPage() {
               >
                 <div className={cn(
                   'w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0',
-                  allDone ? 'border-[#10B981] bg-[rgba(16,185,129,0.15)]' : 'border-[rgba(80,96,128,0.4)]'
+                  allDone ? 'border-[#10B981] bg-[rgba(16,185,129,0.15)]' : 'border-[rgba(65,50,50,0.4)]'
                 )}>
                   {allDone && <div className="w-2 h-2 rounded-full bg-[#10B981]" />}
                 </div>
 
                 <div className="flex-1 text-left min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-[#F5F5F5]">{exercise.name}</span>
+                    <span className="font-semibold text-[color:var(--text-0)]">{exercise.name}</span>
                     {exercise.isKPI && (
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-[color:color-mix(in_srgb,var(--accent)_15%,transparent)] text-[color:var(--accent)] border border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)]">KPI</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-[rgba(16,16,16,0.78)] text-[color:var(--accent)] border border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)]">KPI</span>
                     )}
                   </div>
-                  <p className="text-xs text-[#6B6B6B]">{exercise.sets} × {exercise.reps} · {exercise.rest}s rest</p>
+                  <p className="text-xs text-[color:var(--text-2)]">{exercise.sets} × {exercise.reps} · {exercise.rest}s rest</p>
                 </div>
 
                 <div className="flex items-center gap-3 shrink-0">
@@ -285,8 +285,8 @@ export default function WorkoutPage() {
                       {Math.round(exVolume).toLocaleString()} kg
                     </span>
                   )}
-                  <span className="text-xs font-mono tabular-nums text-[#6B6B6B]">{doneSets}/{exercise.sets}</span>
-                  {isOpen ? <ChevronUp size={16} className="text-[#6B6B6B]" /> : <ChevronDown size={16} className="text-[#6B6B6B]" />}
+                  <span className="text-xs font-mono tabular-nums text-[color:var(--text-2)]">{doneSets}/{exercise.sets}</span>
+                  {isOpen ? <ChevronUp size={16} className="text-[color:var(--text-2)]" /> : <ChevronDown size={16} className="text-[color:var(--text-2)]" />}
                 </div>
               </button>
 
@@ -294,10 +294,10 @@ export default function WorkoutPage() {
                 <div className="px-4 pb-4 space-y-2">
                   {/* Column headers */}
                   <div className="grid grid-cols-[2.5rem_1fr_1fr_5rem] gap-2 px-1">
-                    <span className="text-xs text-[#6B6B6B]">Set</span>
-                    <span className="text-xs text-[#6B6B6B]">Weight kg</span>
-                    <span className="text-xs text-[#6B6B6B]">Reps</span>
-                    <span className="text-xs text-[#6B6B6B] text-center">Time</span>
+                    <span className="text-xs text-[color:var(--text-2)]">Set</span>
+                    <span className="text-xs text-[color:var(--text-2)]">Weight kg</span>
+                    <span className="text-xs text-[color:var(--text-2)]">Reps</span>
+                    <span className="text-xs text-[color:var(--text-2)] text-center">Time</span>
                   </div>
 
                   {sets.map((log, i) => (
@@ -305,9 +305,9 @@ export default function WorkoutPage() {
                       'grid grid-cols-[2.5rem_1fr_1fr_5rem] gap-2 items-center p-2 rounded-lg border transition-all',
                       log.timeStamped
                         ? 'border-[rgba(16,185,129,0.3)] bg-[rgba(16,185,129,0.06)]'
-                        : 'border-[rgba(80,96,128,0.2)] bg-[rgba(16,22,34,0.4)]'
+                        : 'border-[rgba(65,50,50,0.2)] bg-[rgba(18,14,14,0.4)]'
                     )}>
-                      <span className="text-xs font-mono text-[#6B6B6B] text-center">{i + 1}</span>
+                      <span className="text-xs font-mono text-[color:var(--text-2)] text-center">{i + 1}</span>
 
                       <input
                         type="number"
@@ -316,7 +316,7 @@ export default function WorkoutPage() {
                         value={log.weight}
                         onChange={e => updateSet(exercise.exerciseId, i, 'weight', e.target.value)}
                         placeholder={i > 0 ? (sets[i - 1].weight || '—') : '—'}
-                        className="w-full bg-[rgba(16,22,34,0.7)] border border-[rgba(80,96,128,0.25)] rounded px-2 py-1.5 text-sm text-[#F5F5F5] font-mono tabular-nums placeholder:text-[#6B6B6B]/40 focus:outline-none focus:border-[rgba(212,175,55,0.4)]"
+                        className="w-full bg-[rgba(18,14,14,0.7)] border border-[rgba(65,50,50,0.25)] rounded px-2 py-1.5 text-sm text-[color:var(--text-0)] font-mono tabular-nums placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color-mix(in srgb,var(--accent) 40%,transparent0.4)]"
                       />
 
                       <input
@@ -325,7 +325,7 @@ export default function WorkoutPage() {
                         value={log.reps}
                         onChange={e => updateSet(exercise.exerciseId, i, 'reps', e.target.value)}
                         placeholder="—"
-                        className="w-full bg-[rgba(16,22,34,0.7)] border border-[rgba(80,96,128,0.25)] rounded px-2 py-1.5 text-sm text-[#F5F5F5] font-mono tabular-nums placeholder:text-[#6B6B6B]/40 focus:outline-none focus:border-[rgba(212,175,55,0.4)]"
+                        className="w-full bg-[rgba(18,14,14,0.7)] border border-[rgba(65,50,50,0.25)] rounded px-2 py-1.5 text-sm text-[color:var(--text-0)] font-mono tabular-nums placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color-mix(in srgb,var(--accent) 40%,transparent0.4)]"
                       />
 
                       {/* Time stamp button */}
@@ -335,7 +335,7 @@ export default function WorkoutPage() {
                           'w-full h-8 rounded-lg text-xs font-mono font-semibold border transition-all',
                           log.timeStamped
                             ? 'border-[rgba(16,185,129,0.4)] bg-[rgba(16,185,129,0.12)] text-[#10B981]'
-                            : 'border-[rgba(80,96,128,0.3)] text-[#6B6B6B] hover:border-[rgba(212,175,55,0.4)] hover:text-[#F5F5F5]'
+                            : 'border-[rgba(65,50,50,0.3)] text-[color:var(--text-2)] hover:border-[color-mix(in srgb,var(--accent) 40%,transparent0.4)] hover:text-[color:var(--text-0)]'
                         )}
                       >
                         {log.timeStamped ?? '—'}
@@ -344,7 +344,7 @@ export default function WorkoutPage() {
                   ))}
 
                   {exercise.notes && (
-                    <p className="text-xs text-[#6B6B6B] italic pt-1 px-1">{exercise.notes}</p>
+                    <p className="text-xs text-[color:var(--text-2)] italic pt-1 px-1">{exercise.notes}</p>
                   )}
                 </div>
               )}
@@ -355,13 +355,13 @@ export default function WorkoutPage() {
 
       {/* Session notes */}
       <div className="glass-panel p-4 space-y-2">
-        <label className="text-sm font-medium text-[#9A9A9A]">Session Notes</label>
+        <label className="text-sm font-medium text-[color:var(--text-1)]">Session Notes</label>
         <textarea
           value={notes}
           onChange={e => setNotes(e.target.value)}
           placeholder="Felt strong / fatigue / PR notes…"
           rows={2}
-          className="w-full bg-[rgba(16,22,34,0.6)] border border-[rgba(80,96,128,0.25)] rounded-lg p-3 text-sm text-[#F5F5F5] placeholder:text-[#6B6B6B]/50 focus:outline-none focus:border-[rgba(212,175,55,0.4)] resize-none"
+          className="w-full bg-[rgba(18,14,14,0.6)] border border-[rgba(65,50,50,0.25)] rounded-lg p-3 text-sm text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color-mix(in srgb,var(--accent) 40%,transparent0.4)] resize-none"
         />
       </div>
 

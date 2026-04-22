@@ -112,9 +112,9 @@ export default function ExportPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-heading font-bold text-foreground">Export Data</h1>
+        <h1 className="text-2xl font-heading font-bold text-[color:var(--accent)]">Export Data</h1>
         <p className="text-text-secondary">
           Generate an <strong>Athlete Status Report</strong> (markdown) for coach-style analysis. Pair the export with{' '}
           <code className="rounded bg-surface-elevated px-1 py-0.5 text-xs">prompts/04-coach-analysis-from-export-or-screenshots.md</code>{' '}
@@ -190,7 +190,8 @@ export default function ExportPage() {
                   type="checkbox"
                   checked={value as boolean}
                   onChange={() => toggleOption(key as keyof ExportOptions)}
-                  className="w-4 h-4 rounded border-border bg-surface-elevated text-accent focus:ring-accent"
+                  className="w-4 h-4 rounded border-border bg-surface-elevated focus:ring-[color:var(--accent)]"
+                  style={{ accentColor: 'var(--accent)' }}
                 />
                 <span className="text-sm text-foreground capitalize">
                   {key.replace('include', '').replace(/([A-Z])/g, ' $1').trim()}
@@ -220,7 +221,7 @@ export default function ExportPage() {
           <button
             type="button"
             onClick={() => setOptions(DEFAULT_COACH_OPTIONS)}
-            className="text-sm font-medium text-accent underline-offset-4 hover:underline"
+            className="text-sm font-medium text-[color:var(--accent)] underline-offset-4 hover:underline"
           >
             Coach analysis preset (42d · all sections)
           </button>
@@ -231,7 +232,7 @@ export default function ExportPage() {
       <button
         onClick={handleGenerate}
         disabled={isGenerating}
-        className="w-full py-3 bg-accent text-white font-medium rounded-xl hover:bg-accent-hover transition-colors disabled:opacity-50"
+        className="btn-primary w-full py-3 disabled:opacity-50"
       >
         {isGenerating ? 'Generating...' : 'Generate Export'}
       </button>
@@ -251,7 +252,7 @@ export default function ExportPage() {
               </button>
               <button
                 onClick={handleDownload}
-                className="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover transition-colors"
+                className="btn-primary flex items-center gap-2 px-4 py-2"
               >
                 <Download size={16} />
                 Download .md

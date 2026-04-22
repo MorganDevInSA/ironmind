@@ -33,7 +33,7 @@ export function PromptBlock({ text, filename, label, rows = 16 }: PromptBlockPro
   return (
     <div className="flex flex-col gap-3">
       {label && (
-        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#5E5E5E]">{label}</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[color:var(--text-2)]">{label}</p>
       )}
 
       <textarea
@@ -42,7 +42,7 @@ export function PromptBlock({ text, filename, label, rows = 16 }: PromptBlockPro
         rows={rows}
         className="w-full rounded-lg px-4 py-3 font-mono text-xs leading-relaxed
           bg-[rgba(8,8,8,0.9)] border border-[rgba(65,50,50,0.40)]
-          text-[#9A9A9A] resize-none focus:outline-none overflow-y-auto"
+          text-[color:var(--text-1)] resize-none focus:outline-none overflow-y-auto"
       />
 
       <div className="flex items-center gap-3">
@@ -59,9 +59,9 @@ export function PromptBlock({ text, filename, label, rows = 16 }: PromptBlockPro
 
         <button
           onClick={handleDownload}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm text-[#9A9A9A]
+          className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm text-[color:var(--text-1)]
             bg-[rgba(22,16,16,0.9)] border border-[rgba(65,50,50,0.45)]
-            hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[#F0F0F0]
+            hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]
             active:scale-95 transition-all duration-200"
         >
           <Download size={15} />

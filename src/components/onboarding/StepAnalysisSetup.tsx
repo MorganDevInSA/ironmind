@@ -27,10 +27,10 @@ export function StepAnalysisSetup({ onNext, onBack }: StepAnalysisSetupProps) {
         <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[color:var(--accent)]">
           Step 5 of 6
         </span>
-        <h2 className="mt-2 text-2xl sm:text-3xl font-bold font-heading tracking-tight text-[#F0F0F0]">
+        <h2 className="mt-2 text-2xl sm:text-3xl font-bold font-heading tracking-tight text-[color:var(--text-0)]">
           Ongoing Coach Analysis
         </h2>
-        <p className="mt-2 text-sm text-[#9A9A9A]">
+        <p className="mt-2 text-sm text-[color:var(--text-1)]">
           Once your app is running you can export your data at any time and paste it into AI for
           analysis. This prompt tells the AI how to read your IRONMIND export and produce
           actionable, evidence-based coaching advice.
@@ -50,7 +50,7 @@ export function StepAnalysisSetup({ onNext, onBack }: StepAnalysisSetupProps) {
       {/* How to use */}
       <div className="rounded-[14px] p-5 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)]
         shadow-[0_10px_24px_rgba(0,0,0,0.45)] flex flex-col gap-3">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#5E5E5E]">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[color:var(--text-2)]">
           How to use it
         </p>
         <ol className="flex flex-col gap-3">
@@ -62,11 +62,11 @@ export function StepAnalysisSetup({ onNext, onBack }: StepAnalysisSetupProps) {
           ].map((text, i) => (
             <li key={i} className="flex items-start gap-4">
               <span className="mt-0.5 w-6 h-6 shrink-0 rounded-full flex items-center justify-center
-                text-[10px] font-bold bg-[color:color-mix(in_srgb,var(--accent)_12%,transparent)] border border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)]
+                text-[10px] font-bold bg-[rgba(16,16,16,0.78)] border border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)]
                 text-[color:var(--accent-light)]">
                 0{i + 1}
               </span>
-              <p className="text-sm text-[#F0F0F0] leading-relaxed">{text}</p>
+              <p className="text-sm text-[color:var(--text-0)] leading-relaxed">{text}</p>
             </li>
           ))}
         </ol>
@@ -76,10 +76,10 @@ export function StepAnalysisSetup({ onNext, onBack }: StepAnalysisSetupProps) {
       <div className="rounded-[14px] p-5 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)]
         shadow-[0_10px_24px_rgba(0,0,0,0.45)] flex flex-col gap-4">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#5E5E5E] mb-1">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[color:var(--text-2)] mb-1">
             Keeping Chat Context
           </p>
-          <p className="text-sm text-[#9A9A9A]">
+          <p className="text-sm text-[color:var(--text-1)]">
             When returning to an existing AI chat thread, use this prompt to restore continuity.
             Paste your IRONMIND export where indicated so the coach picks up exactly where it left off.
           </p>
@@ -91,7 +91,7 @@ export function StepAnalysisSetup({ onNext, onBack }: StepAnalysisSetupProps) {
           rows={6}
           className="w-full rounded-lg px-4 py-3 font-mono text-xs leading-relaxed
             bg-[rgba(8,8,8,0.9)] border border-[rgba(65,50,50,0.40)]
-            text-[#9A9A9A] resize-none focus:outline-none"
+            text-[color:var(--text-1)] resize-none focus:outline-none"
         />
 
         <button
@@ -110,9 +110,9 @@ export function StepAnalysisSetup({ onNext, onBack }: StepAnalysisSetupProps) {
       <div className="flex items-center justify-between">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm text-[#9A9A9A]
+          className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm text-[color:var(--text-1)]
             bg-[rgba(22,16,16,0.9)] border border-[rgba(65,50,50,0.45)]
-            hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[#F0F0F0]
+            hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]
             active:scale-95 transition-all duration-200"
         >
           <ArrowLeft size={15} />

@@ -13,13 +13,34 @@ Every animation must feel deliberate, swift, and premium. No bounce, no wobble, 
 - **Ease-out**: Decelerating motion feels natural and confident
 - **Purposeful**: Feedback, guidance, or delight — never decoration
 - **Restrained**: One animated element per user action
-- **Crimson tokens**: glows, rings, and glints use **`rgba(220, 38, 38, …)`** — not legacy gold (`#D4AF37`) or blue (`#3B82F6`). Older class names like `.gold-glint` in `globals.css`, if present, should map to crimson visually.
+- **Theme-aware**: All accent colors use CSS variables (`var(--accent)`, `var(--accent-light)`, `var(--accent-2)`) — never hardcoded hex values
 
 ---
 
-## Required Keyframes
+## Motion Design Tokens
 
-Add all to `src/app/globals.css` (illustrative — align with **`IRONMIND.md`** / **`ironmind-styling`** warm-dark panels):
+Define in `:root` of `globals.css` for consistent timing:
+
+```css
+:root {
+  --duration-instant: 100ms;
+  --duration-fast: 150ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
+  --duration-page: 500ms;
+  --duration-ambient: 3000ms;
+  
+  --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.6, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+```
+
+---
+
+## Keyframes (Theme-Aware)
+
+All keyframes in `globals.css` use CSS variables for theme compatibility:
 
 ```css
 @keyframes pulse-soft {
@@ -27,27 +48,31 @@ Add all to `src/app/globals.css` (illustrative — align with **`IRONMIND.md`** 
   50% { opacity: 0.72; }
 }
 
-@keyframes crimson-glint {
+@keyframes accent-glint {
   0%, 100% {
-    filter: drop-shadow(0 0 4px rgba(220,38,38,0.85)) drop-shadow(0 0 8px rgba(220,38,38,0.35));
+    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--accent) 85%, transparent))
+            drop-shadow(0 0 8px color-mix(in srgb, var(--accent-light) 35%, transparent));
   }
   50% {
-    filter: drop-shadow(0 0 8px rgba(239,68,68,0.95)) drop-shadow(0 0 12px rgba(220,38,38,0.55));
+    filter: drop-shadow(0 0 8px var(--accent-light))
+            drop-shadow(0 0 12px color-mix(in srgb, var(--accent) 55%, transparent));
   }
 }
 
 @keyframes pulse-ring {
-  0% { box-shadow: 0 0 0 0 rgba(220,38,38,0.45); }
-  70% { box-shadow: 0 0 0 10px rgba(220,38,38,0); }
-  100% { box-shadow: 0 0 0 0 rgba(220,38,38,0); }
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 45%, transparent); }
+  70% { box-shadow: 0 0 0 10px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
 }
 
-@keyframes crimson-glow {
+@keyframes accent-glow {
   0%, 100% {
-    box-shadow: 0 0 20px rgba(220,38,38,0.22), inset 0 1px 2px rgba(220,38,38,0.28);
+    box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 22%, transparent),
+                inset 0 1px 2px color-mix(in srgb, var(--accent-light) 28%, transparent);
   }
   50% {
-    box-shadow: 0 0 30px rgba(220,38,38,0.38), inset 0 1px 2px rgba(239,68,68,0.35);
+    box-shadow: 0 0 30px color-mix(in srgb, var(--accent) 38%, transparent),
+                inset 0 1px 2px color-mix(in srgb, var(--accent-light) 35%, transparent);
   }
 }
 
@@ -76,49 +101,32 @@ Add all to `src/app/globals.css` (illustrative — align with **`IRONMIND.md`** 
   45% { left: 120%; }
   100% { left: 120%; }
 }
+```
 
-.pulse-soft { animation: pulse-soft 2s cubic-bezier(0.4,0,0.6,1) infinite; }
-.crimson-glint { animation: crimson-glint 3s ease-in-out infinite; }
-.crimson-glow { animation: crimson-glow 3s ease-in-out infinite; }
-.animate-pulse-ring { animation: pulse-ring 1.5s cubic-bezier(0.4,0,0.6,1) infinite; }
-.animate-fade-in-up { animation: fade-in-up 0.3s ease-out; }
-.animate-scale-in { animation: scale-in 0.2s ease-out; }
-.animate-count-up { animation: count-up 0.3s ease-out; }
+### Utility Classes
 
-.skeleton {
-  background: rgba(18, 14, 14, 0.92);
-  background-image: linear-gradient(
-    90deg,
-    rgba(255,255,255,0) 0,
-    rgba(255,255,255,0.03) 20%,
-    rgba(255,255,255,0.08) 60%,
-    rgba(255,255,255,0)
-  );
-  background-size: 1000px 100%;
-  animation: shimmer 2s infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
+```css
+.pulse-soft       { animation: pulse-soft var(--duration-ambient) var(--ease-in-out) infinite; }
+.accent-glint     { animation: accent-glint var(--duration-ambient) ease-in-out infinite; }
+.accent-glow      { animation: accent-glow var(--duration-ambient) ease-in-out infinite; }
+.animate-pulse-ring { animation: pulse-ring 1.5s var(--ease-in-out) infinite; }
+.animate-fade-in-up { animation: fade-in-up var(--duration-slow) var(--ease-out); }
+.animate-scale-in   { animation: scale-in var(--duration-normal) var(--ease-out); }
+.animate-count-up   { animation: count-up var(--duration-slow) var(--ease-out); }
 ```
 
 ---
 
-## Hover Effects (Tailwind)
+## Hover Effects (Tailwind + CSS Variables)
 
-### Card Lift + Crimson Border
+### Card Lift + Accent Border
 
 ```tsx
-<div className="rounded-[14px] border border-[rgba(65,50,50,0.35)]
+<div className="rounded-[14px] border border-[color:var(--panel-border)]
   transition-all duration-200
   hover:-translate-y-1
-  hover:border-[rgba(220,38,38,0.28)]
-  hover:shadow-[0_8px_32px_rgba(220,38,38,0.18)]">
+  hover:border-[color:color-mix(in_srgb,var(--accent)_28%,transparent)]
+  hover:shadow-[var(--shadow-accent)]">
 ```
 
 ### Button Press
@@ -131,49 +139,20 @@ Add all to `src/app/globals.css` (illustrative — align with **`IRONMIND.md`** 
 
 ```tsx
 <input className="transition-all duration-200
-  focus:border-[rgba(220,38,38,0.45)]
-  focus:shadow-[0_0_0_3px_rgba(220,38,38,0.12)]
+  focus:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)]
+  focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--accent)_12%,transparent)]
   focus:outline-none" />
 ```
 
-### Nav Item Active Shimmer (CSS pseudo-element)
+### Nav Item Active Shimmer
 
-```css
-.nav-item {
-  position: relative;
-  overflow: hidden;
-}
-
-.nav-item::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -120%;
-  width: 120%;
-  height: 100%;
-  background: linear-gradient(
-    110deg,
-    transparent 0%,
-    rgba(220,38,38,0.06) 35%,
-    rgba(220,38,38,0.18) 50%,
-    rgba(220,38,38,0.06) 65%,
-    transparent 100%
-  );
-  opacity: 0;
-}
-
-.nav-item.active::after {
-  opacity: 0.55;
-  animation: nav-shimmer 3.8s ease-in-out infinite;
-}
-```
+Already defined in `globals.css` as `.nav-item.active::after` — uses theme-aware `var(--accent-light)`.
 
 ---
 
 ## Page Transitions (Framer Motion)
 
 ```tsx
-// app/components/providers/page-transition.tsx
 import { motion } from 'framer-motion';
 
 const variants = {
@@ -213,12 +192,14 @@ const item = {
 
 ## Loading States
 
-### Skeleton Card
+### Skeleton (Theme-Aware)
+
+Use `.skeleton` class from `globals.css`:
 
 ```tsx
 function SkeletonCard() {
   return (
-    <div className="rounded-[14px] p-5 bg-[rgba(16,22,34,0.72)] border border-[rgba(80,96,128,0.25)] space-y-4">
+    <div className="glass-panel p-5 space-y-4">
       <div className="skeleton w-1/3 h-3 rounded" />
       <div className="skeleton w-full h-8 rounded" />
       <div className="skeleton w-2/3 h-3 rounded" />
@@ -227,21 +208,32 @@ function SkeletonCard() {
 }
 ```
 
-### Spinner
+### Spinner (Theme-Aware)
+
+Use `.spinner` class from `globals.css`:
+
+```tsx
+<div className="spinner" />
+```
+
+Or inline with theme variables:
 
 ```tsx
 <div className="inline-block w-6 h-6 rounded-full animate-spin
-  border-[3px] border-[rgba(80,96,128,0.6)] border-t-[#D4AF37]" />
+  border-[3px] border-[color:color-mix(in_srgb,var(--accent)_20%,var(--panel-border))]
+  border-t-[color:var(--accent)]" />
 ```
 
-### Progress Bar
+### Progress Bar (Theme-Aware)
 
 ```tsx
-<div className="h-1.5 rounded-full bg-[#141414] overflow-hidden">
+<div className="h-1.5 rounded-full bg-[color:var(--surface-track)] overflow-hidden">
   <div
-    className="h-full rounded-full bg-gradient-to-r from-blue-500 to-blue-600
-      transition-all duration-500 ease-out"
-    style={{ width: `${progress}%` }}
+    className="h-full rounded-full transition-all duration-500 ease-out"
+    style={{
+      width: `${progress}%`,
+      background: `linear-gradient(90deg, var(--accent), var(--accent-2))`
+    }}
   />
 </div>
 ```
@@ -264,7 +256,6 @@ export function AnimatedCounter({ target, duration = 800 }: { target: number; du
     const step = (ts: number) => {
       if (!startRef.current) startRef.current = ts;
       const progress = Math.min((ts - startRef.current) / duration, 1);
-      // Ease-out cubic
       const eased = 1 - Math.pow(1 - progress, 3);
       setValue(Math.round(eased * target));
       if (progress < 1) requestAnimationFrame(step);
@@ -276,24 +267,40 @@ export function AnimatedCounter({ target, duration = 800 }: { target: number; du
 }
 ```
 
-### Ring Progress (SVG)
+### Ring Progress (Theme-Aware via inline style)
 
 ```tsx
-export function ProgressRing({ value, max, size = 120, strokeWidth = 8, color = '#D4AF37' }) {
+export function ProgressRing({ 
+  value, 
+  max, 
+  size = 120, 
+  strokeWidth = 8 
+}: { 
+  value: number; 
+  max: number; 
+  size?: number; 
+  strokeWidth?: number;
+}) {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (value / max) * circumference;
 
   return (
     <svg width={size} height={size} className="transform -rotate-90">
-      <circle cx={size/2} cy={size/2} r={radius} fill="none"
-        stroke="rgba(80,96,128,0.2)" strokeWidth={strokeWidth} />
-      <circle cx={size/2} cy={size/2} r={radius} fill="none"
-        stroke={color} strokeWidth={strokeWidth}
+      <circle 
+        cx={size/2} cy={size/2} r={radius} fill="none"
+        stroke="var(--panel-border)" 
+        strokeWidth={strokeWidth} 
+      />
+      <circle 
+        cx={size/2} cy={size/2} r={radius} fill="none"
+        stroke="var(--accent)" 
+        strokeWidth={strokeWidth}
         strokeLinecap="round"
         strokeDasharray={circumference}
         strokeDashoffset={offset}
-        className="transition-all duration-700 ease-out" />
+        className="transition-all duration-700 ease-out" 
+      />
     </svg>
   );
 }
@@ -303,12 +310,13 @@ export function ProgressRing({ value, max, size = 120, strokeWidth = 8, color = 
 
 ## Micro-interactions
 
-### Gradient Border Card
+### Gradient Border Card (Theme-Aware)
+
+Use `.gradient-border` class from `globals.css`:
 
 ```tsx
-<div className="relative rounded-[14px] p-[1px]
-  bg-gradient-to-r from-[rgba(212,175,55,0.2)] via-transparent to-[rgba(212,175,55,0.2)]">
-  <div className="rounded-[14px] bg-[rgba(16,22,34,0.9)] p-6">
+<div className="gradient-border">
+  <div className="bg-[color:var(--panel-strong)] p-6">
     Content
   </div>
 </div>
@@ -316,13 +324,11 @@ export function ProgressRing({ value, max, size = 120, strokeWidth = 8, color = 
 
 ### Spotlight Sweep on Hover
 
+Use `.spotlight-hover` class from `globals.css`:
+
 ```tsx
-<div className="relative overflow-hidden rounded-[14px]
-  before:absolute before:inset-0 before:pointer-events-none
-  before:bg-gradient-to-r before:from-transparent before:via-white/[0.04] before:to-transparent
-  before:-translate-x-full hover:before:translate-x-full
-  before:transition-transform before:duration-700">
-  <div className="relative z-10 p-6">Content</div>
+<div className="spotlight-hover rounded-[14px] glass-panel p-6">
+  Content
 </div>
 ```
 
@@ -330,21 +336,33 @@ export function ProgressRing({ value, max, size = 120, strokeWidth = 8, color = 
 
 ## Duration Standards
 
-| Interaction | Duration | Easing |
-|-------------|----------|--------|
-| Button click | 100ms | ease-out |
-| Hover state | 200ms | ease-out |
-| Modal open | 200ms | ease-out |
-| Page enter | 300ms | ease-out |
-| Chart bars | 500ms | ease-out |
-| Counter | 800ms | cubic ease-out |
-| Ambient glow | 3000ms | ease-in-out |
+| Interaction | Duration Token | Value |
+|-------------|----------------|-------|
+| Button click | `--duration-instant` | 100ms |
+| Hover state | `--duration-normal` | 200ms |
+| Modal open | `--duration-normal` | 200ms |
+| Page enter | `--duration-slow` | 300ms |
+| Chart bars | `--duration-page` | 500ms |
+| Counter | custom | 800ms |
+| Ambient glow | `--duration-ambient` | 3000ms |
 
 ---
 
 ## Reduced Motion
 
-Always wrap complex animations:
+Always respect user preferences. The global rule in `globals.css` handles this:
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+```
+
+For Framer Motion components:
 
 ```tsx
 import { useReducedMotion } from 'framer-motion';

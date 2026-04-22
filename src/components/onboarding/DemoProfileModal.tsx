@@ -38,7 +38,7 @@ const DEMO_PROFILES: DemoProfile[] = [
     goal: 'Off-season muscle gain',
     description: 'Advanced rebuild block with high-capacity progression and pelvic-safe loading strategy.',
     tag: 'Masters athlete',
-    tagColor: 'text-[color:var(--accent)] bg-[color:color-mix(in_srgb,var(--accent)_12%,transparent)] border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)]',
+    tagColor: 'text-[color:var(--accent)] bg-[rgba(16,16,16,0.78)] border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)]',
     lifestyle: 'Remote high-pressure professional role with flexible windows for training and recovery.',
     trainingHistory: 'Natural, highly trained athlete with deep lifting history and advanced exercise literacy.',
     geneticsNote: 'Elite responder profile: lower training dose produces outsized hypertrophy and strength carryover.',
@@ -86,7 +86,7 @@ const DEMO_PROFILES: DemoProfile[] = [
     goal: 'General fitness',
     description: 'Beginner progression template focused on consistency, body composition, and sustainable weekly output.',
     tag: 'Beginner friendly',
-    tagColor: 'text-[color:var(--accent-light)] bg-[color:color-mix(in_srgb,var(--accent)_10%,transparent)] border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)]',
+    tagColor: 'text-[color:var(--accent-light)] bg-[rgba(16,16,16,0.78)] border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)]',
     lifestyle: 'Parent-led schedule with narrow training windows and 45-minute session ceilings.',
     trainingHistory: 'Early-stage trainee with completed restart phase and reliable baseline movement patterns.',
     geneticsNote: 'Responds well to moderate deficits, high-protein intake, and repeatable habit loops.',
@@ -166,8 +166,8 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
           <div className="flex items-center gap-3">
             <Zap size={18} className="text-[color:var(--accent)]" />
             <div>
-              <h2 className="text-base font-bold text-[#F0F0F0]">Choose a Demo Profile</h2>
-              <p className="text-xs text-[#5E5E5E] mt-0.5">
+              <h2 className="text-base font-bold text-[color:var(--text-0)]">Choose a Demo Profile</h2>
+              <p className="text-xs text-[color:var(--text-2)] mt-0.5">
                 Loads a pre-built plan so you can explore every feature
               </p>
             </div>
@@ -175,7 +175,7 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
           <button
             onClick={onClose}
             className="w-7 h-7 flex items-center justify-center rounded-full
-              text-[#5E5E5E] hover:text-[#F0F0F0] hover:bg-[rgba(65,50,50,0.40)]
+              text-[color:var(--text-2)] hover:text-[color:var(--text-0)] hover:bg-[rgba(65,50,50,0.40)]
               transition-all duration-200"
           >
             <X size={15} />
@@ -187,7 +187,7 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
           {alreadySeeded && (
             <div
               className="p-3 rounded-lg text-xs border border-[color:color-mix(in_srgb,var(--accent)_32%,transparent)]
-              bg-[color:color-mix(in_srgb,var(--accent)_8%,transparent)] text-[color:var(--accent-light)]"
+              bg-[rgba(16,16,16,0.78)] text-[color:var(--accent-light)]"
             >
               <strong>Note:</strong> You already have data loaded. Selecting a demo profile will replace it.
             </div>
@@ -221,8 +221,8 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <span className="font-bold text-[#F0F0F0] text-sm">{profile.name}</span>
-                    <span className="text-xs text-[#5E5E5E]">
+                    <span className="font-bold text-[color:var(--text-0)] text-sm">{profile.name}</span>
+                    <span className="text-xs text-[color:var(--text-2)]">
                       {profile.age} · {profile.sex} · {profile.level}
                     </span>
                     <span className={`text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border ${profile.tagColor}`}>
@@ -230,28 +230,28 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
                     </span>
                   </div>
                   <p className="text-xs font-semibold text-[color:var(--accent)] mb-1">{profile.goal}</p>
-                  <p className="text-xs text-[#5E5E5E] leading-relaxed">{profile.description}</p>
+                  <p className="text-xs text-[color:var(--text-2)] leading-relaxed">{profile.description}</p>
                   {selected === profile.id && (
                     <div className="mt-3 space-y-2 border-t border-[rgba(65,50,50,0.35)] pt-3">
                       <div>
                         <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">Lifestyle</p>
-                        <p className="text-xs text-[#9A9A9A] leading-relaxed">{profile.lifestyle}</p>
+                        <p className="text-xs text-[color:var(--text-1)] leading-relaxed">{profile.lifestyle}</p>
                       </div>
                       <div>
                         <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">Training History</p>
-                        <p className="text-xs text-[#9A9A9A] leading-relaxed">{profile.trainingHistory}</p>
+                        <p className="text-xs text-[color:var(--text-1)] leading-relaxed">{profile.trainingHistory}</p>
                       </div>
                       <div>
                         <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">Genetics & Recovery</p>
-                        <p className="text-xs text-[#9A9A9A] leading-relaxed">{profile.geneticsNote}</p>
+                        <p className="text-xs text-[color:var(--text-1)] leading-relaxed">{profile.geneticsNote}</p>
                       </div>
                       <div>
                         <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">Equipment & Resources</p>
-                        <p className="text-xs text-[#9A9A9A] leading-relaxed">{profile.equipment}</p>
+                        <p className="text-xs text-[color:var(--text-1)] leading-relaxed">{profile.equipment}</p>
                       </div>
                       <div>
                         <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">Coach Summary</p>
-                        <p className="text-xs text-[#F0F0F0] leading-relaxed">{profile.coachNote}</p>
+                        <p className="text-xs text-[color:var(--text-0)] leading-relaxed">{profile.coachNote}</p>
                       </div>
                     </div>
                   )}
@@ -260,7 +260,7 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
             </button>
           ))}
 
-          <p className="text-[10px] text-[#3A3A3A] text-center pt-1">
+          <p className="text-[10px] text-[color:var(--text-2)] text-center pt-1">
             Replace demo data at any time via Settings → Import Coach Data
           </p>
         </div>
@@ -269,9 +269,9 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
         <div className="px-5 pb-5 pt-2 flex items-center gap-3 border-t border-[rgba(65,50,50,0.25)]">
           <button
             onClick={onClose}
-            className="flex-1 py-2.5 rounded-lg font-semibold text-sm text-[#9A9A9A]
+            className="flex-1 py-2.5 rounded-lg font-semibold text-sm text-[color:var(--text-1)]
               bg-[rgba(22,16,16,0.9)] border border-[rgba(65,50,50,0.45)]
-              hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[#F0F0F0]
+              hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]
               active:scale-95 transition-all duration-200"
           >
             Cancel

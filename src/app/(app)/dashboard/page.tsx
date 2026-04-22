@@ -180,7 +180,7 @@ function PhysiqueMiniCharts({
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#5E5E5E]">Trend</span>
+        <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">Trend</span>
         <div className="flex rounded-lg overflow-hidden border border-[rgba(65,50,50,0.35)]">
           <button
             type="button"
@@ -191,8 +191,8 @@ function PhysiqueMiniCharts({
             className={cn(
               'px-3 py-1 text-xs font-semibold transition-colors',
               mode === 'weight'
-                ? 'bg-[rgba(220,38,38,0.2)] text-[#F5F5F5]'
-                : 'text-[#9A9A9A] hover:text-[#F0F0F0]'
+                ? 'bg-[rgba(220,38,38,0.2)] text-[color:var(--text-0)]'
+                : 'text-[color:var(--text-1)] hover:text-[color:var(--text-0)]'
             )}
           >
             Weight
@@ -207,8 +207,8 @@ function PhysiqueMiniCharts({
             className={cn(
               'px-3 py-1 text-xs font-semibold transition-colors',
               mode === 'measurements'
-                ? 'bg-[rgba(220,38,38,0.2)] text-[#F5F5F5]'
-                : 'text-[#9A9A9A] hover:text-[#F0F0F0]',
+                ? 'bg-[rgba(220,38,38,0.2)] text-[color:var(--text-0)]'
+                : 'text-[color:var(--text-1)] hover:text-[color:var(--text-0)]',
               !hasMeas && 'opacity-40 cursor-not-allowed'
             )}
           >
@@ -246,7 +246,7 @@ function PhysiqueMiniCharts({
                   borderRadius: 12,
                   fontSize: 12,
                 }}
-                labelStyle={{ color: '#9A9A9A' }}
+                labelStyle={{ color: 'color:var(--text-1)' }}
                 formatter={(v) => [`${typeof v === 'number' ? v : '—'} kg`, 'Weight']}
               />
               {targetWeight != null && (
@@ -320,7 +320,7 @@ function MealContent({ slotKey, isLiftDay, nutrition, nutritionPlan: nutritionPl
     <div className="space-y-4">
       <div>
         <p className="text-[10px] text-[color:var(--text-detail)] uppercase tracking-wider mb-1">Plan</p>
-        <p className="text-[#F5F5F5]">{description}</p>
+        <p className="text-[color:var(--text-0)]">{description}</p>
       </div>
       {loggedMeal && loggedMeal.foods.length > 0 ? (
         <div>
@@ -328,7 +328,7 @@ function MealContent({ slotKey, isLiftDay, nutrition, nutritionPlan: nutritionPl
           <div className="space-y-1.5">
             {loggedMeal.foods.map((food, i) => (
               <div key={i} className="flex justify-between text-sm">
-                <span className="text-[#F5F5F5]">
+                <span className="text-[color:var(--text-0)]">
                   {food.name} <span className="text-[color:var(--text-detail)]">× {food.quantity}{food.unit}</span>
                 </span>
                 <span className="font-mono tabular-nums text-[color:var(--text-detail)] text-xs">
@@ -370,7 +370,7 @@ function VitaminsContent({ timing, supplements, protocol: protocolProp }: {
                 {taken
                   ? <CheckCircle2 size={14} className="text-[#10B981] shrink-0" />
                   : <span className="w-3.5 h-3.5 rounded-full border border-[rgba(65,50,50,0.22)] shrink-0 inline-block" />}
-                <span className={taken ? 'text-[color:var(--text-detail)] line-through' : 'text-[#F5F5F5]'}>{name}</span>
+                <span className={taken ? 'text-[color:var(--text-detail)]' : 'text-[color:var(--text-0)]'}>{name}</span>
               </div>
             );
           })}
@@ -424,11 +424,11 @@ function SessionProgramPreview({ session }: { session: ProgramSession }) {
                   <span className="exercise-index-badge shrink-0">{i + 1}</span>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className={cn('font-medium', ex.isKPI ? 'text-[color:var(--accent)]' : 'text-[#F5F5F5]')}>
+                      <span className={cn('font-medium', ex.isKPI ? 'text-[color:var(--accent)]' : 'text-[color:var(--text-0)]')}>
                         {ex.name}
                       </span>
                       {ex.isKPI && (
-                        <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-[rgba(220,38,38,0.14)] text-[#F5F5F5] border border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)] shrink-0">
+                        <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-[rgba(220,38,38,0.14)] text-[color:var(--text-0)] border border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)] shrink-0">
                           KPI
                         </span>
                       )}
@@ -448,7 +448,7 @@ function SessionProgramPreview({ session }: { session: ProgramSession }) {
       )}
       {session.cardio && (
         <div className="p-3 rounded-lg bg-[color:var(--surface-track)] space-y-1">
-          <p className="text-sm font-medium text-[#F5F5F5]">{session.cardio.type}</p>
+          <p className="text-sm font-medium text-[color:var(--text-0)]">{session.cardio.type}</p>
           <p className="text-xs text-[color:var(--text-detail)]">
             {session.cardio.duration} min
             {session.cardio.note ? ` · ${session.cardio.note}` : ''}
@@ -467,7 +467,7 @@ function SessionProgramPreview({ session }: { session: ProgramSession }) {
           <ul className="space-y-2">
             {breath.map((bw, i) => (
               <li key={i} className="text-sm">
-                <span className="font-medium text-[#F5F5F5]">{bw.name}</span>
+                <span className="font-medium text-[color:var(--text-0)]">{bw.name}</span>
                 <span className="text-[color:var(--text-detail)] text-xs font-mono tabular-nums ml-2">
                   in {bw.inhale}s
                   {bw.hold != null ? ` · hold ${bw.hold}s` : ''} · out {bw.exhale}s
@@ -484,7 +484,7 @@ function SessionProgramPreview({ session }: { session: ProgramSession }) {
           <div className="divide-y divide-[rgba(65,50,50,0.14)]">
             {core.map((c, i) => (
               <div key={i} className="flex items-start justify-between gap-2 py-2 text-sm">
-                <span className="text-[#F5F5F5]">{c.name}</span>
+                <span className="text-[color:var(--text-0)]">{c.name}</span>
                 <span className="font-mono tabular-nums text-[color:var(--text-detail)] text-xs shrink-0 text-right">
                   {c.sets}×
                   {c.reps != null ? c.reps : c.holdSec != null ? `${c.holdSec}s` : '—'}
@@ -560,7 +560,7 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
 
       {exercises.length > 0 ? (
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#5E5E5E] mb-2">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)] mb-2">
             Lifts ({exercises.length})
           </p>
           <div className={sessionTableWrap}>
@@ -580,11 +580,11 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
                     <td className={cn(sessionTableTd, 'font-mono tabular-nums text-[color:var(--text-detail)]')}>
                       {i + 1}
                     </td>
-                    <td className={cn(sessionTableTd, 'text-[#F5F5F5]')}>
+                    <td className={cn(sessionTableTd, 'text-[color:var(--text-0)]')}>
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="font-medium">{ex.name}</span>
                         {ex.isKPI ? (
-                          <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-[rgba(220,38,38,0.14)] text-[#F5F5F5] border border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)]">
+                          <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-[rgba(220,38,38,0.14)] text-[color:var(--text-0)] border border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)]">
                             KPI
                           </span>
                         ) : null}
@@ -614,7 +614,7 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
 
       {cardio ? (
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#5E5E5E] mb-2">Cardio</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)] mb-2">Cardio</p>
           <div className={sessionTableWrap}>
             <table className="w-full text-sm">
               <thead>
@@ -626,7 +626,7 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
               </thead>
               <tbody>
                 <tr>
-                  <td className={cn(sessionTableTd, 'text-[#F5F5F5] font-medium')}>{cardio.type}</td>
+                  <td className={cn(sessionTableTd, 'text-[color:var(--text-0)] font-medium')}>{cardio.type}</td>
                   <td className={cn(sessionTableTd, 'text-right font-mono tabular-nums text-[#D4D4D4]')}>
                     {cardio.duration} min
                   </td>
@@ -648,7 +648,7 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
 
       {breath.length > 0 ? (
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#5E5E5E] mb-2">Breath work</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)] mb-2">Breath work</p>
           <div className={sessionTableWrap}>
             <table className="w-full min-w-[480px] text-sm">
               <thead>
@@ -661,7 +661,7 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
               <tbody>
                 {breath.map((bw, i) => (
                   <tr key={`${bw.name}-${i}`}>
-                    <td className={cn(sessionTableTd, 'text-[#F5F5F5] font-medium')}>{bw.name}</td>
+                    <td className={cn(sessionTableTd, 'text-[color:var(--text-0)] font-medium')}>{bw.name}</td>
                     <td className={cn(sessionTableTd, 'font-mono tabular-nums text-xs text-[color:var(--text-detail)]')}>
                       in {bw.inhale}s
                       {bw.hold != null ? ` · hold ${bw.hold}s` : ''} · out {bw.exhale}s
@@ -680,7 +680,7 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
 
       {core.length > 0 ? (
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#5E5E5E] mb-2">Core</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)] mb-2">Core</p>
           <div className={sessionTableWrap}>
             <table className="w-full text-sm">
               <thead>
@@ -692,7 +692,7 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
               <tbody>
                 {core.map((c, i) => (
                   <tr key={`${c.name}-${i}`}>
-                    <td className={cn(sessionTableTd, 'text-[#F5F5F5]')}>{c.name}</td>
+                    <td className={cn(sessionTableTd, 'text-[color:var(--text-0)]')}>{c.name}</td>
                     <td className={cn(sessionTableTd, 'text-right font-mono tabular-nums text-[#D4D4D4] text-xs')}>
                       {corePrescription(c)}
                     </td>
@@ -706,7 +706,7 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
 
       {mobility.length > 0 ? (
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#5E5E5E] mb-2">Mobility</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)] mb-2">Mobility</p>
           <div className={sessionTableWrap}>
             <table className="w-full text-sm">
               <thead>
@@ -780,15 +780,15 @@ function SessionDetailModal({
               <Dumbbell size={22} />
             </span>
             <div className="min-w-0">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#5E5E5E]">Session breakdown</p>
-              <h2 className="text-lg font-bold text-[#F5F5F5] leading-snug truncate">{session.name}</h2>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[color:var(--text-2)]">Session breakdown</p>
+              <h2 className="text-lg font-bold text-[color:var(--text-0)] leading-snug truncate">{session.name}</h2>
               <p className="text-xs text-[color:var(--text-detail)] mt-1">{sessionTypeLabel}</p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-lg text-[#9A9A9A] hover:text-[#F5F5F5] hover:bg-[rgba(255,255,255,0.05)] shrink-0"
+            className="p-2 rounded-lg text-[color:var(--text-1)] hover:text-[color:var(--text-0)] hover:bg-[rgba(255,255,255,0.05)] shrink-0"
             aria-label="Close"
           >
             <X size={18} />
@@ -818,7 +818,7 @@ function SessionDetailModal({
             <button
               type="button"
               onClick={onGoTraining}
-              className="px-4 py-2.5 rounded-xl text-sm font-semibold border border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] text-[color:var(--accent)] hover:bg-[color:color-mix(in_srgb,var(--accent)_12%,transparent)]"
+              className="px-4 py-2.5 rounded-xl text-sm font-semibold border border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] text-[color:var(--accent)] hover:border-[color:color-mix(in_srgb,var(--accent)_65%,transparent)]"
             >
               Open training
             </button>
@@ -885,11 +885,11 @@ function ScheduleModal({ item, onClose, session, nutrition, supplements, onStart
             {meta.label}
           </span>
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-[#F5F5F5] truncate">{item.label}</h3>
+            <h3 className="font-semibold text-[color:var(--text-0)] truncate">{item.label}</h3>
             <p className="text-xs text-[color:var(--text-detail)]">{item.time}</p>
           </div>
           {item.done === true && <CheckCircle2 size={15} className="text-[#10B981] shrink-0" />}
-          <button onClick={onClose} className="p-1.5 text-[color:var(--text-detail)] hover:text-[#F5F5F5] shrink-0 transition-colors">
+          <button onClick={onClose} className="p-1.5 text-[color:var(--text-detail)] hover:text-[color:var(--text-0)] shrink-0 transition-colors">
             <X size={16} />
           </button>
         </div>
@@ -1005,7 +1005,7 @@ function TodaySchedule({
       <div className="glass-panel dashboard-card-surface p-4 col-span-full">
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <Calendar size={18} className="text-[color:var(--text-detail)]" />
-          <h3 className="font-semibold text-[#F5F5F5]">{scheduleTitle}</h3>
+          <h3 className="font-semibold text-[color:var(--text-0)]">{scheduleTitle}</h3>
           <span className="text-xs text-[color:var(--text-detail)] ml-auto">{dateBadge}</span>
         </div>
         {previewHint && (
@@ -1060,7 +1060,7 @@ function TodaySchedule({
                       <div className="flex items-start gap-2 min-w-0">
                         <span className={cn(
                           'font-semibold leading-snug',
-                          item.done ? 'text-[color:var(--text-detail)] line-through' : 'text-[#F5F5F5]'
+                          item.done ? 'text-[color:var(--text-detail)]' : 'text-[color:var(--text-0)]'
                         )}>
                           {item.label}
                         </span>
@@ -1077,7 +1077,7 @@ function TodaySchedule({
                         <p
                           className={cn(
                             'text-[13px] leading-relaxed text-[color:var(--text-detail)] break-words',
-                            item.done && 'line-through opacity-80'
+                            item.done && 'opacity-80'
                           )}
                         >
                           {item.detail}
@@ -1154,7 +1154,7 @@ function DensityCard({ workout, onOpen }: { workout: Workout; onOpen?: () => voi
         <div className="flex items-center gap-2">
           <Zap size={18} className="text-[#F59E0B]" />
           <div>
-            <h3 className="font-semibold text-[#F5F5F5]">Training Density</h3>
+            <h3 className="font-semibold text-[color:var(--text-0)]">Training Density</h3>
             <p className="text-xs text-[color:var(--text-detail)]">
               {workout.sessionName} · {formatDisplayDate(workout.date)} · {durationMin} min
             </p>
@@ -1168,7 +1168,7 @@ function DensityCard({ workout, onOpen }: { workout: Workout; onOpen?: () => voi
           ].map(s => (
             <div key={s.label} className="text-center">
               <p className="text-xs text-[color:var(--text-detail)]">{s.label}</p>
-              <p className={cn('font-mono tabular-nums font-bold', s.gold ? 'text-[color:var(--accent)]' : 'text-[#F5F5F5]')}>
+              <p className={cn('font-mono tabular-nums font-bold', s.gold ? 'text-[color:var(--accent)]' : 'text-[color:var(--text-0)]')}>
                 {s.value}
               </p>
             </div>
@@ -1185,7 +1185,7 @@ function DensityCard({ workout, onOpen }: { workout: Workout; onOpen?: () => voi
               type="button"
               onClick={() => setView(v)}
               className={cn('px-3 py-1.5 text-xs font-semibold capitalize transition-all',
-                view === v ? 'bg-[rgba(245,158,11,0.15)] text-[#F59E0B]' : 'text-[color:var(--text-detail)] hover:text-[#F5F5F5]'
+                view === v ? 'bg-[rgba(245,158,11,0.15)] text-[#F59E0B]' : 'text-[color:var(--text-detail)] hover:text-[color:var(--text-0)]'
               )}
             >
               By {v}
@@ -1202,11 +1202,11 @@ function DensityCard({ workout, onOpen }: { workout: Workout; onOpen?: () => voi
             <div key={row.label} className="space-y-1">
               <div className="flex justify-between text-sm">
                 <div className="flex items-center gap-2 min-w-0">
-                  <span className="font-medium text-[#F5F5F5] capitalize truncate">{row.label}</span>
+                  <span className="font-medium text-[color:var(--text-0)] capitalize truncate">{row.label}</span>
                   {view === 'exercise' && <span className="text-xs text-[color:var(--text-detail)] capitalize shrink-0">{row.muscle}</span>}
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
-                  <span className="font-mono tabular-nums text-[#F5F5F5]">
+                  <span className="font-mono tabular-nums text-[color:var(--text-0)]">
                     {Math.round(row.volume).toLocaleString()} kg
                   </span>
                   <span className="font-mono tabular-nums text-[#F59E0B] text-xs w-20 text-right">
@@ -1259,7 +1259,7 @@ function CycleDayTabs({
                 'shrink-0 min-w-[2.75rem] px-3 py-2 rounded-lg text-sm font-mono tabular-nums transition-all border',
                 isSelected
                   ? 'is-selected text-[#FAFAFA]'
-                  : 'border-[rgba(65,50,50,0.35)] text-[#9A9A9A] hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[#F0F0F0]',
+                  : 'border-[rgba(65,50,50,0.35)] text-[color:var(--text-1)] hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]',
                 isTodayTab && !isSelected && 'ring-1 ring-[rgba(220,38,38,0.35)]'
               )}
               aria-pressed={isSelected}
@@ -1369,7 +1369,7 @@ export default function DashboardPage() {
 
       <div className="dashboard-overview space-y-6">
         <header className="space-y-1">
-          <h1 className="text-2xl font-bold text-[#F5F5F5]">Dashboard</h1>
+          <h1 className="text-2xl font-bold text-[color:var(--accent)]">Dashboard</h1>
           <p className="text-[color:var(--text-detail)]">{dashboardSubtitle}</p>
         </header>
 
@@ -1418,7 +1418,7 @@ export default function DashboardPage() {
             >
               {selectedSession ? (
                 <div className="flex min-h-0 flex-1 flex-col space-y-3">
-                  <p className="font-medium text-[#F5F5F5]">{selectedSession.name}</p>
+                  <p className="font-medium text-[color:var(--text-0)]">{selectedSession.name}</p>
                   <p className="text-xs text-[color:var(--text-detail)]">
                     {selectedSession.type === 'lift' && 'Strength'}
                     {selectedSession.type === 'cardio' && 'Cardio / conditioning'}
@@ -1475,7 +1475,7 @@ export default function DashboardPage() {
                       </p>
                     )}
                     <div className="flex items-baseline gap-2">
-                      <span className="text-3xl font-bold font-mono tabular-nums text-[#F5F5F5]">
+                      <span className="text-3xl font-bold font-mono tabular-nums text-[color:var(--text-0)]">
                         {Math.round(recoveryDashEntry.readinessScore)}
                       </span>
                       <span className="text-sm text-[color:var(--text-detail)]">/100</span>
@@ -1484,7 +1484,7 @@ export default function DashboardPage() {
                       Sleep: {recoveryDashEntry.sleepHours}h · HRV: {recoveryDashEntry.hrv}
                     </p>
                     {!isViewingToday && (
-                      <p className="text-[10px] text-[#5E5E5E] pt-1 leading-snug">
+                      <p className="text-[10px] text-[color:var(--text-2)] pt-1 leading-snug">
                         Saved recovery is by calendar date (not the selected cycle day).
                       </p>
                     )}
@@ -1503,7 +1503,7 @@ export default function DashboardPage() {
                 <div className="flex min-h-0 flex-1 flex-col space-y-2">
                   <div className="flex items-baseline justify-between gap-2 shrink-0">
                     <div className="flex items-baseline gap-2">
-                      <span className="text-3xl font-bold font-mono tabular-nums text-[#F5F5F5]">
+                      <span className="text-3xl font-bold font-mono tabular-nums text-[color:var(--text-0)]">
                         {profile?.currentWeight ?? '—'}
                       </span>
                       <span className="text-sm text-[color:var(--text-detail)]">kg</span>
@@ -1538,13 +1538,13 @@ export default function DashboardPage() {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-[color:var(--text-detail)]">Protein</span>
-                  <span className="font-mono tabular-nums text-[#F5F5F5]">
+                  <span className="font-mono tabular-nums text-[color:var(--text-0)]">
                     {Math.round(todayNutrition.macroActuals.protein)}g / {todayNutrition.macroTargets.protein}g
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-[color:var(--text-detail)]">Meals</span>
-                  <span className="font-mono tabular-nums text-[#F5F5F5]">
+                  <span className="font-mono tabular-nums text-[color:var(--text-0)]">
                     {todayNutrition.meals.filter(m => m.completed).length}/{todayNutrition.meals.length} eaten
                   </span>
                 </div>
@@ -1577,7 +1577,7 @@ export default function DashboardPage() {
             ) : todaySupplements ? (
               <div className="space-y-2">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold font-mono tabular-nums text-[#F5F5F5]">
+                  <span className="text-3xl font-bold font-mono tabular-nums text-[color:var(--text-0)]">
                     {todaySupplements.compliancePercent}
                   </span>
                   <span className="text-sm text-[color:var(--text-detail)]">%</span>
@@ -1614,7 +1614,7 @@ export default function DashboardPage() {
               }) => (
                 <div key={muscle.muscleGroup} className="space-y-1">
                   <div className="flex justify-between text-sm">
-                    <span className="text-[#F5F5F5] capitalize">{muscle.muscleGroup}</span>
+                    <span className="text-[color:var(--text-0)] capitalize">{muscle.muscleGroup}</span>
                     <span className="font-mono tabular-nums text-[color:var(--text-detail)]">
                       {muscle.currentSets} / {muscle.targetSets} sets
                     </span>
@@ -1693,7 +1693,7 @@ function Card({
     >
       <div className="flex items-center gap-2 mb-3">
         <span className={iconColor}>{icon}</span>
-        <h3 className="font-medium text-[#F5F5F5]">{title}</h3>
+        <h3 className="font-medium text-[color:var(--text-0)]">{title}</h3>
       </div>
       {children}
     </div>

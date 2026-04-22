@@ -109,9 +109,9 @@ module.exports = {
           to:   { opacity: '1', transform: 'translateX(0)' },
         },
         'pulse-ring': {
-          '0%':   { boxShadow: '0 0 0 0 rgba(59,130,246,0.4)' },
-          '70%':  { boxShadow: '0 0 0 10px rgba(59,130,246,0)' },
-          '100%': { boxShadow: '0 0 0 0 rgba(59,130,246,0)' },
+          '0%':   { boxShadow: '0 0 0 0 rgba(220,38,38,0.4)' },
+          '70%':  { boxShadow: '0 0 0 10px rgba(220,38,38,0)' },
+          '100%': { boxShadow: '0 0 0 0 rgba(220,38,38,0)' },
         },
         'gold-glint': {
           '0%, 100%': {

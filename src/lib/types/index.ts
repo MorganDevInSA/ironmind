@@ -233,7 +233,8 @@ export interface RecoveryEntry {
   stress: number;
   energy: number;
   doms: number;
-  pelvicComfort: number;
+  /** @deprecated Removed from UI — kept optional for historical entries */
+  pelvicComfort?: number;
   readinessScore: number;
   cardioSession?: CardioSessionLog;
   breathWork?: BreathWorkLog[];

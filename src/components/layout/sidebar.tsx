@@ -62,6 +62,7 @@ export function Sidebar() {
       <button
         type="button"
         onClick={toggleSidebar}
+        aria-label={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
         className={cn(
           'absolute -right-3 w-6 h-6 rounded-full z-50 top-[5.75rem]',
           'flex items-center justify-center',
@@ -71,7 +72,7 @@ export function Sidebar() {
           'transition-all duration-200 hover:scale-110'
         )}
       >
-        {sidebarOpen ? <ChevronLeft size={12} /> : <ChevronRight size={12} />}
+        {sidebarOpen ? <ChevronLeft size={12} aria-hidden="true" /> : <ChevronRight size={12} aria-hidden="true" />}
       </button>
 
       {/* Navigation */}
@@ -85,6 +86,8 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               data-active={isActive}
+              aria-current={isActive ? 'page' : undefined}
+              aria-label={!sidebarOpen ? item.label : undefined}
               className={cn(
                 'nav-item group',
                 !sidebarOpen && 'justify-center max-w-none px-0',

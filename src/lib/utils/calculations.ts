@@ -41,11 +41,10 @@ export function calculateReadinessScore(entry: RecoveryEntry): number {
     ((10 - entry.doms) * 0.10)
   ) * 10;
 
-  // Pelvic comfort penalty (1-5 scale, 5 = perfect)
-  if (entry.pelvicComfort <= 2) {
-    return baseScore * 0.7;
-  } else if (entry.pelvicComfort === 3) {
-    return baseScore * 0.85;
+  // Legacy pelvic comfort penalty — only applied for historical entries that have it
+  if (entry.pelvicComfort != null) {
+    if (entry.pelvicComfort <= 2) return baseScore * 0.7;
+    if (entry.pelvicComfort === 3) return baseScore * 0.85;
   }
   return baseScore;
 }

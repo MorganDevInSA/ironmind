@@ -31,10 +31,10 @@ export function StepGenerateJson({ onNext, onBack }: StepGenerateJsonProps) {
         <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[color:var(--accent)]">
           Step 4 of 6
         </span>
-        <h2 className="mt-2 text-2xl sm:text-3xl font-bold font-heading tracking-tight text-[#F0F0F0]">
+        <h2 className="mt-2 text-2xl sm:text-3xl font-bold font-heading tracking-tight text-[color:var(--text-0)]">
           Generate Your Data Pack
         </h2>
-        <p className="mt-2 text-sm text-[#9A9A9A]">
+        <p className="mt-2 text-sm text-[color:var(--text-1)]">
           Paste this prompt into the same AI chat as Step 1, then add your questionnaire JSON.
           The AI will output 6 files that fully populate your IRONMIND app.
         </p>
@@ -43,17 +43,17 @@ export function StepGenerateJson({ onNext, onBack }: StepGenerateJsonProps) {
       {/* Instruction steps */}
       <div className="rounded-[14px] p-5 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)]
         shadow-[0_10px_24px_rgba(0,0,0,0.45)] flex flex-col gap-4">
-        <div className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#5E5E5E]">
+        <div className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[color:var(--text-2)]">
           Instructions
         </div>
         {instructions.map(step => (
           <div key={step.num} className="flex items-start gap-4">
             <span className="mt-0.5 w-6 h-6 shrink-0 rounded-full flex items-center justify-center
-              text-[10px] font-bold bg-[color:color-mix(in_srgb,var(--accent)_12%,transparent)] border border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)]
+              text-[10px] font-bold bg-[rgba(16,16,16,0.78)] border border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)]
               text-[color:var(--accent-light)]">
               {step.num}
             </span>
-            <p className="text-sm text-[#F0F0F0] leading-relaxed">{step.text}</p>
+            <p className="text-sm text-[color:var(--text-0)] leading-relaxed">{step.text}</p>
           </div>
         ))}
       </div>
@@ -71,7 +71,7 @@ export function StepGenerateJson({ onNext, onBack }: StepGenerateJsonProps) {
       {/* Expected file reference panel */}
       <div className="rounded-[14px] p-5 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)]
         shadow-[0_10px_24px_rgba(0,0,0,0.45)]">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#5E5E5E] mb-4">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[color:var(--text-2)] mb-4">
           6 Files the AI Will Output — Save With These Exact Filenames
         </p>
         <div className="flex flex-col gap-2">
@@ -80,8 +80,8 @@ export function StepGenerateJson({ onNext, onBack }: StepGenerateJsonProps) {
               bg-[rgba(8,8,8,0.7)] border border-[rgba(65,50,50,0.30)]">
               <FileJson size={16} className="text-[color:var(--accent)] mt-0.5 shrink-0" />
               <div>
-                <p className="text-sm font-mono font-semibold text-[#F0F0F0]">{file.name}</p>
-                <p className="text-xs text-[#5E5E5E]">{file.description}</p>
+                <p className="text-sm font-mono font-semibold text-[color:var(--text-0)]">{file.name}</p>
+                <p className="text-xs text-[color:var(--text-2)]">{file.description}</p>
               </div>
             </div>
           ))}
@@ -92,9 +92,9 @@ export function StepGenerateJson({ onNext, onBack }: StepGenerateJsonProps) {
       <div className="flex items-center justify-between">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm text-[#9A9A9A]
+          className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm text-[color:var(--text-1)]
             bg-[rgba(22,16,16,0.9)] border border-[rgba(65,50,50,0.45)]
-            hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[#F0F0F0]
+            hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]
             active:scale-95 transition-all duration-200"
         >
           <ArrowLeft size={15} />

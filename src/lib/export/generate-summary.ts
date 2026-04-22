@@ -249,11 +249,11 @@ export async function generateSummary(
 
     markdown += `## Recovery & readiness (last ${options.historyDays} days)\n`;
     markdown += `- Average readiness: ${avgReadiness}/100\n\n`;
-    markdown += `| Date | Sleep | HRV | Mood | Stress | Energy | DOMS | Pelvic | Score |\n`;
-    markdown += `|------|-------|-----|------|--------|--------|------|--------|-------|\n`;
+    markdown += `| Date | Sleep | HRV | Mood | Stress | Energy | DOMS | Score |\n`;
+    markdown += `|------|-------|-----|------|--------|--------|------|-------|\n`;
 
     for (const entry of recovery) {
-      markdown += `| ${formatDisplayDate(entry.date)} | ${entry.sleepHours}h | ${entry.hrv} | ${entry.mood} | ${entry.stress} | ${entry.energy} | ${entry.doms} | ${entry.pelvicComfort} | ${Math.round(entry.readinessScore)} |\n`;
+      markdown += `| ${formatDisplayDate(entry.date)} | ${entry.sleepHours}h | ${entry.hrv} | ${entry.mood} | ${entry.stress} | ${entry.energy} | ${entry.doms} | ${Math.round(entry.readinessScore)} |\n`;
     }
     markdown += `\n`;
   }

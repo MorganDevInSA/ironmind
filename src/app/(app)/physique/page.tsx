@@ -19,12 +19,12 @@ import type { CheckIn, Measurements } from '@/lib/types';
 function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: { name: string; value: number; color: string }[]; label?: string }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-[rgba(10,12,18,0.95)] border border-[rgba(80,96,128,0.3)] rounded-xl px-3 py-2 shadow-xl">
-      <p className="text-xs text-[#6B6B6B] mb-1">{label}</p>
+    <div className="bg-[rgba(14,11,11,0.95)] border border-[rgba(65,50,50,0.3)] rounded-xl px-3 py-2 shadow-xl">
+      <p className="text-xs text-[color:var(--text-2)] mb-1">{label}</p>
       {payload.map(p => (
         <div key={p.name} className="flex items-center gap-2 text-sm">
           <div className="w-2 h-2 rounded-full" style={{ background: p.color }} />
-          <span className="font-mono tabular-nums text-[#F5F5F5] font-bold">{p.value} kg</span>
+          <span className="font-mono tabular-nums text-[color:var(--text-0)] font-bold">{p.value} kg</span>
         </div>
       ))}
     </div>
@@ -34,13 +34,13 @@ function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: 
 function MeasurementTooltip({ active, payload, label }: { active?: boolean; payload?: { name: string; value: number; color: string; unit?: string }[]; label?: string }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-[rgba(10,12,18,0.95)] border border-[rgba(80,96,128,0.3)] rounded-xl px-3 py-2 shadow-xl">
-      <p className="text-xs text-[#6B6B6B] mb-1">{label}</p>
+    <div className="bg-[rgba(14,11,11,0.95)] border border-[rgba(65,50,50,0.3)] rounded-xl px-3 py-2 shadow-xl">
+      <p className="text-xs text-[color:var(--text-2)] mb-1">{label}</p>
       {payload.map(p => (
         <div key={p.name} className="flex items-center gap-2 text-sm">
           <div className="w-2 h-2 rounded-full" style={{ background: p.color }} />
-          <span className="capitalize text-[#9A9A9A]">{p.name}:</span>
-          <span className="font-mono tabular-nums text-[#F5F5F5] font-bold">{p.value} cm</span>
+          <span className="capitalize text-[color:var(--text-1)]">{p.name}:</span>
+          <span className="font-mono tabular-nums text-[color:var(--text-0)] font-bold">{p.value} cm</span>
         </div>
       ))}
     </div>
@@ -52,11 +52,11 @@ function Field({ label, value, onChange, unit = '', placeholder = '' }: {
 }) {
   return (
     <div className="space-y-1">
-      <label className="text-xs font-medium text-[#9A9A9A]">{label}</label>
+      <label className="text-xs font-medium text-[color:var(--text-1)]">{label}</label>
       <div className="relative">
         <input type="number" step="0.1" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
-          className="w-full bg-[rgba(16,22,34,0.6)] border border-[rgba(80,96,128,0.25)] rounded-lg p-3 text-[#F5F5F5] placeholder:text-[#6B6B6B]/50 focus:outline-none focus:border-[rgba(212,175,55,0.4)] pr-12" />
-        {unit && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#6B6B6B]">{unit}</span>}
+          className="w-full bg-[rgba(18,14,14,0.6)] border border-[rgba(65,50,50,0.25)] rounded-lg p-3 text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color-mix(in srgb,var(--accent) 40%,transparent0.4)] pr-12" />
+        {unit && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[color:var(--text-2)]">{unit}</span>}
       </div>
     </div>
   );
@@ -106,7 +106,7 @@ export default function PhysiquePage() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="glass-panel p-10 max-w-sm w-full text-center space-y-4">
           <CheckCircle2 size={40} className="text-[#10B981] mx-auto" />
-          <h2 className="text-xl font-bold text-[#F5F5F5]">Check-in saved.</h2>
+          <h2 className="text-xl font-bold text-[color:var(--text-0)]">Check-in saved.</h2>
           <button onClick={() => router.push('/dashboard')} className="btn-primary w-full">Dashboard</button>
         </div>
       </div>
@@ -153,13 +153,13 @@ export default function PhysiquePage() {
   const targetWeight = profile?.targetWeight;
 
   return (
-    <div className="space-y-5 max-w-2xl">
+    <div className="max-w-4xl mx-auto space-y-5">
 
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#6B6B6B] mb-1">Weekly Check-in</p>
-          <h1 className="text-2xl font-bold text-[#F5F5F5]">Physique</h1>
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[color:var(--text-2)] mb-1">Weekly Check-in</p>
+          <h1 className="text-2xl font-bold text-[color:var(--accent)]">Physique</h1>
         </div>
         <button
           onClick={() => setShowForm(o => !o)}
@@ -174,16 +174,16 @@ export default function PhysiquePage() {
         <div className="glass-panel p-5">
           <div className="flex items-center gap-5">
             <div className="text-center">
-              <p className="text-xs text-[#6B6B6B] mb-1">Current</p>
+              <p className="text-xs text-[color:var(--text-2)] mb-1">Current</p>
               <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-bold font-mono tabular-nums text-[#F5F5F5]">{lastCheckIn.bodyweight}</span>
-                <span className="text-sm text-[#6B6B6B]">kg</span>
+                <span className="text-3xl font-bold font-mono tabular-nums text-[color:var(--text-0)]">{lastCheckIn.bodyweight}</span>
+                <span className="text-sm text-[color:var(--text-2)]">kg</span>
               </div>
             </div>
 
             {weightDelta !== null && (
               <div className={cn('flex items-center gap-1 text-base font-semibold',
-                weightDelta < 0 ? 'text-[#10B981]' : weightDelta > 0 ? 'text-[#EF4444]' : 'text-[#6B6B6B]')}>
+                weightDelta < 0 ? 'text-[#10B981]' : weightDelta > 0 ? 'text-[#EF4444]' : 'text-[color:var(--text-2)]')}>
                 {weightDelta < 0 ? <TrendingDown size={18} /> : weightDelta > 0 ? <TrendingUp size={18} /> : <Minus size={18} />}
                 <span className="font-mono tabular-nums">{weightDelta > 0 ? '+' : ''}{weightDelta.toFixed(1)} kg</span>
               </div>
@@ -191,8 +191,8 @@ export default function PhysiquePage() {
 
             {targetWeight && (
               <div className="ml-auto text-right">
-                <p className="text-xs text-[#6B6B6B] mb-1">Target</p>
-                <p className="font-mono tabular-nums font-bold text-[#F5F5F5]">{targetWeight} kg</p>
+                <p className="text-xs text-[color:var(--text-2)] mb-1">Target</p>
+                <p className="font-mono tabular-nums font-bold text-[color:var(--text-0)]">{targetWeight} kg</p>
                 <p className={cn('text-xs font-semibold',
                   lastCheckIn.bodyweight > targetWeight ? 'text-[#F59E0B]' : 'text-[#10B981]')}>
                   {Math.abs(lastCheckIn.bodyweight - targetWeight).toFixed(1)} kg {lastCheckIn.bodyweight > targetWeight ? 'to lose' : 'to gain'}
@@ -205,8 +205,8 @@ export default function PhysiquePage() {
 
       {/* Check-in form (collapsible) */}
       {showForm && (
-        <div className="glass-panel p-5 space-y-5 border-[3px] border-[color:color-mix(in_srgb,var(--accent)_28%,transparent)]">
-          <h3 className="font-semibold text-[#F5F5F5] flex items-center gap-2">
+        <div className="glass-panel p-5 space-y-5">
+          <h3 className="font-semibold text-[color:var(--text-0)] flex items-center gap-2">
             <Scale size={18} className="text-[color:var(--accent)]" /> New Check-in
           </h3>
 
@@ -232,7 +232,7 @@ export default function PhysiquePage() {
           <Field label="Bodyweight *" value={form.bodyweight} onChange={v => setForm(f => ({ ...f, bodyweight: v }))} unit="kg" placeholder="89.5" />
 
           <div>
-            <p className="text-sm font-medium text-[#9A9A9A] mb-3">Measurements (optional)</p>
+            <p className="text-sm font-medium text-[color:var(--text-1)] mb-3">Measurements (optional)</p>
             <div className="grid grid-cols-2 gap-3">
               <Field label="Waist" value={form.waist} onChange={v => setForm(f => ({ ...f, waist: v }))} unit="cm" />
               <Field label="Chest" value={form.chest} onChange={v => setForm(f => ({ ...f, chest: v }))} unit="cm" />
@@ -244,25 +244,25 @@ export default function PhysiquePage() {
           </div>
 
           <div className="space-y-1">
-            <label className="text-sm font-medium text-[#9A9A9A]">Notes (optional)</label>
+            <label className="text-sm font-medium text-[color:var(--text-1)]">Notes (optional)</label>
             <textarea value={form.coachNotes} onChange={e => setForm(f => ({ ...f, coachNotes: e.target.value }))}
               placeholder="How do you look? Any visible changes or comments for your coach AI?" rows={3}
-              className="w-full bg-[rgba(16,22,34,0.6)] border border-[rgba(80,96,128,0.25)] rounded-lg p-3 text-sm text-[#F5F5F5] placeholder:text-[#6B6B6B]/50 focus:outline-none focus:border-[rgba(212,175,55,0.4)] resize-none" />
+              className="w-full bg-[rgba(18,14,14,0.6)] border border-[rgba(65,50,50,0.25)] rounded-lg p-3 text-sm text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color-mix(in srgb,var(--accent) 40%,transparent0.4)] resize-none" />
           </div>
 
           {PHOTO_UPLOAD_ENABLED ? (
             <div className="space-y-1">
-              <label className="text-sm font-medium text-[#9A9A9A]">Progress photos (optional)</label>
-              <label className="flex items-center gap-3 p-3 rounded-lg border border-[rgba(80,96,128,0.25)] bg-[rgba(16,22,34,0.6)] cursor-pointer hover:border-[color:color-mix(in_srgb,var(--accent)_40%,transparent)] transition-colors">
+              <label className="text-sm font-medium text-[color:var(--text-1)]">Progress photos (optional)</label>
+              <label className="flex items-center gap-3 p-3 rounded-lg border border-[rgba(65,50,50,0.25)] bg-[rgba(18,14,14,0.6)] cursor-pointer hover:border-[color:color-mix(in_srgb,var(--accent)_40%,transparent)] transition-colors">
                 <Camera size={16} className="text-[color:var(--accent)] shrink-0" />
-                <span className="text-sm text-[#9A9A9A]">Tap to add a photo</span>
+                <span className="text-sm text-[color:var(--text-1)]">Tap to add a photo</span>
                 <input type="file" accept="image/*" capture="environment" className="sr-only" />
               </label>
             </div>
           ) : (
-            <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg border border-[rgba(80,96,128,0.15)] bg-[rgba(16,22,34,0.4)]">
-              <Camera size={14} className="text-[#5E5E5E] shrink-0" />
-              <span className="text-xs text-[#5E5E5E]">Progress photos — coming soon</span>
+            <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg border border-[rgba(65,50,50,0.15)] bg-[rgba(18,14,14,0.4)]">
+              <Camera size={14} className="text-[color:var(--text-2)] shrink-0" />
+              <span className="text-xs text-[color:var(--text-2)]">Progress photos — coming soon</span>
             </div>
           )}
 
@@ -287,8 +287,8 @@ export default function PhysiquePage() {
         <div className="glass-panel p-5">
           <div className="flex items-center gap-2 mb-4">
             <Scale size={18} className="text-[#F59E0B]" />
-            <h3 className="font-semibold text-[#F5F5F5]">Weight Trend</h3>
-            <span className="ml-auto text-xs text-[#6B6B6B]">{weightData.length} check-ins</span>
+            <h3 className="font-semibold text-[color:var(--text-0)]">Weight Trend</h3>
+            <span className="ml-auto text-xs text-[color:var(--text-2)]">{weightData.length} check-ins</span>
           </div>
           <ResponsiveContainer width="100%" height={200}>
             <AreaChart data={weightData} margin={{ top: 8, right: 4, bottom: 0, left: -20 }}>
@@ -298,14 +298,14 @@ export default function PhysiquePage() {
                   <stop offset="95%" stopColor="#F59E0B" stopOpacity={0.02} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(80,96,128,0.12)" />
-              <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#6B6B6B' }} tickLine={false} axisLine={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(65,50,50,0.12)" />
+              <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'color:var(--text-2)' }} tickLine={false} axisLine={false} />
               <YAxis
                 domain={[
                   (dataMin: number) => Math.floor(dataMin - 1),
                   (dataMax: number) => Math.ceil(dataMax + 1),
                 ]}
-                tick={{ fontSize: 10, fill: '#6B6B6B' }} tickLine={false} axisLine={false} />
+                tick={{ fontSize: 10, fill: 'color:var(--text-2)' }} tickLine={false} axisLine={false} />
               <Tooltip content={<ChartTooltip />} />
               {targetWeight && (
                 <ReferenceLine y={targetWeight} stroke="rgba(16,185,129,0.5)" strokeDasharray="4 4"
@@ -323,13 +323,13 @@ export default function PhysiquePage() {
         <div className="glass-panel p-5">
           <div className="flex items-center gap-2 mb-4">
             <BarChart3 size={18} className="text-[color:var(--accent)]" />
-            <h3 className="font-semibold text-[#F5F5F5]">Measurements History</h3>
+            <h3 className="font-semibold text-[color:var(--text-0)]">Measurements History</h3>
           </div>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={measurementData} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(80,96,128,0.12)" />
-              <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#6B6B6B' }} tickLine={false} axisLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: '#6B6B6B' }} tickLine={false} axisLine={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(65,50,50,0.12)" />
+              <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'color:var(--text-2)' }} tickLine={false} axisLine={false} />
+              <YAxis tick={{ fontSize: 10, fill: 'color:var(--text-2)' }} tickLine={false} axisLine={false} />
               <Tooltip content={<MeasurementTooltip />} />
               {measurementKeys.map(key => (
                 <Line key={key} type="monotone" dataKey={key}
@@ -342,7 +342,7 @@ export default function PhysiquePage() {
           {/* Legend */}
           <div className="flex flex-wrap gap-3 mt-3">
             {measurementKeys.map(key => (
-              <div key={key} className="flex items-center gap-1.5 text-xs text-[#6B6B6B]">
+              <div key={key} className="flex items-center gap-1.5 text-xs text-[color:var(--text-2)]">
                 <div className="w-2.5 h-2.5 rounded-full" style={{ background: measurementColors[key] }} />
                 <span className="capitalize">{key.replace('left', 'L ').replace('right', 'R ')}</span>
               </div>
@@ -354,35 +354,35 @@ export default function PhysiquePage() {
       {/* Check-in history table */}
       {recentCheckIns && recentCheckIns.length > 0 && (
         <div className="glass-panel overflow-hidden">
-          <div className="px-4 py-3 border-b border-[rgba(80,96,128,0.15)]">
-            <h3 className="font-semibold text-[#F5F5F5]">History</h3>
+          <div className="px-4 py-3 border-b border-[rgba(65,50,50,0.15)]">
+            <h3 className="font-semibold text-[color:var(--text-0)]">History</h3>
           </div>
-          <div className="divide-y divide-[rgba(80,96,128,0.1)]">
+          <div className="divide-y divide-[rgba(65,50,50,0.1)]">
             {recentCheckIns.slice(0, 10).map((c: CheckIn, i) => {
               const prev = recentCheckIns[i + 1];
               const delta = prev ? c.bodyweight - prev.bodyweight : null;
               return (
                 <div key={c.id} className="px-4 py-3 flex items-center justify-between gap-4">
                   <div>
-                    <p className="text-sm font-medium text-[#F5F5F5]">{formatDisplayDate(c.date)}</p>
+                    <p className="text-sm font-medium text-[color:var(--text-0)]">{formatDisplayDate(c.date)}</p>
                     {c.coachNotes && (
-                      <p className="text-xs text-[#6B6B6B] truncate max-w-[200px] mt-0.5">{c.coachNotes}</p>
+                      <p className="text-xs text-[color:var(--text-2)] truncate max-w-[200px] mt-0.5">{c.coachNotes}</p>
                     )}
                     {/* Measurements mini-row */}
                     {c.measurements != null &&
                       Object.values(c.measurements).some((v) => typeof v === 'number' && Number.isFinite(v)) && (
                       <div className="flex gap-2 mt-1 flex-wrap">
-                        {c.measurements.waist && <span className="text-[10px] font-mono text-[#6B6B6B]">W:{c.measurements.waist}</span>}
-                        {c.measurements.chest && <span className="text-[10px] font-mono text-[#6B6B6B]">Ch:{c.measurements.chest}</span>}
-                        {c.measurements.leftArm && <span className="text-[10px] font-mono text-[#6B6B6B]">A:{c.measurements.leftArm}</span>}
+                        {c.measurements.waist && <span className="text-[10px] font-mono text-[color:var(--text-2)]">W:{c.measurements.waist}</span>}
+                        {c.measurements.chest && <span className="text-[10px] font-mono text-[color:var(--text-2)]">Ch:{c.measurements.chest}</span>}
+                        {c.measurements.leftArm && <span className="text-[10px] font-mono text-[color:var(--text-2)]">A:{c.measurements.leftArm}</span>}
                       </div>
                     )}
                   </div>
                   <div className="text-right shrink-0">
-                    <span className="font-mono tabular-nums font-bold text-[#F5F5F5]">{c.bodyweight} kg</span>
+                    <span className="font-mono tabular-nums font-bold text-[color:var(--text-0)]">{c.bodyweight} kg</span>
                     {delta !== null && (
                       <p className={cn('text-xs font-mono tabular-nums',
-                        delta < 0 ? 'text-[#10B981]' : delta > 0 ? 'text-[#EF4444]' : 'text-[#6B6B6B]')}>
+                        delta < 0 ? 'text-[#10B981]' : delta > 0 ? 'text-[#EF4444]' : 'text-[color:var(--text-2)]')}>
                         {delta > 0 ? '+' : ''}{delta.toFixed(1)}
                       </p>
                     )}

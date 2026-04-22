@@ -40,8 +40,7 @@ export async function saveRecoveryEntry(
     entry.mood !== undefined &&
     entry.stress !== undefined &&
     entry.energy !== undefined &&
-    entry.doms !== undefined &&
-    entry.pelvicComfort !== undefined
+    entry.doms !== undefined
   ) {
     readinessScore = calculateReadinessScore(entry as RecoveryEntry);
   }
@@ -125,7 +124,7 @@ export async function getAverageReadiness(
   return { average: Math.round(average), trend };
 }
 
-// Get pelvic comfort flags (days with score <= 2)
+/** @deprecated Pelvic comfort removed from UI — kept for historical data */
 export async function getPelvicComfortFlags(
   userId: string,
   days: number = 14
@@ -133,8 +132,8 @@ export async function getPelvicComfortFlags(
   const entries = await getRecentRecoveryEntries(userId, days);
 
   return entries
-    .filter(e => e.pelvicComfort <= 2)
-    .map(e => ({ date: e.date, score: e.pelvicComfort }));
+    .filter(e => e.pelvicComfort != null && e.pelvicComfort <= 2)
+    .map(e => ({ date: e.date, score: e.pelvicComfort! }));
 }
 
 // Check if today has a recovery entry
@@ -164,7 +163,6 @@ export async function updateCardioSession(
       stress: 0,
       energy: 0,
       doms: 0,
-      pelvicComfort: 5,
       readinessScore: 0,
       cardioSession,
     });
@@ -191,7 +189,6 @@ export async function updateBreathWork(
       stress: 0,
       energy: 0,
       doms: 0,
-      pelvicComfort: 5,
       readinessScore: 0,
       breathWork,
     });
@@ -218,7 +215,6 @@ export async function updateCoreWork(
       stress: 0,
       energy: 0,
       doms: 0,
-      pelvicComfort: 5,
       readinessScore: 0,
       coreWork,
     });

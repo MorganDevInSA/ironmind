@@ -8,6 +8,17 @@
    CSS VARIABLES — Design tokens
 ============================================================ */
 :root {
+  /* ── Motion tokens ──────────────────────── */
+  --duration-instant: 100ms;
+  --duration-fast: 150ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
+  --duration-page: 500ms;
+  --duration-ambient: 3000ms;
+  --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.6, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
   /* ── Per-theme atmospheric glow (body bg) ─ */
   --body-glow-1: rgba(180, 20, 20, 0.06);
   --body-glow-2: rgba(120, 10, 10, 0.04);
@@ -21,8 +32,8 @@
   --surface-2: rgba(28, 20, 20, 0.95);
   --panel: rgba(18, 14, 14, 0.78);
   --panel-strong: rgba(18, 14, 14, 0.94);
-  --panel-border: rgba(65, 50, 50, 0.40);
-  --panel-border-width: 3px;
+  --panel-border: color-mix(in srgb, var(--accent) 14%, transparent);
+  --panel-border-width: 1px;
 
   /*
    * Readable secondary copy on dark surfaces (meal details, sidebar idle, meta lines).
@@ -42,10 +53,10 @@
   --chrome-border-subtle: rgba(42, 36, 36, 0.72);
   --chrome-border-width: 1px;
 
-  /* ── Text ────────────────────────────────── */
+  /* ── Text — tinted toward accent-light per theme ── */
   --text-0: #F0F0F0;
-  --text-1: #9A9A9A;
-  --text-2: #5E5E5E;
+  --text-1: #C08080;
+  --text-2: #8A5454;
 
   /* ── Accent — Crimson ────────────────────── */
   --accent:   #DC2626;
@@ -71,16 +82,6 @@
   --shadow-gold:   0 8px 32px rgba(220, 38, 38, 0.20);
   --shadow-accent: 0 8px 32px rgba(220, 38, 38, 0.20);
 
-  /* Dashboard — centered overview column (full border, rounded, readable insets) */
-  --dashboard-overview-radius: 1.25rem;
-  --dashboard-overview-border: rgba(220, 38, 38, 0.26);
-  --dashboard-overview-border-width: 4px;
-  --dashboard-overview-bg: linear-gradient(
-    165deg,
-    rgba(18, 14, 14, 0.52) 0%,
-    rgba(8, 8, 8, 0.38) 52%,
-    rgba(6, 6, 6, 0.45) 100%
-  );
   --dashboard-overview-max-width: 72rem;
 
   /* Exercise row index — dark tile + primary text (never mid-grey on crimson fill) */
@@ -111,10 +112,12 @@ html[data-theme='hot-pink'] {
   --gold: var(--accent);
   --gold-light: var(--accent-light);
   --gold-dark: var(--accent-2);
+  --text-1: #CC80A8;
+  --text-2: #9A5478;
+  --text-detail: #D898B8;
   --shadow-gold: 0 8px 32px rgba(255, 62, 165, 0.20);
   --shadow-accent: 0 8px 32px rgba(255, 62, 165, 0.20);
-  --dashboard-overview-border: rgba(255, 62, 165, 0.26);
-  --panel-border: rgba(100, 50, 80, 0.40);
+  --panel-border: color-mix(in srgb, var(--accent) 62%, transparent);
   --chrome-border: rgba(100, 50, 80, 0.38);
   --chrome-border-subtle: rgba(80, 40, 60, 0.72);
   --body-glow-1: rgba(255, 62, 165, 0.06);
@@ -126,6 +129,11 @@ html[data-theme='hot-pink'] {
    BASE
 ============================================================ */
 * { box-sizing: border-box; }
+
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--accent);
+}
 
 html {
   scroll-behavior: smooth;
@@ -210,7 +218,10 @@ h4 { font-size: 1.125rem; }
     border: var(--panel-border-width) solid var(--panel-border);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    box-shadow: var(--shadow-soft);
+    box-shadow:
+      0 4px 16px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.58);
     border-radius: 14px;
   }
 
@@ -220,29 +231,27 @@ h4 { font-size: 1.125rem; }
     border: var(--panel-border-width) solid var(--panel-border);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    box-shadow: var(--shadow-strong);
+    box-shadow:
+      var(--shadow-strong),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.58);
     border-radius: 14px;
   }
 
-  /*
-   * Dashboard overview — centered column, border on all sides, thicker chrome, rounded corners.
-   * Does not extend under the sidebar: lives inside `<main>` with horizontal padding from the app layout.
-   */
   .dashboard-overview {
     margin-left: auto;
     margin-right: auto;
     width: 100%;
     max-width: var(--dashboard-overview-max-width);
-    border-radius: var(--dashboard-overview-radius);
-    border: var(--dashboard-overview-border-width) solid var(--dashboard-overview-border);
-    background: var(--dashboard-overview-bg);
+    border-radius: 14px;
+    border: var(--panel-border-width) solid var(--panel-border);
+    background: var(--panel);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     box-shadow:
-      var(--shadow-soft),
-      0 0 0 1px rgba(65, 50, 50, 0.38),
-      0 28px 48px rgba(0, 0, 0, 0.35),
-      inset 0 1px 0 rgba(255, 255, 255, 0.035);
+      0 4px 16px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.58);
     padding: 1.25rem;
   }
 
@@ -251,18 +260,13 @@ h4 { font-size: 1.125rem; }
    * depth from gradient + inset highlight; border is supportive, not a wireframe grid.
    */
   .glass-panel.dashboard-card-surface {
-    border-width: 1px;
-    border-color: rgba(65, 50, 50, 0.42);
+    /* Inherits .glass-panel border/shadow; just override background for depth */
     background: linear-gradient(
       165deg,
       rgba(26, 20, 20, 0.68) 0%,
       rgba(14, 11, 11, 0.86) 52%,
       rgba(10, 9, 9, 0.92) 100%
     );
-    box-shadow:
-      var(--shadow-soft),
-      inset 0 1px 0 rgba(255, 255, 255, 0.045),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.42);
   }
 
   @media (min-width: 768px) {
@@ -387,7 +391,7 @@ h4 { font-size: 1.125rem; }
 
   .btn-ghost:hover {
     color: var(--text-0);
-    background: rgba(20, 28, 44, 0.6);
+    background: rgba(22, 16, 16, 0.6);
   }
 
   .btn-ghost:active { transform: scale(0.95); }
@@ -491,9 +495,9 @@ h4 { font-size: 1.125rem; }
   }
 
   .status-badge.info {
-    background: rgba(59, 130, 246, 0.12);
-    color: #7fb2ff;
-    border-color: rgba(59, 130, 246, 0.35);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    color: var(--accent-light);
+    border-color: color-mix(in srgb, var(--accent) 35%, transparent);
   }
 
   .metric-badge {
@@ -567,12 +571,11 @@ h4 { font-size: 1.125rem; }
 
   /* Shared selected-state glow used by tabs, cards, and toggles */
   .is-selected {
+    border-width: 2px;
     border-color: color-mix(in srgb, var(--accent) 62%, transparent);
-    background:
-      radial-gradient(120% 140% at 50% 0%, color-mix(in srgb, var(--accent) 10%, transparent) 0%, transparent 60%),
-      linear-gradient(180deg, rgba(22, 16, 16, 0.94) 0%, rgba(10, 10, 10, 0.98) 100%);
+    background: radial-gradient(120% 140% at 50% 0%, color-mix(in srgb, var(--accent) 8%, transparent) 0%, #070707 58%);
     box-shadow:
-      0 0 14px color-mix(in srgb, var(--accent) 14%, transparent),
+      0 0 14px color-mix(in srgb, var(--accent) 9%, transparent),
       inset 0 1px 0 rgba(255, 255, 255, 0.04),
       inset 0 -1px 0 rgba(0, 0, 0, 0.58);
   }
@@ -657,12 +660,12 @@ h4 { font-size: 1.125rem; }
   .data-table td {
     padding: 1rem;
     color: var(--text-1);
-    border-bottom: 1px solid rgba(80, 96, 128, 0.2);
+    border-bottom: 1px solid rgba(65, 50, 50, 0.25);
     transition: background 0.15s ease;
   }
 
   .data-table tr:hover td {
-    background: rgba(20, 28, 44, 0.55);
+    background: rgba(22, 16, 16, 0.55);
   }
 
   .data-table tr:hover td:first-child {
@@ -672,7 +675,7 @@ h4 { font-size: 1.125rem; }
   /* --- Skeleton --------------------------------------------- */
 
   .skeleton {
-    background: rgba(18, 24, 38, 0.9);
+    background: rgba(18, 14, 14, 0.92);
     background-image: linear-gradient(
       90deg,
       rgba(255, 255, 255, 0) 0,
@@ -733,13 +736,13 @@ h4 { font-size: 1.125rem; }
   /* --- Chart containers ------------------------------------- */
 
   .chart-container .recharts-cartesian-grid line {
-    stroke: rgba(114, 136, 176, 0.16);
+    stroke: rgba(65, 50, 50, 0.25);
     stroke-dasharray: 3 3;
   }
 
   .chart-container .recharts-cartesian-axis-line,
   .chart-container .recharts-cartesian-axis-tick-line {
-    stroke: rgba(132, 152, 190, 0.32);
+    stroke: rgba(65, 50, 50, 0.45);
   }
 
   .chart-container .recharts-tooltip-cursor,
@@ -830,6 +833,8 @@ h4 { font-size: 1.125rem; }
 .pulse-soft     { animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
 .gold-glint     { animation: gold-glint 3s ease-in-out infinite; }
 .gold-glow      { animation: gold-glow 3s ease-in-out infinite; }
+.accent-glint   { animation: gold-glint var(--duration-ambient) ease-in-out infinite; }
+.accent-glow    { animation: gold-glow var(--duration-ambient) ease-in-out infinite; }
 .pulse-broken   { animation: pulse-broken 1.1s ease-in-out infinite; }
 
 .animate-fade-in-up    { animation: fade-in-up 0.3s ease-out; }
