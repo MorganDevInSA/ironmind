@@ -147,40 +147,35 @@ export default function SettingsPage() {
             }`}
             aria-pressed={theme === 'custom'}
           >
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3 min-w-0">
-                <span className="relative inline-flex h-5 w-5 shrink-0">
-                  <span
-                    className="h-5 w-5 rounded-full border border-white/20 shadow-[0_0_0_1px_rgba(0,0,0,0.4)_inset]"
-                    style={{ background: customAccent }}
-                    aria-hidden
-                  />
-                  <input
-                    type="color"
-                    value={customAccent}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setTheme('custom');
-                    }}
-                    onFocus={() => setTheme('custom')}
-                    onChange={(e) => {
-                      setTheme('custom');
-                      setCustomAccent(e.target.value);
-                    }}
-                    className="absolute inset-0 h-5 w-5 cursor-pointer rounded-full opacity-0"
-                    aria-label="Choose custom accent colour"
-                  />
-                </span>
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-[color:var(--text-0)]">Custom</p>
-                  <p className="text-xs text-[color:var(--text-1)]">
-                    Choose an accent colour — it applies across the app as you adjust.
-                  </p>
-                </div>
-              </div>
-              <span className="font-mono text-xs tabular-nums text-[color:var(--text-1)] shrink-0">
-                {customAccent.toUpperCase()}
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="relative inline-flex h-5 w-5 shrink-0">
+                <span
+                  className="h-5 w-5 rounded-full border border-white/20 shadow-[0_0_0_1px_rgba(0,0,0,0.4)_inset]"
+                  style={{ background: customAccent }}
+                  aria-hidden
+                />
+                <input
+                  type="color"
+                  value={customAccent}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setTheme('custom');
+                  }}
+                  onFocus={() => setTheme('custom')}
+                  onChange={(e) => {
+                    setTheme('custom');
+                    setCustomAccent(e.target.value);
+                  }}
+                  className="absolute inset-0 h-5 w-5 cursor-pointer rounded-full opacity-0"
+                  aria-label="Choose custom accent colour"
+                />
               </span>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-[color:var(--text-0)]">Custom</p>
+                <p className="text-xs text-[color:var(--text-1)]">
+                  Choose an accent colour — it applies across the app as you adjust.
+                </p>
+              </div>
             </div>
           </button>
         </div>

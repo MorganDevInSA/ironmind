@@ -1,6 +1,5 @@
 'use client';
 
-import { useMemo } from 'react';
 import { ArrowLeft, ArrowRight, Palette } from 'lucide-react';
 import { useUIStore } from '@/stores';
 import type { AppTheme } from '@/stores/ui-store';
@@ -61,8 +60,6 @@ export function StepTheme({ onNext, onBack }: StepThemeProps) {
   const setTheme = useUIStore((s) => s.setTheme);
   const setCustomAccent = useUIStore((s) => s.setCustomAccent);
 
-  const customHex = useMemo(() => customAccent.toUpperCase(), [customAccent]);
-
   return (
     <div className="flex flex-col gap-7 py-4">
       <div>
@@ -113,16 +110,11 @@ export function StepTheme({ onNext, onBack }: StepThemeProps) {
       </div>
 
       <div className="rounded-[14px] p-5 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)] shadow-[0_10px_24px_rgba(0,0,0,0.45)] space-y-3">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="text-sm font-semibold text-[color:var(--text-0)]">Custom Accent</p>
-            <p className="text-xs text-[color:var(--text-1)]">
-              Set any accent color and IRONMIND will generate the matching glow and border tones.
-            </p>
-          </div>
-          <span className="font-mono text-xs tabular-nums text-[color:var(--text-1)]">
-            {customHex}
-          </span>
+        <div>
+          <p className="text-sm font-semibold text-[color:var(--text-0)]">Custom Accent</p>
+          <p className="text-xs text-[color:var(--text-1)]">
+            Set any accent color and IRONMIND will generate the matching glow and border tones.
+          </p>
         </div>
         <div className="flex items-center gap-3">
           <span className="relative inline-flex h-7 w-7 shrink-0">
