@@ -37,7 +37,7 @@ import {
   Tooltip,
   ReferenceLine,
 } from 'recharts';
-import type { CheckIn } from '@/lib/types';
+import type { CheckIn, Measurements } from '@/lib/types';
 
 const chartGridStroke = 'color-mix(in srgb, var(--chrome-border) 35%, transparent)';
 
@@ -123,13 +123,28 @@ function MeasurementTooltip({
   );
 }
 
-type TapeDeltaKey = 'waist' | 'chest' | 'leftArm';
+/** Order for History tape snapshot + Δ row (all circumferences in cm). */
+const PHYSIQUE_HISTORY_METRICS: readonly {
+  key: keyof Measurements;
+  label: string;
+}[] = [
+  { key: 'waist', label: 'Waist' },
+  { key: 'chest', label: 'Chest' },
+  { key: 'hips', label: 'Hips' },
+  { key: 'shoulders', label: 'Shoulders' },
+  { key: 'leftArm', label: 'L arm' },
+  { key: 'rightArm', label: 'R arm' },
+  { key: 'leftThigh', label: 'L thigh' },
+  { key: 'rightThigh', label: 'R thigh' },
+  { key: 'leftCalf', label: 'L calf' },
+  { key: 'rightCalf', label: 'R calf' },
+] as const;
 
 /** Δ cm for this check-in vs the next older row (same ordering as scale Δ kg). */
 function tapeDeltaCm(
   current: CheckIn,
   older: CheckIn | undefined,
-  key: TapeDeltaKey,
+  key: keyof Measurements,
 ): number | null {
   if (!older?.measurements || !current.measurements) return null;
   const cur = current.measurements[key];
@@ -627,13 +642,13 @@ export default function PhysiquePage() {
           <div className="px-4 py-3 border-b border-[rgba(65,50,50,0.15)] space-y-1">
             <h3 className="font-semibold text-[color:var(--text-0)]">History</h3>
             <p className="text-[10px] text-[color:var(--text-2)] leading-snug max-w-xl">
-              Tape: waist, chest, left arm — all in{' '}
-              <span className="font-semibold text-[color:var(--text-1)]">cm</span>. Second row per
-              entry shows <span className="font-semibold text-[color:var(--text-1)]">Δ tape</span>{' '}
-              (cm vs next older check-in). Right column is{' '}
-              <span className="font-semibold text-[color:var(--text-1)]">scale weight (kg)</span>{' '}
-              and <span className="font-semibold text-[color:var(--text-1)]">Δ kg</span> the same
-              way (list is newest first).
+              All tape fields are{' '}
+              <span className="font-semibold text-[color:var(--text-1)]">cm</span>. First row =
+              values for this date; second row ={' '}
+              <span className="font-semibold text-[color:var(--text-1)]">Δ tape</span> vs the next
+              older check-in (only sites logged on both). Right:{' '}
+              <span className="font-semibold text-[color:var(--text-1)]">scale (kg)</span> and{' '}
+              <span className="font-semibold text-[color:var(--text-1)]">Δ kg</span>. Newest first.
             </p>
           </div>
           <div className="divide-y divide-[rgba(65,50,50,0.1)]">
@@ -643,11 +658,12 @@ export default function PhysiquePage() {
                 prev && typeof c.bodyweight === 'number' && typeof prev.bodyweight === 'number'
                   ? c.bodyweight - prev.bodyweight
                   : null;
-              const deltaWaist = tapeDeltaCm(c, prev, 'waist');
-              const deltaChest = tapeDeltaCm(c, prev, 'chest');
-              const deltaLArm = tapeDeltaCm(c, prev, 'leftArm');
-              const hasTapeDeltas =
-                deltaWaist !== null || deltaChest !== null || deltaLArm !== null;
+              const tapeDeltas = PHYSIQUE_HISTORY_METRICS.map(({ key, label }) => ({
+                key,
+                label,
+                delta: tapeDeltaCm(c, prev, key),
+              }));
+              const hasTapeDeltas = tapeDeltas.some((t) => t.delta !== null);
               return (
                 <div key={c.id} className="px-4 py-3 flex items-center justify-between gap-4">
                   <div>
@@ -665,21 +681,18 @@ export default function PhysiquePage() {
                         (v) => typeof v === 'number' && Number.isFinite(v),
                       ) && (
                         <div className="flex gap-2 mt-1 flex-wrap">
-                          {Number.isFinite(c.measurements.waist) && (
-                            <span className="text-[10px] font-mono text-[color:var(--text-2)]">
-                              Waist {c.measurements.waist} cm
-                            </span>
-                          )}
-                          {Number.isFinite(c.measurements.chest) && (
-                            <span className="text-[10px] font-mono text-[color:var(--text-2)]">
-                              Chest {c.measurements.chest} cm
-                            </span>
-                          )}
-                          {Number.isFinite(c.measurements.leftArm) && (
-                            <span className="text-[10px] font-mono text-[color:var(--text-2)]">
-                              L arm {c.measurements.leftArm} cm
-                            </span>
-                          )}
+                          {PHYSIQUE_HISTORY_METRICS.map(({ key, label }) => {
+                            const v = c.measurements?.[key];
+                            if (typeof v !== 'number' || !Number.isFinite(v)) return null;
+                            return (
+                              <span
+                                key={key}
+                                className="text-[10px] font-mono text-[color:var(--text-2)]"
+                              >
+                                {label} {v} cm
+                              </span>
+                            );
+                          })}
                         </div>
                       )}
                     {hasTapeDeltas && (
@@ -690,9 +703,9 @@ export default function PhysiquePage() {
                         <span className="text-[9px] font-semibold uppercase tracking-wider text-[color:var(--text-2)] shrink-0">
                           Δ tape
                         </span>
-                        <TapeDeltaChip label="waist" delta={deltaWaist} />
-                        <TapeDeltaChip label="chest" delta={deltaChest} />
-                        <TapeDeltaChip label="L arm" delta={deltaLArm} />
+                        {tapeDeltas.map(({ key, label, delta }) => (
+                          <TapeDeltaChip key={key} label={label} delta={delta} />
+                        ))}
                       </div>
                     )}
                   </div>
