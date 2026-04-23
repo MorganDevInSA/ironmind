@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import {
   useProfile,
@@ -19,6 +19,10 @@ import { cn } from '@/lib/utils';
 import { IronmindLogo } from '@/components/brand/ironmind-logo';
 
 const LED_COUNT = 10;
+
+function dismissedAlertsStorageKey(userId: string) {
+  return `ironmind:dismissed-alerts:${userId}`;
+}
 
 function LedBar({
   ratio,
@@ -80,8 +84,41 @@ export function TopBar() {
   const [alertsOpen, setAlertsOpen] = useState(false);
   const [readinessHover, setReadinessHover] = useState(false);
   const [targetHover, setTargetHover] = useState(false);
+  const [dismissedAlertIds, setDismissedAlertIds] = useState<string[]>([]);
 
-  const alertCount = alerts?.length ?? 0;
+  useEffect(() => {
+    if (!userId || typeof window === 'undefined') {
+      setDismissedAlertIds([]);
+      return;
+    }
+    try {
+      const raw = sessionStorage.getItem(dismissedAlertsStorageKey(userId));
+      const parsed = JSON.parse(raw ?? '[]');
+      setDismissedAlertIds(
+        Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === 'string') : [],
+      );
+    } catch {
+      setDismissedAlertIds([]);
+    }
+  }, [userId]);
+
+  const serverAlerts = alerts ?? [];
+  const visibleAlerts = useMemo(
+    () => serverAlerts.filter((a) => !dismissedAlertIds.includes(a.id)),
+    [serverAlerts, dismissedAlertIds],
+  );
+  const alertCount = visibleAlerts.length;
+
+  const dismissAlert = (id: string) => {
+    setDismissedAlertIds((prev) => {
+      if (prev.includes(id)) return prev;
+      const next = [...prev, id];
+      if (userId && typeof window !== 'undefined') {
+        sessionStorage.setItem(dismissedAlertsStorageKey(userId), JSON.stringify(next));
+      }
+      return next;
+    });
+  };
   const fallbackRecovery = recoveryHistory?.[0];
   const readinessSource = recovery ?? fallbackRecovery ?? null;
   const readinessScore = readinessSource ? calculateReadinessScore(readinessSource) : null;
@@ -305,57 +342,101 @@ export function TopBar() {
           </div>
         </div>
 
-        {/* Bell — only if unread alerts exist */}
-        {alertCount > 0 && (
-          <div className="relative">
-            <button
-              onClick={() => setAlertsOpen((o) => !o)}
-              aria-label={`${alertCount} unread alert${alertCount > 1 ? 's' : ''}`}
-              aria-expanded={alertsOpen}
-              className="relative p-2 text-[color:var(--accent)] hover:text-[color:var(--accent-light)] transition-colors duration-200 rounded-lg hover:bg-[rgba(0,0,0,0.35)]"
+        {/* Bell — always visible; dims when there are no active (non-dismissed) alerts */}
+        <div className="relative shrink-0">
+          <button
+            type="button"
+            onClick={() => setAlertsOpen((o) => !o)}
+            aria-label={`Alerts, ${alertCount} active`}
+            aria-expanded={alertsOpen}
+            className={cn(
+              'relative p-2 rounded-lg transition-colors duration-200 hover:bg-[rgba(0,0,0,0.35)]',
+              alertCount > 0
+                ? 'text-[color:var(--accent)] hover:text-[color:var(--accent-light)]'
+                : 'text-[color:color-mix(in_srgb,var(--accent)_38%,var(--text-2)))] hover:text-[color:color-mix(in_srgb,var(--accent)_48%,var(--text-1)))]',
+            )}
+          >
+            <Bell size={16} aria-hidden="true" className="relative z-0" />
+            {alertCount > 0 && (
+              <span
+                className="absolute top-1 right-1 z-[1] h-1.5 w-1.5 rounded-full bg-[color:var(--accent)] animate-pulse"
+                aria-hidden
+              />
+            )}
+            <span
+              className={cn(
+                'pointer-events-none absolute bottom-0 right-0 z-[2] min-w-[0.875rem] translate-x-0.5 translate-y-0.5 text-center text-[9px] font-bold font-mono tabular-nums leading-none',
+                alertCount > 0 ? 'text-[color:var(--accent-light)]' : 'text-[color:var(--text-2)]',
+              )}
+              aria-hidden
             >
-              <Bell size={16} aria-hidden="true" />
-              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-[color:var(--accent)] rounded-full animate-pulse" />
-            </button>
+              {alertCount}
+            </span>
+          </button>
 
-            {alertsOpen && (
-              <div className="absolute right-0 top-full mt-2 w-80 glass-panel z-50 overflow-hidden">
-                <div className="flex items-center justify-between px-4 py-3 border-b border-[rgba(65,50,50,0.28)]">
-                  <span className="text-sm font-semibold text-[color:var(--text-0)]">Alerts</span>
-                  <button
-                    onClick={() => setAlertsOpen(false)}
-                    aria-label="Close alerts"
-                    className="text-[color:var(--text-1)] hover:text-[color:var(--text-0)]"
-                  >
-                    <X size={16} aria-hidden="true" />
-                  </button>
-                </div>
-                <div className="max-h-64 overflow-y-auto divide-y divide-[rgba(65,50,50,0.18)]">
-                  {alerts?.map((alert) => (
-                    <div key={alert.id} className="px-4 py-3 flex items-start gap-3">
+          {alertsOpen && (
+            <div className="absolute right-0 top-full mt-2 w-80 glass-panel z-50 overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-[rgba(65,50,50,0.28)]">
+                <span className="text-sm font-semibold text-[color:var(--text-0)]">Alerts</span>
+                <button
+                  type="button"
+                  onClick={() => setAlertsOpen(false)}
+                  aria-label="Close alerts"
+                  className="text-[color:var(--text-1)] hover:text-[color:var(--text-0)]"
+                >
+                  <X size={16} aria-hidden="true" />
+                </button>
+              </div>
+              <div className="max-h-64 overflow-y-auto divide-y divide-[rgba(65,50,50,0.18)]">
+                {visibleAlerts.length === 0 ? (
+                  <div className="px-4 py-5 text-center text-xs text-[color:var(--text-2)] leading-relaxed">
+                    {serverAlerts.length > 0
+                      ? 'All alerts cleared for this session. Refresh the page to review them again.'
+                      : 'No alerts right now.'}
+                  </div>
+                ) : (
+                  visibleAlerts.map((alert) => (
+                    <button
+                      key={alert.id}
+                      type="button"
+                      onClick={() => dismissAlert(alert.id)}
+                      className="w-full px-4 py-3 flex items-start gap-3 text-left transition-colors hover:bg-[color:color-mix(in_srgb,var(--accent)_7%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent)]/45 focus-visible:ring-inset"
+                    >
                       {alert.severity === 'critical' ? (
                         <AlertTriangle
                           size={16}
                           className="text-[color:var(--accent-light)] shrink-0 mt-0.5"
+                          aria-hidden
                         />
                       ) : alert.severity === 'warning' ? (
-                        <AlertTriangle size={16} className="text-[#F59E0B] shrink-0 mt-0.5" />
+                        <AlertTriangle
+                          size={16}
+                          className="text-[#F59E0B] shrink-0 mt-0.5"
+                          aria-hidden
+                        />
                       ) : (
-                        <Info size={16} className="text-[color:var(--accent)] shrink-0 mt-0.5" />
+                        <Info
+                          size={16}
+                          className="text-[color:var(--accent)] shrink-0 mt-0.5"
+                          aria-hidden
+                        />
                       )}
-                      <div>
+                      <div className="min-w-0">
                         <p className="text-sm font-medium text-[color:var(--text-0)]">
                           {alert.title}
                         </p>
                         <p className="text-xs text-[color:var(--text-1)] mt-0.5">{alert.message}</p>
+                        <p className="text-[10px] text-[color:var(--text-2)] mt-1.5">
+                          Tap to dismiss
+                        </p>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    </button>
+                  ))
+                )}
               </div>
-            )}
-          </div>
-        )}
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );
