@@ -44,21 +44,30 @@ export function useActiveProgram(userId: string) {
 }
 
 // Workouts
-export function useWorkouts(userId: string, dateRange?: { from: string; to: string }) {
+export function useWorkouts(
+  userId: string,
+  dateRange: { from: string; to: string } | undefined,
+  options?: { enabled?: boolean },
+) {
+  const enabled = (options?.enabled ?? true) && !!userId && !!dateRange?.from && !!dateRange?.to;
   return useQuery({
     queryKey: queryKeys(userId).training.workouts(dateRange),
-    queryFn: () => getWorkouts(userId, dateRange),
+    queryFn: () => getWorkouts(userId, dateRange!),
     staleTime: staleTimes.workouts,
-    enabled: !!userId,
+    enabled,
   });
 }
 
-export function useRecentWorkouts(userId: string, days: number = 14) {
+export function useRecentWorkouts(
+  userId: string,
+  days: number = 14,
+  options?: { enabled?: boolean },
+) {
   return useQuery({
     queryKey: queryKeys(userId).training.recentWorkouts(days),
     queryFn: () => getRecentWorkouts(userId, days),
     staleTime: staleTimes.workouts,
-    enabled: !!userId,
+    enabled: (options?.enabled ?? true) && !!userId,
   });
 }
 

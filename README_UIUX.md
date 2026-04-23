@@ -109,6 +109,19 @@ Dashboard and recovery indicators/charts now share a strict fill language:
 - Use one gradient family per view to reduce cognitive noise and improve scan speed
 - Avoid endpoint marker clutter on progress bars unless a marker communicates a distinct threshold
 
+### Dashboard nutrition + supplements layout
+
+The dashboard places **Today's Nutrition** and **Supplements** in a **two-column grid** at `md+`
+so both cards are equal width and the pair spans the same horizontal band as other full-width
+summary sections.
+
+### Nutrition meal pickers
+
+Meal plan-line dropdowns on the Nutrition page use the **`nutrition-meal-select`** semantic class
+for dark native chrome and accent-aligned focus. The selected plan line is driven by saved
+`planLine` data (falling back to the computed default only when unset), so preset choices remain
+applied after save.
+
 ### Motion Design
 
 Animation is governed by motion tokens (`--duration-fast`, `--duration-normal`,

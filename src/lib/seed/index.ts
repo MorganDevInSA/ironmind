@@ -6,7 +6,11 @@ import { createPhase, setActivePhase, createJournalEntry } from '@/services/coac
 import { updateVolumeLandmarks } from '@/services/volume.service';
 import { saveNutritionDay, saveNutritionPlan } from '@/services/nutrition.service';
 import { today } from '@/lib/utils';
-import { DEMO_HISTORY_DAYS, seedDemoHistoricalData } from './demo-historical';
+import {
+  DEMO_HISTORY_DAYS,
+  getDemoHistoryStartDateString,
+  seedDemoHistoricalData,
+} from './demo-historical';
 import { logServiceWrite } from '@/lib/logging/service-write-log';
 import { collections } from '@/lib/firebase/config';
 import { addDocument, updateDocument } from '@/lib/firebase/firestore';
@@ -170,11 +174,10 @@ export async function seedUserData(userId: string): Promise<SeedUserDataResult> 
  */
 export async function seedMortonData(userId: string): Promise<void> {
   await updateProfile(userId, mortonProfile);
-  const historyStart = new Date();
-  historyStart.setDate(historyStart.getDate() - (DEMO_HISTORY_DAYS - 1));
+  const historyStartStr = getDemoHistoryStartDateString();
   const programId = await createProgram(userId, {
     ...mortonProgram,
-    startDate: historyStart.toISOString().split('T')[0],
+    startDate: historyStartStr,
   });
   await setActiveProgram(userId, programId);
   await saveProtocol(userId, mortonSupplementProtocol);
@@ -199,11 +202,12 @@ export async function seedMortonData(userId: string): Promise<void> {
     programId,
     program: {
       ...mortonProgram,
-      startDate: historyStart.toISOString().split('T')[0],
+      startDate: historyStartStr,
     },
     nutritionPlan: mortonNutritionPlan,
     supplementProtocol: mortonSupplementProtocol,
     days: DEMO_HISTORY_DAYS,
+    historyStartDate: historyStartStr,
   });
   await markUserSeeded(userId);
 }
@@ -213,11 +217,10 @@ export async function seedMortonData(userId: string): Promise<void> {
  */
 export async function seedSheriData(userId: string): Promise<void> {
   await updateProfile(userId, sheriProfile);
-  const historyStart = new Date();
-  historyStart.setDate(historyStart.getDate() - (DEMO_HISTORY_DAYS - 1));
+  const historyStartStr = getDemoHistoryStartDateString();
   const programId = await createProgram(userId, {
     ...sheriProgram,
-    startDate: historyStart.toISOString().split('T')[0],
+    startDate: historyStartStr,
   });
   await setActiveProgram(userId, programId);
   await saveProtocol(userId, sheriSupplementProtocol);
@@ -242,11 +245,12 @@ export async function seedSheriData(userId: string): Promise<void> {
     programId,
     program: {
       ...sheriProgram,
-      startDate: historyStart.toISOString().split('T')[0],
+      startDate: historyStartStr,
     },
     nutritionPlan: sheriNutritionPlan,
     supplementProtocol: sheriSupplementProtocol,
     days: DEMO_HISTORY_DAYS,
+    historyStartDate: historyStartStr,
   });
   await markUserSeeded(userId);
 }
@@ -256,11 +260,10 @@ export async function seedSheriData(userId: string): Promise<void> {
  */
 export async function seedAlexData(userId: string): Promise<void> {
   await updateProfile(userId, alexProfile);
-  const historyStart = new Date();
-  historyStart.setDate(historyStart.getDate() - (DEMO_HISTORY_DAYS - 1));
+  const historyStartStr = getDemoHistoryStartDateString();
   const programId = await createProgram(userId, {
     ...alexProgram,
-    startDate: historyStart.toISOString().split('T')[0],
+    startDate: historyStartStr,
   });
   await setActiveProgram(userId, programId);
   await saveProtocol(userId, alexSupplementProtocol);
@@ -285,11 +288,12 @@ export async function seedAlexData(userId: string): Promise<void> {
     programId,
     program: {
       ...alexProgram,
-      startDate: historyStart.toISOString().split('T')[0],
+      startDate: historyStartStr,
     },
     nutritionPlan: alexNutritionPlan,
     supplementProtocol: alexSupplementProtocol,
     days: DEMO_HISTORY_DAYS,
+    historyStartDate: historyStartStr,
   });
   await markUserSeeded(userId);
 }
@@ -299,11 +303,10 @@ export async function seedAlexData(userId: string): Promise<void> {
  */
 export async function seedJordanData(userId: string): Promise<void> {
   await updateProfile(userId, jordanProfile);
-  const historyStart = new Date();
-  historyStart.setDate(historyStart.getDate() - (DEMO_HISTORY_DAYS - 1));
+  const historyStartStr = getDemoHistoryStartDateString();
   const programId = await createProgram(userId, {
     ...jordanProgram,
-    startDate: historyStart.toISOString().split('T')[0],
+    startDate: historyStartStr,
   });
   await setActiveProgram(userId, programId);
   await saveProtocol(userId, jordanSupplementProtocol);
@@ -328,11 +331,12 @@ export async function seedJordanData(userId: string): Promise<void> {
     programId,
     program: {
       ...jordanProgram,
-      startDate: historyStart.toISOString().split('T')[0],
+      startDate: historyStartStr,
     },
     nutritionPlan: jordanNutritionPlan,
     supplementProtocol: jordanSupplementProtocol,
     days: DEMO_HISTORY_DAYS,
+    historyStartDate: historyStartStr,
   });
   await markUserSeeded(userId);
 }

@@ -185,3 +185,17 @@ Tailwind accent utilities (`text-accent`, `bg-accent`, `border-accent`, `focus:b
 - Keep bar endings clean (match Training Density style) unless a specific threshold marker is required.
 - Axis tick labels must use valid token values (e.g. `fill: 'var(--text-2)'`), not invalid strings like `fill: 'color:var(--text-2)'`.
 - Multi-series measurement charts should render only series that actually have data points in the current dataset.
+
+### Dashboard: Nutrition + Supplements row
+
+- On the dashboard, **Today's Nutrition** and **Supplements** share one full-width row using
+  **`md:grid-cols-2`** so both cards are **equal width** and span the same combined width as other
+  `col-span-full` panels (e.g. Weekly Volume). Do not use a three-column grid with only two children.
+
+### Nutrition page: meal plan-line `<select>`
+
+- Use the **`nutrition-meal-select`** class (see `globals.css`) for theme-aligned closed-state
+  styling: `color-scheme: dark`, `accent-color: var(--accent)`, themed borders and focus ring.
+- **Selection model:** `displayLine` = saved `meal.planLine` when set, otherwise the computed
+  default for that slot. Do not treat “value is one of the preset options” as “show default” — that
+  breaks controlled `<select>` values after the user picks a preset line.

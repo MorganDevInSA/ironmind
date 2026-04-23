@@ -53,6 +53,7 @@ Pages/Components  →  Controllers (use-*.ts)  →  Services (*.service.ts)  →
 - Use `color-mix()` for opacity: `color-mix(in srgb, var(--accent) 20%, transparent)`
 - Never hardcode accent hex values (`#DC2626`, etc.)
 - Native `<input type="checkbox">` and `<input type="radio">` are globally themed via `accent-color: var(--accent)` in globals.css
+- Nutrition meal plan-line `<select>`: use `.nutrition-meal-select` (see `globals.css`) and keep controlled values in sync with saved `planLine` (do not replace user-selected preset lines with the slot default in UI state)
 - Progress visuals (bars/sliders) must use **filled-only accent gradients** and neutral empty tracks
 - NEVER use Tailwind's `text-accent`, `bg-accent`, `border-accent`, `focus:border-accent` utilities — they resolve to hardcoded hex from `tailwind.config.js` and bypass the CSS variable theme system. Use `text-[color:var(--accent)]` etc. instead.
 

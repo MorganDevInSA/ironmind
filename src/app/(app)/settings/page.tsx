@@ -10,21 +10,46 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import type { AppTheme } from '@/stores/ui-store';
 
-const themeOptions: Array<{ value: AppTheme; label: string; description: string; swatch: string }> = [
-  {
-    value: 'crimson',
-    label: 'Crimson (Default)',
-    description: 'Original IRONMIND red treatment.',
-    /* Fixed colours — do not use var(--accent); custom theme overrides those on :root */
-    swatch: 'linear-gradient(135deg, #DC2626, #991B1B)',
-  },
-  {
-    value: 'hot-pink',
-    label: 'Hot Pink',
-    description: 'Swap red accents for high-energy hot pink.',
-    swatch: 'linear-gradient(135deg, #FF3EA5, #C21877)',
-  },
-];
+const themeOptions: Array<{ value: AppTheme; label: string; description: string; swatch: string }> =
+  [
+    {
+      value: 'crimson',
+      label: 'Crimson (Default)',
+      description: 'Original IRONMIND red treatment.',
+      /* Fixed colours — do not use var(--accent); custom theme overrides those on :root */
+      swatch: 'linear-gradient(135deg, #DC2626, #991B1B)',
+    },
+    {
+      value: 'hot-pink',
+      label: 'Hot Pink',
+      description: 'Swap red accents for high-energy hot pink.',
+      swatch: 'linear-gradient(135deg, #FF3EA5, #C21877)',
+    },
+    {
+      value: 'cobalt',
+      label: 'Cobalt',
+      description: 'Cold steel blue for precision-focused training blocks.',
+      swatch: 'linear-gradient(135deg, #3B82F6, #1D4ED8)',
+    },
+    {
+      value: 'forge',
+      label: 'Forge',
+      description: 'Molten orange tone with an aggressive high-contrast edge.',
+      swatch: 'linear-gradient(135deg, #EA580C, #9A3412)',
+    },
+    {
+      value: 'emerald',
+      label: 'Emerald',
+      description: 'Controlled green variant tuned for consistency and recovery focus.',
+      swatch: 'linear-gradient(135deg, #16A34A, #166534)',
+    },
+    {
+      value: 'violet',
+      label: 'Violet',
+      description: 'Deep violet command mode with premium contrast and glow.',
+      swatch: 'linear-gradient(135deg, #8B5CF6, #6D28D9)',
+    },
+  ];
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -38,6 +63,11 @@ export default function SettingsPage() {
 
   const [targetWeight, setTargetWeight] = useState('');
   const [currentWeight, setCurrentWeight] = useState('');
+  const athleteName =
+    profile?.clientName?.trim() ||
+    user?.displayName?.trim() ||
+    user?.email?.split('@')[0] ||
+    'Athlete';
 
   const handleSaveWeights = () => {
     const updates: Record<string, number> = {};
@@ -98,50 +128,61 @@ export default function SettingsPage() {
                     style={{ background: option.swatch }}
                   />
                   <div>
-                    <p className="text-sm font-semibold text-[color:var(--text-0)]">{option.label}</p>
+                    <p className="text-sm font-semibold text-[color:var(--text-0)]">
+                      {option.label}
+                    </p>
                     <p className="text-xs text-[color:var(--text-1)]">{option.description}</p>
                   </div>
                 </div>
               </button>
             );
           })}
-          <div
-            className={`w-full p-3 rounded-lg border transition-colors ${
+          <button
+            type="button"
+            onClick={() => setTheme('custom')}
+            className={`w-full p-3 rounded-lg border text-left transition-colors ${
               theme === 'custom'
                 ? 'border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)] bg-[rgba(16,16,16,0.78)]'
-                : 'border-[rgba(65,50,50,0.38)] bg-[rgba(16,16,16,0.78)]'
+                : 'border-[rgba(65,50,50,0.38)] bg-[rgba(16,16,16,0.78)] hover:border-[rgba(120,120,120,0.45)]'
             }`}
+            aria-pressed={theme === 'custom'}
           >
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-[color:var(--text-0)]">Custom</p>
-                <p className="text-xs text-[color:var(--text-1)]">
-                  Choose an accent colour — it applies across the app as you adjust.
-                </p>
-              </div>
-              <div className="flex items-end gap-3 shrink-0">
-                <label className="flex flex-col gap-1 text-[10px] font-semibold uppercase tracking-wider text-[color:var(--text-2)]">
-                  Colour
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <span className="relative inline-flex h-5 w-5 shrink-0">
+                  <span
+                    className="h-5 w-5 rounded-full border border-white/20 shadow-[0_0_0_1px_rgba(0,0,0,0.4)_inset]"
+                    style={{ background: customAccent }}
+                    aria-hidden
+                  />
                   <input
                     type="color"
                     value={customAccent}
-                    onClick={() => setTheme('custom')}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setTheme('custom');
+                    }}
                     onFocus={() => setTheme('custom')}
                     onChange={(e) => {
                       setTheme('custom');
                       setCustomAccent(e.target.value);
                     }}
-                    className="h-10 w-[4.5rem] cursor-pointer rounded-md border border-white/25 bg-[#0a0a0a] p-0.5 shadow-inner"
-                    title="Accent colour"
+                    className="absolute inset-0 h-5 w-5 cursor-pointer rounded-full opacity-0"
                     aria-label="Choose custom accent colour"
                   />
-                </label>
-                <span className="font-mono text-xs tabular-nums text-[color:var(--text-1)] pb-1">
-                  {customAccent.toUpperCase()}
                 </span>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-[color:var(--text-0)]">Custom</p>
+                  <p className="text-xs text-[color:var(--text-1)]">
+                    Choose an accent colour — it applies across the app as you adjust.
+                  </p>
+                </div>
               </div>
+              <span className="font-mono text-xs tabular-nums text-[color:var(--text-1)] shrink-0">
+                {customAccent.toUpperCase()}
+              </span>
             </div>
-          </div>
+          </button>
         </div>
       </div>
 
@@ -153,18 +194,22 @@ export default function SettingsPage() {
         </div>
 
         <div className="space-y-1">
-          <p className="text-xs text-[color:var(--text-2)]">Email</p>
-          <p className="text-[color:var(--text-0)]">{user?.email}</p>
+          <p className="text-xs text-[color:var(--text-2)]">Name</p>
+          <p className="text-[color:var(--text-0)]">{athleteName}</p>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
             <p className="text-xs text-[color:var(--text-2)]">Current Weight</p>
-            <p className="font-mono tabular-nums text-[color:var(--text-0)]">{profile?.currentWeight ?? '—'} kg</p>
+            <p className="font-mono tabular-nums text-[color:var(--text-0)]">
+              {profile?.currentWeight ?? '—'} kg
+            </p>
           </div>
           <div className="space-y-1">
             <p className="text-xs text-[color:var(--text-2)]">Target Weight</p>
-            <p className="font-mono tabular-nums text-[color:var(--text-0)]">{profile?.targetWeight ?? '—'} kg</p>
+            <p className="font-mono tabular-nums text-[color:var(--text-0)]">
+              {profile?.targetWeight ?? '—'} kg
+            </p>
           </div>
         </div>
       </div>
@@ -183,7 +228,7 @@ export default function SettingsPage() {
               type="number"
               step="0.1"
               value={currentWeight}
-              onChange={e => setCurrentWeight(e.target.value)}
+              onChange={(e) => setCurrentWeight(e.target.value)}
               placeholder={profile?.currentWeight?.toString() ?? ''}
               className="w-full bg-[rgba(18,14,14,0.6)] border border-[rgba(65,50,50,0.25)] rounded-lg p-3 text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color:color-mix(in_srgb,var(--accent)_40%,transparent)]"
             />
@@ -194,7 +239,7 @@ export default function SettingsPage() {
               type="number"
               step="0.1"
               value={targetWeight}
-              onChange={e => setTargetWeight(e.target.value)}
+              onChange={(e) => setTargetWeight(e.target.value)}
               placeholder={profile?.targetWeight?.toString() ?? ''}
               className="w-full bg-[rgba(18,14,14,0.6)] border border-[rgba(65,50,50,0.25)] rounded-lg p-3 text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color:color-mix(in_srgb,var(--accent)_40%,transparent)]"
             />
@@ -217,9 +262,11 @@ export default function SettingsPage() {
           <h2 className="font-semibold text-[color:var(--text-0)]">Re-import Plan</h2>
         </div>
         <p className="text-sm text-[color:var(--text-2)]">
-          Upload new JSON files generated by your coach AI to update your training plan, nutrition targets, or volume landmarks.
-          If you already have data in IronMind, open the review step and check{' '}
-          <span className="text-[color:var(--text-1)]">Replace existing IronMind data</span> before confirming import.
+          Upload new JSON files generated by your coach AI to update your training plan, nutrition
+          targets, or volume landmarks. If you already have data in IronMind, open the review step
+          and check{' '}
+          <span className="text-[color:var(--text-1)]">Replace existing IronMind data</span> before
+          confirming import.
         </p>
         <button
           onClick={() => router.push('/onboarding')}

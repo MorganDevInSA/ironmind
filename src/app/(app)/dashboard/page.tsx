@@ -1,21 +1,24 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores';
 import {
   useDashboardData,
   useRecentWorkouts,
+  useWorkouts,
   useRecentCheckIns,
   useNutritionPlan,
   useProtocol,
 } from '@/controllers';
 import { getCycleDay, today, formatDisplayDate } from '@/lib/utils';
+import { differenceInCalendarDays, format, parseISO, subDays } from 'date-fns';
 import {
   Activity,
   Dumbbell,
   Scale,
   Pill,
+  Utensils,
   TrendingUp,
   Zap,
   Calendar,
@@ -110,21 +113,15 @@ const SUPPL_TIME: Record<string, string> = {
 const KIND_META = {
   meal: {
     label: 'Meal',
-    color: 'text-[#34D399]',
-    bg: 'bg-[rgba(16,185,129,0.11)]',
-    border: 'border-[rgba(16,185,129,0.32)]',
+    icon: Utensils,
   },
   vitamins: {
     label: 'Vitamins',
-    color: 'text-[#D8B4FE]',
-    bg: 'bg-[rgba(167,139,250,0.12)]',
-    border: 'border-[rgba(167,139,250,0.30)]',
+    icon: Pill,
   },
   activity: {
     label: 'Activity',
-    color: 'text-[#FBBF24]',
-    bg: 'bg-[rgba(245,158,11,0.12)]',
-    border: 'border-[rgba(245,158,11,0.32)]',
+    icon: Activity,
   },
 };
 
@@ -174,9 +171,12 @@ const THEME_FILL_GRADIENT =
 function PhysiqueMiniCharts({
   checkIns,
   targetWeight,
+  emptyHint,
 }: {
   checkIns: CheckIn[] | undefined;
   targetWeight: number | undefined;
+  /** When set, shown instead of the default copy when there are no points in-range. */
+  emptyHint?: string | null;
 }) {
   const [mode, setMode] = useState<'weight' | 'measurements'>('weight');
   const chron = (checkIns ?? []).slice().reverse();
@@ -205,7 +205,7 @@ function PhysiqueMiniCharts({
   if (!chron.length) {
     return (
       <p className="text-sm text-[color:var(--text-detail)]">
-        No check-ins yet — open Physique to log bodyweight and measurements.
+        {emptyHint ?? 'No check-ins yet — open Physique to log bodyweight and measurements.'}
       </p>
     );
   }
@@ -1078,15 +1078,8 @@ function ScheduleModal({
       >
         {/* Header */}
         <div className="flex items-center gap-3 p-4 border-b border-[rgba(65,50,50,0.28)] shrink-0">
-          <span
-            className={cn(
-              'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border shrink-0',
-              meta.color,
-              meta.bg,
-              meta.border,
-            )}
-          >
-            {meta.label}
+          <span className="inline-flex items-center justify-center w-7 h-7 rounded-md border border-[color:color-mix(in_srgb,var(--accent)_26%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_10%,transparent)] shrink-0">
+            <meta.icon size={14} className="text-[color:var(--accent-light)]" />
           </span>
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-[color:var(--text-0)] truncate">{item.label}</h3>
@@ -1271,14 +1264,8 @@ function TodaySchedule({
                       {item.time}
                     </td>
                     <td className="py-2.5 pr-4 align-top">
-                      <span
-                        className={cn(
-                          'inline-flex text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border',
-                          meta.color,
-                          meta.bg,
-                          meta.border,
-                        )}
-                      >
+                      <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-[color:color-mix(in_srgb,var(--accent)_24%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_8%,transparent)] text-[color:var(--text-detail)]">
+                        <meta.icon size={11} className="text-[color:var(--accent-light)]" />
                         {meta.label}
                       </span>
                     </td>
@@ -1296,8 +1283,7 @@ function TodaySchedule({
                         </span>
                         <span
                           className={cn(
-                            'text-[11px] font-semibold shrink-0 opacity-0 group-hover:opacity-100 transition-opacity pt-0.5',
-                            meta.color,
+                            'text-[11px] font-semibold shrink-0 opacity-0 group-hover:opacity-100 transition-opacity pt-0.5 text-[color:var(--accent-light)]',
                           )}
                         >
                           →
@@ -1484,6 +1470,179 @@ function DensityCard({ workout, onOpen }: { workout: Workout; onOpen?: () => voi
   );
 }
 
+type TrendPresetDays = 7 | 14 | 21 | 28;
+
+/* ─────────────────────────────────────────────────────────────────────
+   Calendar trend window (workouts + physique chart; separate from cycle tabs)
+───────────────────────────────────────────────────────────────────── */
+function DashboardTrendWindow({
+  trendKind,
+  presetDays,
+  onSelectPreset,
+  customDraftFrom,
+  customDraftTo,
+  onChangeCustomDraft,
+  onApplyCustom,
+  customError,
+  summary,
+}: {
+  trendKind: 'preset' | 'custom';
+  presetDays: TrendPresetDays;
+  onSelectPreset: (days: TrendPresetDays) => void;
+  customDraftFrom: string;
+  customDraftTo: string;
+  onChangeCustomDraft: (patch: { from?: string; to?: string }) => void;
+  onApplyCustom: () => void;
+  customError: string;
+  summary: string;
+}) {
+  const weekChips: { label: string; days: TrendPresetDays }[] = [
+    { label: '1 wk', days: 7 },
+    { label: '2 wk', days: 14 },
+    { label: '3 wk', days: 21 },
+    { label: '4 wk', days: 28 },
+  ];
+
+  const inputClass =
+    'rounded-lg px-2.5 py-1.5 text-xs font-mono tabular-nums min-w-0 ' +
+    'bg-[color:var(--bg-2)] border border-[color:var(--panel-border)] text-[color:var(--text-0)] ' +
+    'focus:border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)] ' +
+    'focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--accent)_10%,transparent)] focus:outline-none ' +
+    'transition-all duration-200 [color-scheme:dark]';
+
+  return (
+    <div className="glass-panel dashboard-card-surface px-4 py-3 space-y-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="data-label">Trend window</span>
+        <span className="text-[10px] text-[color:var(--text-detail)] font-mono tabular-nums">
+          {summary}
+        </span>
+      </div>
+      <p className="text-[10px] text-[color:var(--text-2)] leading-snug">
+        Workouts and the physique chart use this calendar range. Cycle-day tabs below still control
+        program preview vs today.
+      </p>
+
+      <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center lg:gap-x-4 lg:gap-y-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)] shrink-0">
+            Quick
+          </span>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => onSelectPreset(7)}
+              className={cn(
+                'text-xs font-semibold transition-colors rounded-md px-2 py-1 border border-transparent',
+                trendKind === 'preset' && presetDays === 7
+                  ? 'is-selected text-[color:var(--text-0)] border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)]'
+                  : 'text-[color:var(--accent)] hover:text-[color:var(--accent-light)] border-transparent',
+              )}
+              aria-pressed={trendKind === 'preset' && presetDays === 7}
+            >
+              Last 7 days
+            </button>
+            <button
+              type="button"
+              onClick={() => onSelectPreset(14)}
+              className={cn(
+                'text-xs font-semibold transition-colors rounded-md px-2 py-1 border border-transparent',
+                trendKind === 'preset' && presetDays === 14
+                  ? 'is-selected text-[color:var(--text-0)] border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)]'
+                  : 'text-[color:var(--accent)] hover:text-[color:var(--accent-light)]',
+              )}
+              aria-pressed={trendKind === 'preset' && presetDays === 14}
+            >
+              Last 14 days
+            </button>
+          </div>
+        </div>
+
+        <div
+          className="flex flex-wrap items-center gap-2"
+          role="group"
+          aria-label="Presets by week length"
+        >
+          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)] shrink-0">
+            Weeks
+          </span>
+          <div className="flex flex-wrap gap-1.5">
+            {weekChips.map(({ label, days }) => {
+              const active = trendKind === 'preset' && presetDays === days;
+              return (
+                <button
+                  key={label}
+                  type="button"
+                  onClick={() => onSelectPreset(days)}
+                  className={cn(
+                    'shrink-0 min-w-[2.75rem] px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all border',
+                    active
+                      ? 'is-selected text-[color:var(--text-0)]'
+                      : 'border-[rgba(65,50,50,0.35)] text-[color:var(--text-1)] hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]',
+                  )}
+                  aria-pressed={active}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div
+          role="group"
+          aria-label="Custom date range"
+          className="flex flex-wrap items-end gap-2 pt-1 border-t border-[rgba(65,50,50,0.22)] lg:border-t-0 lg:pt-0 lg:ml-auto lg:pl-4 lg:border-l lg:border-[rgba(65,50,50,0.22)]"
+        >
+          <div className="flex flex-col gap-0.5 min-w-0">
+            <label
+              htmlFor="dash-trend-from"
+              className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--text-2)]"
+            >
+              From
+            </label>
+            <input
+              id="dash-trend-from"
+              type="date"
+              value={customDraftFrom}
+              onChange={(e) => onChangeCustomDraft({ from: e.target.value })}
+              className={inputClass}
+            />
+          </div>
+          <div className="flex flex-col gap-0.5 min-w-0">
+            <label
+              htmlFor="dash-trend-to"
+              className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--text-2)]"
+            >
+              To
+            </label>
+            <input
+              id="dash-trend-to"
+              type="date"
+              value={customDraftTo}
+              onChange={(e) => onChangeCustomDraft({ to: e.target.value })}
+              className={inputClass}
+            />
+          </div>
+          <button
+            type="button"
+            onClick={onApplyCustom}
+            className="btn-secondary text-xs px-3 py-2 shrink-0 self-end"
+          >
+            Apply range
+          </button>
+        </div>
+      </div>
+
+      {customError ? (
+        <p className="text-xs text-[color:var(--warn)]" role="alert">
+          {customError}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 /* ─────────────────────────────────────────────────────────────────────
    Cycle day tabs (length follows active program — 7, 14, etc.)
 ───────────────────────────────────────────────────────────────────── */
@@ -1514,14 +1673,14 @@ function CycleDayTabs({
               type="button"
               onClick={() => onSelect(day)}
               className={cn(
-                'shrink-0 min-w-[2.75rem] px-3 py-2 rounded-lg text-sm font-mono tabular-nums transition-all border',
+                'im-tooltip-trigger shrink-0 min-w-[2.75rem] px-3 py-2 rounded-lg text-sm font-mono tabular-nums transition-all border',
                 isSelected
                   ? 'is-selected text-[#FAFAFA]'
                   : 'border-[rgba(65,50,50,0.35)] text-[color:var(--text-1)] hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]',
                 isTodayTab && !isSelected && 'ring-1 ring-[rgba(220,38,38,0.35)]',
               )}
               aria-pressed={isSelected}
-              title={isTodayTab ? 'Today (calendar)' : `Cycle day ${day}`}
+              data-tooltip={isTodayTab ? 'Today (calendar)' : `Cycle day ${day}`}
             >
               {day}
             </button>
@@ -1542,6 +1701,41 @@ export default function DashboardPage() {
 
   const [sessionDetailOpen, setSessionDetailOpen] = useState(false);
 
+  const todayStr = today();
+
+  const [trendKind, setTrendKind] = useState<'preset' | 'custom'>('preset');
+  const [trendPresetDays, setTrendPresetDays] = useState<TrendPresetDays>(7);
+  const [customDraft, setCustomDraft] = useState<{ from: string; to: string }>({
+    from: '',
+    to: '',
+  });
+  const [customApplied, setCustomApplied] = useState<{ from: string; to: string } | null>(null);
+  const [customError, setCustomError] = useState('');
+
+  const trendBounds = useMemo(() => {
+    if (trendKind === 'preset') {
+      const to = todayStr;
+      const from = format(subDays(parseISO(to), trendPresetDays), 'yyyy-MM-dd');
+      return { from, to };
+    }
+    if (customApplied) return { ...customApplied };
+    return { from: todayStr, to: todayStr };
+  }, [trendKind, trendPresetDays, customApplied, todayStr]);
+
+  const checkInQueryLimit = useMemo(() => {
+    if (trendKind === 'custom' && customApplied) {
+      const span =
+        differenceInCalendarDays(parseISO(customApplied.to), parseISO(customApplied.from)) + 1;
+      return Math.min(500, Math.max(40, span + 40));
+    }
+    return Math.max(50, trendPresetDays + 30);
+  }, [trendKind, customApplied, trendPresetDays]);
+
+  const trendSummary = useMemo(
+    () => `${formatDisplayDate(trendBounds.from)} – ${formatDisplayDate(trendBounds.to)}`,
+    [trendBounds.from, trendBounds.to],
+  );
+
   const {
     profile,
     activeProgram,
@@ -1552,15 +1746,29 @@ export default function DashboardPage() {
     weeklyVolume,
     isLoading,
   } = useDashboardData(userId);
-  const { data: recentWorkouts } = useRecentWorkouts(userId, 7);
-  const { data: physiqueCheckIns } = useRecentCheckIns(userId, 40);
+
+  const { data: presetWorkouts } = useRecentWorkouts(userId, trendPresetDays, {
+    enabled: trendKind === 'preset',
+  });
+  const { data: customWorkouts } = useWorkouts(
+    userId,
+    trendKind === 'custom' && customApplied ? customApplied : undefined,
+    { enabled: trendKind === 'custom' && !!customApplied },
+  );
+  const recentWorkouts = trendKind === 'preset' ? presetWorkouts : customWorkouts;
+
+  const { data: physiqueCheckIns } = useRecentCheckIns(userId, checkInQueryLimit);
+  const physiqueCheckInsForTrend = useMemo(() => {
+    const list = physiqueCheckIns ?? [];
+    const { from, to } = trendBounds;
+    return list.filter((c) => c.date >= from && c.date <= to);
+  }, [physiqueCheckIns, trendBounds]);
+
   const { data: nutritionPlanData } = useNutritionPlan(userId);
   const { data: protocolData } = useProtocol(userId);
 
   const activePlan = nutritionPlanData ?? mortonNutritionPlan;
   const activeProtocol = protocolData ?? mortonSupplementProtocol;
-
-  const todayStr = today();
   const cycleDay = activeProgram
     ? getCycleDay(activeProgram.startDate ?? todayStr, todayStr, activeProgram.cycleLengthDays)
     : null;
@@ -1639,6 +1847,41 @@ export default function DashboardPage() {
           <h1 className="text-2xl font-bold text-[color:var(--accent)]">Dashboard</h1>
           <p className="text-[color:var(--text-detail)]">{dashboardSubtitle}</p>
         </header>
+
+        <DashboardTrendWindow
+          trendKind={trendKind}
+          presetDays={trendPresetDays}
+          onSelectPreset={(d) => {
+            setTrendKind('preset');
+            setTrendPresetDays(d);
+            setCustomError('');
+          }}
+          customDraftFrom={customDraft.from}
+          customDraftTo={customDraft.to}
+          onChangeCustomDraft={(patch) => setCustomDraft((prev) => ({ ...prev, ...patch }))}
+          onApplyCustom={() => {
+            setCustomError('');
+            const from = customDraft.from;
+            const to = customDraft.to;
+            if (!from || !to) {
+              setCustomError('Choose both start and end dates.');
+              return;
+            }
+            if (from > to) {
+              setCustomError('Start date must be on or before end date.');
+              return;
+            }
+            const span = differenceInCalendarDays(parseISO(to), parseISO(from)) + 1;
+            if (span > 366) {
+              setCustomError('Range cannot exceed 366 days.');
+              return;
+            }
+            setTrendKind('custom');
+            setCustomApplied({ from, to });
+          }}
+          customError={customError}
+          summary={trendSummary}
+        />
 
         {activeProgram && cycleDay !== null && (
           <CycleDayTabs
@@ -1789,8 +2032,14 @@ export default function DashboardPage() {
                     </p>
                     <div className="min-h-0 flex-1">
                       <PhysiqueMiniCharts
-                        checkIns={physiqueCheckIns}
+                        checkIns={physiqueCheckInsForTrend}
                         targetWeight={profile?.targetWeight}
+                        emptyHint={
+                          (physiqueCheckIns?.length ?? 0) > 0 &&
+                          physiqueCheckInsForTrend.length === 0
+                            ? 'No check-ins in this date range. Widen the trend window or open Physique to log.'
+                            : undefined
+                        }
                       />
                     </div>
                     <p className="text-xs text-[color:var(--accent)]/80 font-medium shrink-0">
@@ -1801,9 +2050,10 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Full-width row: nutrition · supplements · coaching — always three columns from md */}
-            <div className="col-span-full grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-4">
+            {/* Full-width row: nutrition + supplements — two equal columns spanning same width as other full-width panels */}
+            <div className="col-span-full grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-4">
               <Card
+                className="min-w-0"
                 title="Today's Nutrition"
                 icon={<TrendingUp size={20} />}
                 iconColor="text-[color:var(--accent)]"
@@ -1852,6 +2102,7 @@ export default function DashboardPage() {
               </Card>
 
               <Card
+                className="min-w-0"
                 title="Supplements"
                 icon={<Pill size={20} />}
                 iconColor="text-[color:var(--accent)]"

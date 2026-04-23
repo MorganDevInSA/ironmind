@@ -45,6 +45,9 @@ Every page must pass this checklist before being marked complete.
 - [ ] Required fields are marked
 - [ ] Form submits on Enter key (where appropriate)
 - [ ] Success feedback after submit (toast or redirect)
+- [ ] Themed `<select>` controls (e.g. Nutrition meal plan-line): use `.nutrition-meal-select` and
+      token borders/focus rings; ensure the controlled `value` reflects saved state (saved line
+      or explicit default), not a label that overwrites user choice
 
 ### Accordion Panels
 

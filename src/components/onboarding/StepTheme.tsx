@@ -29,6 +29,30 @@ const presetOptions: Array<{
     description: 'High-energy variant with pink accent highlights.',
     swatch: 'linear-gradient(135deg, #FF3EA5, #C21877)',
   },
+  {
+    value: 'cobalt',
+    label: 'Cobalt',
+    description: 'Cold steel blue for precision-focused training blocks.',
+    swatch: 'linear-gradient(135deg, #3B82F6, #1D4ED8)',
+  },
+  {
+    value: 'forge',
+    label: 'Forge',
+    description: 'Molten orange tone with an aggressive high-contrast edge.',
+    swatch: 'linear-gradient(135deg, #EA580C, #9A3412)',
+  },
+  {
+    value: 'emerald',
+    label: 'Emerald',
+    description: 'Controlled green variant tuned for consistency and recovery focus.',
+    swatch: 'linear-gradient(135deg, #16A34A, #166534)',
+  },
+  {
+    value: 'violet',
+    label: 'Violet',
+    description: 'Deep violet command mode with premium contrast and glow.',
+    swatch: 'linear-gradient(135deg, #8B5CF6, #6D28D9)',
+  },
 ];
 
 export function StepTheme({ onNext, onBack }: StepThemeProps) {
@@ -70,7 +94,7 @@ export function StepTheme({ onNext, onBack }: StepThemeProps) {
                 'w-full rounded-lg border p-3 text-left transition-all',
                 active
                   ? 'is-selected'
-                  : 'border-[rgba(65,50,50,0.38)] bg-[rgba(16,16,16,0.78)] hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)]'
+                  : 'border-[rgba(65,50,50,0.38)] bg-[rgba(16,16,16,0.78)] hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)]',
               )}
             >
               <div className="flex items-center gap-3">
@@ -96,21 +120,29 @@ export function StepTheme({ onNext, onBack }: StepThemeProps) {
               Set any accent color and IRONMIND will generate the matching glow and border tones.
             </p>
           </div>
-          <span className="font-mono text-xs tabular-nums text-[color:var(--text-1)]">{customHex}</span>
+          <span className="font-mono text-xs tabular-nums text-[color:var(--text-1)]">
+            {customHex}
+          </span>
         </div>
         <div className="flex items-center gap-3">
-          <input
-            type="color"
-            value={customAccent}
-            onChange={(e) => {
-              setTheme('custom');
-              setCustomAccent(e.target.value);
-            }}
-            onFocus={() => setTheme('custom')}
-            className="h-10 w-20 cursor-pointer rounded-md border border-white/25 bg-[#0a0a0a] p-0.5"
-            title="Accent colour"
-            aria-label="Choose custom accent colour"
-          />
+          <span className="relative inline-flex h-7 w-7 shrink-0">
+            <span
+              className="h-7 w-7 rounded-full border border-white/20 shadow-[0_0_0_1px_rgba(0,0,0,0.4)_inset]"
+              style={{ background: customAccent }}
+              aria-hidden
+            />
+            <input
+              type="color"
+              value={customAccent}
+              onChange={(e) => {
+                setTheme('custom');
+                setCustomAccent(e.target.value);
+              }}
+              onFocus={() => setTheme('custom')}
+              className="absolute inset-0 h-7 w-7 cursor-pointer rounded-full opacity-0"
+              aria-label="Choose custom accent colour"
+            />
+          </span>
           <button
             type="button"
             onClick={() => setTheme('custom')}
@@ -118,7 +150,7 @@ export function StepTheme({ onNext, onBack }: StepThemeProps) {
               'rounded-lg border px-3 py-2 text-xs font-semibold uppercase tracking-wider transition-colors',
               theme === 'custom'
                 ? 'is-selected text-[color:var(--accent-light)]'
-                : 'border-[rgba(65,50,50,0.38)] text-[color:var(--text-1)] hover:text-[color:var(--text-0)]'
+                : 'border-[rgba(65,50,50,0.38)] text-[color:var(--text-1)] hover:text-[color:var(--text-0)]',
             )}
           >
             Use Custom

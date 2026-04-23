@@ -225,6 +225,8 @@ These patterns are the result of iterative refinement and must be preserved:
 - **Text color hierarchy**: Accent is ONLY for h1 titles, icons, links, interactive elements, and micro-labels. Body text, bold/strong within paragraphs, section headings inside panels, user names, and informational metadata must be `--text-0` (white) or `--text-1`/`--text-2` (grey) for readability — especially on mobile.
 - **Knight Rider LED bars**: Stacked readiness + target indicators in top bar with faint backlit idle segments, per-indicator hover/focus detail modals, and minimum 1 lit segment when data is valid at 0%.
 - **Progress fill language**: Filled portions use accent gradient (lighter -> darker); empty tracks stay neutral (`--surface-track`) with no accent tint.
+- **Dashboard nutrition + supplements**: Two equal cards in one full-width row (`md:grid-cols-2`), same combined span as other `col-span-full` panels.
+- **Nutrition meal `<select>`**: Use `.nutrition-meal-select`; controlled value reflects saved `planLine` (fallback to computed default only when unset — never treat “preset option” as “show default” in UI state).
 - **Native form theming**: `accent-color: var(--accent)` globally applied to checkboxes and radios.
 - **Single-column centered layout**: All pages use `max-w-4xl mx-auto` — no multi-column layouts on desktop.
 - **Recessive design**: Resting elements are near-invisible; interaction brings them to life.

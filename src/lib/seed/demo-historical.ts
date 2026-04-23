@@ -21,14 +21,24 @@ import { saveRecoveryEntry } from '@/services/recovery.service';
 import { saveCheckIn } from '@/services/physique.service';
 import { createJournalEntry } from '@/services/coaching.service';
 import { calculateCalories, calculateComplianceScore } from '@/lib/utils/calculations';
+import { addDays, format, parseISO, startOfDay } from 'date-fns';
 
 type DemoPersonaId = 'morton' | 'sheri' | 'alex' | 'jordan';
 
 /**
  * Demo overwrite seeds (`seedMortonData`, etc.) align program `startDate` and
  * `seedDemoHistoricalData` to this window. Keep bounded (writes scale linearly).
+ *
+ * 84 is a multiple of 7 and 14 so the calendar last day of the window (inclusive
+ * of "today") is always the final day of the program cycle when `startDate` matches
+ * the first seeded day.
  */
 export const DEMO_HISTORY_DAYS = 84;
+
+/** First calendar day of the demo history window (local), as `YYYY-MM-DD`. */
+export function getDemoHistoryStartDateString(days: number = DEMO_HISTORY_DAYS): string {
+  return format(addDays(startOfDay(new Date()), -days + 1), 'yyyy-MM-dd');
+}
 
 interface HistoricalSeedContext {
   personaId: DemoPersonaId;
@@ -39,6 +49,8 @@ interface HistoricalSeedContext {
   nutritionPlan: NutritionPlanSeed;
   supplementProtocol: SupplementProtocol;
   days?: number;
+  /** Must match active program `startDate` — single source of truth with overwrite seeds. */
+  historyStartDate?: string;
 }
 
 interface PersonaTuning {
@@ -165,10 +177,9 @@ const foodTemplates = {
 export async function seedDemoHistoricalData(ctx: HistoricalSeedContext): Promise<void> {
   const days = ctx.days ?? DEMO_HISTORY_DAYS;
   const tuning = personaTuning[ctx.personaId];
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const historyStart = addDays(today, -days + 1);
+  const historyStart = ctx.historyStartDate
+    ? startOfDay(parseISO(ctx.historyStartDate))
+    : addDays(startOfDay(new Date()), -days + 1);
   const checkInDates: string[] = [];
   const totalWeeks = Math.max(1, Math.ceil(days / 7));
   const midDeloadWeek = Math.max(1, Math.floor(totalWeeks / 2) - 1);
@@ -783,13 +794,7 @@ function inferMuscleGroup(exerciseName: string): string {
 }
 
 function toDateOnly(date: Date): string {
-  return date.toISOString().split('T')[0];
-}
-
-function addDays(date: Date, days: number): Date {
-  const d = new Date(date);
-  d.setDate(d.getDate() + days);
-  return d;
+  return format(date, 'yyyy-MM-dd');
 }
 
 function pick<T>(arr: T[], seed: number): T {

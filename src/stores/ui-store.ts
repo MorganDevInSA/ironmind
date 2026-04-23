@@ -1,7 +1,14 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type AppTheme = 'crimson' | 'hot-pink' | 'custom';
+export type AppTheme =
+  | 'crimson'
+  | 'hot-pink'
+  | 'cobalt'
+  | 'forge'
+  | 'emerald'
+  | 'violet'
+  | 'custom';
 
 interface UIState {
   // Sidebar state
@@ -69,6 +76,6 @@ export const useUIStore = create<UIState>()(
         theme: state.theme,
         customAccent: state.customAccent,
       }),
-    }
-  )
+    },
+  ),
 );

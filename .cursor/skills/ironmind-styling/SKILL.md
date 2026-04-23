@@ -105,21 +105,22 @@ All classes are defined in `globals.css` and are theme-aware.
 
 ### Utilities
 
-| Class                   | Use                                                                                                                     |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `.exercise-index-badge` | Ordered exercise number                                                                                                 |
-| `.divider`              | Horizontal accent gradient line                                                                                         |
-| `.skeleton`             | Loading shimmer effect (deprecated — prefer `.spinner`)                                                                 |
-| `.spinner`              | iOS-style activity indicator (conic gradient, `steps(12)`). Size variants: `.spinner-sm` (1rem), `.spinner-lg` (2.5rem) |
-| `.accordion-wrapper`    | Grid-based expand/collapse container — toggle via `data-open="true"`                                                    |
-| `.accordion-inner`      | Inner wrapper for overflow + opacity transition (place inside `.accordion-wrapper`)                                     |
-| `.knight-led`           | LED bar indicator dot (base)                                                                                            |
-| `.knight-led-lit`       | Active LED with `knight-pulse` animation (primary hue)                                                                  |
-| `.knight-led-lit-alt`   | Active LED with `knight-pulse` animation (secondary hue)                                                                |
-| `.recovery-slider`      | Themed range slider (filled gradient + neutral empty track)                                                             |
-| `.tooltip`              | Floating tooltip box                                                                                                    |
-| `.live-dot`             | Pulsing live indicator                                                                                                  |
-| `.spotlight-hover`      | Hover sweep effect                                                                                                      |
+| Class                    | Use                                                                                                                     |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| `.exercise-index-badge`  | Ordered exercise number                                                                                                 |
+| `.divider`               | Horizontal accent gradient line                                                                                         |
+| `.skeleton`              | Loading shimmer effect (deprecated — prefer `.spinner`)                                                                 |
+| `.spinner`               | iOS-style activity indicator (conic gradient, `steps(12)`). Size variants: `.spinner-sm` (1rem), `.spinner-lg` (2.5rem) |
+| `.accordion-wrapper`     | Grid-based expand/collapse container — toggle via `data-open="true"`                                                    |
+| `.accordion-inner`       | Inner wrapper for overflow + opacity transition (place inside `.accordion-wrapper`)                                     |
+| `.knight-led`            | LED bar indicator dot (base)                                                                                            |
+| `.knight-led-lit`        | Active LED with `knight-pulse` animation (primary hue)                                                                  |
+| `.knight-led-lit-alt`    | Active LED with `knight-pulse` animation (secondary hue)                                                                |
+| `.recovery-slider`       | Themed range slider (filled gradient + neutral empty track)                                                             |
+| `.nutrition-meal-select` | Nutrition meal plan-line `<select>`: dark `color-scheme`, accent focus, themed `option` rows                            |
+| `.tooltip`               | Floating tooltip box                                                                                                    |
+| `.live-dot`              | Pulsing live indicator                                                                                                  |
+| `.spotlight-hover`       | Hover sweep effect                                                                                                      |
 
 ---
 

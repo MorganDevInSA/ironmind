@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores';
-import { useSaveCheckIn, useRecentCheckIns, useProfile } from '@/controllers';
+import { useSaveCheckIn, useCheckIns, useProfile } from '@/controllers';
 import { today, formatDisplayDate } from '@/lib/utils';
 import {
   Scale,
@@ -167,7 +167,7 @@ export default function PhysiquePage() {
     error,
     reset,
   } = useSaveCheckIn(userId);
-  const { data: recentCheckIns } = useRecentCheckIns(userId, 20);
+  const { data: checkIns } = useCheckIns(userId);
   const { data: profile } = useProfile(userId);
 
   const [showForm, setShowForm] = useState(false);
@@ -225,7 +225,7 @@ export default function PhysiquePage() {
   }
 
   /* ── Chart data ─────────────────────────────────────────────── */
-  const weightData = (recentCheckIns ?? [])
+  const weightData = (checkIns ?? [])
     .slice()
     .reverse()
     .map((c: CheckIn) => ({
@@ -233,7 +233,7 @@ export default function PhysiquePage() {
       weight: c.bodyweight,
     }));
 
-  const measurementData = (recentCheckIns ?? [])
+  const measurementData = (checkIns ?? [])
     .slice()
     .reverse()
     .map((c: CheckIn) => ({
@@ -252,8 +252,8 @@ export default function PhysiquePage() {
   );
   const hasAnyMeasurements = activeMeasurementSeries.length > 0;
 
-  const lastCheckIn = recentCheckIns?.[0];
-  const prevCheckIn = recentCheckIns?.[1];
+  const lastCheckIn = checkIns?.[0];
+  const prevCheckIn = checkIns?.[1];
   const weightDelta =
     lastCheckIn && prevCheckIn ? lastCheckIn.bodyweight - prevCheckIn.bodyweight : null;
   const targetWeight = profile?.targetWeight;
@@ -581,14 +581,14 @@ export default function PhysiquePage() {
       )}
 
       {/* Check-in history table */}
-      {recentCheckIns && recentCheckIns.length > 0 && (
+      {checkIns && checkIns.length > 0 && (
         <div className="glass-panel overflow-hidden">
           <div className="px-4 py-3 border-b border-[rgba(65,50,50,0.15)]">
             <h3 className="font-semibold text-[color:var(--text-0)]">History</h3>
           </div>
           <div className="divide-y divide-[rgba(65,50,50,0.1)]">
-            {recentCheckIns.slice(0, 10).map((c: CheckIn, i) => {
-              const prev = recentCheckIns[i + 1];
+            {checkIns.slice(0, 10).map((c: CheckIn, i) => {
+              const prev = checkIns[i + 1];
               const delta = prev ? c.bodyweight - prev.bodyweight : null;
               return (
                 <div key={c.id} className="px-4 py-3 flex items-center justify-between gap-4">

@@ -125,6 +125,98 @@ html[data-theme='hot-pink'] {
   --body-glow-3: rgba(255, 80, 180, 0.03);
 }
 
+html[data-theme='cobalt'] {
+  --accent: #3b82f6;
+  --accent-2: #1d4ed8;
+  --accent-light: #60a5fa;
+  --crimson: var(--accent);
+  --crimson-light: var(--accent-light);
+  --crimson-dark: var(--accent-2);
+  --gold: var(--accent);
+  --gold-light: var(--accent-light);
+  --gold-dark: var(--accent-2);
+  --text-1: #8ea8cc;
+  --text-2: #637da4;
+  --text-detail: #afc4df;
+  --shadow-gold: 0 8px 32px rgba(59, 130, 246, 0.2);
+  --shadow-accent: 0 8px 32px rgba(59, 130, 246, 0.2);
+  --panel-border: color-mix(in srgb, var(--accent) 6%, transparent);
+  --chrome-border: rgba(54, 68, 102, 0.38);
+  --chrome-border-subtle: rgba(44, 56, 84, 0.72);
+  --body-glow-1: rgba(59, 130, 246, 0.06);
+  --body-glow-2: rgba(37, 99, 235, 0.04);
+  --body-glow-3: rgba(96, 165, 250, 0.03);
+}
+
+html[data-theme='forge'] {
+  --accent: #ea580c;
+  --accent-2: #9a3412;
+  --accent-light: #fb923c;
+  --crimson: var(--accent);
+  --crimson-light: var(--accent-light);
+  --crimson-dark: var(--accent-2);
+  --gold: var(--accent);
+  --gold-light: var(--accent-light);
+  --gold-dark: var(--accent-2);
+  --text-1: #d19d82;
+  --text-2: #a6755d;
+  --text-detail: #e0b69f;
+  --shadow-gold: 0 8px 32px rgba(234, 88, 12, 0.2);
+  --shadow-accent: 0 8px 32px rgba(234, 88, 12, 0.2);
+  --panel-border: color-mix(in srgb, var(--accent) 6%, transparent);
+  --chrome-border: rgba(92, 62, 48, 0.38);
+  --chrome-border-subtle: rgba(72, 48, 36, 0.72);
+  --body-glow-1: rgba(234, 88, 12, 0.06);
+  --body-glow-2: rgba(194, 65, 12, 0.04);
+  --body-glow-3: rgba(251, 146, 60, 0.03);
+}
+
+html[data-theme='emerald'] {
+  --accent: #16a34a;
+  --accent-2: #166534;
+  --accent-light: #4ade80;
+  --crimson: var(--accent);
+  --crimson-light: var(--accent-light);
+  --crimson-dark: var(--accent-2);
+  --gold: var(--accent);
+  --gold-light: var(--accent-light);
+  --gold-dark: var(--accent-2);
+  --text-1: #8fbc9c;
+  --text-2: #658b72;
+  --text-detail: #a8d2b4;
+  --shadow-gold: 0 8px 32px rgba(22, 163, 74, 0.2);
+  --shadow-accent: 0 8px 32px rgba(22, 163, 74, 0.2);
+  --panel-border: color-mix(in srgb, var(--accent) 6%, transparent);
+  --chrome-border: rgba(52, 82, 60, 0.38);
+  --chrome-border-subtle: rgba(42, 66, 48, 0.72);
+  --body-glow-1: rgba(22, 163, 74, 0.06);
+  --body-glow-2: rgba(21, 128, 61, 0.04);
+  --body-glow-3: rgba(74, 222, 128, 0.03);
+}
+
+html[data-theme='violet'] {
+  --accent: #8b5cf6;
+  --accent-2: #6d28d9;
+  --accent-light: #a78bfa;
+  --crimson: var(--accent);
+  --crimson-light: var(--accent-light);
+  --crimson-dark: var(--accent-2);
+  --gold: var(--accent);
+  --gold-light: var(--accent-light);
+  --gold-dark: var(--accent-2);
+  --text-1: #b09ad8;
+  --text-2: #856fb0;
+  --text-detail: #c5b1e7;
+  --shadow-gold: 0 8px 32px rgba(139, 92, 246, 0.2);
+  --shadow-accent: 0 8px 32px rgba(139, 92, 246, 0.2);
+  --panel-border: color-mix(in srgb, var(--accent) 6%, transparent);
+  --chrome-border: rgba(78, 62, 98, 0.38);
+  --chrome-border-subtle: rgba(60, 48, 76, 0.72);
+  --body-glow-1: rgba(139, 92, 246, 0.06);
+  --body-glow-2: rgba(109, 40, 217, 0.04);
+  --body-glow-3: rgba(167, 139, 250, 0.03);
+}
+
 /* ============================================================
    BASE
 ============================================================ */
@@ -843,6 +935,44 @@ h4 {
     color: var(--text-1);
   }
 
+  .im-tooltip-trigger {
+    position: relative;
+  }
+
+  .im-tooltip-trigger[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 50%;
+    top: calc(100% + 10px);
+    transform: translateX(-50%) translateY(-4px);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 60;
+    white-space: nowrap;
+    max-width: min(80vw, 22rem);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0.45rem 0.7rem;
+    border-radius: 0.5rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-0);
+    background: color-mix(in srgb, var(--panel-strong) 92%, black 8%);
+    border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    box-shadow:
+      0 10px 28px color-mix(in srgb, black 55%, transparent),
+      0 0 12px color-mix(in srgb, var(--accent) 18%, transparent);
+    transition:
+      opacity 160ms ease-out,
+      transform 160ms ease-out;
+  }
+
+  .im-tooltip-trigger[data-tooltip]:hover::after,
+  .im-tooltip-trigger[data-tooltip]:focus-visible::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
   /* --- Spinner (iOS-style activity indicator) --------------- */
 
   .spinner {
@@ -1044,6 +1174,17 @@ h4 {
   border: 1px solid color-mix(in srgb, var(--accent-light) 70%, white 30%);
   background: color-mix(in srgb, var(--accent-light) 88%, white 12%);
   box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+/* Nutrition meal plan-line picker — dark native chrome + theme focus (OS list UI may still vary) */
+.nutrition-meal-select {
+  color-scheme: dark;
+  accent-color: var(--accent);
+}
+
+.nutrition-meal-select option {
+  background-color: var(--bg-1);
+  color: var(--text-0);
 }
 
 @keyframes pulse-soft {

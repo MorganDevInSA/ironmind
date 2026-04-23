@@ -215,7 +215,7 @@ export function TopBar() {
               <div className="flex items-center justify-between gap-3 text-sm">
                 <span className="text-[color:var(--text-1)]">Readiness</span>
                 {readinessScore !== null ? (
-                  <span className="font-mono tabular-nums text-[color:var(--text-0)]">
+                  <span className="text-[color:var(--text-0)] font-semibold">
                     {Math.round(readinessScore)}/100 ({readinessLabel})
                   </span>
                 ) : (
@@ -268,7 +268,7 @@ export function TopBar() {
                   <span className="text-[color:var(--text-1)]">Target progress</span>
                   <span
                     className={cn(
-                      'font-mono tabular-nums',
+                      'font-semibold',
                       targetDelta ? 'text-[color:var(--text-0)]' : 'text-[color:var(--text-2)]',
                     )}
                   >
@@ -282,19 +282,19 @@ export function TopBar() {
                     <>
                       <div className="flex items-center justify-between gap-3 text-xs">
                         <span className="text-[color:var(--text-2)]">Range</span>
-                        <span className="font-mono tabular-nums text-[color:var(--text-1)]">
+                        <span className="font-semibold text-[color:var(--text-1)]">
                           {targetDelta.totalRange.toFixed(1)} kg ({initialWeight} to {goalWeight})
                         </span>
                       </div>
                       <div className="flex items-center justify-between gap-3 text-xs">
                         <span className="text-[color:var(--text-2)]">Progressed</span>
-                        <span className="font-mono tabular-nums text-[color:var(--text-1)]">
+                        <span className="font-semibold text-[color:var(--text-1)]">
                           {targetDelta.progressed.toFixed(1)} kg
                         </span>
                       </div>
                       <div className="flex items-center justify-between gap-3 text-xs">
                         <span className="text-[color:var(--text-2)]">Remaining</span>
-                        <span className="font-mono tabular-nums text-[color:var(--text-1)]">
+                        <span className="font-semibold text-[color:var(--text-1)]">
                           {targetDelta.remaining.toFixed(1)} kg
                         </span>
                       </div>

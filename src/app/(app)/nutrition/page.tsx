@@ -362,10 +362,12 @@ export default function NutritionPage() {
               const baseOptions = slotDef
                 ? getPlanLineOptions(slotDef, isLiftDay ?? false, dayType)
                 : [];
-              const isKnownDefault =
-                !meal.planLine?.trim() || baseOptions.includes(meal.planLine.trim());
-              const displayLine = isKnownDefault ? defaultLine : meal.planLine!.trim();
+              const savedLine = meal.planLine?.trim() ?? '';
+              const displayLine = savedLine || defaultLine;
               const optionList = mergePlanLineOptions(baseOptions, displayLine);
+              const selectValue = optionList.includes(displayLine)
+                ? displayLine
+                : (optionList[0] ?? displayLine);
               const isOpen = expanded === meal.slot;
               const showPicker = optionList.length > 1;
 
@@ -410,8 +412,8 @@ export default function NutritionPage() {
                         </div>
                         {!isOpen && (
                           <p
-                            className="text-xs text-[color:var(--text-2)] mt-1 line-clamp-2"
-                            title={displayLine}
+                            className="im-tooltip-trigger text-xs text-[color:var(--text-2)] mt-1 line-clamp-2"
+                            data-tooltip={displayLine}
                           >
                             {displayLine}
                           </p>
@@ -422,19 +424,24 @@ export default function NutritionPage() {
                         <label className="block shrink-0 w-full sm:w-auto sm:max-w-[min(100%,18rem)]">
                           <span className="sr-only">Meal option for {meal.slot}</span>
                           <select
-                            value={optionList.includes(displayLine) ? displayLine : optionList[0]}
+                            value={selectValue}
                             onChange={(e) => handlePlanLineChange(meal.slot, e.target.value)}
                             disabled={isSaving}
-                            title={displayLine}
+                            aria-label={`Meal option for ${meal.slot.replace('-', ' ')}`}
                             className={cn(
-                              'w-full text-xs sm:text-sm rounded-lg border bg-[rgba(18,14,14,0.75)] px-2 py-2',
-                              'border-[rgba(65,50,50,0.35)] text-[color:var(--text-0)]',
-                              'focus:outline-none focus:ring-2 focus:ring-[rgba(220,38,38,0.45)]',
+                              'nutrition-meal-select w-full text-xs sm:text-sm rounded-lg border px-2 py-2',
+                              'border-[color:color-mix(in_srgb,var(--chrome-border)_55%,transparent)]',
+                              'bg-[color:var(--bg-2)] text-[color:var(--text-0)]',
+                              'focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--bg-1)]',
                               'disabled:opacity-50',
                             )}
                           >
                             {optionList.map((opt) => (
-                              <option key={opt} value={opt} className="bg-[#0d0d0d]">
+                              <option
+                                key={opt}
+                                value={opt}
+                                className="bg-[color:var(--bg-1)] text-[color:var(--text-0)]"
+                              >
                                 {opt.length > 90 ? `${opt.slice(0, 87)}…` : opt}
                               </option>
                             ))}
@@ -442,8 +449,8 @@ export default function NutritionPage() {
                         </label>
                       ) : (
                         <p
-                          className="text-xs text-[color:var(--text-1)] max-w-md truncate"
-                          title={displayLine}
+                          className="im-tooltip-trigger text-xs text-[color:var(--text-1)] max-w-md truncate"
+                          data-tooltip={displayLine}
                         >
                           {displayLine}
                         </p>
