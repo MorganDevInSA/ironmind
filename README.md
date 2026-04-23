@@ -39,7 +39,9 @@ This is not a mass-market “step counter.” It is a **precision instrument** f
 
 ## Visuals
 
-Screenshots and marketing renders live outside this README for now. For brand treatment and raster paths, see [Documentation/LOGO-BRIEF.md](./Documentation/LOGO-BRIEF.md) and `public/brand/`.
+![Uploading combined.png…]()
+
+or brand treatment and raster paths, see [Documentation/LOGO-BRIEF.md](./Documentation/LOGO-BRIEF.md) and `public/brand/`.
 
 ## Business and platform value
 
