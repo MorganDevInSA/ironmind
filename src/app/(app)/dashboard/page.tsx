@@ -9,7 +9,10 @@ import {
   useWorkouts,
   useRecentCheckIns,
   useNutritionPlan,
+  useNutritionDay,
   useProtocol,
+  useRecoveryEntry,
+  useSupplementLog,
 } from '@/controllers';
 import {
   getCycleDay,
@@ -1757,16 +1760,23 @@ export default function DashboardPage() {
     [trendBounds.from, trendBounds.to],
   );
 
-  const {
-    profile,
-    activeProgram,
-    todayNutrition,
-    todayRecovery,
-    latestRecovery,
-    todaySupplements,
-    weeklyVolume,
-    isLoading,
-  } = useDashboardData(userId);
+  const [selectedTrendDate, setSelectedTrendDate] = useState(todayStr);
+
+  useEffect(() => {
+    const from = trendBounds.from;
+    const to = trendBounds.to;
+    setSelectedTrendDate((cur) => {
+      if (cur >= from && cur <= to) return cur;
+      if (todayStr >= from && todayStr <= to) return todayStr;
+      return to;
+    });
+  }, [trendBounds.from, trendBounds.to, todayStr]);
+
+  const { profile, activeProgram, weeklyVolume, isLoading } = useDashboardData(userId);
+
+  const { data: selectedDayNutrition } = useNutritionDay(userId, selectedTrendDate);
+  const { data: selectedDayRecovery } = useRecoveryEntry(userId, selectedTrendDate);
+  const { data: selectedDaySupplements } = useSupplementLog(userId, selectedTrendDate);
 
   const { data: presetWorkouts } = useRecentWorkouts(userId, trendPresetDays, {
     enabled: trendKind === 'preset',
@@ -1790,17 +1800,6 @@ export default function DashboardPage() {
 
   const activePlan = nutritionPlanData ?? mortonNutritionPlan;
   const activeProtocol = protocolData ?? mortonSupplementProtocol;
-  const [selectedTrendDate, setSelectedTrendDate] = useState(todayStr);
-
-  useEffect(() => {
-    const from = trendBounds.from;
-    const to = trendBounds.to;
-    setSelectedTrendDate((cur) => {
-      if (cur >= from && cur <= to) return cur;
-      if (todayStr >= from && todayStr <= to) return todayStr;
-      return to;
-    });
-  }, [trendBounds.from, trendBounds.to, todayStr]);
 
   const cycleDayForSelected = useMemo(() => {
     if (!activeProgram) return null;
@@ -1818,13 +1817,17 @@ export default function DashboardPage() {
   const isLiftForSelected = selectedSession?.type === 'lift';
   const isViewingToday = selectedTrendDate === todayStr;
 
-  const todayWorkout = recentWorkouts?.find((w) => w.date === todayStr);
-  const lastWorkout = recentWorkouts?.find((w) =>
-    w.exercises.some((ex) => ex.sets.some((s) => s.completed)),
+  const selectedDayWorkout = useMemo(
+    () => recentWorkouts?.find((w) => w.date === selectedTrendDate),
+    [recentWorkouts, selectedTrendDate],
   );
 
-  const recoveryDashEntry = todayRecovery ?? latestRecovery ?? null;
-  const recoveryDashHistorical = !todayRecovery && !!latestRecovery;
+  const hasCompletedWorkoutSelected = useMemo(() => {
+    if (!selectedDayWorkout) return false;
+    return selectedDayWorkout.exercises.some((ex) => ex.sets.some((s) => s.completed));
+  }, [selectedDayWorkout]);
+
+  const recoveryEntry = selectedDayRecovery ?? undefined;
 
   const scheduleTitle = isViewingToday
     ? "Today's Schedule"
@@ -1833,7 +1836,7 @@ export default function DashboardPage() {
     ? formatDisplayDate(todayStr)
     : formatDisplayDate(selectedTrendDate);
   const previewHint = !isViewingToday
-    ? 'Nutrition and supplement cards below reflect calendar today only. Recovery shows your latest saved check-in.'
+    ? 'Logged meals, supplements, and recovery below follow the date selected in the strip. Start a new workout from Training when viewing today.'
     : null;
 
   const dashboardSubtitle =
@@ -1863,7 +1866,7 @@ export default function DashboardPage() {
         }
         onClose={() => setSessionDetailOpen(false)}
         isViewingToday={isViewingToday}
-        hasLoggedWorkoutToday={!!todayWorkout}
+        hasLoggedWorkoutToday={hasCompletedWorkoutSelected}
         onGoWorkout={() => {
           setSessionDetailOpen(false);
           router.push('/training/workout');
@@ -1930,9 +1933,9 @@ export default function DashboardPage() {
             <TodaySchedule
               session={selectedSession}
               isLiftDay={isLiftForSelected ?? false}
-              nutrition={isViewingToday ? todayNutrition : undefined}
-              supplements={isViewingToday ? todaySupplements : undefined}
-              todayDone={isViewingToday ? !!todayWorkout : false}
+              nutrition={selectedDayNutrition}
+              supplements={selectedDaySupplements}
+              todayDone={hasCompletedWorkoutSelected}
               onActivityClick={() => router.push('/training/workout')}
               scheduleTitle={scheduleTitle}
               dateBadge={dateBadge}
@@ -1977,7 +1980,7 @@ export default function DashboardPage() {
                     <div className="border-t border-[rgba(65,50,50,0.25)] pt-3 space-y-1.5 shrink-0">
                       <p className="text-xs text-[color:var(--accent)]/90 font-medium">
                         {isViewingToday
-                          ? todayWorkout
+                          ? hasCompletedWorkoutSelected
                             ? 'Open workout →'
                             : 'Start workout →'
                           : 'Open training →'}
@@ -2003,41 +2006,29 @@ export default function DashboardPage() {
                   iconColor="text-[color:var(--accent)]"
                   onClick={() => router.push('/recovery')}
                 >
-                  {!recoveryDashEntry ? (
+                  {!recoveryEntry ? (
                     <div className="space-y-3">
-                      <p className="text-[color:var(--text-detail)]">No recovery data logged yet</p>
+                      <p className="text-[color:var(--text-detail)]">
+                        No recovery logged for {formatDisplayDate(selectedTrendDate)}.
+                      </p>
                       <p className="text-xs text-[color:var(--accent)]/90 font-medium">
                         Log on Recovery page →
                       </p>
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      {recoveryDashHistorical && latestRecovery && (
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-detail)] leading-snug">
-                          {latestRecovery.date === todayStr
-                            ? 'Latest entry'
-                            : `Last logged · ${formatDisplayDate(latestRecovery.date)}`}
-                        </p>
-                      )}
-                      {todayRecovery && (
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-detail)]">
-                          Today · {formatDisplayDate(todayStr)}
-                        </p>
-                      )}
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-detail)]">
+                        {isViewingToday ? 'Today' : formatDisplayDate(selectedTrendDate)}
+                      </p>
                       <div className="flex items-baseline gap-2">
                         <span className="text-3xl font-bold font-mono tabular-nums text-[color:var(--text-0)]">
-                          {Math.round(recoveryDashEntry.readinessScore)}
+                          {Math.round(recoveryEntry.readinessScore)}
                         </span>
                         <span className="text-sm text-[color:var(--text-detail)]">/100</span>
                       </div>
                       <p className="text-sm text-[color:var(--text-detail)]">
-                        Sleep: {recoveryDashEntry.sleepHours}h · HRV: {recoveryDashEntry.hrv}
+                        Sleep: {recoveryEntry.sleepHours}h · HRV: {recoveryEntry.hrv}
                       </p>
-                      {!isViewingToday && (
-                        <p className="text-[10px] text-[color:var(--text-2)] pt-1 leading-snug">
-                          Saved recovery is by calendar date (not the selected cycle day).
-                        </p>
-                      )}
                       <p className="text-xs text-[color:var(--accent)]/90 font-medium pt-1">
                         Open recovery →
                       </p>
@@ -2093,42 +2084,35 @@ export default function DashboardPage() {
             <div className="col-span-full grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-4">
               <Card
                 className="min-w-0"
-                title="Today's Nutrition"
+                title={
+                  isViewingToday
+                    ? "Today's Nutrition"
+                    : `Nutrition · ${formatShortDate(selectedTrendDate)}`
+                }
                 icon={<TrendingUp size={20} />}
                 iconColor="text-[color:var(--accent)]"
                 onClick={() => router.push('/nutrition')}
               >
-                {!isViewingToday ? (
-                  <p className="text-sm text-[color:var(--text-detail)]">
-                    Meal logging and macro totals are for calendar today. Select{' '}
-                    <span className="font-medium text-[color:var(--text-1)]">
-                      {formatDisplayDate(todayStr)}
-                    </span>
-                    {trendDateList.includes(todayStr)
-                      ? ' in the days strip above'
-                      : ' (include today in your trend range, or open Nutrition)'}{' '}
-                    to edit today&apos;s intake.
-                  </p>
-                ) : todayNutrition ? (
+                {selectedDayNutrition ? (
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-[color:var(--text-detail)]">Protein</span>
                       <span className="font-mono tabular-nums text-[color:var(--text-0)]">
-                        {Math.round(todayNutrition.macroActuals.protein)}g /{' '}
-                        {todayNutrition.macroTargets.protein}g
+                        {Math.round(selectedDayNutrition.macroActuals.protein)}g /{' '}
+                        {selectedDayNutrition.macroTargets.protein}g
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-[color:var(--text-detail)]">Meals</span>
                       <span className="font-mono tabular-nums text-[color:var(--text-0)]">
-                        {todayNutrition.meals.filter((m) => m.completed).length}/
-                        {todayNutrition.meals.length} eaten
+                        {selectedDayNutrition.meals.filter((m) => m.completed).length}/
+                        {selectedDayNutrition.meals.length} eaten
                       </span>
                     </div>
                     <div className="h-2 rounded-full overflow-hidden bg-[color:var(--surface-track)] ring-1 ring-inset ring-black/35">
                       <div
                         className="h-full bg-[color:var(--accent)] rounded-full transition-all"
-                        style={{ width: `${Math.min(100, todayNutrition.complianceScore)}%` }}
+                        style={{ width: `${Math.min(100, selectedDayNutrition.complianceScore)}%` }}
                       />
                     </div>
                     <p className="text-xs text-[color:var(--accent)]/80 font-medium pt-1">
@@ -2137,7 +2121,9 @@ export default function DashboardPage() {
                   </div>
                 ) : (
                   <>
-                    <p className="text-[color:var(--text-detail)]">No meals logged today</p>
+                    <p className="text-[color:var(--text-detail)]">
+                      No meals logged for {formatDisplayDate(selectedTrendDate)}.
+                    </p>
                     <p className="text-xs text-[color:var(--accent)]/80 font-medium pt-2">
                       Open nutrition →
                     </p>
@@ -2147,32 +2133,37 @@ export default function DashboardPage() {
 
               <Card
                 className="min-w-0"
-                title="Supplements"
+                title={
+                  isViewingToday
+                    ? 'Supplements'
+                    : `Supplements · ${formatShortDate(selectedTrendDate)}`
+                }
                 icon={<Pill size={20} />}
                 iconColor="text-[color:var(--accent)]"
                 onClick={() => router.push('/supplements')}
               >
-                {!isViewingToday ? (
-                  <p className="text-sm text-[color:var(--text-detail)]">
-                    Supplement checklist reflects calendar today. Select today&apos;s date in the
-                    strip when it&apos;s in range, or open Supplements.
-                  </p>
-                ) : todaySupplements ? (
+                {selectedDaySupplements ? (
                   <div className="space-y-2">
                     <div className="flex items-baseline gap-2">
                       <span className="text-3xl font-bold font-mono tabular-nums text-[color:var(--text-0)]">
-                        {todaySupplements.compliancePercent}
+                        {selectedDaySupplements.compliancePercent}
                       </span>
                       <span className="text-sm text-[color:var(--text-detail)]">%</span>
                     </div>
-                    <p className="text-sm text-[color:var(--text-detail)]">compliance today</p>
+                    <p className="text-sm text-[color:var(--text-detail)]">
+                      {isViewingToday
+                        ? 'Compliance today'
+                        : `Compliance · ${formatShortDate(selectedTrendDate)}`}
+                    </p>
                     <p className="text-xs text-[color:var(--accent)]/80 font-medium">
                       Open supplements →
                     </p>
                   </div>
                 ) : (
                   <>
-                    <p className="text-[color:var(--text-detail)]">No supplements logged today</p>
+                    <p className="text-[color:var(--text-detail)]">
+                      No supplement log for {formatDisplayDate(selectedTrendDate)}.
+                    </p>
                     <p className="text-xs text-[color:var(--accent)]/80 font-medium pt-2">
                       Open supplements →
                     </p>
@@ -2181,7 +2172,9 @@ export default function DashboardPage() {
               </Card>
             </div>
 
-            {isViewingToday && lastWorkout && <DensityCard workout={lastWorkout} />}
+            {selectedDayWorkout && hasCompletedWorkoutSelected && (
+              <DensityCard workout={selectedDayWorkout} />
+            )}
           </div>
         </section>
 
