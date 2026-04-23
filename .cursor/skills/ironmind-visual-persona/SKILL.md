@@ -25,24 +25,28 @@ IRONMIND is a **raw performance system** for elite athletes. Not a finance dashb
 
 ## Theming System
 
-IRONMIND supports multiple color themes via CSS custom properties. The default is **Crimson** (`#DC2626`), but themes like **Hot Pink** (`#FF3EA5`) are available.
+IRONMIND supports multiple color themes via CSS custom properties. The default is **Crimson** (`#DC2626`). **Preset accents** also include **Hot Pink**, **Cobalt**, **Forge**, **Emerald**, and **Violet** (`html[data-theme=…]` in `globals.css`). **Custom** uses a user hex and `tinycolor2` in `ThemeSync` to rebuild the accent triad and tinted neutrals.
 
 ### Theme-Aware Development Rules
 
 1. **Always use CSS variables** for accent colors — never hardcode hex values
 2. **Use `var(--accent)`** for primary accent, `var(--accent-light)` for highlights, `var(--accent-2)` for dark tones
 3. **Use `color-mix()`** for opacity variants: `color-mix(in srgb, var(--accent) 20%, transparent)`
-4. **Neutral colors are mostly fixed** — backgrounds (`--bg-0`, `--bg-1`, `--bg-2`) and `--text-0` don't change per theme. Note that `--text-1`, `--text-2`, and `--text-detail` ARE now theme-tinted (brighter, accent-blended) in hot-pink and custom themes. They are NOT purely fixed neutrals anymore.
+4. **Neutral colors are mostly fixed** — backgrounds (`--bg-0`, `--bg-1`, `--bg-2`) and `--text-0` don't change per theme. Note that `--text-1`, `--text-2`, and `--text-detail` are **accent-tinted** on non-default presets and **custom** (brighter, accent-blended). They are not purely fixed neutrals on those themes.
 
 ### Available Themes
 
-| Theme        | `data-theme` | Accent          | Use Case                                                   |
-| ------------ | ------------ | --------------- | ---------------------------------------------------------- |
-| **Crimson**  | (default)    | `#DC2626`       | Default — blood, intensity, power                          |
-| **Hot Pink** | `hot-pink`   | `#FF3EA5`       | Alternative — high energy, modern edge                     |
-| **Custom**   | `custom`     | User-chosen hex | Full personalization — `tinycolor2` derives full token set |
+| Theme        | `data-theme` | Accent (primary) | Use Case                                                   |
+| ------------ | ------------ | ---------------- | ---------------------------------------------------------- |
+| **Crimson**  | _(omit)_     | `#DC2626`        | Default — blood, intensity, power                          |
+| **Hot Pink** | `hot-pink`   | `#FF3EA5`        | High energy, modern edge                                   |
+| **Cobalt**   | `cobalt`     | `#3B82F6`        | Precision / “cold steel” command tone                      |
+| **Forge**    | `forge`      | `#EA580C`        | Aggressive molten orange, high contrast                    |
+| **Emerald**  | `emerald`    | `#16A34A`        | Controlled green — consistency / recovery emphasis         |
+| **Violet**   | `violet`     | `#8B5CF6`        | Deep violet “command” mode                                 |
+| **Custom**   | `custom`     | User-chosen hex  | Full personalization — `tinycolor2` derives full token set |
 
-To apply a theme: `<html data-theme="hot-pink">`.
+To apply a preset: `document.documentElement.dataset.theme = 'forge'` (or use `useUIStore` → `ThemeSync`). For default crimson, remove `data-theme` or set the store back to `crimson` per app wiring.
 
 ---
 

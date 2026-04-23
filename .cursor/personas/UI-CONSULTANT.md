@@ -207,7 +207,7 @@ Assume the app uses:
 - React 18 + Next.js 14 (App Router)
 - TypeScript (strict mode)
 - Tailwind CSS v3 with CSS custom properties for theming
-- Multi-theme system (Crimson, Hot Pink, Custom) via `data-theme` attribute
+- Multi-theme system: **Crimson** (default), **Hot Pink**, **Cobalt**, **Forge**, **Emerald**, **Violet**, plus **Custom** (`data-theme` on `<html>`; custom uses `tinycolor2`-derived tokens in `ThemeSync`)
 - shadcn/ui + Lucide icons
 - TanStack Query + Zustand
 - Framer Motion + Recharts
@@ -224,6 +224,7 @@ These patterns are the result of iterative refinement and must be preserved:
 - **Accent page titles**: All h1 page titles use `text-[color:var(--accent)]` for branded identity. Data values stay white.
 - **Text color hierarchy**: Accent is ONLY for h1 titles, icons, links, interactive elements, and micro-labels. Body text, bold/strong within paragraphs, section headings inside panels, user names, and informational metadata must be `--text-0` (white) or `--text-1`/`--text-2` (grey) for readability — especially on mobile.
 - **Knight Rider LED bars**: Stacked readiness + target indicators in top bar with faint backlit idle segments, per-indicator hover/focus detail modals, and minimum 1 lit segment when data is valid at 0%.
+- **Alerts bell**: Always visible; **active** (non-dismissed) alert count drives accent strength, optional pulse dot, and a small numeric badge; dismissed rows drop out of the panel for the **browser session** (session-scoped dismiss, not a Firestore write).
 - **Progress fill language**: Filled portions use accent gradient (lighter -> darker); empty tracks stay neutral (`--surface-track`) with no accent tint.
 - **Dashboard nutrition + supplements**: Two equal cards in one full-width row (`md:grid-cols-2`), same combined span as other `col-span-full` panels.
 - **Nutrition meal `<select>`**: Use `.nutrition-meal-select`; controlled value reflects saved `planLine` (fallback to computed default only when unset — never treat “preset option” as “show default” in UI state).

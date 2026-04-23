@@ -69,7 +69,7 @@ All collection path strings must come from **`src/lib/firebase/config.ts`** → 
 
 - Exports **`seedDemoHistoricalData(ctx)`** — builds a **multi-week** synthetic history from a **persona id** (`morton` | `sheri` | `alex` | `jordan`), profile, program, nutrition plan, supplement protocol, and `programId`.
 - **`personaTuning`** at the top of the file: knobs for **adherence**, sleep, HRV, stress, weight drift, meal portions, etc. This is the right place to tune “how strict this athlete’s demo looks” without rewriting the whole generator.
-- **`DEMO_HISTORY_DAYS`** (exported constant, default **84** ≈ **12 weeks**): demo overwrite seeds in **`src/lib/seed/index.ts`** pass this to `seedDemoHistoricalData` and align each program’s `startDate` to `today - (DEMO_HISTORY_DAYS - 1)` so the training calendar and synthetic logs share one window.
+- **`DEMO_HISTORY_DAYS`** (exported constant, default **84** ≈ **12 weeks**) and **`getDemoHistoryStartDateString(days?)`**: demo overwrite seeds in **`src/lib/seed/index.ts`** pass the day count into `seedDemoHistoricalData` and set each program’s `startDate` from **`getDemoHistoryStartDateString()`** so the **last synthetic day** lines up with **today** and the training calendar + historical logs share one anchored window.
 - Uses **services only** (`createWorkout`, `saveNutritionDay`, `saveRecoveryEntry`, …) so Firestore converters and timestamps stay consistent.
 
 **When you change tuning:** Re-seed via the UI demo flow (or call the `seed*Data` function in a dev harness) so documents are rewritten — editing TS alone does not mutate existing Firestore docs.

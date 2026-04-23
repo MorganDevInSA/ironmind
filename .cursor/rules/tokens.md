@@ -8,17 +8,28 @@ All tokens are defined in `src/app/globals.css` as CSS custom properties.
 
 ## Theming
 
-IRONMIND supports multiple color themes. The default is **Crimson**.
+IRONMIND supports multiple color themes. The default is **Crimson** (no `data-theme` on `<html>`).
+
+**Preset themes** (each sets `data-theme` on `<html>` — see `src/app/globals.css`):
+
+- `hot-pink`
+- `cobalt`
+- `forge`
+- `emerald`
+- `violet`
+
+**Custom** uses `data-theme="custom"` and inline `--accent*` / text-tint tokens from `ThemeSync` (`src/components/theme/theme-sync.tsx`).
 
 ```html
-<!-- Default (Crimson) -->
-<html>
-  <!-- Hot Pink theme -->
-  <html data-theme="hot-pink"></html>
+<!-- Examples (use one at a time on <html>) -->
+<html data-theme="hot-pink">
+  <html data-theme="cobalt">
+    <html data-theme="custom"></html>
+  </html>
 </html>
 ```
 
-Accent colors change per theme; neutrals remain fixed.
+Accent colors and several text/chrome tokens change per theme; deep backgrounds (`--bg-*`) stay fixed.
 
 ---
 
@@ -65,11 +76,13 @@ Accent colors change per theme; neutrals remain fixed.
 
 ### Accent (Theme-Aware)
 
-| Token            | Crimson   | Hot Pink  | Use                 |
-| ---------------- | --------- | --------- | ------------------- |
-| `--accent`       | `#DC2626` | `#FF3EA5` | Primary accent      |
-| `--accent-light` | `#EF4444` | `#FF7DC4` | Bright/hover accent |
-| `--accent-2`     | `#991B1B` | `#C21877` | Dark accent         |
+| Token            | Crimson (default) | Hot Pink  | Use                 |
+| ---------------- | ----------------- | --------- | ------------------- |
+| `--accent`       | `#DC2626`         | `#FF3EA5` | Primary accent      |
+| `--accent-light` | `#EF4444`         | `#FF7DC4` | Bright/hover accent |
+| `--accent-2`     | `#991B1B`         | `#C21877` | Dark accent         |
+
+Other presets (**cobalt**, **forge**, **emerald**, **violet**) define the same triad pattern in `globals.css` — always read tokens from CSS variables, not from this table alone.
 
 ### Legacy Aliases (Map to Accent)
 

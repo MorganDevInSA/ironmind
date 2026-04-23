@@ -9,13 +9,14 @@ premium SaaS products from teams with dedicated design engineering functions.
 ### Design Token System
 
 Every visual decision — color, spacing, shadow, motion, border weight — is expressed as a
-CSS custom property. The app ships three theme paths (Crimson, Hot Pink, Custom) that
-rewrite the entire visual identity at runtime without a single component change:
+CSS custom property. The app ships **preset themes** (Crimson default, Hot Pink, Cobalt,
+Forge, Emerald, Violet) plus **Custom** accent mode — all rewriting the visual identity at
+runtime without per-component color forks:
 
 - **60+ CSS variables** define the full token vocabulary (`--accent`, `--panel-border`,
   `--panel-border-hover`, `--panel-glow`, `--body-glow-*`, `--shadow-accent`,
   `--text-0/1/2`, `--chrome-border`, etc.)
-- **Preset themes** override tokens via `[data-theme]` CSS selectors — zero JavaScript
+- **Preset themes** override tokens via `[data-theme]` CSS selectors on `<html>` — no per-screen color tables
 - **Custom accent mode** uses `tinycolor2` to derive the full token set (accent triad,
   warm-blended borders, theme-tinted secondary text, atmospheric glows, shadow tints)
   from any user-chosen hex
@@ -88,6 +89,12 @@ the alert bell. Each bar renders 10 segments with:
 - **Per-indicator detail panels**: each bar has its own hover/focus detail modal (no inline titles
   or inline numeric labels in the header row)
 
+### Smart alerts (top bar)
+
+- **Bell** stays in the header next to the LED stack; styling **dims** when there are no **active** (non-dismissed) alerts.
+- **Dismiss** is **per browser session** (e.g. `sessionStorage` keyed by user): removing a row from the panel does not imply a Firestore mutation or clearing the underlying alert condition.
+- **Count badge** stays small and anchored to the bell; data still comes from the same `useActiveAlerts` / bundle invalidation contract as the rest of the app.
+
 ### Atmospheric Design
 
 The background itself is a design element: three layered `radial-gradient` passes using
@@ -114,6 +121,13 @@ Dashboard and recovery indicators/charts now share a strict fill language:
 The dashboard places **Today's Nutrition** and **Supplements** in a **two-column grid** at `md+`
 so both cards are equal width and the pair spans the same horizontal band as other full-width
 summary sections.
+
+### Dashboard trend window
+
+Workout density and physique mini-charts on `/dashboard` follow a **trend window** control:
+short presets (e.g. 7 / 14 days), multi-week presets, and an optional **custom from–to range**.
+Controllers and hooks use bounded date filters (and `enabled` flags where needed) so queries stay
+cheap and consistent with the selected window.
 
 ### Nutrition meal pickers
 

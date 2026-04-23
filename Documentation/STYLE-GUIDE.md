@@ -23,18 +23,18 @@ IRONMIND should feel like a disciplined performance war room:
 
 ### Background + text
 
-| Token                  | Value                                                        | Role                                                        |
-| ---------------------- | ------------------------------------------------------------ | ----------------------------------------------------------- |
-| `--bg-0`               | `#080808`                                                    | Main canvas                                                 |
-| `--bg-1`               | `#0D0D0D`                                                    | Section background                                          |
-| `--bg-2`               | `#131313`                                                    | Elevated background                                         |
-| `--panel`              | `rgba(18, 14, 14, 0.78)`                                     | Glass panel base                                            |
-| `--panel-border`       | `color-mix(in srgb, var(--accent) 6%, transparent)`          | Panel edge (resting)                                        |
-| `--panel-border-hover` | `color-mix(in srgb, var(--accent) 62%, transparent)`         | Panel edge (hover/focus-within)                             |
-| `--panel-glow`         | `0 0 14px color-mix(in srgb, var(--accent) 9%, transparent)` | Panel hover glow                                            |
-| `--text-0`             | `#F0F0F0`                                                    | Primary text                                                |
-| `--text-1`             | `#9A9A9A`                                                    | Secondary text (theme-tinted in hot-pink and custom themes) |
-| `--text-2`             | `#5E5E5E`                                                    | Labels/meta (theme-tinted in hot-pink and custom themes)    |
+| Token                  | Value                                                        | Role                                                            |
+| ---------------------- | ------------------------------------------------------------ | --------------------------------------------------------------- |
+| `--bg-0`               | `#080808`                                                    | Main canvas                                                     |
+| `--bg-1`               | `#0D0D0D`                                                    | Section background                                              |
+| `--bg-2`               | `#131313`                                                    | Elevated background                                             |
+| `--panel`              | `rgba(18, 14, 14, 0.78)`                                     | Glass panel base                                                |
+| `--panel-border`       | `color-mix(in srgb, var(--accent) 6%, transparent)`          | Panel edge (resting)                                            |
+| `--panel-border-hover` | `color-mix(in srgb, var(--accent) 62%, transparent)`         | Panel edge (hover/focus-within)                                 |
+| `--panel-glow`         | `0 0 14px color-mix(in srgb, var(--accent) 9%, transparent)` | Panel hover glow                                                |
+| `--text-0`             | `#F0F0F0`                                                    | Primary text                                                    |
+| `--text-1`             | `#9A9A9A`                                                    | Secondary text (theme-tinted on non-default presets and custom) |
+| `--text-2`             | `#5E5E5E`                                                    | Labels/meta (theme-tinted on non-default presets and custom)    |
 
 ### Accent + status
 
@@ -50,8 +50,8 @@ IRONMIND should feel like a disciplined performance war room:
 ### Theme modes
 
 - `crimson` (default)
-- `hot-pink`
-- `custom` (user-set accent color via tinycolor2 derivation)
+- `hot-pink`, `cobalt`, `forge`, `emerald`, `violet` (preset `data-theme` blocks in `globals.css`)
+- `custom` (user-set accent hex; full token triad via `tinycolor2` in `ThemeSync`)
 
 Theme is controlled by `useUIStore` and synchronized through `ThemeSync`.
 
@@ -110,6 +110,8 @@ Use these in sidebar/topbar/mobile-nav. Do not hardcode cool greys for app rails
 The top bar includes **stacked Knight Rider LED bars**: readiness + target progress, each with
 its own hover/focus detail panel. Inline metric labels are intentionally removed from the header
 row for cleaner chrome.
+
+**Alerts bell:** Always visible. **Active** (non–session-dismissed) alerts drive accent strength, optional pulse, and a small count badge; clicking a row can **dismiss for this session** (client overlay only — not a Firestore delete). When there are no active alerts, the bell uses **muted** chrome styling.
 
 ---
 
@@ -191,6 +193,11 @@ Tailwind accent utilities (`text-accent`, `bg-accent`, `border-accent`, `focus:b
 - On the dashboard, **Today's Nutrition** and **Supplements** share one full-width row using
   **`md:grid-cols-2`** so both cards are **equal width** and span the same combined width as other
   `col-span-full` panels (e.g. Weekly Volume). Do not use a three-column grid with only two children.
+
+### Dashboard: trend window + schedule affordances
+
+- **Trend window** (`DashboardTrendWindow` on `/dashboard`): quick ranges (e.g. last 7 / 14 days, week presets) plus optional **custom date range**; drives workout density and physique mini-charts for that window (controllers accept `enabled` / range params as implemented).
+- **Today's schedule** type cues use **themed icon chips** (meal / vitamins / activity), not multicolor type pills — keep schedule rows readable and on-brand.
 
 ### Nutrition page: meal plan-line `<select>`
 

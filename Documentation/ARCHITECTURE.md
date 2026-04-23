@@ -168,7 +168,7 @@ Paths below map to `page.tsx` files — **any new `Link` must target one of thes
 ### 6.1 Zustand (`src/stores/`)
 
 - **`auth-store`** — Current Firebase user snapshot, `isAuthenticated`, persisted slice for user identity.
-- **`ui-store`** — Shell UX + theme preferences (`crimson`, `hot-pink`, `custom` with `customAccent`), persisted in local storage; not Firestore server data.
+- **`ui-store`** — Shell UX + theme preferences (`AppTheme`: `crimson`, `hot-pink`, `cobalt`, `forge`, `emerald`, `violet`, `custom` with optional `customAccent`), persisted in local storage; not Firestore server data.
 
 Use Zustand for **transient UI and auth identity**, not for Firestore document mirrors (those belong in TanStack Query).
 
@@ -254,7 +254,7 @@ Exported services (`src/services/index.ts`): profile, training, nutrition, recov
 | Alerts      | `alerts.service.ts`       | `use-alerts`                    | Dashboard / notifications                                             |
 | Export      | (summary in `lib/export`) | `use-export`                    | Export page                                                           |
 
-**Alert cache contract:** `getActiveAlerts` is pure derivation over training, recovery, physique, supplements, etc. **`useActiveAlerts`** (`src/controllers/use-alerts.ts`) caches under **`queryKeys(userId).alerts.active()`** with **`staleTimes.alerts`** (5 minutes in `stale-times.ts`). The shell **top bar** uses `useActiveAlerts` directly, while **`getDashboardBundle`** also embeds alerts for the dashboard page — those are **separate** TanStack trees. **`invalidateDashboardBundle`** (`invalidate-dashboard.ts`) therefore invalidates **both** `[userId, 'dashboard']` and **`queryKeys(userId).alerts.all`**, so any mutation that already refreshed the bundle (workouts, nutrition, recovery, …) also refetches top-bar alerts instead of waiting for the 5‑minute stale window.
+**Alert cache contract:** `getActiveAlerts` is pure derivation over training, recovery, physique, supplements, etc. **`useActiveAlerts`** (`src/controllers/use-alerts.ts`) caches under **`queryKeys(userId).alerts.active()`** with **`staleTimes.alerts`** (5 minutes in `stale-times.ts`). The shell **top bar** uses `useActiveAlerts` directly, while **`getDashboardBundle`** also embeds alerts for the dashboard page — those are **separate** TanStack trees. **`invalidateDashboardBundle`** (`invalidate-dashboard.ts`) therefore invalidates **both** `[userId, 'dashboard']` and **`queryKeys(userId).alerts.all`**, so any mutation that already refreshed the bundle (workouts, nutrition, recovery, …) also refetches top-bar alerts instead of waiting for the 5‑minute stale window. **Session dismiss:** the top bar may **filter out** alerts the user dismissed in **`sessionStorage`** for that browser session — that is a **presentation overlay** only; it does not change Firestore or invalidate alert queries.
 
 **`getActiveAlerts` inputs:** Tabulated at the top of [`alerts.service.ts`](../src/services/alerts.service.ts) — update when adding a branch.
 
@@ -300,7 +300,7 @@ Structured JSON files (e.g. `athlete_profile.json`, `training_program.json`, …
 Current onboarding flow is **6 steps**:
 
 1. Overview
-2. Theme selection (`crimson`, `hot-pink`, `custom`)
+2. Theme selection (`crimson`, `hot-pink`, `cobalt`, `forge`, `emerald`, `violet`, `custom`)
 3. Coach prompt
 4. Questionnaire
 5. Data generation + analysis guidance
@@ -355,7 +355,9 @@ From `.cursor/rules/IRONMIND.md`:
 ### 13.4 Dashboard layout & exercise list readability
 
 - **Overview shell:** The authenticated dashboard wraps its primary content in **`.dashboard-overview`** (`globals.css`). It is **horizontally centered** (`max-width` + auto margins) with **rounded corners** (`1.25rem`) and a subtle warm-dark translucent fill. `.dashboard-overview` uses the same panel border system as `.glass-panel`: subtle resting border (6% accent), accent glow on hover/focus-within, 1px border width.
-- **Ordered exercises:** Row indices use **`.exercise-index-badge`** — **dark tile + primary text + thin crimson border**. Avoid **grey-on-saturated-red** number chips (low contrast); follow **`IRONMIND.md`** and the **ironmind-styling** skill.
+- **Trend window:** Dashboard charts for training density and physique minis respect a user-selected **date range** (presets + custom) via shared dashboard state — extend controllers with `enabled` / bounded queries when adding new range-driven widgets.
+- **Today's schedule:** Non-workout items (meals, vitamins, activities) use **icon-forward** type chips (accent-themed), not unrelated rainbow pills.
+- **Ordered exercises:** Row indices use **`.exercise-index-badge`** — **dark tile + primary text + thin accent border**. Avoid **grey-on-saturated-accent** number chips (low contrast); follow **`IRONMIND.md`** and the **ironmind-styling** skill.
 
 ### 13.5 App chrome (header, sidebar, mobile nav)
 
@@ -364,6 +366,7 @@ Persistent layout chrome uses the same **warm dark** token hierarchy as the rest
 - **Tokens** (`globals.css` `:root`): `--chrome-bg` (sidebar & mobile nav, matches `--bg-1`), `--chrome-bg-topbar` (sticky header — **same value as `--chrome-bg`** so header and sidebar share one shade), `--chrome-bg-toggle` (sidebar rail control, matches `--bg-0`).
 - **Components:** `top-bar.tsx`, `sidebar.tsx`, `mobile-nav.tsx` — backgrounds via `bg-[color:var(--chrome-…)]`; idle/hover chrome text via `var(--text-1)` / `var(--text-0)` (see **`.cursor/rules/IRONMIND.md`**).
 - **LED indicators:** The top bar's Knight Rider-style LED readiness and weight bars replace the old numeric readiness display and profile section. Two synced pulse-animated bars with hover tooltips, themed via accent CSS variables.
+- **Alerts bell:** Persists beside the LEDs; **active** alert count sets accent emphasis / badge; **session dismiss** hides rows client-side without a server write.
 
 ### 13.6 Brand imagery (logos)
 

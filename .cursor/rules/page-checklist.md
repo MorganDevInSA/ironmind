@@ -63,6 +63,13 @@ Every page must pass this checklist before being marked complete.
 - [ ] Back navigation works as expected
 - [ ] Active state shown in nav
 
+### Shell — alerts bell (`TopBar`)
+
+- [ ] Alert list rows are keyboard-accessible (`<button>` or equivalent) with clear dismiss behavior
+- [ ] Dismissing an alert removes it from the **visible** list without implying server-side deletion (computed alerts refetch unchanged until conditions change)
+- [ ] Bell reflects **active** (non-dismissed) count; when count is zero, bell styling is **muted** vs “has alerts” state
+- [ ] Count badge stays readable at small size (`font-mono tabular-nums`, sufficient contrast)
+
 ---
 
 ## Responsive Design

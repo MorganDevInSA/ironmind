@@ -16,12 +16,12 @@ description: Design and tune IRONMIND demo personas, synthetic multi-week histor
 
 ## Where to edit
 
-| Goal                                                       | Location                                                                                                                       |
-| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| Static profile / program / nutrition / phase for a persona | `src/lib/seed/profile.ts`, `program.ts`, `nutrition.ts`, `sheri-*.ts`, `alex-*.ts`, `jordan-*.ts`                              |
-| Adherence, recovery baselines, weight drift, portions      | `personaTuning` in [`demo-historical.ts`](../../../src/lib/seed/demo-historical.ts)                                            |
-| History window length (demo overwrite)                     | **`DEMO_HISTORY_DAYS`** in `demo-historical.ts` + matching program `startDate` offset in `seed/index.ts`                       |
-| Mid-block story (deload, stress week, journal arc)         | Logic and `buildJournalNotes` in `demo-historical.ts` — keep **journal text consistent** with what the generator actually does |
+| Goal                                                       | Location                                                                                                                                                                                           |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Static profile / program / nutrition / phase for a persona | `src/lib/seed/profile.ts`, `program.ts`, `nutrition.ts`, `sheri-*.ts`, `alex-*.ts`, `jordan-*.ts`                                                                                                  |
+| Adherence, recovery baselines, weight drift, portions      | `personaTuning` in [`demo-historical.ts`](../../../src/lib/seed/demo-historical.ts)                                                                                                                |
+| History window length (demo overwrite)                     | **`DEMO_HISTORY_DAYS`** + **`getDemoHistoryStartDateString()`** in `demo-historical.ts` / `seed/index.ts` — keep program `startDate` and `seedDemoHistoricalData({ days })` on the **same** anchor |
+| Mid-block story (deload, stress week, journal arc)         | Logic and `buildJournalNotes` in `demo-historical.ts` — keep **journal text consistent** with what the generator actually does                                                                     |
 
 ## Realism checklist
 

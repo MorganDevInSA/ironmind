@@ -29,7 +29,7 @@ This automatically applies to all focusable elements. Do not override with `outl
 ```tsx
 <button className="
   focus:outline-none
-  focus-visible:ring-2 
+  focus-visible:ring-2
   focus-visible:ring-[color:var(--accent)]
   focus-visible:ring-offset-2
   focus-visible:ring-offset-[color:var(--bg-1)]
@@ -41,12 +41,14 @@ This automatically applies to all focusable elements. Do not override with `outl
 For cards or groups that should show focus when any child is focused:
 
 ```tsx
-<div className="
+<div
+  className="
   rounded-[14px] border border-[color:var(--panel-border)]
   focus-within:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)]
   focus-within:ring-2
   focus-within:ring-[color:color-mix(in_srgb,var(--accent)_20%,transparent)]
-">
+"
+>
   <input className="bg-transparent focus:outline-none" />
 </div>
 ```
@@ -61,9 +63,9 @@ Add at the top of the layout for screen reader users:
 
 ```tsx
 // In app layout
-<a 
-  href="#main-content" 
-  className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 
+<a
+  href="#main-content"
+  className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4
     focus:z-50 focus:btn-primary"
 >
   Skip to main content
@@ -78,7 +80,7 @@ Add at the top of the layout for screen reader users:
 ```tsx
 function useArrowNavigation<T extends HTMLElement>(
   itemCount: number,
-  onSelect: (index: number) => void
+  onSelect: (index: number) => void,
 ) {
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -171,6 +173,7 @@ function TabPanel() {
 ### Focus Trap
 
 When a modal opens:
+
 1. Focus moves to the modal
 2. Tab cycles within the modal only
 3. Escape closes the modal
@@ -179,13 +182,13 @@ When a modal opens:
 ```tsx
 import { useEffect, useRef } from 'react';
 
-function Modal({ 
-  isOpen, 
-  onClose, 
-  children 
-}: { 
-  isOpen: boolean; 
-  onClose: () => void; 
+function Modal({
+  isOpen,
+  onClose,
+  children,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
   children: React.ReactNode;
 }) {
   const modalRef = useRef<HTMLDivElement>(null);
@@ -232,12 +235,8 @@ function Modal({
       aria-labelledby="modal-title"
     >
       {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/80"
-        onClick={onClose}
-        aria-hidden="true"
-      />
-      
+      <div className="absolute inset-0 bg-black/80" onClick={onClose} aria-hidden="true" />
+
       {/* Modal */}
       <div
         ref={modalRef}
@@ -284,8 +283,8 @@ Always associate labels with inputs:
 ```tsx
 // Visible label
 <div className="space-y-1">
-  <label 
-    htmlFor="weight" 
+  <label
+    htmlFor="weight"
     className="data-label"
   >
     BODY WEIGHT
@@ -314,17 +313,9 @@ Always associate labels with inputs:
 Connect errors to inputs with `aria-describedby`:
 
 ```tsx
-function FormField({ 
-  id, 
-  label, 
-  error 
-}: { 
-  id: string; 
-  label: string; 
-  error?: string;
-}) {
+function FormField({ id, label, error }: { id: string; label: string; error?: string }) {
   const errorId = `${id}-error`;
-  
+
   return (
     <div className="space-y-1">
       <label htmlFor={id} className="data-label">
@@ -336,10 +327,7 @@ function FormField({
         aria-describedby={error ? errorId : undefined}
         className={`
           w-full px-4 py-3 rounded-lg bg-[color:var(--bg-2)]
-          border ${error 
-            ? 'border-[color:var(--bad)]' 
-            : 'border-[color:var(--panel-border)]'
-          }
+          border ${error ? 'border-[color:var(--bad)]' : 'border-[color:var(--panel-border)]'}
         `}
       />
       {error && (
@@ -436,16 +424,14 @@ Maintain logical heading structure:
 ```tsx
 // Page structure
 <main>
-  <h1>Dashboard</h1>           {/* One h1 per page */}
-  
+  <h1>Dashboard</h1> {/* One h1 per page */}
   <section>
-    <h2>Today's Progress</h2>  {/* Major sections */}
+    <h2>Today's Progress</h2> {/* Major sections */}
     <div>...</div>
   </section>
-  
   <section>
     <h2>Weekly Summary</h2>
-    <h3>Training</h3>          {/* Subsections */}
+    <h3>Training</h3> {/* Subsections */}
     <h3>Nutrition</h3>
   </section>
 </main>
@@ -465,14 +451,14 @@ Never skip heading levels (h1 → h3 without h2).
 
 ### IRONMIND Palette Contrast (on `#080808`)
 
-| Token | Hex | Contrast | Pass |
-|-------|-----|----------|------|
-| `--text-0` | `#F0F0F0` | 17.4:1 | ✅ AAA |
-| `--text-1` | `#9A9A9A` | 7.0:1 | ✅ AAA |
-| `--text-2` | `#5E5E5E` | 3.3:1 | ✅ Large only |
-| `--accent` | `#DC2626` | 4.6:1 | ✅ AA |
-| `--good` | `#22C55E` | 7.3:1 | ✅ AAA |
-| `--warn` | `#F59E0B` | 8.5:1 | ✅ AAA |
+| Token      | Hex       | Contrast | Pass          |
+| ---------- | --------- | -------- | ------------- |
+| `--text-0` | `#F0F0F0` | 17.4:1   | ✅ AAA        |
+| `--text-1` | `#9A9A9A` | 7.0:1    | ✅ AAA        |
+| `--text-2` | `#5E5E5E` | 3.3:1    | ✅ Large only |
+| `--accent` | `#DC2626` | 4.6:1    | ✅ AA         |
+| `--good`   | `#22C55E` | 7.3:1    | ✅ AAA        |
+| `--warn`   | `#F59E0B` | 8.5:1    | ✅ AAA        |
 
 ### Don't Rely on Color Alone
 
@@ -517,6 +503,15 @@ Minimum touch target size: **44×44px** on mobile.
   <X className="w-5 h-5" />
 </button>
 ```
+
+---
+
+## Shell: alerts bell (`TopBar`)
+
+- **Toggle:** Bell control is a `<button>` with **`aria-expanded`** matching the panel and an **`aria-label`** that includes the **active** count (e.g. `Alerts, 2 active`).
+- **Panel:** When open, provide a **Close** control with `aria-label="Close alerts"`; trap focus only if you upgrade to a true modal — today the panel is a lightweight popover.
+- **Rows:** Each alert is a **full-width `<button>`** (keyboard activatable). Clicking dismisses for the **session** only — document that in copy if users confuse it with “fixing” the underlying issue.
+- **Decorative chrome:** Pulse dot and numeric badge can stay **`aria-hidden`** when the label already conveys count; avoid duplicate announcements.
 
 ---
 

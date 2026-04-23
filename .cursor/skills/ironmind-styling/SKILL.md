@@ -356,12 +356,14 @@ Or inline:
 
 ## Theme Switching
 
-To change theme at runtime:
+Use **`useUIStore`** (`theme`, `setTheme`, optional `customAccent`) so the choice persists and **`ThemeSync`** (`src/components/theme/theme-sync.tsx`) keeps `data-theme` and CSS variables aligned.
+
+**Preset `data-theme` values** (see `globals.css`): `hot-pink`, `cobalt`, `forge`, `emerald`, `violet`. **Crimson** is the default (no `data-theme` / store value `crimson`). **Custom** sets `data-theme="custom"` and derives tokens with `tinycolor2`.
 
 ```tsx
-document.documentElement.dataset.theme = 'hot-pink';
-// or remove for default:
-delete document.documentElement.dataset.theme;
+// Low-level illustration only — prefer the Zustand store in app code:
+document.documentElement.dataset.theme = 'forge';
+delete document.documentElement.dataset.theme; // back toward default crimson path
 ```
 
 All components using CSS variables automatically update.

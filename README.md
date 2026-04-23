@@ -47,7 +47,6 @@ Primary wordmarks (rasters in-repo):
 
 Additional layout variants and transparent marks live under [`public/brand/`](public/brand/). Full brand prompts, palette, and asset map: [Documentation/LOGO-BRIEF.md](./Documentation/LOGO-BRIEF.md).
 
-
 ## Business and platform value
 
 - **Operational leverage**: One athlete, one source of truth—training, nutrition, recovery, physique, and supplements—reduces back-and-forth and “lost context” versus chat plus spreadsheets.
@@ -87,7 +86,7 @@ Covers: cache invalidation strategy, optimistic updates, structured error handli
 
 ### Design-Engineered UI System
 
-- **60+ CSS design tokens** enabling runtime theme switching without component changes
+- **60+ CSS design tokens** enabling runtime theme switching (multiple presets + custom accent) without forked component palettes
 - **Interactive panel states** with asymmetric hover transitions (200ms border, 300ms glow)
 - **iOS-style spinners** derived from `var(--accent)` via `color-mix()`
 - **Knight Rider LED indicators** with staggered 60ms pulse animations

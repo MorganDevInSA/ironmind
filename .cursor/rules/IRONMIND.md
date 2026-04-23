@@ -10,7 +10,7 @@ These rules are enforced on every edit in this project. No exceptions.
 
 **Stack**: Next.js 14 (App Router) · TypeScript strict · Tailwind CSS v3 · shadcn/ui · Firebase (Auth + Firestore + Storage) · TanStack Query · Zustand · Framer Motion · Recharts · Lucide Icons.
 
-**Themes**: Crimson (default), Hot Pink, Custom (user-chosen hex via tinycolor2) — all accent colors use CSS variables for theme support.
+**Themes**: **Crimson** (default), **Hot Pink**, **Cobalt**, **Forge**, **Emerald**, **Violet**, plus **Custom** (user-chosen hex via `tinycolor2` in `ThemeSync`). Presets map to `html[data-theme="…"]` blocks in `globals.css`; all accent colors use CSS variables for theme support.
 
 ---
 
