@@ -7,6 +7,7 @@ import { updateVolumeLandmarks } from '@/services/volume.service';
 import { createJournalEntry } from '@/services/coaching.service';
 import { saveNutritionDay, saveNutritionPlan } from '@/services/nutrition.service';
 import { today } from '@/lib/utils';
+import { seedDemoHistoricalData } from './demo-historical';
 
 import { mortonProfile } from './profile';
 import { mortonProgram } from './program';
@@ -112,7 +113,12 @@ export async function seedUserData(userId: string): Promise<boolean> {
  */
 export async function seedMortonData(userId: string): Promise<void> {
   await updateProfile(userId, mortonProfile);
-  const programId = await createProgram(userId, mortonProgram);
+  const historyStart = new Date();
+  historyStart.setDate(historyStart.getDate() - 41);
+  const programId = await createProgram(userId, {
+    ...mortonProgram,
+    startDate: historyStart.toISOString().split('T')[0],
+  });
   await setActiveProgram(userId, programId);
   await saveProtocol(userId, mortonSupplementProtocol);
   const phaseId = await createPhase(userId, mortonInitialPhase);
@@ -129,6 +135,18 @@ export async function seedMortonData(userId: string): Promise<void> {
     macroActuals: { calories: 0, protein: 0, carbs: 0, fat: 0 },
     complianceScore: 0,
   });
+  await seedDemoHistoricalData({
+    personaId: 'morton',
+    userId,
+    profile: mortonProfile,
+    programId,
+    program: {
+      ...mortonProgram,
+      startDate: historyStart.toISOString().split('T')[0],
+    },
+    nutritionPlan: mortonNutritionPlan,
+    supplementProtocol: mortonSupplementProtocol,
+  });
   await markUserSeeded(userId);
 }
 
@@ -137,7 +155,12 @@ export async function seedMortonData(userId: string): Promise<void> {
  */
 export async function seedSheriData(userId: string): Promise<void> {
   await updateProfile(userId, sheriProfile);
-  const programId = await createProgram(userId, sheriProgram);
+  const historyStart = new Date();
+  historyStart.setDate(historyStart.getDate() - 41);
+  const programId = await createProgram(userId, {
+    ...sheriProgram,
+    startDate: historyStart.toISOString().split('T')[0],
+  });
   await setActiveProgram(userId, programId);
   await saveProtocol(userId, sheriSupplementProtocol);
   const phaseId = await createPhase(userId, sheriInitialPhase);
@@ -154,6 +177,18 @@ export async function seedSheriData(userId: string): Promise<void> {
     macroActuals: { calories: 0, protein: 0, carbs: 0, fat: 0 },
     complianceScore: 0,
   });
+  await seedDemoHistoricalData({
+    personaId: 'sheri',
+    userId,
+    profile: sheriProfile,
+    programId,
+    program: {
+      ...sheriProgram,
+      startDate: historyStart.toISOString().split('T')[0],
+    },
+    nutritionPlan: sheriNutritionPlan,
+    supplementProtocol: sheriSupplementProtocol,
+  });
   await markUserSeeded(userId);
 }
 
@@ -162,7 +197,12 @@ export async function seedSheriData(userId: string): Promise<void> {
  */
 export async function seedAlexData(userId: string): Promise<void> {
   await updateProfile(userId, alexProfile);
-  const programId = await createProgram(userId, alexProgram);
+  const historyStart = new Date();
+  historyStart.setDate(historyStart.getDate() - 41);
+  const programId = await createProgram(userId, {
+    ...alexProgram,
+    startDate: historyStart.toISOString().split('T')[0],
+  });
   await setActiveProgram(userId, programId);
   await saveProtocol(userId, alexSupplementProtocol);
   const phaseId = await createPhase(userId, alexInitialPhase);
@@ -179,6 +219,18 @@ export async function seedAlexData(userId: string): Promise<void> {
     macroActuals: { calories: 0, protein: 0, carbs: 0, fat: 0 },
     complianceScore: 0,
   });
+  await seedDemoHistoricalData({
+    personaId: 'alex',
+    userId,
+    profile: alexProfile,
+    programId,
+    program: {
+      ...alexProgram,
+      startDate: historyStart.toISOString().split('T')[0],
+    },
+    nutritionPlan: alexNutritionPlan,
+    supplementProtocol: alexSupplementProtocol,
+  });
   await markUserSeeded(userId);
 }
 
@@ -187,7 +239,12 @@ export async function seedAlexData(userId: string): Promise<void> {
  */
 export async function seedJordanData(userId: string): Promise<void> {
   await updateProfile(userId, jordanProfile);
-  const programId = await createProgram(userId, jordanProgram);
+  const historyStart = new Date();
+  historyStart.setDate(historyStart.getDate() - 41);
+  const programId = await createProgram(userId, {
+    ...jordanProgram,
+    startDate: historyStart.toISOString().split('T')[0],
+  });
   await setActiveProgram(userId, programId);
   await saveProtocol(userId, jordanSupplementProtocol);
   const phaseId = await createPhase(userId, jordanInitialPhase);
@@ -203,6 +260,18 @@ export async function seedJordanData(userId: string): Promise<void> {
     macroTargets: jordanNutritionPlan.macroTargetsByDayType.moderate,
     macroActuals: { calories: 0, protein: 0, carbs: 0, fat: 0 },
     complianceScore: 0,
+  });
+  await seedDemoHistoricalData({
+    personaId: 'jordan',
+    userId,
+    profile: jordanProfile,
+    programId,
+    program: {
+      ...jordanProgram,
+      startDate: historyStart.toISOString().split('T')[0],
+    },
+    nutritionPlan: jordanNutritionPlan,
+    supplementProtocol: jordanSupplementProtocol,
   });
   await markUserSeeded(userId);
 }
