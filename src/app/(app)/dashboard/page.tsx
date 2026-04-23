@@ -11,7 +11,14 @@ import {
   useNutritionPlan,
   useProtocol,
 } from '@/controllers';
-import { getCycleDay, today, formatDisplayDate } from '@/lib/utils';
+import {
+  getCycleDay,
+  today,
+  formatDisplayDate,
+  formatShortDate,
+  getDaysInRange,
+  sortCheckInsChronologicalAsc,
+} from '@/lib/utils';
 import { differenceInCalendarDays, format, parseISO, subDays } from 'date-fns';
 import {
   Activity,
@@ -39,14 +46,9 @@ import {
   ReferenceLine,
 } from 'recharts';
 import { cn } from '@/lib/utils';
-import type {
-  Workout,
-  NutritionDay,
-  SupplementLog,
-  ProgramSession,
-  CheckIn,
-  Measurements,
-} from '@/lib/types';
+import { measurementForChart } from '@/lib/utils/measurement-bounds';
+import { MEASUREMENT_CHART_SERIES } from '@/lib/constants/measurement-chart-series';
+import type { Workout, NutritionDay, SupplementLog, ProgramSession, CheckIn } from '@/lib/types';
 import { mortonNutritionPlan } from '@/lib/seed/nutrition';
 import { mortonSupplementProtocol } from '@/lib/seed/supplements';
 import type { NutritionPlanSeed } from '@/lib/seed/nutrition';
@@ -148,23 +150,37 @@ function capitalize(s: string) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-const MEASUREMENT_SERIES: { key: keyof Measurements; label: string; color: string }[] = [
-  { key: 'waist', label: 'Waist', color: 'color-mix(in srgb, var(--accent-light) 92%, white 8%)' },
-  { key: 'chest', label: 'Chest', color: 'var(--accent)' },
-  { key: 'hips', label: 'Hips', color: 'color-mix(in srgb, var(--accent) 86%, white 14%)' },
-  { key: 'leftArm', label: 'L arm', color: 'color-mix(in srgb, var(--accent) 78%, black 22%)' },
-  { key: 'rightArm', label: 'R arm', color: 'color-mix(in srgb, var(--accent) 72%, black 28%)' },
-  {
-    key: 'leftThigh',
-    label: 'L thigh',
-    color: 'color-mix(in srgb, var(--accent-light) 80%, white 20%)',
-  },
-  {
-    key: 'rightThigh',
-    label: 'R thigh',
-    color: 'color-mix(in srgb, var(--accent) 68%, black 32%)',
-  },
-];
+const DASHBOARD_MEASUREMENT_LINE_COLORS = [
+  'color-mix(in srgb, var(--accent-light) 92%, white 8%)',
+  'var(--accent)',
+  'color-mix(in srgb, var(--accent) 86%, white 14%)',
+  'color-mix(in srgb, var(--accent) 78%, black 22%)',
+  'color-mix(in srgb, var(--accent) 72%, black 28%)',
+  'color-mix(in srgb, var(--accent-light) 80%, white 20%)',
+  'color-mix(in srgb, var(--accent) 68%, black 32%)',
+] as const;
+
+const MEASUREMENT_SERIES_MINI = MEASUREMENT_CHART_SERIES.map((s, i) => ({
+  ...s,
+  color: DASHBOARD_MEASUREMENT_LINE_COLORS[i] ?? 'var(--accent)',
+}));
+
+function MiniMeasurementLegendSwatch({ dash, stroke }: { dash: string; stroke: string }) {
+  return (
+    <svg width={22} height={8} viewBox="0 0 22 8" aria-hidden className="shrink-0">
+      <line
+        x1="1"
+        y1="4"
+        x2="21"
+        y2="4"
+        stroke={stroke}
+        strokeWidth={1.5}
+        strokeLinecap="round"
+        strokeDasharray={dash === '0' ? '0' : dash}
+      />
+    </svg>
+  );
+}
 const THEME_FILL_GRADIENT =
   'linear-gradient(90deg, color-mix(in srgb, var(--accent-light) 85%, white 15%) 0%, color-mix(in srgb, var(--accent) 72%, black 28%) 100%)';
 
@@ -179,27 +195,27 @@ function PhysiqueMiniCharts({
   emptyHint?: string | null;
 }) {
   const [mode, setMode] = useState<'weight' | 'measurements'>('weight');
-  const chron = (checkIns ?? []).slice().reverse();
+  const chron = sortCheckInsChronologicalAsc(checkIns ?? []);
 
   const weightRows = chron.map((c) => ({
-    date: formatDisplayDate(c.date).slice(0, 5),
+    dateKey: c.date,
     weight: c.bodyweight,
   }));
 
   const measRows = chron.map((c) => {
     const row: Record<string, string | number | undefined> = {
-      date: formatDisplayDate(c.date).slice(0, 5),
+      dateKey: c.date,
     };
     const m = c.measurements ?? {};
-    for (const { key } of MEASUREMENT_SERIES) {
-      const v = m[key];
+    for (const { key } of MEASUREMENT_CHART_SERIES) {
+      const v = measurementForChart(key, m[key]);
       if (typeof v === 'number') row[key as string] = v;
     }
     return row;
   });
 
   const hasMeas = measRows.some((row) =>
-    MEASUREMENT_SERIES.some(({ key }) => typeof row[key as string] === 'number'),
+    MEASUREMENT_CHART_SERIES.some(({ key }) => typeof row[key as string] === 'number'),
   );
 
   if (!chron.length) {
@@ -270,7 +286,8 @@ function PhysiqueMiniCharts({
                 stroke="color-mix(in srgb, var(--chrome-border) 45%, transparent)"
               />
               <XAxis
-                dataKey="date"
+                dataKey="dateKey"
+                tickFormatter={(v) => (typeof v === 'string' ? formatShortDate(v) : String(v))}
                 tick={{ fontSize: 9, fill: '#B8B8B8' }}
                 tickLine={false}
                 axisLine={false}
@@ -292,6 +309,11 @@ function PhysiqueMiniCharts({
                   fontSize: 12,
                 }}
                 labelStyle={{ color: 'color:var(--text-1)' }}
+                labelFormatter={(label) =>
+                  typeof label === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(label)
+                    ? formatDisplayDate(label)
+                    : String(label)
+                }
                 formatter={(v) => [`${typeof v === 'number' ? v : '—'} kg`, 'Weight']}
               />
               {targetWeight != null && (
@@ -312,40 +334,66 @@ function PhysiqueMiniCharts({
             </AreaChart>
           </ResponsiveContainer>
         ) : mode === 'measurements' && hasMeas ? (
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={measRows} margin={{ top: 4, right: 4, bottom: 0, left: -16 }}>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="color-mix(in srgb, var(--chrome-border) 45%, transparent)"
-              />
-              <XAxis
-                dataKey="date"
-                tick={{ fontSize: 9, fill: '#B8B8B8' }}
-                tickLine={false}
-                axisLine={false}
-              />
-              <YAxis tick={{ fontSize: 9, fill: '#B8B8B8' }} tickLine={false} axisLine={false} />
-              <Tooltip
-                contentStyle={{
-                  background: 'rgba(10,10,10,0.95)',
-                  border: '1px solid rgba(65,50,50,0.4)',
-                  borderRadius: 12,
-                  fontSize: 12,
-                }}
-              />
-              {MEASUREMENT_SERIES.map(({ key, color }) => (
-                <Line
-                  key={key}
-                  type="monotone"
-                  dataKey={key as string}
-                  stroke={color}
-                  strokeWidth={1.5}
-                  dot={{ r: 2, fill: color }}
-                  connectNulls
+          <div className="flex min-h-0 flex-1 flex-col gap-1">
+            <ResponsiveContainer width="100%" height="100%" minHeight={110}>
+              <LineChart data={measRows} margin={{ top: 4, right: 4, bottom: 0, left: -16 }}>
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="color-mix(in srgb, var(--chrome-border) 45%, transparent)"
                 />
+                <XAxis
+                  dataKey="dateKey"
+                  tickFormatter={(v) => (typeof v === 'string' ? formatShortDate(v) : String(v))}
+                  tick={{ fontSize: 9, fill: '#B8B8B8' }}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis tick={{ fontSize: 9, fill: '#B8B8B8' }} tickLine={false} axisLine={false} />
+                <Tooltip
+                  contentStyle={{
+                    background: 'rgba(10,10,10,0.95)',
+                    border: '1px solid rgba(65,50,50,0.4)',
+                    borderRadius: 12,
+                    fontSize: 12,
+                  }}
+                  labelFormatter={(label) =>
+                    typeof label === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(label)
+                      ? formatDisplayDate(label)
+                      : String(label)
+                  }
+                  formatter={(value, name) => [
+                    typeof value === 'number' ? `${value} cm` : '—',
+                    String(name),
+                  ]}
+                />
+                {MEASUREMENT_SERIES_MINI.map(({ key, color, label, dash }) => (
+                  <Line
+                    key={key}
+                    type="monotone"
+                    name={label}
+                    dataKey={key as string}
+                    stroke={color}
+                    strokeWidth={1.5}
+                    strokeDasharray={dash === '0' ? undefined : dash}
+                    dot={{ r: 2, fill: color }}
+                    connectNulls={false}
+                    isAnimationActive={false}
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+            <div
+              className="flex flex-wrap gap-x-2.5 gap-y-0.5 px-0.5 text-[9px] leading-tight text-[color:var(--text-2)]"
+              aria-label="Measurement series"
+            >
+              {MEASUREMENT_SERIES_MINI.map(({ key, label, dash, color }) => (
+                <div key={key} className="flex items-center gap-1">
+                  <MiniMeasurementLegendSwatch dash={dash} stroke={color} />
+                  <span>{label}</span>
+                </div>
               ))}
-            </LineChart>
-          </ResponsiveContainer>
+            </div>
+          </div>
         ) : (
           <div className="h-full flex items-center justify-center text-xs text-[color:var(--text-detail)]">
             Add a second check-in to see the weight line.
@@ -1519,45 +1567,11 @@ function DashboardTrendWindow({
         </span>
       </div>
       <p className="text-[10px] text-[color:var(--text-2)] leading-snug">
-        Workouts and the physique chart use this calendar range. Cycle-day tabs below still control
-        program preview vs today.
+        Workouts and the physique chart use this calendar range. The day strip below lists every
+        date in the range — select one to preview that day&apos;s planned session.
       </p>
 
       <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center lg:gap-x-4 lg:gap-y-2">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)] shrink-0">
-            Quick
-          </span>
-          <div className="flex flex-wrap items-center gap-1.5">
-            <button
-              type="button"
-              onClick={() => onSelectPreset(7)}
-              className={cn(
-                'text-xs font-semibold transition-colors rounded-md px-2 py-1 border border-transparent',
-                trendKind === 'preset' && presetDays === 7
-                  ? 'is-selected text-[color:var(--text-0)] border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)]'
-                  : 'text-[color:var(--accent)] hover:text-[color:var(--accent-light)] border-transparent',
-              )}
-              aria-pressed={trendKind === 'preset' && presetDays === 7}
-            >
-              Last 7 days
-            </button>
-            <button
-              type="button"
-              onClick={() => onSelectPreset(14)}
-              className={cn(
-                'text-xs font-semibold transition-colors rounded-md px-2 py-1 border border-transparent',
-                trendKind === 'preset' && presetDays === 14
-                  ? 'is-selected text-[color:var(--text-0)] border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)]'
-                  : 'text-[color:var(--accent)] hover:text-[color:var(--accent-light)]',
-              )}
-              aria-pressed={trendKind === 'preset' && presetDays === 14}
-            >
-              Last 14 days
-            </button>
-          </div>
-        </div>
-
         <div
           className="flex flex-wrap items-center gap-2"
           role="group"
@@ -1644,45 +1658,47 @@ function DashboardTrendWindow({
 }
 
 /* ─────────────────────────────────────────────────────────────────────
-   Cycle day tabs (length follows active program — 7, 14, etc.)
+   One tab per calendar day in the trend range (session = program cycle for that date)
 ───────────────────────────────────────────────────────────────────── */
-function CycleDayTabs({
-  cycleLengthDays,
-  selectedCycleDay,
-  todayCycleDay,
+function TrendRangeDayTabs({
+  dates,
+  selectedDate,
+  todayStr,
   onSelect,
 }: {
-  cycleLengthDays: number;
-  selectedCycleDay: number;
-  todayCycleDay: number | null;
-  onSelect: (day: number) => void;
+  dates: string[];
+  selectedDate: string;
+  todayStr: string;
+  onSelect: (date: string) => void;
 }) {
-  const days = Array.from({ length: cycleLengthDays }, (_, i) => i + 1);
   return (
     <div className="flex flex-col gap-2">
       <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[color:var(--text-2)]">
-        Cycle days
+        Days in range
       </p>
       <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-thin">
-        {days.map((day) => {
-          const isTodayTab = todayCycleDay !== null && day === todayCycleDay;
-          const isSelected = day === selectedCycleDay;
+        {dates.map((dateStr) => {
+          const isSelected = dateStr === selectedDate;
+          const isCalendarToday = dateStr === todayStr;
           return (
             <button
-              key={day}
+              key={dateStr}
               type="button"
-              onClick={() => onSelect(day)}
+              onClick={() => onSelect(dateStr)}
               className={cn(
-                'im-tooltip-trigger shrink-0 min-w-[2.75rem] px-3 py-2 rounded-lg text-sm font-mono tabular-nums transition-all border',
+                'im-tooltip-trigger shrink-0 min-w-[2.75rem] px-2.5 py-2 rounded-lg text-xs font-mono tabular-nums transition-all border',
                 isSelected
                   ? 'is-selected text-[#FAFAFA]'
                   : 'border-[rgba(65,50,50,0.35)] text-[color:var(--text-1)] hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]',
-                isTodayTab && !isSelected && 'ring-1 ring-[rgba(220,38,38,0.35)]',
               )}
               aria-pressed={isSelected}
-              data-tooltip={isTodayTab ? 'Today (calendar)' : `Cycle day ${day}`}
+              data-tooltip={
+                isCalendarToday
+                  ? `Today · ${formatDisplayDate(dateStr)}`
+                  : formatDisplayDate(dateStr)
+              }
             >
-              {day}
+              {formatShortDate(dateStr)}
             </button>
           );
         })}
@@ -1736,6 +1752,11 @@ export default function DashboardPage() {
     [trendBounds.from, trendBounds.to],
   );
 
+  const trendDateList = useMemo(
+    () => getDaysInRange(trendBounds.from, trendBounds.to),
+    [trendBounds.from, trendBounds.to],
+  );
+
   const {
     profile,
     activeProgram,
@@ -1769,26 +1790,33 @@ export default function DashboardPage() {
 
   const activePlan = nutritionPlanData ?? mortonNutritionPlan;
   const activeProtocol = protocolData ?? mortonSupplementProtocol;
-  const cycleDay = activeProgram
-    ? getCycleDay(activeProgram.startDate ?? todayStr, todayStr, activeProgram.cycleLengthDays)
-    : null;
-
-  const [selectedCycleDay, setSelectedCycleDay] = useState(1);
+  const [selectedTrendDate, setSelectedTrendDate] = useState(todayStr);
 
   useEffect(() => {
-    if (cycleDay != null) setSelectedCycleDay(cycleDay);
-  }, [cycleDay]);
+    const from = trendBounds.from;
+    const to = trendBounds.to;
+    setSelectedTrendDate((cur) => {
+      if (cur >= from && cur <= to) return cur;
+      if (todayStr >= from && todayStr <= to) return todayStr;
+      return to;
+    });
+  }, [trendBounds.from, trendBounds.to, todayStr]);
 
-  const cycleLen = activeProgram?.cycleLengthDays ?? 1;
+  const cycleDayForSelected = useMemo(() => {
+    if (!activeProgram) return null;
+    return getCycleDay(
+      activeProgram.startDate ?? todayStr,
+      selectedTrendDate,
+      activeProgram.cycleLengthDays,
+    );
+  }, [activeProgram, selectedTrendDate, todayStr]);
 
-  useEffect(() => {
-    setSelectedCycleDay((d) => Math.min(d, cycleLen));
-  }, [cycleLen]);
-  const safeDay = Math.min(Math.max(selectedCycleDay, 1), cycleLen);
-
-  const selectedSession = activeProgram?.sessions.find((s) => s.dayNumber === safeDay);
+  const selectedSession =
+    cycleDayForSelected != null
+      ? activeProgram?.sessions.find((s) => s.dayNumber === cycleDayForSelected)
+      : undefined;
   const isLiftForSelected = selectedSession?.type === 'lift';
-  const isViewingToday = cycleDay !== null && safeDay === cycleDay;
+  const isViewingToday = selectedTrendDate === todayStr;
 
   const todayWorkout = recentWorkouts?.find((w) => w.date === todayStr);
   const lastWorkout = recentWorkouts?.find((w) =>
@@ -1798,16 +1826,20 @@ export default function DashboardPage() {
   const recoveryDashEntry = todayRecovery ?? latestRecovery ?? null;
   const recoveryDashHistorical = !todayRecovery && !!latestRecovery;
 
-  const scheduleTitle = isViewingToday ? "Today's Schedule" : `Day ${safeDay} — Plan`;
-  const dateBadge = isViewingToday ? formatDisplayDate(todayStr) : 'Preview';
+  const scheduleTitle = isViewingToday
+    ? "Today's Schedule"
+    : `${formatDisplayDate(selectedTrendDate)} — Plan`;
+  const dateBadge = isViewingToday
+    ? formatDisplayDate(todayStr)
+    : formatDisplayDate(selectedTrendDate);
   const previewHint = !isViewingToday
-    ? "Nutrition and supplement cards below reflect calendar today only when the highlighted tab matches today's cycle day. Recovery shows your latest saved check-in."
+    ? 'Nutrition and supplement cards below reflect calendar today only. Recovery shows your latest saved check-in.'
     : null;
 
   const dashboardSubtitle =
-    activeProgram && cycleDay
-      ? `Day ${safeDay} of ${activeProgram.cycleLengthDays} — ${selectedSession?.name ?? 'Rest Day'}`
-      : formatDisplayDate(todayStr);
+    activeProgram && cycleDayForSelected != null
+      ? `Day ${cycleDayForSelected} of ${activeProgram.cycleLengthDays} — ${selectedSession?.name ?? 'Rest Day'} · ${formatDisplayDate(selectedTrendDate)}`
+      : formatDisplayDate(selectedTrendDate);
 
   if (isLoading) {
     return (
@@ -1883,17 +1915,17 @@ export default function DashboardPage() {
           summary={trendSummary}
         />
 
-        {activeProgram && cycleDay !== null && (
-          <CycleDayTabs
-            cycleLengthDays={cycleLen}
-            selectedCycleDay={safeDay}
-            todayCycleDay={cycleDay}
-            onSelect={setSelectedCycleDay}
+        {trendDateList.length > 0 && (
+          <TrendRangeDayTabs
+            dates={trendDateList}
+            selectedDate={selectedTrendDate}
+            todayStr={todayStr}
+            onSelect={setSelectedTrendDate}
           />
         )}
 
-        {/* Schedule + cycle-tab cards */}
-        <section key={safeDay} className="space-y-4">
+        {/* Schedule + selected trend date */}
+        <section key={selectedTrendDate} className="space-y-4">
           <div className="grid grid-cols-1 gap-4">
             <TodaySchedule
               session={selectedSession}
@@ -1916,7 +1948,13 @@ export default function DashboardPage() {
             <div className="col-span-full grid grid-cols-1 gap-4 lg:grid-cols-2 lg:items-stretch lg:gap-4">
               <Card
                 className="min-h-0 lg:flex lg:flex-col lg:h-full"
-                title={isViewingToday ? "Today's Session" : `Day ${safeDay} — Session plan`}
+                title={
+                  isViewingToday
+                    ? "Today's Session"
+                    : cycleDayForSelected != null
+                      ? `Day ${cycleDayForSelected} — Session plan`
+                      : 'Session plan'
+                }
                 icon={<Dumbbell size={20} />}
                 iconColor="text-[color:var(--accent)]"
                 selected
@@ -1946,7 +1984,8 @@ export default function DashboardPage() {
                       </p>
                       {!isViewingToday && (
                         <p className="text-[10px] text-[color:var(--text-detail)] leading-snug">
-                          Logging runs on calendar today when you select today&apos;s cycle-day tab.
+                          Logging runs on calendar today when you select today&apos;s date in the
+                          strip above.
                         </p>
                       )}
                     </div>
@@ -2061,9 +2100,14 @@ export default function DashboardPage() {
               >
                 {!isViewingToday ? (
                   <p className="text-sm text-[color:var(--text-detail)]">
-                    Meal logging and macro totals are for calendar today. Select today&apos;s
-                    cycle-day tab ({cycleDay !== null ? `day ${cycleDay}` : ''}) to edit
-                    today&apos;s intake.
+                    Meal logging and macro totals are for calendar today. Select{' '}
+                    <span className="font-medium text-[color:var(--text-1)]">
+                      {formatDisplayDate(todayStr)}
+                    </span>
+                    {trendDateList.includes(todayStr)
+                      ? ' in the days strip above'
+                      : ' (include today in your trend range, or open Nutrition)'}{' '}
+                    to edit today&apos;s intake.
                   </p>
                 ) : todayNutrition ? (
                   <div className="space-y-2">
@@ -2110,8 +2154,8 @@ export default function DashboardPage() {
               >
                 {!isViewingToday ? (
                   <p className="text-sm text-[color:var(--text-detail)]">
-                    Supplement checklist reflects calendar today. Switch to today&apos;s cycle tab
-                    to tick off today&apos;s windows.
+                    Supplement checklist reflects calendar today. Select today&apos;s date in the
+                    strip when it&apos;s in range, or open Supplements.
                   </p>
                 ) : todaySupplements ? (
                   <div className="space-y-2">

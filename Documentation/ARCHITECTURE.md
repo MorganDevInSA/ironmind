@@ -64,7 +64,7 @@ ironmind/
 │   │   ├── firebase/              # SDK init, converters, helpers
 │   │   ├── types/                 # Domain TypeScript models
 │   │   ├── constants/             # query keys, stale times, brand assets, domain constants
-│   │   ├── seed/                  # Initial data + seedUserData()
+│   │   ├── seed/                  # Baseline seed + demo roster (`demo-historical`, `demo-data/physique/`, `demo-theme`)
 │   │   ├── export/                # Markdown summary generation
 │   │   └── utils/                 # dates, formatting, cn(), cycle math, etc.
 │   └── stores/                    # Zustand (auth, UI)
@@ -306,6 +306,10 @@ Current onboarding flow is **6 steps**:
 5. Data generation + analysis guidance
 6. Import
 
+### 10.3 Demo roster overwrite (`seed*Data` + `demo-historical.ts`)
+
+Six alternate personas (`seedMortonData` … `seedMariaData` in `src/lib/seed/index.ts`, chosen from `DemoProfileModal`) overwrite baseline domains and call **`seedDemoHistoricalData`**, which **`deleteAllCheckIns`** then writes **twelve** weekly physique points from **`src/lib/seed/demo-data/physique/`** (per-persona TypeScript literals) across the same **`DEMO_HISTORY_DAYS`** window as daily synthetic logs (**`personaTuning`**). Demo **UI theme** mapping is **`src/lib/seed/demo-theme.ts`**; `DemoProfileModal` sets theme after seed, and **`DemoThemeSync`** reapplies it when `clientName` matches a demo athlete. Canonical narrative: **`Documentation/EXPERT-DEMO-DATA-AND-STORAGE-GUIDE.md`**.
+
 ---
 
 ## 11. Alerts architecture (`src/services/alerts.service.ts`)
@@ -356,6 +360,7 @@ From `.cursor/rules/IRONMIND.md`:
 
 - **Overview shell:** The authenticated dashboard wraps its primary content in **`.dashboard-overview`** (`globals.css`). It is **horizontally centered** (`max-width` + auto margins) with **rounded corners** (`1.25rem`) and a subtle warm-dark translucent fill. `.dashboard-overview` uses the same panel border system as `.glass-panel`: subtle resting border (6% accent), accent glow on hover/focus-within, 1px border width.
 - **Trend window:** Dashboard charts for training density and physique minis respect a user-selected **date range** (presets + custom) via shared dashboard state — extend controllers with `enabled` / bounded queries when adding new range-driven widgets.
+- **Trend day strip:** One tab per calendar day in the active trend bounds; session preview uses `getCycleDay` for that date against the active program.
 - **Today's schedule:** Non-workout items (meals, vitamins, activities) use **icon-forward** type chips (accent-themed), not unrelated rainbow pills.
 - **Ordered exercises:** Row indices use **`.exercise-index-badge`** — **dark tile + primary text + thin accent border**. Avoid **grey-on-saturated-accent** number chips (low contrast); follow **`IRONMIND.md`** and the **ironmind-styling** skill.
 
@@ -379,7 +384,7 @@ Persistent layout chrome uses the same **warm dark** token hierarchy as the rest
 
 - **Utility class:** `.is-selected` in `src/app/globals.css`.
 - **Purpose:** Keep selected buttons, tabs, and cards synchronized with one theme-driven glow/border treatment.
-- **Applied in:** dashboard cycle-day tabs + selected session card, nutrition day-type selector, recovery log/trends tab switcher, and selected demo profile tiles during onboarding.
+- **Applied in:** dashboard days-in-range strip + selected session card, nutrition day-type selector, recovery log/trends tab switcher, and selected demo profile tiles during onboarding.
 
 ---
 

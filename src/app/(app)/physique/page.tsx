@@ -4,7 +4,14 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores';
 import { useSaveCheckIn, useCheckIns, useProfile } from '@/controllers';
-import { today, formatDisplayDate } from '@/lib/utils';
+import {
+  today,
+  formatDisplayDate,
+  formatShortDate,
+  sortCheckInsChronologicalAsc,
+} from '@/lib/utils';
+import { measurementForChart, sanitizeMeasurementsInput } from '@/lib/utils/measurement-bounds';
+import { MEASUREMENT_CHART_SERIES } from '@/lib/constants/measurement-chart-series';
 import {
   Scale,
   CheckCircle2,
@@ -30,22 +37,9 @@ import {
   Tooltip,
   ReferenceLine,
 } from 'recharts';
-import type { CheckIn, Measurements } from '@/lib/types';
+import type { CheckIn } from '@/lib/types';
 
 const chartGridStroke = 'color-mix(in srgb, var(--chrome-border) 35%, transparent)';
-const measurementSeries: Array<{
-  key: keyof Measurements;
-  label: string;
-  dash?: string;
-}> = [
-  { key: 'waist', label: 'Waist' },
-  { key: 'chest', label: 'Chest', dash: '8 3' },
-  { key: 'hips', label: 'Hips', dash: '1 4' },
-  { key: 'leftArm', label: 'L arm', dash: '12 3 2 3' },
-  { key: 'rightArm', label: 'R arm', dash: '3 3 1 3' },
-  { key: 'leftThigh', label: 'L thigh', dash: '2 2 10 2' },
-  { key: 'rightThigh', label: 'R thigh', dash: '10 2' },
-];
 
 function LegendLineSwatch({ dash }: { dash?: string }) {
   return (
@@ -75,9 +69,13 @@ function ChartTooltip({
   label?: string;
 }) {
   if (!active || !payload?.length) return null;
+  const labelText =
+    typeof label === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(label)
+      ? formatDisplayDate(label)
+      : label;
   return (
     <div className="bg-[rgba(14,11,11,0.95)] border border-[rgba(65,50,50,0.3)] rounded-xl px-3 py-2 shadow-xl">
-      <p className="text-xs text-[color:var(--text-2)] mb-1">{label}</p>
+      <p className="text-xs text-[color:var(--text-2)] mb-1">{labelText}</p>
       {payload.map((p) => (
         <div key={p.name} className="flex items-center gap-2 text-sm">
           <div className="w-2 h-2 rounded-full" style={{ background: p.color }} />
@@ -100,14 +98,20 @@ function MeasurementTooltip({
   label?: string;
 }) {
   if (!active || !payload?.length) return null;
+  const labelText =
+    typeof label === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(label)
+      ? formatDisplayDate(label)
+      : label;
   return (
     <div className="bg-[rgba(14,11,11,0.95)] border border-[rgba(65,50,50,0.3)] rounded-xl px-3 py-2 shadow-xl">
-      <p className="text-xs text-[color:var(--text-2)] mb-1">{label}</p>
+      <p className="text-xs text-[color:var(--text-2)] mb-1">{labelText}</p>
       {payload.map((p) => {
-        const series = measurementSeries.find((s) => s.label === p.name);
+        const series = MEASUREMENT_CHART_SERIES.find((s) => s.label === p.name);
+        const swatchDash =
+          series?.dash === '0' || series?.dash === undefined ? undefined : series.dash;
         return (
           <div key={p.name} className="flex items-center gap-2 text-sm">
-            <LegendLineSwatch dash={series?.dash} />
+            <LegendLineSwatch dash={swatchDash} />
             <span className="capitalize text-[color:var(--text-1)]">{p.name}:</span>
             <span className="font-mono tabular-nums text-[color:var(--text-0)] font-bold">
               {p.value} cm
@@ -193,7 +197,7 @@ export default function PhysiquePage() {
       checkIn: {
         date: todayStr,
         bodyweight,
-        measurements: {
+        measurements: sanitizeMeasurementsInput({
           waist: form.waist ? parseFloat(form.waist) : undefined,
           chest: form.chest ? parseFloat(form.chest) : undefined,
           hips: form.hips ? parseFloat(form.hips) : undefined,
@@ -201,7 +205,7 @@ export default function PhysiquePage() {
           rightArm: form.rightArm ? parseFloat(form.rightArm) : undefined,
           leftThigh: form.leftThigh ? parseFloat(form.leftThigh) : undefined,
           rightThigh: form.rightThigh ? parseFloat(form.rightThigh) : undefined,
-        },
+        }),
         photoUrls: [],
         conditioningScore: 0,
         symmetryNotes: '',
@@ -225,32 +229,29 @@ export default function PhysiquePage() {
   }
 
   /* ── Chart data ─────────────────────────────────────────────── */
-  const weightData = (checkIns ?? [])
-    .slice()
-    .reverse()
-    .map((c: CheckIn) => ({
-      date: formatDisplayDate(c.date).slice(0, 5),
-      weight: c.bodyweight,
-    }));
+  const chron = sortCheckInsChronologicalAsc(checkIns ?? []);
+  const weightData = chron.map((c: CheckIn) => ({
+    dateKey: c.date,
+    weight: c.bodyweight,
+  }));
 
-  const measurementData = (checkIns ?? [])
-    .slice()
-    .reverse()
-    .map((c: CheckIn) => ({
-      date: formatDisplayDate(c.date).slice(0, 5),
-      waist: c.measurements?.waist,
-      chest: c.measurements?.chest,
-      hips: c.measurements?.hips,
-      leftArm: c.measurements?.leftArm,
-      rightArm: c.measurements?.rightArm,
-      leftThigh: c.measurements?.leftThigh,
-      rightThigh: c.measurements?.rightThigh,
-    }));
+  const measurementData = chron.map((c: CheckIn) => {
+    const m = c.measurements ?? {};
+    return {
+      dateKey: c.date,
+      waist: measurementForChart('waist', m.waist),
+      chest: measurementForChart('chest', m.chest),
+      hips: measurementForChart('hips', m.hips),
+      leftArm: measurementForChart('leftArm', m.leftArm),
+      rightArm: measurementForChart('rightArm', m.rightArm),
+      leftThigh: measurementForChart('leftThigh', m.leftThigh),
+      rightThigh: measurementForChart('rightThigh', m.rightThigh),
+    };
+  });
 
-  const activeMeasurementSeries = measurementSeries.filter(({ key }) =>
-    measurementData.some((d) => d[key as keyof typeof d] !== undefined),
+  const hasAnyMeasurements = measurementData.some((d) =>
+    MEASUREMENT_CHART_SERIES.some(({ key }) => typeof d[key] === 'number'),
   );
-  const hasAnyMeasurements = activeMeasurementSeries.length > 0;
 
   const lastCheckIn = checkIns?.[0];
   const prevCheckIn = checkIns?.[1];
@@ -404,6 +405,12 @@ export default function PhysiquePage() {
                 onChange={(v) => setForm((f) => ({ ...f, leftThigh: v }))}
                 unit="cm"
               />
+              <Field
+                label="R Thigh"
+                value={form.rightThigh}
+                onChange={(v) => setForm((f) => ({ ...f, rightThigh: v }))}
+                unit="cm"
+              />
             </div>
           </div>
 
@@ -485,7 +492,8 @@ export default function PhysiquePage() {
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke={chartGridStroke} />
               <XAxis
-                dataKey="date"
+                dataKey="dateKey"
+                tickFormatter={(v) => (typeof v === 'string' ? formatShortDate(v) : String(v))}
                 tick={{ fontSize: 10, fill: 'var(--text-2)' }}
                 tickLine={false}
                 axisLine={false}
@@ -538,7 +546,8 @@ export default function PhysiquePage() {
             <LineChart data={measurementData} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={chartGridStroke} />
               <XAxis
-                dataKey="date"
+                dataKey="dateKey"
+                tickFormatter={(v) => (typeof v === 'string' ? formatShortDate(v) : String(v))}
                 tick={{ fontSize: 10, fill: 'var(--text-2)' }}
                 tickLine={false}
                 axisLine={false}
@@ -549,7 +558,7 @@ export default function PhysiquePage() {
                 axisLine={false}
               />
               <Tooltip content={<MeasurementTooltip />} />
-              {activeMeasurementSeries.map(({ key, label, dash }) => (
+              {MEASUREMENT_CHART_SERIES.map(({ key, label, dash }) => (
                 <Line
                   key={key}
                   type="monotone"
@@ -557,22 +566,23 @@ export default function PhysiquePage() {
                   dataKey={key}
                   stroke="var(--accent)"
                   strokeWidth={2}
-                  strokeDasharray={dash}
+                  strokeDasharray={dash === '0' ? undefined : dash}
                   dot={{ r: 3, fill: 'var(--accent)', strokeWidth: 0 }}
-                  connectNulls
+                  connectNulls={false}
                   activeDot={{ r: 5, fill: 'var(--accent)' }}
+                  isAnimationActive={false}
                 />
               ))}
             </LineChart>
           </ResponsiveContainer>
           {/* Legend */}
-          <div className="flex flex-wrap gap-3 mt-3">
-            {activeMeasurementSeries.map(({ key, label, dash }) => (
+          <div className="flex flex-wrap gap-3 mt-3" aria-label="Measurement series">
+            {MEASUREMENT_CHART_SERIES.map(({ key, label, dash }) => (
               <div
                 key={key}
                 className="flex items-center gap-1.5 text-xs text-[color:var(--text-2)]"
               >
-                <LegendLineSwatch dash={dash} />
+                <LegendLineSwatch dash={dash === '0' ? undefined : dash} />
                 <span>{label}</span>
               </div>
             ))}

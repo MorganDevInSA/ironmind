@@ -55,6 +55,8 @@ IRONMIND should feel like a disciplined performance war room:
 
 Theme is controlled by `useUIStore` and synchronized through `ThemeSync`.
 
+**Demo profile loads:** After seed completes, `DemoProfileModal` calls **`getDemoThemeForProfileId`** from `src/lib/seed/demo-theme.ts` (same preset map as `Documentation/EXPERT-DEMO-DATA-AND-STORAGE-GUIDE.md` §13). **`DemoThemeSync`** reapplies that mapping when the active profile’s `clientName` matches a demo athlete so refresh does not revert to crimson alone. Onboarding’s `StepTheme` remains the user-driven path for non-demo accounts.
+
 ---
 
 ## 3) Shared selected-state system
@@ -63,7 +65,7 @@ Use `.is-selected` (defined in `globals.css`) for selected tabs/cards/buttons so
 
 Current usage includes:
 
-- Dashboard cycle-day tabs
+- Dashboard **days in range** tabs (one tab per calendar day in the trend window)
 - Dashboard selected session panel
 - Nutrition day-type selector
 - Recovery `Log`/`Trends` switcher
@@ -196,7 +198,7 @@ Tailwind accent utilities (`text-accent`, `bg-accent`, `border-accent`, `focus:b
 
 ### Dashboard: trend window + schedule affordances
 
-- **Trend window** (`DashboardTrendWindow` on `/dashboard`): quick ranges (e.g. last 7 / 14 days, week presets) plus optional **custom date range**; drives workout density and physique mini-charts for that window (controllers accept `enabled` / range params as implemented).
+- **Trend window** (`DashboardTrendWindow` on `/dashboard`): week-length presets (1–4 wk) plus optional **custom date range**; drives workout density and physique mini-charts for that window. A **horizontal day strip** lists every `yyyy-MM-dd` in the active range; picking a date previews that calendar day’s **program session** (via `getCycleDay`), while nutrition/supplements stay tied to true calendar today when shown.
 - **Today's schedule** type cues use **themed icon chips** (meal / vitamins / activity), not multicolor type pills — keep schedule rows readable and on-brand.
 
 ### Nutrition page: meal plan-line `<select>`

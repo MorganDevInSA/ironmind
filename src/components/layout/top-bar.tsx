@@ -102,7 +102,7 @@ export function TopBar() {
     }
   }, [userId]);
 
-  const serverAlerts = alerts ?? [];
+  const serverAlerts = useMemo(() => alerts ?? [], [alerts]);
   const visibleAlerts = useMemo(
     () => serverAlerts.filter((a) => !dismissedAlertIds.includes(a.id)),
     [serverAlerts, dismissedAlertIds],

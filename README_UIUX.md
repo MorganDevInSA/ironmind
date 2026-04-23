@@ -125,7 +125,8 @@ summary sections.
 ### Dashboard trend window
 
 Workout density and physique mini-charts on `/dashboard` follow a **trend window** control:
-short presets (e.g. 7 / 14 days), multi-week presets, and an optional **custom from–to range**.
+multi-week presets (1–4 wk) and an optional **custom from–to range**. A **scrollable day strip**
+lists every calendar day in that range; selecting a day previews that date’s planned session.
 Controllers and hooks use bounded date filters (and `enabled` flags where needed) so queries stay
 cheap and consistent with the selected window.
 
