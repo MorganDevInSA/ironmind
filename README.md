@@ -1,6 +1,18 @@
 # IRONMIND — Elite Bodybuilding Performance System
 
-A world-class bodybuilding training application for elite athletes who self-coach. Built with Next.js 14, TypeScript, Tailwind CSS, and Firebase.
+**IRONMIND** is a hypertrophy-first performance system for serious bodybuilders: a rotating program, KPI strength tracking, day-type nutrition, supplement timing, recovery signals, physique trends, volume versus MEV/MAV/MRV landmarks, and **one-click markdown export** so you (or your coach) can reason over full athlete state in an LLM thread.
+
+Built with **Next.js 14** (App Router), **TypeScript** (strict), **Tailwind CSS**, **TanStack Query**, and **Firebase** (Auth, Firestore, Storage).
+
+## Why it matters
+
+Most gym apps optimize for generic logging or social loops. IRONMIND optimizes for **decision quality**: tying training load, nutrition, recovery, and supplements into one coherent model, then surfacing **computed alerts** (fatigue, spillover risk, adherence gaps) instead of leaving interpretation to memory and spreadsheets.
+
+## Who it is for
+
+- **Self-coached advanced athletes** who want contest-prep-grade structure without losing ownership of the plan.
+- **Coaches and technical partners** who can generate or import structured seed data (JSON) and iterate with the athlete using exports and notes.
+- **Builders** evaluating a reference implementation of a production-grade **Pages → Controllers → Services → Firebase** architecture on Vercel.
 
 ## Features
 
@@ -12,6 +24,28 @@ A world-class bodybuilding training application for elite athletes who self-coac
 - **Physique Tracking**: Bodyweight trends, measurements, progress photos
 - **AI Agent Export**: One-click export of full athlete state for LLM analysis
 - **Smart Alerts**: Shoulder spillover, fatigue flags, calorie emergency
+
+## How IRONMIND differs (positioning)
+
+| Typical fitness tracker        | IRONMIND                                                                        |
+| ------------------------------ | ------------------------------------------------------------------------------- |
+| Rep and set logging            | **Program + KPIs + volume landmarks** per muscle group                          |
+| Static calorie targets         | **Day-type-aware macros** aligned to training demand                            |
+| Disconnected “stacks” in notes | **Timed supplement protocol** with daily windows                                |
+| No export story                | **Full markdown athlete report** for continuity in external AI coaching threads |
+| UI talks straight to APIs      | **Hard-layered data flow** (enforced boundaries, documented cache strategy)     |
+
+This is not a mass-market “step counter.” It is a **precision instrument** for people who already speak the language of phases, weak points, and recoverable volume.
+
+## Visuals
+
+Screenshots and marketing renders live outside this README for now. For brand treatment and raster paths, see [Documentation/LOGO-BRIEF.md](./Documentation/LOGO-BRIEF.md) and `public/brand/`.
+
+## Business and platform value
+
+- **Operational leverage**: One athlete, one source of truth—training, nutrition, recovery, physique, and supplements—reduces back-and-forth and “lost context” versus chat plus spreadsheets.
+- **Scale-ready engineering**: Multi-tenant-safe data model (`users/{uid}/…`), typed domain layer, CI gates, and documented delivery patterns suitable for agencies or product teams forking the codebase.
+- **License**: **MIT** — suitable for portfolio use, internal deployment, or as the core of a commercial offering you host and brand.
 
 ## Tech Stack
 
@@ -169,6 +203,16 @@ src/
   stores/           # Zustand stores
   styles/           # Global styles
 ```
+
+## Roadmap and deeper docs
+
+There is no single public roadmap file; direction is captured in dated implementation and principal reviews under [Documentation/README.md](./Documentation/README.md) (for example architecture, data-layer hardening, and demo data guides). Start with [Documentation/ARCHITECTURE.md](./Documentation/ARCHITECTURE.md) for canonical product intent and stack authority.
+
+**GTM / sales long-form:** [Technical](./Documentation/SALES-TECHNICAL.md) · [User value](./Documentation/SALES-USER-VALUE.md) · [Corporate](./Documentation/SALES-CORPORATE-VALUE.md)
+
+## Contributing and contact
+
+Issues and PRs are welcome for bug fixes and clearly scoped improvements. Before larger changes, read [Documentation/ARCHITECTURE.md](./Documentation/ARCHITECTURE.md) and the root `README_*` pillars so proposals match enforced layering and quality gates. For repository access, use the clone URL in [Quickstart](#quickstart) below.
 
 ## License
 
