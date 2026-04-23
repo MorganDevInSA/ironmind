@@ -123,6 +123,37 @@ function MeasurementTooltip({
   );
 }
 
+type TapeDeltaKey = 'waist' | 'chest' | 'leftArm';
+
+/** Δ cm for this check-in vs the next older row (same ordering as scale Δ kg). */
+function tapeDeltaCm(
+  current: CheckIn,
+  older: CheckIn | undefined,
+  key: TapeDeltaKey,
+): number | null {
+  if (!older?.measurements || !current.measurements) return null;
+  const cur = current.measurements[key];
+  const prev = older.measurements[key];
+  if (typeof cur !== 'number' || typeof prev !== 'number') return null;
+  if (!Number.isFinite(cur) || !Number.isFinite(prev)) return null;
+  return Math.round((cur - prev) * 10) / 10;
+}
+
+function TapeDeltaChip({ label, delta }: { label: string; delta: number | null }) {
+  if (delta === null) return null;
+  return (
+    <span
+      className={cn(
+        'text-[10px] font-mono tabular-nums',
+        delta !== 0 ? 'text-[color:var(--accent)]' : 'text-[color:var(--text-2)]',
+      )}
+    >
+      Δ {label} {delta > 0 ? '+' : ''}
+      {delta.toFixed(1)} cm
+    </span>
+  );
+}
+
 function Field({
   label,
   value,
@@ -597,18 +628,26 @@ export default function PhysiquePage() {
             <h3 className="font-semibold text-[color:var(--text-0)]">History</h3>
             <p className="text-[10px] text-[color:var(--text-2)] leading-snug max-w-xl">
               Tape: waist, chest, left arm — all in{' '}
-              <span className="font-semibold text-[color:var(--text-1)]">cm</span>. Right column is{' '}
-              <span className="font-semibold text-[color:var(--text-1)]">scale weight (kg)</span>;
-              the colored value is Δ kg vs the next older check-in (list is newest first).
+              <span className="font-semibold text-[color:var(--text-1)]">cm</span>. Second row per
+              entry shows <span className="font-semibold text-[color:var(--text-1)]">Δ tape</span>{' '}
+              (cm vs next older check-in). Right column is{' '}
+              <span className="font-semibold text-[color:var(--text-1)]">scale weight (kg)</span>{' '}
+              and <span className="font-semibold text-[color:var(--text-1)]">Δ kg</span> the same
+              way (list is newest first).
             </p>
           </div>
           <div className="divide-y divide-[rgba(65,50,50,0.1)]">
             {checkIns.slice(0, 10).map((c: CheckIn, i) => {
               const prev = checkIns[i + 1];
-              const delta =
+              const deltaKg =
                 prev && typeof c.bodyweight === 'number' && typeof prev.bodyweight === 'number'
                   ? c.bodyweight - prev.bodyweight
                   : null;
+              const deltaWaist = tapeDeltaCm(c, prev, 'waist');
+              const deltaChest = tapeDeltaCm(c, prev, 'chest');
+              const deltaLArm = tapeDeltaCm(c, prev, 'leftArm');
+              const hasTapeDeltas =
+                deltaWaist !== null || deltaChest !== null || deltaLArm !== null;
               return (
                 <div key={c.id} className="px-4 py-3 flex items-center justify-between gap-4">
                   <div>
@@ -643,6 +682,19 @@ export default function PhysiquePage() {
                           )}
                         </div>
                       )}
+                    {hasTapeDeltas && (
+                      <div
+                        className="flex flex-wrap gap-x-2 gap-y-0.5 mt-1.5 items-baseline"
+                        aria-label="Tape measure change vs previous check-in"
+                      >
+                        <span className="text-[9px] font-semibold uppercase tracking-wider text-[color:var(--text-2)] shrink-0">
+                          Δ tape
+                        </span>
+                        <TapeDeltaChip label="waist" delta={deltaWaist} />
+                        <TapeDeltaChip label="chest" delta={deltaChest} />
+                        <TapeDeltaChip label="L arm" delta={deltaLArm} />
+                      </div>
+                    )}
                   </div>
                   <div className="text-right shrink-0">
                     <p className="text-[9px] font-semibold uppercase tracking-wider text-[color:var(--text-2)] mb-0.5">
@@ -651,16 +703,18 @@ export default function PhysiquePage() {
                     <span className="font-mono tabular-nums font-bold text-[color:var(--text-0)]">
                       {c.bodyweight} kg
                     </span>
-                    {delta !== null && (
+                    {deltaKg !== null && (
                       <p
                         className={cn(
                           'text-xs font-mono tabular-nums',
-                          delta !== 0 ? 'text-[color:var(--accent)]' : 'text-[color:var(--text-2)]',
+                          deltaKg !== 0
+                            ? 'text-[color:var(--accent)]'
+                            : 'text-[color:var(--text-2)]',
                         )}
-                        aria-label={`Weight change vs previous check-in: ${delta > 0 ? '+' : ''}${delta.toFixed(1)} kilograms`}
+                        aria-label={`Weight change vs previous check-in: ${deltaKg > 0 ? '+' : ''}${deltaKg.toFixed(1)} kilograms`}
                       >
-                        {delta > 0 ? '+' : ''}
-                        {delta.toFixed(1)} kg
+                        {deltaKg > 0 ? '+' : ''}
+                        {deltaKg.toFixed(1)} kg
                       </p>
                     )}
                   </div>
