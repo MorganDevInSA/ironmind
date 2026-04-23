@@ -47,7 +47,6 @@ Primary wordmarks (rasters in-repo):
 
 Additional layout variants and transparent marks live under [`public/brand/`](public/brand/). Full brand prompts, palette, and asset map: [Documentation/LOGO-BRIEF.md](./Documentation/LOGO-BRIEF.md).
 
-Screenshots of the running app are not embedded here yet; capture from a local or preview deploy when you want product chrome in the README.
 
 ## Business and platform value
 
