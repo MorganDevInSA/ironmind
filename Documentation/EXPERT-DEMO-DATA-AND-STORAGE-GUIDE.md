@@ -69,6 +69,7 @@ All collection path strings must come from **`src/lib/firebase/config.ts`** → 
 
 - Exports **`seedDemoHistoricalData(ctx)`** — builds a **multi-week** synthetic history from a **persona id** (`morton` | `sheri` | `alex` | `jordan`), profile, program, nutrition plan, supplement protocol, and `programId`.
 - **`personaTuning`** at the top of the file: knobs for **adherence**, sleep, HRV, stress, weight drift, meal portions, etc. This is the right place to tune “how strict this athlete’s demo looks” without rewriting the whole generator.
+- **`DEMO_HISTORY_DAYS`** (exported constant, default **84** ≈ **12 weeks**): demo overwrite seeds in **`src/lib/seed/index.ts`** pass this to `seedDemoHistoricalData` and align each program’s `startDate` to `today - (DEMO_HISTORY_DAYS - 1)` so the training calendar and synthetic logs share one window.
 - Uses **services only** (`createWorkout`, `saveNutritionDay`, `saveRecoveryEntry`, …) so Firestore converters and timestamps stay consistent.
 
 **When you change tuning:** Re-seed via the UI demo flow (or call the `seed*Data` function in a dev harness) so documents are rewritten — editing TS alone does not mutate existing Firestore docs.
@@ -149,6 +150,25 @@ After changing queries: run **`npm run deploy:indexes`** when your workflow allo
 | `Documentation/ARCHITECTURE.md`                     | Full stack, import pipeline, alert cache, schema versioning, Storage lifecycle |
 | `Documentation/PRINCIPAL-REVIEW-DATA-2026-04-23.md` | Data-layer hardening status, bounded reads, rollback semantics                 |
 | `README_DATA_LAYER.md`                              | Pages → controllers → services → Firebase rule                                 |
+
+---
+
+---
+
+## 12. Default demo ecosystem (when expanding without a custom brief)
+
+Use these defaults unless product explicitly requests otherwise:
+
+| Decision        | Default                                                                                                                                               |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Demo user count | **Four** roster personas: **Morton**, **Sheri**, **Alex**, **Jordan** (wired in **`DemoProfileModal.tsx`** and **`seed/index.ts`**)                   |
+| Time depth      | **`DEMO_HISTORY_DAYS` (84)** — twelve weeks of daily nutrition, recovery, supplements; weekly check-ins; persona-specific coaching journal milestones |
+| Delivery        | **Seed modules + `seedDemoHistoricalData`** — not raw scripts; **data only** (no Storage photo fixtures unless you add an explicit upload path)       |
+| Roster mix      | **Mixed**: masters male gain, female fat-loss journey, intermediate male hypertrophy, beginner female consistency                                     |
+| Realism         | **Serious amateur / coached** — intentional misses, mid-block deload week, Sheri stress-week bump, imperfect adherence in **`personaTuning`**         |
+| Schema          | **Preserve** existing types and validators; new fields require **`src/lib/types/index.ts`** + serializers + any import validators                     |
+
+**Operational note:** Doubling history length **doubles** per-demo Firestore writes on overwrite; keep `DEMO_HISTORY_DAYS` bounded and adjust only with performance awareness.
 
 ---
 

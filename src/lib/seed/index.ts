@@ -6,7 +6,7 @@ import { createPhase, setActivePhase, createJournalEntry } from '@/services/coac
 import { updateVolumeLandmarks } from '@/services/volume.service';
 import { saveNutritionDay, saveNutritionPlan } from '@/services/nutrition.service';
 import { today } from '@/lib/utils';
-import { seedDemoHistoricalData } from './demo-historical';
+import { DEMO_HISTORY_DAYS, seedDemoHistoricalData } from './demo-historical';
 import { logServiceWrite } from '@/lib/logging/service-write-log';
 import { collections } from '@/lib/firebase/config';
 import { addDocument, updateDocument } from '@/lib/firebase/firestore';
@@ -171,7 +171,7 @@ export async function seedUserData(userId: string): Promise<SeedUserDataResult> 
 export async function seedMortonData(userId: string): Promise<void> {
   await updateProfile(userId, mortonProfile);
   const historyStart = new Date();
-  historyStart.setDate(historyStart.getDate() - 41);
+  historyStart.setDate(historyStart.getDate() - (DEMO_HISTORY_DAYS - 1));
   const programId = await createProgram(userId, {
     ...mortonProgram,
     startDate: historyStart.toISOString().split('T')[0],
@@ -203,6 +203,7 @@ export async function seedMortonData(userId: string): Promise<void> {
     },
     nutritionPlan: mortonNutritionPlan,
     supplementProtocol: mortonSupplementProtocol,
+    days: DEMO_HISTORY_DAYS,
   });
   await markUserSeeded(userId);
 }
@@ -213,7 +214,7 @@ export async function seedMortonData(userId: string): Promise<void> {
 export async function seedSheriData(userId: string): Promise<void> {
   await updateProfile(userId, sheriProfile);
   const historyStart = new Date();
-  historyStart.setDate(historyStart.getDate() - 41);
+  historyStart.setDate(historyStart.getDate() - (DEMO_HISTORY_DAYS - 1));
   const programId = await createProgram(userId, {
     ...sheriProgram,
     startDate: historyStart.toISOString().split('T')[0],
@@ -245,6 +246,7 @@ export async function seedSheriData(userId: string): Promise<void> {
     },
     nutritionPlan: sheriNutritionPlan,
     supplementProtocol: sheriSupplementProtocol,
+    days: DEMO_HISTORY_DAYS,
   });
   await markUserSeeded(userId);
 }
@@ -255,7 +257,7 @@ export async function seedSheriData(userId: string): Promise<void> {
 export async function seedAlexData(userId: string): Promise<void> {
   await updateProfile(userId, alexProfile);
   const historyStart = new Date();
-  historyStart.setDate(historyStart.getDate() - 41);
+  historyStart.setDate(historyStart.getDate() - (DEMO_HISTORY_DAYS - 1));
   const programId = await createProgram(userId, {
     ...alexProgram,
     startDate: historyStart.toISOString().split('T')[0],
@@ -287,6 +289,7 @@ export async function seedAlexData(userId: string): Promise<void> {
     },
     nutritionPlan: alexNutritionPlan,
     supplementProtocol: alexSupplementProtocol,
+    days: DEMO_HISTORY_DAYS,
   });
   await markUserSeeded(userId);
 }
@@ -297,7 +300,7 @@ export async function seedAlexData(userId: string): Promise<void> {
 export async function seedJordanData(userId: string): Promise<void> {
   await updateProfile(userId, jordanProfile);
   const historyStart = new Date();
-  historyStart.setDate(historyStart.getDate() - 41);
+  historyStart.setDate(historyStart.getDate() - (DEMO_HISTORY_DAYS - 1));
   const programId = await createProgram(userId, {
     ...jordanProgram,
     startDate: historyStart.toISOString().split('T')[0],
@@ -329,6 +332,7 @@ export async function seedJordanData(userId: string): Promise<void> {
     },
     nutritionPlan: jordanNutritionPlan,
     supplementProtocol: jordanSupplementProtocol,
+    days: DEMO_HISTORY_DAYS,
   });
   await markUserSeeded(userId);
 }
@@ -341,3 +345,4 @@ export { mortonSupplementProtocol } from './supplements';
 export { mortonInitialPhase } from './phase';
 export { mortonVolumeLandmarks } from './volume-landmarks';
 export { mortonInitialNotes } from './coaching-notes';
+export { DEMO_HISTORY_DAYS } from './demo-historical';

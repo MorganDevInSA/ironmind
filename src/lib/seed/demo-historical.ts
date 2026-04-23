@@ -24,6 +24,12 @@ import { calculateCalories, calculateComplianceScore } from '@/lib/utils/calcula
 
 type DemoPersonaId = 'morton' | 'sheri' | 'alex' | 'jordan';
 
+/**
+ * Demo overwrite seeds (`seedMortonData`, etc.) align program `startDate` and
+ * `seedDemoHistoricalData` to this window. Keep bounded (writes scale linearly).
+ */
+export const DEMO_HISTORY_DAYS = 84;
+
 interface HistoricalSeedContext {
   personaId: DemoPersonaId;
   userId: string;
@@ -52,60 +58,60 @@ interface PersonaTuning {
 
 const personaTuning: Record<DemoPersonaId, PersonaTuning> = {
   morton: {
-    workoutAdherence: 0.96,
-    nutritionAdherence: 0.9,
-    supplementAdherence: 0.88,
-    avgSleepHours: 7.4,
-    avgSleepQuality: 7.4,
-    avgHrv: 72,
-    avgStress: 4.3,
-    avgEnergy: 7.7,
-    avgMood: 7.6,
-    avgDomsOnLift: 5.4,
-    weeklyWeightDelta: 0.18,
-    mealPortionMultiplier: 1.08,
+    workoutAdherence: 0.93,
+    nutritionAdherence: 0.87,
+    supplementAdherence: 0.84,
+    avgSleepHours: 7.2,
+    avgSleepQuality: 7.2,
+    avgHrv: 70,
+    avgStress: 4.6,
+    avgEnergy: 7.5,
+    avgMood: 7.4,
+    avgDomsOnLift: 5.5,
+    weeklyWeightDelta: 0.14,
+    mealPortionMultiplier: 1.05,
   },
   sheri: {
-    workoutAdherence: 0.84,
-    nutritionAdherence: 0.8,
-    supplementAdherence: 0.72,
-    avgSleepHours: 6.8,
-    avgSleepQuality: 6.6,
-    avgHrv: 61,
-    avgStress: 5.6,
-    avgEnergy: 6.3,
-    avgMood: 6.6,
-    avgDomsOnLift: 4.8,
-    weeklyWeightDelta: -0.32,
-    mealPortionMultiplier: 0.94,
+    workoutAdherence: 0.78,
+    nutritionAdherence: 0.74,
+    supplementAdherence: 0.68,
+    avgSleepHours: 6.6,
+    avgSleepQuality: 6.4,
+    avgHrv: 58,
+    avgStress: 6,
+    avgEnergy: 6.1,
+    avgMood: 6.4,
+    avgDomsOnLift: 4.7,
+    weeklyWeightDelta: -0.28,
+    mealPortionMultiplier: 0.92,
   },
   alex: {
-    workoutAdherence: 0.93,
-    nutritionAdherence: 0.88,
-    supplementAdherence: 0.86,
-    avgSleepHours: 7.1,
-    avgSleepQuality: 7.1,
-    avgHrv: 70,
-    avgStress: 4.8,
-    avgEnergy: 7.4,
-    avgMood: 7.3,
-    avgDomsOnLift: 5.9,
-    weeklyWeightDelta: 0.24,
-    mealPortionMultiplier: 1.04,
+    workoutAdherence: 0.9,
+    nutritionAdherence: 0.85,
+    supplementAdherence: 0.82,
+    avgSleepHours: 7,
+    avgSleepQuality: 6.9,
+    avgHrv: 68,
+    avgStress: 5.1,
+    avgEnergy: 7.2,
+    avgMood: 7.1,
+    avgDomsOnLift: 5.8,
+    weeklyWeightDelta: 0.2,
+    mealPortionMultiplier: 1.02,
   },
   jordan: {
-    workoutAdherence: 0.82,
-    nutritionAdherence: 0.81,
-    supplementAdherence: 0.76,
-    avgSleepHours: 6.9,
-    avgSleepQuality: 6.8,
-    avgHrv: 64,
-    avgStress: 5.3,
-    avgEnergy: 6.4,
-    avgMood: 6.8,
-    avgDomsOnLift: 4.9,
-    weeklyWeightDelta: -0.2,
-    mealPortionMultiplier: 0.96,
+    workoutAdherence: 0.76,
+    nutritionAdherence: 0.77,
+    supplementAdherence: 0.72,
+    avgSleepHours: 6.7,
+    avgSleepQuality: 6.5,
+    avgHrv: 62,
+    avgStress: 5.5,
+    avgEnergy: 6.2,
+    avgMood: 6.6,
+    avgDomsOnLift: 4.8,
+    weeklyWeightDelta: -0.16,
+    mealPortionMultiplier: 0.94,
   },
 };
 
@@ -157,13 +163,15 @@ const foodTemplates = {
 };
 
 export async function seedDemoHistoricalData(ctx: HistoricalSeedContext): Promise<void> {
-  const days = ctx.days ?? 42;
+  const days = ctx.days ?? DEMO_HISTORY_DAYS;
   const tuning = personaTuning[ctx.personaId];
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   const historyStart = addDays(today, -days + 1);
   const checkInDates: string[] = [];
+  const totalWeeks = Math.max(1, Math.ceil(days / 7));
+  const midDeloadWeek = Math.max(1, Math.floor(totalWeeks / 2) - 1);
 
   for (let i = 0; i < days; i++) {
     const dateObj = addDays(historyStart, i);
@@ -171,7 +179,20 @@ export async function seedDemoHistoricalData(ctx: HistoricalSeedContext): Promis
     const cycleDay = (i % ctx.program.cycleLengthDays) + 1;
     const session = ctx.program.sessions.find((s) => s.dayNumber === cycleDay) ?? null;
     const isLift = session?.type === 'lift';
-    const didWorkout = Boolean(isLift && chance(tuning.workoutAdherence, i, 11));
+    const weekNum = Math.floor(i / 7);
+    const isDeloadWeek = weekNum === midDeloadWeek;
+    const isStressWeekSheri = ctx.personaId === 'sheri' && weekNum === 3;
+
+    let workoutP = tuning.workoutAdherence;
+    if (isDeloadWeek)
+      workoutP *= ctx.personaId === 'morton' || ctx.personaId === 'alex' ? 0.86 : 0.78;
+    if (isStressWeekSheri) workoutP *= 0.88;
+
+    let nutritionP = tuning.nutritionAdherence;
+    if (isDeloadWeek) nutritionP *= 0.93;
+    if (isStressWeekSheri) nutritionP *= 0.89;
+
+    const didWorkout = Boolean(isLift && chance(workoutP, i, 11));
     const dayType = resolveDayType(session?.type, i);
 
     if (didWorkout && session?.exercises?.length) {
@@ -182,7 +203,8 @@ export async function seedDemoHistoricalData(ctx: HistoricalSeedContext): Promis
         cycleDay,
         sessionName: session.name,
         sessionExercises: session.exercises,
-        weekIndex: Math.floor(i / 7),
+        weekIndex: weekNum,
+        isDeloadWeek,
       });
       await createWorkout(ctx.userId, workout);
     }
@@ -193,7 +215,7 @@ export async function seedDemoHistoricalData(ctx: HistoricalSeedContext): Promis
       dayType,
       isLiftDay: Boolean(isLift),
       plan: ctx.nutritionPlan,
-      adherence: tuning.nutritionAdherence,
+      adherence: nutritionP,
       portionMultiplier: tuning.mealPortionMultiplier,
       dayIndex: i,
     });
@@ -213,6 +235,7 @@ export async function seedDemoHistoricalData(ctx: HistoricalSeedContext): Promis
       tuning,
       dayIndex: i,
       personaId: ctx.personaId,
+      stressBump: isStressWeekSheri ? 1.4 : isDeloadWeek ? -0.35 : 0,
     });
     await saveRecoveryEntry(ctx.userId, date, recovery);
 
@@ -229,6 +252,7 @@ export async function seedDemoHistoricalData(ctx: HistoricalSeedContext): Promis
       weekIndex: i,
       weeklyWeightDelta: tuning.weeklyWeightDelta,
       personaId: ctx.personaId,
+      totalCheckInWeeks: checkInDates.length,
     });
     await saveCheckIn(ctx.userId, date, checkIn);
   }
@@ -247,6 +271,7 @@ function buildWorkout(args: {
   sessionName: string;
   sessionExercises: SessionExercise[];
   weekIndex: number;
+  isDeloadWeek: boolean;
 }): Omit<Workout, 'id'> {
   const exercises: WorkoutExercise[] = args.sessionExercises.map((exercise, exerciseIndex) => {
     const baseWeight = inferBaseWeight(args.personaId, exercise.name);
@@ -254,10 +279,12 @@ function buildWorkout(args: {
       0,
       args.weekIndex * progressionStep(args.personaId, exercise.name),
     );
+    const setCompletionP = args.isDeloadWeek ? 0.88 : 0.94;
     const sets = Array.from({ length: exercise.sets }).map((_, setIdx) => {
       const reps = parseRepTarget(exercise.reps);
-      const completed = chance(0.95, setIdx + exerciseIndex, args.weekIndex + 5);
-      const weight = Math.max(0, baseWeight + progressiveLoad + setIdx * 0.5);
+      const completed = chance(setCompletionP, setIdx + exerciseIndex, args.weekIndex + 5);
+      const deloadScale = args.isDeloadWeek ? 0.92 : 1;
+      const weight = Math.max(0, (baseWeight + progressiveLoad + setIdx * 0.5) * deloadScale);
       return {
         setNumber: setIdx + 1,
         type: 'working' as const,
@@ -281,7 +308,9 @@ function buildWorkout(args: {
     (sum, ex) => sum + ex.sets.filter((s) => s.completed).length,
     0,
   );
-  const durationMinutes = Math.max(35, Math.round(completedSets * 3.2));
+  const durationMinutes = Math.max(35, Math.round(completedSets * (args.isDeloadWeek ? 2.8 : 3.2)));
+
+  const notes = workoutSessionNotes(args.personaId, args.weekIndex, args.isDeloadWeek);
 
   return {
     programId: args.programId,
@@ -291,7 +320,7 @@ function buildWorkout(args: {
     date: args.date,
     exercises,
     durationMinutes,
-    notes: args.weekIndex >= 4 ? 'Final block push week, effort high but controlled.' : undefined,
+    notes,
     startedAt: `${args.date}T16:30:00.000Z`,
     completedAt: `${args.date}T17:45:00.000Z`,
   };
@@ -392,6 +421,7 @@ function buildRecoveryEntry(args: {
   tuning: PersonaTuning;
   dayIndex: number;
   personaId: DemoPersonaId;
+  stressBump?: number;
 }): Partial<RecoveryEntry> {
   const sleepHours = round1(args.tuning.avgSleepHours + wave(args.dayIndex, 0.45));
   const sleepQuality = clamp(
@@ -400,7 +430,12 @@ function buildRecoveryEntry(args: {
     9,
   );
   const hrv = clamp(Math.round(args.tuning.avgHrv + wave(args.dayIndex + 5, 8)), 45, 95);
-  const stress = clamp(Math.round(args.tuning.avgStress + wave(args.dayIndex + 1, 2)), 2, 9);
+  const stressBump = args.stressBump ?? 0;
+  const stress = clamp(
+    Math.round(args.tuning.avgStress + wave(args.dayIndex + 1, 2) + stressBump),
+    2,
+    9,
+  );
   const energy = clamp(Math.round(args.tuning.avgEnergy + wave(args.dayIndex + 4, 2)), 3, 9);
   const mood = clamp(Math.round(args.tuning.avgMood + wave(args.dayIndex + 3, 2)), 3, 9);
   const domsBase = args.isLiftDay ? args.tuning.avgDomsOnLift : args.tuning.avgDomsOnLift - 2;
@@ -426,9 +461,11 @@ function buildCheckIn(args: {
   weekIndex: number;
   weeklyWeightDelta: number;
   personaId: DemoPersonaId;
+  totalCheckInWeeks: number;
 }): Partial<CheckIn> {
   const base = args.profile.currentWeight;
-  const drift = args.weeklyWeightDelta * (args.weekIndex - 5);
+  const mid = Math.max(1, Math.floor(args.totalCheckInWeeks / 2));
+  const drift = args.weeklyWeightDelta * (args.weekIndex - mid);
   const waveNoise = wave(args.weekIndex * 2, 0.35);
   const bodyweight = round1(base + drift + waveNoise);
 
@@ -455,11 +492,12 @@ function buildCheckIn(args: {
     photoUrls: [],
     conditioningScore,
     symmetryNotes: 'Stable symmetry. Minor right-left fatigue differences noted post-session.',
-    coachNotes:
-      args.weekIndex >= 4
-        ? 'Final two weeks show better consistency and improved fatigue management.'
-        : 'Technique and routine are trending in the right direction.',
+    coachNotes: checkInCoachNotes(args.personaId, args.weekIndex, args.totalCheckInWeeks),
   };
+}
+
+function journalMilestoneDate(historyStart: Date, days: number, dayOffset: number): string {
+  return toDateOnly(addDays(historyStart, Math.min(Math.max(0, dayOffset), days - 1)));
 }
 
 function buildJournalNotes(
@@ -467,106 +505,179 @@ function buildJournalNotes(
   historyStart: Date,
   days: number,
 ): Omit<JournalEntry, 'id'>[] {
-  const week0 = toDateOnly(addDays(historyStart, 0));
-  const week2 = toDateOnly(addDays(historyStart, Math.min(days - 1, 14)));
-  const week5 = toDateOnly(addDays(historyStart, Math.min(days - 1, 35)));
+  const d1 = journalMilestoneDate(historyStart, days, 0);
+  const d2 = journalMilestoneDate(historyStart, days, Math.floor(days * 0.28));
+  const d3 = journalMilestoneDate(historyStart, days, Math.floor(days * 0.58));
+  const d4 = journalMilestoneDate(historyStart, days, Math.max(0, days - 4));
 
   const byPersona: Record<DemoPersonaId, Omit<JournalEntry, 'id'>[]> = {
     morton: [
       {
-        date: week0,
+        date: d1,
         title: 'Block Start',
         content:
           'Energy high, execution sharp. Prioritising chest/back quality and recovery consistency.',
         tags: ['training', 'block-start'],
       },
       {
-        date: week2,
+        date: d2,
         title: 'Mid-Block Adjustment',
         content:
           'Slight shoulder fatigue after push sessions. Reduced one accessory set; performance remains stable.',
         tags: ['fatigue', 'adjustments'],
       },
       {
-        date: week5,
-        title: 'Six-Week Summary',
+        date: d3,
+        title: 'Deload Week Intent',
         content:
-          'Bodyweight trend is up with controlled fatigue. Recovery and nutrition adherence remain high.',
+          'Planned pull-back week: same patterns, slightly lower top sets. Pelvic comfort holding steady.',
+        tags: ['deload', 'pelvic'],
+      },
+      {
+        date: d4,
+        title: 'Block Review',
+        content:
+          'Twelve-week arc: weight up modestly, strength retained, fatigue lower than mid-block spike. Ready to re-ramp.',
         tags: ['summary', 'progress'],
       },
     ],
     sheri: [
       {
-        date: week0,
+        date: d1,
         title: 'Routine Kickoff',
         content:
           'Main objective is adherence: complete sessions, keep meals repeatable, and protect sleep windows.',
         tags: ['habit', 'consistency'],
       },
       {
-        date: week2,
+        date: d2,
         title: 'Workday Strategy',
         content:
           'Prepared two lunch options and pre-packed snacks. Reduced decision fatigue significantly.',
         tags: ['nutrition', 'schedule'],
       },
       {
-        date: week5,
-        title: 'Six-Week Summary',
+        date: d3,
+        title: 'High-Stress Week',
         content:
-          'Steady fat-loss trend and confidence lift. Next block can add small progression in lower-body work.',
+          'Work volume spiked; sleep fragmented two nights. Kept protein high, shortened one session, no guilt spiral.',
+        tags: ['stress', 'adherence'],
+      },
+      {
+        date: d4,
+        title: 'Phase Check-In',
+        content:
+          'Trend is down on scale with normal water noise. Confidence on lower-body patterns improved.',
         tags: ['summary', 'fat-loss'],
       },
     ],
     alex: [
       {
-        date: week0,
+        date: d1,
         title: 'Hypertrophy Block Start',
         content:
           'Bench and pull-up KPIs established. Focus is controlled overload and quality execution.',
         tags: ['hypertrophy', 'kpi'],
       },
       {
-        date: week2,
+        date: d2,
         title: 'Volume Check',
         content:
           'Upper-body volume is tolerable. Slight elbow stress managed with tempo and exercise order tweaks.',
         tags: ['volume', 'recovery'],
       },
       {
-        date: week5,
-        title: 'Six-Week Summary',
+        date: d3,
+        title: 'Intensification Gate',
         content:
-          'Strength and bodyweight trending up. Ready for either deload or transition to intensification.',
+          'Two lifts plateaued on paper but bar speed improved. Holding volume, nudging top-set quality.',
+        tags: ['plateau', 'progress'],
+      },
+      {
+        date: d4,
+        title: 'Mesocycle Close',
+        content:
+          'Bodyweight and e1RM trends align. Next block can bias either strength expression or added volume.',
         tags: ['summary', 'strength'],
       },
     ],
     jordan: [
       {
-        date: week0,
+        date: d1,
         title: 'Foundation Start',
         content:
           'Priority is consistency over intensity. Three quality sessions and simple meals each week.',
         tags: ['foundation', 'habits'],
       },
       {
-        date: week2,
+        date: d2,
         title: 'Momentum Week',
         content:
           'Training confidence improved. Added short walks on non-lift days without extra fatigue.',
         tags: ['confidence', 'cardio'],
       },
       {
-        date: week5,
-        title: 'Six-Week Summary',
+        date: d3,
+        title: 'Schedule Friction',
         content:
-          'Solid consistency across training and nutrition. Next phase can include gradual load progression.',
+          'School holiday week: two sessions shortened, one moved to early morning. Kept protein and steps on track.',
+        tags: ['schedule', 'adherence'],
+      },
+      {
+        date: d4,
+        title: 'Habit Solidification',
+        content:
+          'Compliance back in range. Small wins on waist trend; focus stays on repeatable week template.',
         tags: ['summary', 'progress'],
       },
     ],
   };
 
   return byPersona[personaId];
+}
+
+function workoutSessionNotes(
+  personaId: DemoPersonaId,
+  weekIndex: number,
+  isDeloadWeek: boolean,
+): string | undefined {
+  if (isDeloadWeek) {
+    return 'Deload: trimmed top-end sets, kept technique work and pump work in range.';
+  }
+  if (personaId === 'morton' && weekIndex >= 9) {
+    return 'Late block: effort high but controlled; monitoring shoulder and pelvic response.';
+  }
+  if (personaId === 'sheri' && weekIndex === 3) {
+    return 'Stress week — reduced accessories, protected main lifts.';
+  }
+  if (personaId === 'alex' && weekIndex >= 8) {
+    return 'Progressing where joint tolerance allows; left a rep in the tank on pressing.';
+  }
+  if (personaId === 'jordan' && weekIndex >= 7) {
+    return 'Time-capped session; prioritized compounds and single top set per pattern.';
+  }
+  return undefined;
+}
+
+function checkInCoachNotes(
+  personaId: DemoPersonaId,
+  weekIndex: number,
+  totalWeeks: number,
+): string {
+  const late = weekIndex >= totalWeeks - 2;
+  if (personaId === 'sheri') {
+    return late
+      ? 'Scale trend and tape measures align; next focus is tightening weekend structure.'
+      : 'Technique and routine are trending in the right direction.';
+  }
+  if (personaId === 'jordan') {
+    return late
+      ? 'Momentum returned after the compressed week; keep loads honest, not heroic.'
+      : 'Technique and routine are trending in the right direction.';
+  }
+  return late
+    ? 'Final weeks show better consistency and improved fatigue management.'
+    : 'Technique and routine are trending in the right direction.';
 }
 
 function buildMeals(
