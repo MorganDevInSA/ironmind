@@ -115,6 +115,13 @@ Every page must pass this checklist before being marked complete.
 - [ ] Responsive behavior (horizontal scroll or card view on mobile)
 - [ ] Empty table state
 
+### Physique — History (`/physique`)
+
+- [ ] History uses a **wide** `.data-table` inside **`overflow-x-auto`** so tape + scale columns remain usable on mobile
+- [ ] **First column (date) sticky** on horizontal scroll with opaque background so labels do not bleed through
+- [ ] Each tape / scale cell shows **two lines**: absolute value (cm or kg), then **Δ** vs the **next older** check-in (accent when non-zero; muted when zero or unavailable)
+- [ ] Copy above the table explains units (cm, kg) and that the list is **newest first**
+
 ### Charts
 
 - [ ] Axis labels present and readable

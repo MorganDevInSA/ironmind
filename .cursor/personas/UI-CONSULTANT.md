@@ -312,7 +312,7 @@ Always check:
 - Dashboard usability
 - Navigation logic
 - Forms
-- Tables
+- Tables (including **Physique History** on `/physique`: horizontal scroll + **sticky** first column; **two-line** numeric cells for value vs **Δ**; `font-mono tabular-nums` — see `.cursor/rules/page-checklist.md`)
 - Filters
 - Search UX
 - Data entry speed

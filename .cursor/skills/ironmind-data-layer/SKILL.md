@@ -239,6 +239,13 @@ Before marking a page as done, verify:
 
 Major authenticated routes under `src/app/(app)/` include **dashboard**, **training** (`/training`, `/training/workout`, `/training/programs`, `/training/history`, `/training/exercises`), **nutrition**, **supplements**, **recovery**, **physique**, **coaching**, **export**, **settings**. Before adding `href` / `router.push`, confirm **`page.tsx` exists** at that segment (`IRONMIND.md` routing rule).
 
+### Physique page (`/physique`)
+
+- **Writes:** Check-in form → controller mutation → **`saveCheckIn`**; circumferences bounded by **`sanitizeMeasurementsInput`** / **`CM_BOUNDS`** in [`measurement-bounds.ts`](../../../src/lib/utils/measurement-bounds.ts) (includes shoulders and calves when present).
+- **History UI:** [`src/app/(app)/physique/page.tsx`](<../../../src/app/(app)/physique/page.tsx>) — scrollable `.data-table`, **sticky** date column, **`HistoryTapeCell`** / **`HistoryScaleCell`**, newest-first list trimmed with **`checkIns.slice(0, 10)`**; per-cell **Δ** is vs the **next older** check-in, not persisted.
+- **Charts:** Driven by **`MEASUREMENT_CHART_SERIES`** — may omit sites that History still lists.
+- **Markdown export:** [`formatCheckInsTable`](../../../src/lib/export/generate-summary.ts) columns can lag the UI; extend when export must match History.
+
 ---
 
 ## Mutation Error Handling — Connect to Toast

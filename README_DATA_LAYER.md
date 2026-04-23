@@ -71,6 +71,8 @@ The export feature demonstrates the architecture's power. When generating a 50KB
 
 On the second export within the stale-time window, **zero network calls** occur — the entire summary is assembled from cache. This pattern extends to dashboard widgets, alert calculations, and any derived data view.
 
+**Physique check-ins in export:** The markdown table built by **`formatCheckInsTable`** (`src/lib/export/generate-summary.ts`) lists a **fixed** set of measurement columns plus weight and notes. The **`/physique`** page **History** table can show additional sites (e.g. shoulders, calves) and **Δ** rows that are **not** persisted — extend the export formatter when coaches need full parity with the on-screen History layout (`Documentation/EXPERT-DEMO-DATA-AND-STORAGE-GUIDE.md`).
+
 ### Firebase Abstraction Layer
 
 IRONMIND never calls Firebase SDK methods directly from services. All SDK operations flow through typed helpers in `src/lib/firebase/`:

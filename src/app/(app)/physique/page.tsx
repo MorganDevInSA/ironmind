@@ -154,18 +154,51 @@ function tapeDeltaCm(
   return Math.round((cur - prev) * 10) / 10;
 }
 
-function TapeDeltaChip({ label, delta }: { label: string; delta: number | null }) {
-  if (delta === null) return null;
+/** One tape site: absolute (cm) on first line, Δ cm vs older row on second. */
+function HistoryTapeCell({
+  valueCm,
+  deltaCm,
+}: {
+  valueCm: number | undefined;
+  deltaCm: number | null;
+}) {
+  const hasVal = typeof valueCm === 'number' && Number.isFinite(valueCm);
   return (
-    <span
-      className={cn(
-        'text-[10px] font-mono tabular-nums',
-        delta !== 0 ? 'text-[color:var(--accent)]' : 'text-[color:var(--text-2)]',
-      )}
-    >
-      Δ {label} {delta > 0 ? '+' : ''}
-      {delta.toFixed(1)} cm
-    </span>
+    <td className="text-right font-mono tabular-nums align-top whitespace-nowrap px-2 py-2.5">
+      <div className="text-[color:var(--text-0)] text-sm">{hasVal ? valueCm.toFixed(1) : '—'}</div>
+      <div
+        className={cn(
+          'text-[10px] leading-tight',
+          deltaCm === null
+            ? 'text-[color:var(--text-2)]'
+            : deltaCm !== 0
+              ? 'text-[color:var(--accent)]'
+              : 'text-[color:var(--text-2)]',
+        )}
+      >
+        {deltaCm === null ? '—' : `${deltaCm > 0 ? '+' : ''}${deltaCm.toFixed(1)}`}
+      </div>
+    </td>
+  );
+}
+
+function HistoryScaleCell({ kg, deltaKg }: { kg: number; deltaKg: number | null }) {
+  return (
+    <td className="text-right font-mono tabular-nums align-top whitespace-nowrap px-2 py-2.5">
+      <div className="text-[color:var(--text-0)] text-sm font-semibold">{kg.toFixed(1)}</div>
+      <div
+        className={cn(
+          'text-[10px] leading-tight',
+          deltaKg === null
+            ? 'text-[color:var(--text-2)]'
+            : deltaKg !== 0
+              ? 'text-[color:var(--accent)]'
+              : 'text-[color:var(--text-2)]',
+        )}
+      >
+        {deltaKg === null ? '—' : `${deltaKg > 0 ? '+' : ''}${deltaKg.toFixed(1)}`}
+      </div>
+    </td>
   );
 }
 
@@ -660,104 +693,86 @@ export default function PhysiquePage() {
         </div>
       )}
 
-      {/* Check-in history table */}
+      {/* Check-in history — tabular (newest first; Δ vs next older row) */}
       {checkIns && checkIns.length > 0 && (
         <div className="glass-panel overflow-hidden">
           <div className="px-4 py-3 border-b border-[rgba(65,50,50,0.15)] space-y-1">
             <h3 className="font-semibold text-[color:var(--text-0)]">History</h3>
-            <p className="text-[10px] text-[color:var(--text-2)] leading-snug max-w-xl">
-              All tape fields are{' '}
-              <span className="font-semibold text-[color:var(--text-1)]">cm</span>. First row =
-              values for this date; second row ={' '}
-              <span className="font-semibold text-[color:var(--text-1)]">Δ tape</span> vs the next
-              older check-in (only sites logged on both). Right:{' '}
-              <span className="font-semibold text-[color:var(--text-1)]">scale (kg)</span> and{' '}
-              <span className="font-semibold text-[color:var(--text-1)]">Δ kg</span>. Newest first.
+            <p className="text-[10px] text-[color:var(--text-2)] leading-snug max-w-3xl">
+              Each cell: <span className="font-semibold text-[color:var(--text-1)]">value</span>{' '}
+              then <span className="font-semibold text-[color:var(--text-1)]">Δ</span> vs the next
+              older row (same date order as the list). Tape = cm, scale = kg. Scroll horizontally on
+              small screens.
             </p>
           </div>
-          <div className="divide-y divide-[rgba(65,50,50,0.1)]">
-            {checkIns.slice(0, 10).map((c: CheckIn, i) => {
-              const prev = checkIns[i + 1];
-              const deltaKg =
-                prev && typeof c.bodyweight === 'number' && typeof prev.bodyweight === 'number'
-                  ? c.bodyweight - prev.bodyweight
-                  : null;
-              const tapeDeltas = PHYSIQUE_HISTORY_METRICS.map(({ key, label }) => ({
-                key,
-                label,
-                delta: tapeDeltaCm(c, prev, key),
-              }));
-              const hasTapeDeltas = tapeDeltas.some((t) => t.delta !== null);
-              return (
-                <div key={c.id} className="px-4 py-3 flex items-center justify-between gap-4">
-                  <div>
-                    <p className="text-sm font-medium text-[color:var(--text-0)]">
-                      {formatDisplayDate(c.date)}
-                    </p>
-                    {c.coachNotes && (
-                      <p className="text-xs text-[color:var(--text-2)] truncate max-w-[200px] mt-0.5">
-                        {c.coachNotes}
-                      </p>
-                    )}
-                    {/* Circumference snapshot (cm) — not scale weight */}
-                    {c.measurements != null &&
-                      Object.values(c.measurements).some(
-                        (v) => typeof v === 'number' && Number.isFinite(v),
-                      ) && (
-                        <div className="flex gap-2 mt-1 flex-wrap">
-                          {PHYSIQUE_HISTORY_METRICS.map(({ key, label }) => {
-                            const v = c.measurements?.[key];
-                            if (typeof v !== 'number' || !Number.isFinite(v)) return null;
-                            return (
-                              <span
-                                key={key}
-                                className="text-[10px] font-mono text-[color:var(--text-2)]"
-                              >
-                                {label} {v} cm
-                              </span>
-                            );
-                          })}
-                        </div>
-                      )}
-                    {hasTapeDeltas && (
-                      <div
-                        className="flex flex-wrap gap-x-2 gap-y-0.5 mt-1.5 items-baseline"
-                        aria-label="Tape measure change vs previous check-in"
-                      >
-                        <span className="text-[9px] font-semibold uppercase tracking-wider text-[color:var(--text-2)] shrink-0">
-                          Δ tape
-                        </span>
-                        {tapeDeltas.map(({ key, label, delta }) => (
-                          <TapeDeltaChip key={key} label={label} delta={delta} />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  <div className="text-right shrink-0">
-                    <p className="text-[9px] font-semibold uppercase tracking-wider text-[color:var(--text-2)] mb-0.5">
-                      Scale
-                    </p>
-                    <span className="font-mono tabular-nums font-bold text-[color:var(--text-0)]">
-                      {c.bodyweight} kg
+          <div className="overflow-x-auto">
+            <table className="data-table min-w-[56rem] w-full text-sm">
+              <thead>
+                <tr>
+                  <th
+                    className="sticky left-0 z-[1] bg-[color:var(--bg-2)] whitespace-nowrap pr-3 pl-4 shadow-[4px_0_12px_rgba(0,0,0,0.25)]"
+                    scope="col"
+                  >
+                    Date
+                  </th>
+                  <th className="min-w-[7rem] max-w-[10rem] whitespace-nowrap" scope="col">
+                    Notes
+                  </th>
+                  {PHYSIQUE_HISTORY_METRICS.map(({ key, label }) => (
+                    <th
+                      key={key}
+                      className="text-right whitespace-nowrap px-2"
+                      scope="col"
+                      title={`${label} (cm), then Δ cm vs older check-in`}
+                    >
+                      <span className="block">{label}</span>
+                      <span className="block text-[9px] font-normal normal-case tracking-normal text-[color:var(--text-2)]">
+                        cm · Δ
+                      </span>
+                    </th>
+                  ))}
+                  <th
+                    className="text-right whitespace-nowrap px-2"
+                    scope="col"
+                    title="Bodyweight (kg), then Δ kg vs older check-in"
+                  >
+                    <span className="block">Scale</span>
+                    <span className="block text-[9px] font-normal normal-case tracking-normal text-[color:var(--text-2)]">
+                      kg · Δ
                     </span>
-                    {deltaKg !== null && (
-                      <p
-                        className={cn(
-                          'text-xs font-mono tabular-nums',
-                          deltaKg !== 0
-                            ? 'text-[color:var(--accent)]'
-                            : 'text-[color:var(--text-2)]',
-                        )}
-                        aria-label={`Weight change vs previous check-in: ${deltaKg > 0 ? '+' : ''}${deltaKg.toFixed(1)} kilograms`}
-                      >
-                        {deltaKg > 0 ? '+' : ''}
-                        {deltaKg.toFixed(1)} kg
-                      </p>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {checkIns.slice(0, 10).map((c: CheckIn, i) => {
+                  const prev = checkIns[i + 1];
+                  const deltaKg =
+                    prev && typeof c.bodyweight === 'number' && typeof prev.bodyweight === 'number'
+                      ? c.bodyweight - prev.bodyweight
+                      : null;
+                  return (
+                    <tr key={c.id}>
+                      <td className="sticky left-0 z-[1] bg-[color:var(--bg-2)] whitespace-nowrap pr-3 pl-4 align-top shadow-[4px_0_12px_rgba(0,0,0,0.2)]">
+                        <span className="font-medium text-[color:var(--text-0)]">
+                          {formatDisplayDate(c.date)}
+                        </span>
+                      </td>
+                      <td className="max-w-[10rem] align-top text-xs text-[color:var(--text-2)]">
+                        <span className="line-clamp-2">{c.coachNotes?.trim() || '—'}</span>
+                      </td>
+                      {PHYSIQUE_HISTORY_METRICS.map(({ key }) => (
+                        <HistoryTapeCell
+                          key={key}
+                          valueCm={c.measurements?.[key]}
+                          deltaCm={tapeDeltaCm(c, prev, key)}
+                        />
+                      ))}
+                      <HistoryScaleCell kg={c.bodyweight} deltaKg={deltaKg} />
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         </div>
       )}

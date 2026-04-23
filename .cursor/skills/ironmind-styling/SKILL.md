@@ -333,6 +333,8 @@ Use `.data-table` class or inline:
 </table>
 ```
 
+**Wide measurement grids (Physique History):** Wrap in **`overflow-x-auto`**. Keep the **first column sticky** (`sticky left-0`) with a solid **`bg-[color:var(--bg-…)]`** (match panel background) so the date column stays readable while scrolling. Tape and scale cells often use a **two-line** pattern: primary value (`font-mono tabular-nums`), then **Δ** on the second line (`text-[10px]`, **`var(--accent)`** when delta ≠ 0). Reference: **`HistoryTapeCell`** / **`HistoryScaleCell`** in [`src/app/(app)/physique/page.tsx`](<../../../src/app/(app)/physique/page.tsx>).
+
 ---
 
 ## Dividers

@@ -147,19 +147,19 @@ flowchart LR
 
 Paths below map to `page.tsx` files — **any new `Link` must target one of these** (see IRONMIND routing rule):
 
-| Route                                                                                              | Feature area                   |
-| -------------------------------------------------------------------------------------------------- | ------------------------------ |
-| `/dashboard`                                                                                       | Day overview, schedule widgets |
-| `/training`, `/training/programs`, `/training/exercises`, `/training/history`, `/training/workout` | Program + session execution    |
-| `/nutrition`                                                                                       | Day-type macros, meals         |
-| `/supplements`                                                                                     | Protocol + daily log           |
-| `/recovery`                                                                                        | Readiness scoring and trends   |
-| `/physique`                                                                                        | Weight, measurements, photos   |
-| `/settings`                                                                                        | Profile / app settings         |
-| `/export`                                                                                          | LLM-oriented markdown export   |
-| `/more`                                                                                            | Mobile “more” hub              |
-| `/onboarding`                                                                                      | Coach JSON import + seed       |
-| `/login`, `/register`                                                                              | Auth                           |
+| Route                                                                                              | Feature area                                                   |
+| -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| `/dashboard`                                                                                       | Day overview, schedule widgets                                 |
+| `/training`, `/training/programs`, `/training/exercises`, `/training/history`, `/training/workout` | Program + session execution                                    |
+| `/nutrition`                                                                                       | Day-type macros, meals                                         |
+| `/supplements`                                                                                     | Protocol + daily log                                           |
+| `/recovery`                                                                                        | Readiness scoring and trends                                   |
+| `/physique`                                                                                        | Weight, tape (History table: cm + Δ vs next older row), photos |
+| `/settings`                                                                                        | Profile / app settings                                         |
+| `/export`                                                                                          | LLM-oriented markdown export                                   |
+| `/more`                                                                                            | Mobile “more” hub                                              |
+| `/onboarding`                                                                                      | Coach JSON import + seed                                       |
+| `/login`, `/register`                                                                              | Auth                                                           |
 
 ---
 

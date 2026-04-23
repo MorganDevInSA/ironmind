@@ -775,7 +775,7 @@ src/
 │   │   ├── nutrition/     Macro tracking
 │   │   ├── supplements/   Protocol checklist
 │   │   ├── recovery/      Morning readiness form
-│   │   ├── physique/      Check-ins + photos
+│   │   ├── physique/      Tape + scale check-ins, History table (Δ vs older row), photos
 │   │   ├── coaching/      Phase + journal + KPIs
 │   │   ├── export/        LLM-oriented markdown export
 │   │   └── settings/      Profile + preferences

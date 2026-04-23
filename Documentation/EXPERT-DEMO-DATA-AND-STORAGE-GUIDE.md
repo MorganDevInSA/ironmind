@@ -65,9 +65,11 @@ All collection path strings must come from **`src/lib/firebase/config.ts`** → 
 
 **Demo UI — accent theme on load:** After a successful `seed*Data`, **`DemoProfileModal`** calls **`getDemoThemeForProfileId`** from **`src/lib/seed/demo-theme.ts`** (same preset map as **§13**) and applies `setTheme`. **`DemoThemeSync`** (`src/components/theme/demo-theme-sync.tsx`) re-applies the preset when the active profile’s `clientName` matches a demo athlete (e.g. after full page refresh).
 
-**Physique check-ins — partial writes:** `saveCheckIn` in **`src/services/physique.service.ts`** **deep-merges** `measurements` onto any existing check-in for that date before `setDocument(..., { merge: true })`, so partial UI saves do not wipe other circumference fields. Incoming circumferences are passed through **`sanitizeMeasurementsInput`** (`src/lib/utils/measurement-bounds.ts`) so implausible values (typos, autofill garbage) **do not overwrite** stored keys. **Charts** use **`measurementForChart`** so out-of-range legacy rows are **omitted** from trend lines instead of stretching the Y-axis. **Demo overwrite** replaces the entire check-in subcollection, then writes **only** the hand-authored rows from **`src/lib/seed/demo-data/physique/`** (all seven circumference keys + `shoulders`, within plausible bounds).
+**Physique check-ins — partial writes:** `saveCheckIn` in **`src/services/physique.service.ts`** **deep-merges** `measurements` onto any existing check-in for that date before `setDocument(..., { merge: true })`, so partial UI saves do not wipe other circumference fields. Incoming circumferences are passed through **`sanitizeMeasurementsInput`** (`src/lib/utils/measurement-bounds.ts`, **`CM_BOUNDS`**) so implausible values (typos, autofill garbage) **do not overwrite** stored keys — including **shoulders** and **calves** when those fields are submitted. **Charts** use **`measurementForChart`** so out-of-range legacy rows are **omitted** from trend lines instead of stretching the Y-axis. **Demo overwrite** replaces the entire check-in subcollection, then writes **only** the hand-authored rows from **`src/lib/seed/demo-data/physique/`** (tape keys as authored per persona file — typically waist through thighs plus **shoulders**; extend literals if you add calves), within plausible bounds.
 
-**Physique charts (read path):** Dashboard and Physique pages **sort** check-ins by ISO `date` and use **`dateKey` (`YYYY-MM-DD`)** as the Recharts series key with short tick labels — avoids ambiguous `dd/MM` collisions across years.
+**Physique History (in-app UI):** On **`src/app/(app)/physique/page.tsx`**, the **History** section lists check-ins **newest first** and renders the **first 10** loaded rows in a **horizontally scrollable** `.data-table` with a **sticky** date column. Each tape column follows **`PHYSIQUE_HISTORY_METRICS`** (waist → calves): **absolute cm** on the first line and **Δ cm vs the next older check-in** on the second (only when both rows contain that site). **Scale** shows **kg** and **Δ kg** vs the next older row the same way. This is **derived in the UI** — Firestore remains point-in-time values per date.
+
+**Physique charts (read path):** Dashboard and Physique pages **sort** check-ins by ISO `date` and use **`dateKey` (`YYYY-MM-DD`)** as the Recharts series key with short tick labels — avoids ambiguous `dd/MM` collisions across years. Chart series may use a **subset** of sites (`MEASUREMENT_CHART_SERIES`) even when additional sites are stored or shown in History.
 
 ---
 
@@ -172,6 +174,8 @@ After changing queries: run **`npm run deploy:indexes`** when your workflow allo
 | `Documentation/PRINCIPAL-REVIEW-DATA-2026-04-23.md` | Data-layer hardening status, bounded reads, rollback semantics                 |
 | `README_DATA_LAYER.md`                              | Pages → controllers → services → Firebase rule                                 |
 
+**Export parity:** Markdown export **`formatCheckInsTable`** in **`src/lib/export/generate-summary.ts`** prints a **fixed column set** (waist–thigh plus weight and notes) and does **not** yet mirror every History column (e.g. shoulders, calves) or **Δ** columns. Extend that table when coaches need full parity inside LLM exports.
+
 ---
 
 ## 12. Default demo ecosystem (when expanding without a custom brief)
@@ -212,4 +216,4 @@ Adding a seventh demo persona requires a **new** `AppTheme` preset in `globals.c
 
 ---
 
-_Last aligned with repo: hard-coded demo physique (`src/lib/seed/demo-data/physique/`), `deleteAllCheckIns` + `seedDemoHistoricalData`, `demo-theme.ts` + `DemoThemeSync`, and chart `dateKey` sorting. If paths drift, trust `src/lib/firebase/config.ts` and `ARCHITECTURE.md` over this file._
+_Last aligned with repo: hard-coded demo physique (`src/lib/seed/demo-data/physique/`), `deleteAllCheckIns` + `seedDemoHistoricalData`, `demo-theme.ts` + `DemoThemeSync`, chart `dateKey` sorting, and Physique **History** as a scrollable table with Δ vs next older row. If paths drift, trust `src/lib/firebase/config.ts` and `ARCHITECTURE.md` over this file._

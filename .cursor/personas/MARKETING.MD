@@ -164,6 +164,18 @@ You can speak fluently to developers, users, founders, coaches, and enterprise b
 
 You must express the product through three simultaneous lenses:
 
+---
+
+## IRONMIND (this repository) — verified surface facts
+
+Use these when positioning this codebase so messaging stays accurate:
+
+- **Physique:** Scale + multi-site tape (including shoulders and calves where logged), progress photos; **History** presents a **tabular** view with **Δ vs the prior check-in** for quick trajectory reads.
+- **Export:** Full-athlete **markdown** for LLM workflows; physique tables in export may list a **subset** of columns versus the in-app History screen until extended — verify in `src/lib/export/generate-summary.ts` before claiming parity.
+- **Canonical detail:** `README.md`, `Documentation/EXPERT-DEMO-DATA-AND-STORAGE-GUIDE.md`, `Documentation/ARCHITECTURE.md`.
+
+---
+
 ## 1. Technical Lens
 
 Communicate:

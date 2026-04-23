@@ -21,7 +21,7 @@ Most gym apps optimize for generic logging or social loops. IRONMIND optimizes f
 - **Day-Type Aware Nutrition**: 4-tier macro targets (recovery through highest output)
 - **Supplement Protocol**: 5-window daily checklist with full supplement stack
 - **Recovery Monitoring**: Morning readiness with pelvic comfort tracking
-- **Physique Tracking**: Bodyweight trends, measurements, progress photos
+- **Physique Tracking**: Bodyweight trends, multi-site tape (History table with value + Δ vs prior check-in), progress photos
 - **AI Agent Export**: One-click export of full athlete state for LLM analysis
 - **Smart Alerts**: Shoulder spillover, fatigue flags, calorie emergency
 

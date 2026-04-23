@@ -168,6 +168,17 @@ function TabPanel() {
 
 ---
 
+## Data tables
+
+- Use real `<table>`, `<thead>`, `<tbody>`, `<th>`, `<td>` — not div grids posing as tables.
+- **`scope`:** Use `scope="col"` on column headers. For row-label cells (e.g. dates), `scope="row"` on a `<th>` is ideal; if global styles style every `th` like a small-caps header (see `.data-table th` in `globals.css`), either add **`tbody th`** overrides to match body cells or keep a `<td>` for the first column and rely on clear column headers plus nearby descriptive copy.
+- **Caption:** Add a visually hidden caption when the table’s purpose is not obvious from surrounding headings: `<caption className="sr-only">…</caption>`.
+- **Scroll containers:** Wrapping a wide table in `overflow-x-auto` is fine; ensure focusable controls inside remain reachable and the sticky first column keeps a solid background so text does not overlap when scrolling.
+
+Reference: [`src/app/(app)/physique/page.tsx`](<../../../src/app/(app)/physique/page.tsx>) (History).
+
+---
+
 ## Modal Accessibility
 
 ### Focus Trap
