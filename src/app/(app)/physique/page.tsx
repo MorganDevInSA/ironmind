@@ -593,13 +593,22 @@ export default function PhysiquePage() {
       {/* Check-in history table */}
       {checkIns && checkIns.length > 0 && (
         <div className="glass-panel overflow-hidden">
-          <div className="px-4 py-3 border-b border-[rgba(65,50,50,0.15)]">
+          <div className="px-4 py-3 border-b border-[rgba(65,50,50,0.15)] space-y-1">
             <h3 className="font-semibold text-[color:var(--text-0)]">History</h3>
+            <p className="text-[10px] text-[color:var(--text-2)] leading-snug max-w-xl">
+              Tape: waist, chest, left arm — all in{' '}
+              <span className="font-semibold text-[color:var(--text-1)]">cm</span>. Right column is{' '}
+              <span className="font-semibold text-[color:var(--text-1)]">scale weight (kg)</span>;
+              the colored value is Δ kg vs the next older check-in (list is newest first).
+            </p>
           </div>
           <div className="divide-y divide-[rgba(65,50,50,0.1)]">
             {checkIns.slice(0, 10).map((c: CheckIn, i) => {
               const prev = checkIns[i + 1];
-              const delta = prev ? c.bodyweight - prev.bodyweight : null;
+              const delta =
+                prev && typeof c.bodyweight === 'number' && typeof prev.bodyweight === 'number'
+                  ? c.bodyweight - prev.bodyweight
+                  : null;
               return (
                 <div key={c.id} className="px-4 py-3 flex items-center justify-between gap-4">
                   <div>
@@ -611,31 +620,34 @@ export default function PhysiquePage() {
                         {c.coachNotes}
                       </p>
                     )}
-                    {/* Measurements mini-row */}
+                    {/* Circumference snapshot (cm) — not scale weight */}
                     {c.measurements != null &&
                       Object.values(c.measurements).some(
                         (v) => typeof v === 'number' && Number.isFinite(v),
                       ) && (
                         <div className="flex gap-2 mt-1 flex-wrap">
-                          {c.measurements.waist && (
+                          {Number.isFinite(c.measurements.waist) && (
                             <span className="text-[10px] font-mono text-[color:var(--text-2)]">
-                              W:{c.measurements.waist}
+                              Waist {c.measurements.waist} cm
                             </span>
                           )}
-                          {c.measurements.chest && (
+                          {Number.isFinite(c.measurements.chest) && (
                             <span className="text-[10px] font-mono text-[color:var(--text-2)]">
-                              Ch:{c.measurements.chest}
+                              Chest {c.measurements.chest} cm
                             </span>
                           )}
-                          {c.measurements.leftArm && (
+                          {Number.isFinite(c.measurements.leftArm) && (
                             <span className="text-[10px] font-mono text-[color:var(--text-2)]">
-                              A:{c.measurements.leftArm}
+                              L arm {c.measurements.leftArm} cm
                             </span>
                           )}
                         </div>
                       )}
                   </div>
                   <div className="text-right shrink-0">
+                    <p className="text-[9px] font-semibold uppercase tracking-wider text-[color:var(--text-2)] mb-0.5">
+                      Scale
+                    </p>
                     <span className="font-mono tabular-nums font-bold text-[color:var(--text-0)]">
                       {c.bodyweight} kg
                     </span>
@@ -645,9 +657,10 @@ export default function PhysiquePage() {
                           'text-xs font-mono tabular-nums',
                           delta !== 0 ? 'text-[color:var(--accent)]' : 'text-[color:var(--text-2)]',
                         )}
+                        aria-label={`Weight change vs previous check-in: ${delta > 0 ? '+' : ''}${delta.toFixed(1)} kilograms`}
                       >
                         {delta > 0 ? '+' : ''}
-                        {delta.toFixed(1)}
+                        {delta.toFixed(1)} kg
                       </p>
                     )}
                   </div>
