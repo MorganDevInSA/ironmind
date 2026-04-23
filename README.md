@@ -39,9 +39,15 @@ This is not a mass-market “step counter.” It is a **precision instrument** f
 
 ## Visuals
 
-![Uploading combined.png…]()
+Primary wordmarks (rasters in-repo):
 
-or brand treatment and raster paths, see [Documentation/LOGO-BRIEF.md](./Documentation/LOGO-BRIEF.md) and `public/brand/`.
+|                              Combined                              |                             Female                             |                            Male                            |
+| :----------------------------------------------------------------: | :------------------------------------------------------------: | :--------------------------------------------------------: |
+| ![IRONMIND combined logo](public/brand/ironmind_logo_combined.png) | ![IRONMIND female logo](public/brand/ironmind_logo_female.png) | ![IRONMIND male logo](public/brand/ironmind_logo_male.png) |
+
+Additional layout variants and transparent marks live under [`public/brand/`](public/brand/). Full brand prompts, palette, and asset map: [Documentation/LOGO-BRIEF.md](./Documentation/LOGO-BRIEF.md).
+
+Screenshots of the running app are not embedded here yet; capture from a local or preview deploy when you want product chrome in the README.
 
 ## Business and platform value
 
