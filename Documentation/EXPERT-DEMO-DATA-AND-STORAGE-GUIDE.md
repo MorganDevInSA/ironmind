@@ -21,26 +21,28 @@ Do **not** conflate them: JSON seed blobs and Firestore documents are **not** St
 
 All collection path strings must come from **`src/lib/firebase/config.ts`** → `collections` (never hand-roll `users/...` strings in app code).
 
-| Helper                                 | Path pattern                      | Typical content                                         |
-| -------------------------------------- | --------------------------------- | ------------------------------------------------------- |
-| `collections.users`                    | `users`                           | Top-level user doc (`isSeeded`, `dataSchemaVersion`, …) |
-| `collections.profiles(uid)`            | `users/{uid}/profile`             | Doc `data` — athlete profile                            |
-| `collections.programs(uid)`            | `users/{uid}/programs`            | Training programs                                       |
-| `collections.workouts(uid)`            | `users/{uid}/workouts`            | Completed / planned workouts                            |
-| `collections.nutritionDays(uid)`       | `users/{uid}/nutrition`           | One doc per calendar `date`                             |
-| `collections.nutritionPlan(uid)`       | `users/{uid}/nutritionPlan`       | Doc `current` — plan seed                               |
-| `collections.recoveryEntries(uid)`     | `users/{uid}/recovery`            | Recovery logs                                           |
-| `collections.checkIns(uid)`            | `users/{uid}/checkins`            | Physique check-ins                                      |
-| `collections.phases(uid)`              | `users/{uid}/phases`              | Coaching phases                                         |
-| `collections.journalEntries(uid)`      | `users/{uid}/journal`             | Journal                                                 |
-| `collections.volumeLandmarks(uid)`     | `users/{uid}/landmarks`           | Doc `data` — volume landmarks                           |
-| `collections.supplementProtocol(uid)`  | `users/{uid}/protocol`            | Doc `current`                                           |
-| `collections.supplementLogs(uid)`      | `users/{uid}/supplements`         | Per-day supplement logs                                 |
-| `collections.weeklyVolumeRollups(uid)` | `users/{uid}/weeklyVolumeRollups` | Aggregates (usually leave to app, not hand-edited)      |
-| `collections.importJobs(uid)`          | `users/{uid}/importJobs`          | Import audit                                            |
-| `collections.seedJobs(uid)`            | `users/{uid}/seedJobs`            | First-login seed audit                                  |
+| Helper                                 | Path pattern                      | Typical content                                                                                                                    |
+| -------------------------------------- | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `collections.users`                    | `users`                           | Top-level user doc (`isSeeded`, `dataSchemaVersion`, …)                                                                            |
+| `collections.profiles(uid)`            | `users/{uid}/profile`             | Doc `data` — athlete profile                                                                                                       |
+| `collections.programs(uid)`            | `users/{uid}/programs`            | Training programs                                                                                                                  |
+| `collections.workouts(uid)`            | `users/{uid}/workouts`            | Completed / planned workouts                                                                                                       |
+| `collections.nutritionDays(uid)`       | `users/{uid}/nutrition`           | One doc per calendar `date`                                                                                                        |
+| `collections.nutritionPlan(uid)`       | `users/{uid}/nutritionPlan`       | Doc `current` — plan seed                                                                                                          |
+| `collections.recoveryEntries(uid)`     | `users/{uid}/recovery`            | Recovery logs                                                                                                                      |
+| `collections.checkIns(uid)`            | `users/{uid}/checkins`            | Physique check-ins — dated seeds use **doc id = `YYYY-MM-DD`**; demo overwrite **deletes the whole subcollection** first (see §4a) |
+| `collections.phases(uid)`              | `users/{uid}/phases`              | Coaching phases                                                                                                                    |
+| `collections.journalEntries(uid)`      | `users/{uid}/journal`             | Journal                                                                                                                            |
+| `collections.volumeLandmarks(uid)`     | `users/{uid}/landmarks`           | Doc `data` — volume landmarks                                                                                                      |
+| `collections.supplementProtocol(uid)`  | `users/{uid}/protocol`            | Doc `current`                                                                                                                      |
+| `collections.supplementLogs(uid)`      | `users/{uid}/supplements`         | Per-day supplement logs                                                                                                            |
+| `collections.weeklyVolumeRollups(uid)` | `users/{uid}/weeklyVolumeRollups` | Aggregates (usually leave to app, not hand-edited)                                                                                 |
+| `collections.importJobs(uid)`          | `users/{uid}/importJobs`          | Import audit                                                                                                                       |
+| `collections.seedJobs(uid)`            | `users/{uid}/seedJobs`            | First-login seed audit                                                                                                             |
 
 **Security:** `firestore.rules` — authenticated users may read/write only under their own `users/{userId}/...`. Experts tuning **client-side** seed/import still produce data **as that user** once the app runs; there is no separate “admin bypass” in-repo.
+
+**Check-in hygiene:** Any document in `checkins` with a **non–date-shaped** id (e.g. from `addDocument`) survives normal `saveCheckIn(userId, date, …)` writes because those target **date-keyed** ids only. Demo overwrite therefore calls **`deleteAllCheckIns(userId)`** in **`src/services/physique.service.ts`** at the start of **`seedDemoHistoricalData`** so charts cannot mix stale rows with new demo data.
 
 ---
 
@@ -51,28 +53,47 @@ All collection path strings must come from **`src/lib/firebase/config.ts`** → 
 | File pattern                                                                                                         | Role                                                                     |
 | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
 | `profile.ts`, `program.ts`, `nutrition.ts`, `supplements.ts`, `phase.ts`, `volume-landmarks.ts`, `coaching-notes.ts` | **Morton** (default first-login seed)                                    |
-| `sheri-*.ts`, `alex-*.ts`, `jordan-*.ts`                                                                             | Alternate **demo personas** (Sheri, Alex, Jordan)                        |
+| `sheri-*.ts`, `alex-*.ts`, `jordan-*.ts`, `fez-*.ts`, `maria-*.ts`                                                   | Alternate **demo personas** (Sheri, Alex, Jordan, Fez, Maria)            |
 | `nutrition.ts`                                                                                                       | Exports **`NutritionPlanSeed`** used by seed + demo historical generator |
 
 **Orchestration:**
 
 - **First login (production path):** `seedUserData` in **`src/lib/seed/index.ts`** — runs **once** when the user is not seeded; uses **Morton** constants; creates **`seedJobs`** and uses compensating rollback on failure (same artifact idea as import).
-- **Demo / dev personas (overwrite):** `seedMortonData`, `seedSheriData`, `seedAlexData`, `seedJordanData` in **`index.ts`** — **overwrite** existing domain data for that `userId`, then call **`seedDemoHistoricalData`** (see below). Wired from **`src/components/onboarding/DemoProfileModal.tsx`**.
+- **Demo / dev personas (overwrite):** `seedMortonData`, `seedSheriData`, `seedAlexData`, `seedJordanData`, `seedFezData`, `seedMariaData` in **`index.ts`** — **overwrite** existing domain data for that `userId`, then call **`seedDemoHistoricalData`** (see below). Wired from **`src/components/onboarding/DemoProfileModal.tsx`**.
 
 **Project rule (from IRONMIND):** Any new `src/lib/seed/*.ts` module must be **imported and invoked** from `seed/index.ts` (and follow existing logging patterns where applicable).
 
+**Demo UI — accent theme on load:** After a successful `seed*Data`, **`DemoProfileModal`** calls **`getDemoThemeForProfileId`** from **`src/lib/seed/demo-theme.ts`** (same preset map as **§13**) and applies `setTheme`. **`DemoThemeSync`** (`src/components/theme/demo-theme-sync.tsx`) re-applies the preset when the active profile’s `clientName` matches a demo athlete (e.g. after full page refresh).
+
+**Physique check-ins — partial writes:** `saveCheckIn` in **`src/services/physique.service.ts`** **deep-merges** `measurements` onto any existing check-in for that date before `setDocument(..., { merge: true })`, so partial UI saves do not wipe other circumference fields. Incoming circumferences are passed through **`sanitizeMeasurementsInput`** (`src/lib/utils/measurement-bounds.ts`) so implausible values (typos, autofill garbage) **do not overwrite** stored keys. **Charts** use **`measurementForChart`** so out-of-range legacy rows are **omitted** from trend lines instead of stretching the Y-axis. **Demo overwrite** replaces the entire check-in subcollection, then writes **only** the hand-authored rows from **`src/lib/seed/demo-data/physique/`** (all seven circumference keys + `shoulders`, within plausible bounds).
+
+**Physique charts (read path):** Dashboard and Physique pages **sort** check-ins by ISO `date` and use **`dateKey` (`YYYY-MM-DD`)** as the Recharts series key with short tick labels — avoids ambiguous `dd/MM` collisions across years.
+
 ---
 
-## 4. Synthetic historical demo data (workouts, nutrition, recovery, …)
+## 4. Demo historical data (`seedDemoHistoricalData`)
 
-**Primary file:** `src/lib/seed/demo-historical.ts`
+**Primary file:** `src/lib/seed/demo-historical.ts` — orchestrates the **84-day** window (default), calls **`deleteAllCheckIns`**, writes physique from static data, then generates daily telemetry via services.
 
-- Exports **`seedDemoHistoricalData(ctx)`** — builds a **multi-week** synthetic history from a **persona id** (`morton` | `sheri` | `alex` | `jordan`), profile, program, nutrition plan, supplement protocol, and `programId`.
-- **`personaTuning`** at the top of the file: knobs for **adherence**, sleep, HRV, stress, weight drift, meal portions, etc. This is the right place to tune “how strict this athlete’s demo looks” without rewriting the whole generator.
-- **`DEMO_HISTORY_DAYS`** (exported constant, default **84** ≈ **12 weeks**) and **`getDemoHistoryStartDateString(days?)`**: demo overwrite seeds in **`src/lib/seed/index.ts`** pass the day count into `seedDemoHistoricalData` and set each program’s `startDate` from **`getDemoHistoryStartDateString()`** so the **last synthetic day** lines up with **today** and the training calendar + historical logs share one anchored window.
-- Uses **services only** (`createWorkout`, `saveNutritionDay`, `saveRecoveryEntry`, …) so Firestore converters and timestamps stay consistent.
+### 4a. Physique — hard-coded weekly rows (demo selection only)
 
-**When you change tuning:** Re-seed via the UI demo flow (or call the `seed*Data` function in a dev harness) so documents are rewritten — editing TS alone does not mutate existing Firestore docs.
+| Location                                                                  | Role                                                                                                                                                                                                                   |
+| ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/lib/seed/demo-data/physique/types.ts`                                | `DemoPhysiqueWeek` (bodyweight + `Measurements`), `DemoPersonaId`                                                                                                                                                      |
+| `src/lib/seed/demo-data/physique/{morton,sheri,alex,jordan,fez,maria}.ts` | **Twelve** rows each, oldest → newest; file header describes that persona’s coaching arc; last row **bodyweight** matches that seed profile’s **`currentWeight`**; tape includes **`rightThigh`** and **`shoulders`**. |
+| `src/lib/seed/demo-data/physique/index.ts`                                | **`DEMO_PHYSIQUE_WEEKLY_BY_PERSONA`**, **`getDemoPhysiqueWeeks(personaId)`** — module doc states **only** `seedDemoHistoricalData` may consume this for production-shaped demos.                                       |
+
+**Mapping:** `seedDemoHistoricalData` collects **weekly** calendar dates (`i % 7 === 0` over the window), then for each week index `i` takes row `min(i, 11)` from that persona’s array and **`saveCheckIn(userId, date, buildStaticDemoCheckIn(...))`**. No runtime generator for scale/tape — edit the literals and re-load a demo profile.
+
+**Presentation layer:** Coach notes are **twelve distinct lines per persona** (oldest → newest week). Intermediate weeks apply **deterministic** small jitter to scale/tape from the literals (FNV-style hash on `personaId` + week + field) so History does not read like a perfect spreadsheet; the **last** check-in of the window uses **raw** row values so **`currentWeight`** / tape still match the active seed profile.
+
+### 4b. Synthetic daily telemetry (still generated in `demo-historical.ts`)
+
+- **`personaTuning`:** adherence, sleep, HRV, stress, meal portions, workout probability, etc. — tune “how messy” daily logs look without touching physique literals.
+- **`DEMO_HISTORY_DAYS`** (default **84** ≈ **12 weeks**) and **`getDemoHistoryStartDateString(days?)`:** demo seeds in **`src/lib/seed/index.ts`** pass the day count and align each program’s **`startDate`** with the history window so **today** is the last day of the anchored window.
+- **Writes:** **`createWorkout`**, **`saveNutritionDay`**, **`saveRecoveryEntry`**, **`saveSupplementLog`**, **`createJournalEntry`**, etc., so converters and timestamps stay consistent.
+
+**When you change data:** Re-seed via the **demo profile** UI (or a dev call to `seed*Data`) — editing TypeScript alone does not mutate Firestore.
 
 ---
 
@@ -136,7 +157,7 @@ After changing queries: run **`npm run deploy:indexes`** when your workflow allo
 ## 10. Suggested workflow for experts
 
 1. **Clarify goal:** Baseline first-login (Morton) vs demo persona overwrite vs coach JSON pack vs historical depth/tone.
-2. **Edit the smallest surface:** Static constants in `src/lib/seed/*.ts` and/or **`personaTuning`** in `demo-historical.ts`.
+2. **Edit the smallest surface:** Static profile/program modules in `src/lib/seed/*.ts`; **physique scale/tape** in `src/lib/seed/demo-data/physique/*.ts`; **daily demo noise** via **`personaTuning`** / helpers in **`demo-historical.ts`**.
 3. **Align types:** `src/lib/types/index.ts` (and validators in `import.service.ts` if import format changes).
 4. **Re-seed:** Use onboarding demo modal or controlled calls to `seed*Data` / import flow against **emulator or disposable test users** (`NEXT_PUBLIC_USE_FIREBASE_EMULATORS` — see `README_DATA_LAYER.md`).
 5. **Verify in app:** Dashboard bundle, training week, nutrition day, recovery trends — not only raw Firestore console.
@@ -153,23 +174,42 @@ After changing queries: run **`npm run deploy:indexes`** when your workflow allo
 
 ---
 
----
-
 ## 12. Default demo ecosystem (when expanding without a custom brief)
 
 Use these defaults unless product explicitly requests otherwise:
 
-| Decision        | Default                                                                                                                                               |
-| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Demo user count | **Four** roster personas: **Morton**, **Sheri**, **Alex**, **Jordan** (wired in **`DemoProfileModal.tsx`** and **`seed/index.ts`**)                   |
-| Time depth      | **`DEMO_HISTORY_DAYS` (84)** — twelve weeks of daily nutrition, recovery, supplements; weekly check-ins; persona-specific coaching journal milestones |
-| Delivery        | **Seed modules + `seedDemoHistoricalData`** — not raw scripts; **data only** (no Storage photo fixtures unless you add an explicit upload path)       |
-| Roster mix      | **Mixed**: masters male gain, female fat-loss journey, intermediate male hypertrophy, beginner female consistency                                     |
-| Realism         | **Serious amateur / coached** — intentional misses, mid-block deload week, Sheri stress-week bump, imperfect adherence in **`personaTuning`**         |
-| Schema          | **Preserve** existing types and validators; new fields require **`src/lib/types/index.ts`** + serializers + any import validators                     |
+| Decision        | Default                                                                                                                                                                                                          |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Demo user count | **Six** roster personas: **Morton**, **Sheri**, **Alex**, **Jordan**, **Fez**, **Maria** (wired in **`DemoProfileModal.tsx`** and **`seed/index.ts`**)                                                           |
+| Time depth      | **`DEMO_HISTORY_DAYS` (84)** — twelve weeks of daily nutrition, recovery, supplements; **twelve** weekly physique points from **`DEMO_PHYSIQUE_WEEKLY_BY_PERSONA`**; persona-specific journal milestones         |
+| Delivery        | **`seedDemoHistoricalData`** + static **`demo-data/physique/`** + **`personaTuning`** generator — not ad-hoc Firestore scripts; **data only** (no Storage photo fixtures unless you add an explicit upload path) |
+| Roster mix      | **Mixed**: masters gain, fat-loss beginner, intermediate hypertrophy, home beginner, vegan athlete bulk, home/pool mom recomp                                                                                    |
+| Realism         | **Physique:** hand-authored weekly trends per persona file; **daily logs:** serious amateur variance — deload week, Sheri/Maria stress bumps, imperfect adherence in **`personaTuning`**                         |
+| Schema          | **Preserve** existing types and validators; new fields require **`src/lib/types/index.ts`** + serializers + any import validators                                                                                |
 
 **Operational note:** Doubling history length **doubles** per-demo Firestore writes on overwrite; keep `DEMO_HISTORY_DAYS` bounded and adjust only with performance awareness.
 
 ---
 
-_Last aligned with repo layout as of the document’s introduction; if paths drift, trust `src/lib/firebase/config.ts` and this repo’s `ARCHITECTURE.md` over this file._
+## 13. Demo profile → UI theme (`AppTheme`)
+
+**Source of truth:** **`src/lib/seed/demo-theme.ts`** — exports **`DEMO_THEME_BY_PROFILE_ID`**, **`getDemoThemeForProfileId`**, **`getDemoThemeForClientName`** (lowercased `clientName` → preset). Re-exported from **`src/lib/seed/index.ts`** for app imports.
+
+**Where it applies:** **`DemoProfileModal`** calls **`getDemoThemeForProfileId(selected)`** after a successful `seed*Data` and sets **`useUIStore.setTheme`**. **`DemoThemeSync`** (`src/components/theme/demo-theme-sync.tsx`, mounted from **`src/app/layout.tsx`**) re-applies the same mapping when the signed-in profile’s **`clientName`** is a demo athlete so refresh/navigation does not revert to crimson alone.
+
+Presets are defined on **`html[data-theme='…']`** in **`src/app/globals.css`**.
+
+| Profile id | `AppTheme` | Rationale (short)                                      |
+| ---------- | ---------- | ------------------------------------------------------ |
+| `morton`   | `crimson`  | Default IRONMIND iron / masters intensity              |
+| `sheri`    | `hot-pink` | Distinct feminine energy for the cut-phase narrative   |
+| `alex`     | `emerald`  | Hypertrophy / KPI “progress in the green”              |
+| `jordan`   | `forge`    | Warm orange — beginner momentum, home-gym grit         |
+| `fez`      | `cobalt`   | Cool blue — ocean / cardio athlete, early AM gym focus |
+| `maria`    | `violet`   | Calm purple — home / pool / custody cadence            |
+
+Adding a seventh demo persona requires a **new** `AppTheme` preset in `globals.css` + `ui-store.ts`, or reusing an existing theme and accepting a duplicate.
+
+---
+
+_Last aligned with repo: hard-coded demo physique (`src/lib/seed/demo-data/physique/`), `deleteAllCheckIns` + `seedDemoHistoricalData`, `demo-theme.ts` + `DemoThemeSync`, and chart `dateKey` sorting. If paths drift, trust `src/lib/firebase/config.ts` and `ARCHITECTURE.md` over this file._

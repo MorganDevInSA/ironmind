@@ -189,13 +189,9 @@ npm run deploy:indexes    # firestore indexes
 
 ## Seed Data
 
-On first login, the app automatically seeds Firestore with Morgan's real data:
+On first login, the app runs **`seedUserData`** once and seeds Firestore with **Morton’s** baseline (profile, program, supplements, phase, volume landmarks, nutrition plan, coaching notes — see [`src/lib/seed/index.ts`](./src/lib/seed/index.ts)).
 
-- Athlete profile (age, goals, injury constraints)
-- 14-day rotating program with all exercises
-- Supplement protocol with 5 timing windows
-- Volume landmarks (MV/MEV/MAV/MRV)
-- Initial coaching notes
+**Demo roster (overwrite):** From onboarding or the guide, users can load **six** pre-built personas — **Morton, Sheri, Alex, Jordan, Fez, Maria** — via [`DemoProfileModal`](./src/components/onboarding/DemoProfileModal.tsx). Each run calls `seedMortonData` / `seedSheriData` / … , clears check-ins with **`deleteAllCheckIns`**, writes **twelve** weeks of **hand-authored** physique rows from [`src/lib/seed/demo-data/physique/`](./src/lib/seed/demo-data/physique/), generates **~12 weeks** of daily training/nutrition/recovery history (`DEMO_HISTORY_DAYS` + **`personaTuning`** in [`demo-historical.ts`](./src/lib/seed/demo-historical.ts)), and applies a matching **UI theme** from [`demo-theme.ts`](./src/lib/seed/demo-theme.ts) (also reapplied by [`DemoThemeSync`](./src/components/theme/demo-theme-sync.tsx) on refresh). Expert-facing touchpoints: [`Documentation/EXPERT-DEMO-DATA-AND-STORAGE-GUIDE.md`](./Documentation/EXPERT-DEMO-DATA-AND-STORAGE-GUIDE.md).
 
 ## Project Structure
 

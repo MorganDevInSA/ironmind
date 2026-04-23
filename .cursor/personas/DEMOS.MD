@@ -158,12 +158,16 @@ Alternate persona modules may use patterns such as:
 * `sheri-*`
 * `alex-*`
 * `jordan-*`
+* `fez-*` — vegan lean-bulk bodyboarder, shoulder hardware, commercial gym + cardio (`seedFezData`, theme **cobalt**)
+* `maria-*` — home/pool/stairs beginner, custody-aware weeks (`seedMariaData`, theme **violet**)
 
 Any new seed module must be imported and invoked through:
 
 `src/lib/seed/index.ts`
 
 Never create orphan seed files.
+
+**Synced product behaviour (repo):** Six demo profiles in `DemoProfileModal`; theme presets live in **`src/lib/seed/demo-theme.ts`** (**morton → crimson**, **sheri → hot-pink**, **alex → emerald**, **jordan → forge**, **fez → cobalt**, **maria → violet**) and apply after seed from the modal plus on navigation/refresh via **`DemoThemeSync`**. **`seedDemoHistoricalData`** calls **`deleteAllCheckIns`**, then maps **twelve** hand-authored weekly rows per persona from **`src/lib/seed/demo-data/physique/`** onto the anchored history window (daily workouts/nutrition/recovery still generated in **`demo-historical.ts`** via **`personaTuning`**). `saveCheckIn` merges measurements; **`sanitizeMeasurementsInput`** / **`measurementForChart`** reject or hide impossible circumferences; charts sort by date and use **`dateKey`**. See `Documentation/EXPERT-DEMO-DATA-AND-STORAGE-GUIDE.md` §3–§4, §13.
 
 ---
 

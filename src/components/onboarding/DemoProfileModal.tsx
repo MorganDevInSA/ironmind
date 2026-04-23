@@ -6,7 +6,15 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore, useUIStore } from '@/stores';
 import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/constants/query-keys';
-import { seedMortonData, seedSheriData, seedAlexData, seedJordanData } from '@/lib/seed';
+import {
+  seedMortonData,
+  seedSheriData,
+  seedAlexData,
+  seedJordanData,
+  seedFezData,
+  seedMariaData,
+  getDemoThemeForProfileId,
+} from '@/lib/seed';
 import { cn } from '@/lib/utils';
 
 // ─── demo profiles ────────────────────────────────────────────────────────────
@@ -115,6 +123,47 @@ const DEMO_PROFILES: DemoProfile[] = [
     coachNote:
       'Best outcomes come from time-efficient templates that remove scheduling friction and decision fatigue.',
   },
+  {
+    id: 'fez',
+    name: 'Fez',
+    age: 27,
+    sex: 'Male',
+    level: 'Advanced',
+    goal: 'Lean bulk 73 → 80 kg — vegan, shoulder-safe',
+    description:
+      'Champion bodyboarder rebuilding size on a fast metabolism: early-morning commercial gym work, high cardio base, surgical shoulder history with hardware.',
+    tag: 'Athlete rebuild',
+    tagColor: 'text-[#38BDF8] bg-[rgba(56,189,248,0.10)] border-[rgba(56,189,248,0.38)]',
+    lifestyle:
+      'Full-time job, trains before work, no alcohol or smoking, sleeps well and prioritises whole-food vegan fueling.',
+    trainingHistory:
+      'Elite ocean sport background; years of paddling and explosive lower-body demand; newer to structured hypertrophy blocks.',
+    geneticsNote:
+      'Hard gainer on paper — needs disciplined surplus and protein density without trashing joints.',
+    equipment: 'Commercial gym (machines, cables, free weights) plus pool access for recovery.',
+    coachNote:
+      'Progress pressing through neutral patterns; let legs and back carry overload while scale climbs slowly.',
+  },
+  {
+    id: 'maria',
+    name: 'Maria',
+    age: 45,
+    sex: 'Female',
+    level: 'Beginner',
+    goal: 'Slow recomp — stronger, a little heavier, better cardio',
+    description:
+      'Home-based mom with pool and hill stairs, no traditional gym; custody schedule drives either three straight training days or short kid-friendly sessions.',
+    tag: 'Home + pool',
+    tagColor: 'text-[#A78BFA] bg-[rgba(167,139,250,0.10)] border-[rgba(167,139,250,0.38)]',
+    lifestyle:
+      'Works from home, medium stress, social drinking and occasional smoking; nutrition stays relaxed but protein-conscious on busy weeks.',
+    trainingHistory:
+      'Naturally lean; more daily movement than formal lifting history — building strength habits from a low cardio base.',
+    geneticsNote: 'Fast burner — scale moves slowly even when tape and performance improve.',
+    equipment: 'Bodyweight, stairs, pool; optional light loads (backpack, bands).',
+    coachNote:
+      'Anchor the week around non-negotiable protein and 2–3 strength touches; pool and stairs build cardio without gym dependency.',
+  },
 ];
 
 interface DemoProfileModalProps {
@@ -142,14 +191,20 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
     try {
       if (selected === 'sheri') {
         await seedSheriData(user.uid);
-        useUIStore.getState().setTheme('hot-pink');
       } else if (selected === 'alex') {
         await seedAlexData(user.uid);
       } else if (selected === 'jordan') {
         await seedJordanData(user.uid);
+      } else if (selected === 'fez') {
+        await seedFezData(user.uid);
+      } else if (selected === 'maria') {
+        await seedMariaData(user.uid);
       } else {
         await seedMortonData(user.uid);
       }
+
+      const theme = getDemoThemeForProfileId(selected) ?? 'crimson';
+      useUIStore.getState().setTheme(theme);
       const qk = queryKeys(user.uid);
       await queryClient.invalidateQueries({ queryKey: qk.profile.all });
       await queryClient.invalidateQueries({ queryKey: qk.nutrition.all });
@@ -158,6 +213,7 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
       await queryClient.invalidateQueries({ queryKey: qk.supplements.all });
       await queryClient.invalidateQueries({ queryKey: qk.volume.all });
       await queryClient.invalidateQueries({ queryKey: qk.dashboard.all });
+      await queryClient.invalidateQueries({ queryKey: qk.physique.all });
       setDone(true);
       setTimeout(() => {
         onClose();

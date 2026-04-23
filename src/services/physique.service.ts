@@ -4,10 +4,13 @@ import {
   setDocument,
   addDocument,
   queryDocuments,
+  getAllDocuments,
+  deleteDocument,
   orderBy,
   limit,
   where,
   createConverter,
+  stripUndefinedDeep,
 } from '@/lib/firebase';
 import { collections } from '@/lib/firebase/config';
 import {
@@ -19,11 +22,30 @@ import {
   deleteStoragePaths,
 } from './storage.service';
 import { withService } from '@/lib/errors';
+import { sanitizeMeasurementsInput } from '@/lib/utils/measurement-bounds';
 
 const converter = createConverter<CheckIn>();
 
 /** Default max rows returned for full check-in history lists. */
 const DEFAULT_CHECK_IN_LIST_LIMIT = 500;
+
+/**
+ * Removes every check-in document for the user (any doc id).
+ * Demo seeds must call this before writing static rows so legacy `addDocument` check-ins
+ * (random ids) cannot pollute charts alongside date-keyed demo writes.
+ */
+export async function deleteAllCheckIns(userId: string): Promise<void> {
+  return withService('physique', 'delete all check-ins', async () => {
+    if (!userId) throw new Error('Cannot delete check-ins without a signed-in user');
+    const path = collections.checkIns(userId);
+    const rows = await getAllDocuments<CheckIn>(path, converter);
+    const CHUNK = 40;
+    for (let i = 0; i < rows.length; i += CHUNK) {
+      const slice = rows.slice(i, i + CHUNK);
+      await Promise.all(slice.map((r) => deleteDocument(path, r.id)));
+    }
+  });
+}
 
 // Get check-in by date
 export async function getCheckIn(userId: string, date: string): Promise<CheckIn | null> {
@@ -66,15 +88,24 @@ export async function saveCheckIn(
   date: string,
   checkIn: Partial<CheckIn>,
 ): Promise<void> {
-  return withService('physique', 'save check-in', () => {
+  return withService('physique', 'save check-in', async () => {
     if (!userId) throw new Error('Cannot save check-in without a signed-in user');
 
-    const merged = {
+    const existing = await getCheckIn(userId, date);
+    const sanitizedIncoming = sanitizeMeasurementsInput(checkIn.measurements);
+    const mergedMeasurements: Measurements = {
+      ...(existing?.measurements ?? {}),
+      ...sanitizedIncoming,
+    };
+
+    const merged = stripUndefinedDeep({
+      ...(existing ?? {}),
       ...checkIn,
       date,
-      measurements: checkIn.measurements ?? {},
-    };
-    return setDocument<CheckIn>(collections.checkIns(userId), date, merged as CheckIn, converter);
+      measurements: mergedMeasurements,
+    }) as CheckIn;
+
+    return setDocument<CheckIn>(collections.checkIns(userId), date, merged, converter);
   });
 }
 

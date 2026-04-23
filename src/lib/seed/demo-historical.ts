@@ -18,12 +18,15 @@ import { createWorkout } from '@/services/training.service';
 import { saveNutritionDay } from '@/services/nutrition.service';
 import { saveSupplementLog } from '@/services/supplements.service';
 import { saveRecoveryEntry } from '@/services/recovery.service';
-import { saveCheckIn } from '@/services/physique.service';
+import { deleteAllCheckIns, saveCheckIn } from '@/services/physique.service';
 import { createJournalEntry } from '@/services/coaching.service';
 import { calculateCalories, calculateComplianceScore } from '@/lib/utils/calculations';
 import { addDays, format, parseISO, startOfDay } from 'date-fns';
-
-type DemoPersonaId = 'morton' | 'sheri' | 'alex' | 'jordan';
+import {
+  DEMO_PHYSIQUE_WEEKLY_BY_PERSONA,
+  type DemoPersonaId,
+  type DemoPhysiqueWeek,
+} from './demo-data/physique';
 
 /**
  * Demo overwrite seeds (`seedMortonData`, etc.) align program `startDate` and
@@ -64,7 +67,6 @@ interface PersonaTuning {
   avgEnergy: number;
   avgMood: number;
   avgDomsOnLift: number;
-  weeklyWeightDelta: number;
   mealPortionMultiplier: number;
 }
 
@@ -80,7 +82,6 @@ const personaTuning: Record<DemoPersonaId, PersonaTuning> = {
     avgEnergy: 7.5,
     avgMood: 7.4,
     avgDomsOnLift: 5.5,
-    weeklyWeightDelta: 0.14,
     mealPortionMultiplier: 1.05,
   },
   sheri: {
@@ -94,7 +95,6 @@ const personaTuning: Record<DemoPersonaId, PersonaTuning> = {
     avgEnergy: 6.1,
     avgMood: 6.4,
     avgDomsOnLift: 4.7,
-    weeklyWeightDelta: -0.28,
     mealPortionMultiplier: 0.92,
   },
   alex: {
@@ -108,7 +108,6 @@ const personaTuning: Record<DemoPersonaId, PersonaTuning> = {
     avgEnergy: 7.2,
     avgMood: 7.1,
     avgDomsOnLift: 5.8,
-    weeklyWeightDelta: 0.2,
     mealPortionMultiplier: 1.02,
   },
   jordan: {
@@ -122,8 +121,33 @@ const personaTuning: Record<DemoPersonaId, PersonaTuning> = {
     avgEnergy: 6.2,
     avgMood: 6.6,
     avgDomsOnLift: 4.8,
-    weeklyWeightDelta: -0.16,
     mealPortionMultiplier: 0.94,
+  },
+  fez: {
+    workoutAdherence: 0.91,
+    nutritionAdherence: 0.86,
+    supplementAdherence: 0.84,
+    avgSleepHours: 7.5,
+    avgSleepQuality: 7.6,
+    avgHrv: 74,
+    avgStress: 4.2,
+    avgEnergy: 7.8,
+    avgMood: 7.6,
+    avgDomsOnLift: 5.2,
+    mealPortionMultiplier: 1.06,
+  },
+  maria: {
+    workoutAdherence: 0.72,
+    nutritionAdherence: 0.78,
+    supplementAdherence: 0.7,
+    avgSleepHours: 6.5,
+    avgSleepQuality: 6.3,
+    avgHrv: 60,
+    avgStress: 5.8,
+    avgEnergy: 6.4,
+    avgMood: 6.5,
+    avgDomsOnLift: 4.5,
+    mealPortionMultiplier: 1,
   },
 };
 
@@ -180,6 +204,9 @@ export async function seedDemoHistoricalData(ctx: HistoricalSeedContext): Promis
   const historyStart = ctx.historyStartDate
     ? startOfDay(parseISO(ctx.historyStartDate))
     : addDays(startOfDay(new Date()), -days + 1);
+
+  await deleteAllCheckIns(ctx.userId);
+
   const checkInDates: string[] = [];
   const totalWeeks = Math.max(1, Math.ceil(days / 7));
   const midDeloadWeek = Math.max(1, Math.floor(totalWeeks / 2) - 1);
@@ -193,15 +220,21 @@ export async function seedDemoHistoricalData(ctx: HistoricalSeedContext): Promis
     const weekNum = Math.floor(i / 7);
     const isDeloadWeek = weekNum === midDeloadWeek;
     const isStressWeekSheri = ctx.personaId === 'sheri' && weekNum === 3;
+    const isStressWeekMaria = ctx.personaId === 'maria' && weekNum === 5;
 
     let workoutP = tuning.workoutAdherence;
     if (isDeloadWeek)
-      workoutP *= ctx.personaId === 'morton' || ctx.personaId === 'alex' ? 0.86 : 0.78;
+      workoutP *=
+        ctx.personaId === 'morton' || ctx.personaId === 'alex' || ctx.personaId === 'fez'
+          ? 0.86
+          : 0.78;
     if (isStressWeekSheri) workoutP *= 0.88;
+    if (isStressWeekMaria) workoutP *= 0.85;
 
     let nutritionP = tuning.nutritionAdherence;
     if (isDeloadWeek) nutritionP *= 0.93;
     if (isStressWeekSheri) nutritionP *= 0.89;
+    if (isStressWeekMaria) nutritionP *= 0.9;
 
     const didWorkout = Boolean(isLift && chance(workoutP, i, 11));
     const dayType = resolveDayType(session?.type, i);
@@ -246,7 +279,7 @@ export async function seedDemoHistoricalData(ctx: HistoricalSeedContext): Promis
       tuning,
       dayIndex: i,
       personaId: ctx.personaId,
-      stressBump: isStressWeekSheri ? 1.4 : isDeloadWeek ? -0.35 : 0,
+      stressBump: isStressWeekSheri ? 1.4 : isStressWeekMaria ? 1.1 : isDeloadWeek ? -0.35 : 0,
     });
     await saveRecoveryEntry(ctx.userId, date, recovery);
 
@@ -255,15 +288,19 @@ export async function seedDemoHistoricalData(ctx: HistoricalSeedContext): Promis
     }
   }
 
+  const weeklySeries = DEMO_PHYSIQUE_WEEKLY_BY_PERSONA[ctx.personaId];
   for (let i = 0; i < checkInDates.length; i++) {
     const date = checkInDates[i];
-    const checkIn = buildCheckIn({
-      profile: ctx.profile,
+    const rawRow = weeklySeries[Math.min(i, weeklySeries.length - 1)];
+    const isAnchorWeek = i === checkInDates.length - 1;
+    const row = isAnchorWeek
+      ? rawRow
+      : applyDemoPhysiquePresentationNoise(rawRow, ctx.personaId, i);
+    const checkIn = buildStaticDemoCheckIn({
+      personaId: ctx.personaId,
       date,
       weekIndex: i,
-      weeklyWeightDelta: tuning.weeklyWeightDelta,
-      personaId: ctx.personaId,
-      totalCheckInWeeks: checkInDates.length,
+      row,
     });
     await saveCheckIn(ctx.userId, date, checkIn);
   }
@@ -466,25 +503,77 @@ function buildRecoveryEntry(args: {
   };
 }
 
-function buildCheckIn(args: {
-  profile: AthleteProfile;
+/** FNV-1a 32-bit → [0, 1) — deterministic micro-variation on demo check-ins (anchor week excluded). */
+function demoSeededUnit(personaId: DemoPersonaId, weekIndex: number, field: string): number {
+  let h = 2166136261;
+  const s = `${personaId}\0${weekIndex}\0${field}`;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return ((h >>> 0) % 10000) / 10000;
+}
+
+function demoSeededSigned(
+  personaId: DemoPersonaId,
+  weekIndex: number,
+  field: string,
+  magnitude: number,
+): number {
+  const u = demoSeededUnit(personaId, weekIndex, field);
+  return (u * 2 - 1) * magnitude;
+}
+
+function roundMeasurement(n: number): number {
+  return Math.round(n * 10) / 10;
+}
+
+function applyDemoPhysiquePresentationNoise(
+  row: DemoPhysiqueWeek,
+  personaId: DemoPersonaId,
+  weekIndex: number,
+): DemoPhysiqueWeek {
+  const m = row.measurements;
+  const keys = [
+    'waist',
+    'chest',
+    'hips',
+    'leftArm',
+    'rightArm',
+    'leftThigh',
+    'rightThigh',
+    'shoulders',
+  ] as const;
+  const measurements = { ...m };
+  for (const k of keys) {
+    const v = m[k];
+    if (typeof v === 'number') {
+      const maxJ =
+        k === 'waist' || k === 'hips' ? 0.28 : k === 'chest' || k === 'shoulders' ? 0.22 : 0.18;
+      measurements[k] = roundMeasurement(v + demoSeededSigned(personaId, weekIndex, k, maxJ));
+    }
+  }
+  return {
+    bodyweight: roundMeasurement(
+      row.bodyweight + demoSeededSigned(personaId, weekIndex, 'bodyweight', 0.14),
+    ),
+    measurements,
+  };
+}
+
+function buildStaticDemoCheckIn(args: {
+  personaId: DemoPersonaId;
   date: string;
   weekIndex: number;
-  weeklyWeightDelta: number;
-  personaId: DemoPersonaId;
-  totalCheckInWeeks: number;
+  row: DemoPhysiqueWeek;
 }): Partial<CheckIn> {
-  const base = args.profile.currentWeight;
-  const mid = Math.max(1, Math.floor(args.totalCheckInWeeks / 2));
-  const drift = args.weeklyWeightDelta * (args.weekIndex - mid);
-  const waveNoise = wave(args.weekIndex * 2, 0.35);
-  const bodyweight = round1(base + drift + waveNoise);
-
   const conditioningByPersona: Record<DemoPersonaId, number> = {
     morton: 7,
     alex: 7,
     sheri: 5,
     jordan: 6,
+    fez: 8,
+    maria: 5,
   };
   const conditioningScore = clamp(
     conditioningByPersona[args.personaId] + jitter(args.weekIndex, -1, 1),
@@ -494,16 +583,12 @@ function buildCheckIn(args: {
 
   return {
     date: args.date,
-    bodyweight,
-    measurements: {
-      waist: round1(82 + drift * -1.1 + wave(args.weekIndex + 2, 0.9)),
-      chest: round1(103 + drift * 0.6 + wave(args.weekIndex + 1, 0.8)),
-      shoulders: round1(118 + drift * 0.4 + wave(args.weekIndex + 3, 0.7)),
-    },
+    bodyweight: args.row.bodyweight,
+    measurements: args.row.measurements,
     photoUrls: [],
     conditioningScore,
-    symmetryNotes: 'Stable symmetry. Minor right-left fatigue differences noted post-session.',
-    coachNotes: checkInCoachNotes(args.personaId, args.weekIndex, args.totalCheckInWeeks),
+    symmetryNotes: demoSymmetryNotesForWeek(args.personaId, args.weekIndex),
+    coachNotes: checkInCoachNotes(args.personaId, args.weekIndex),
   };
 }
 
@@ -642,6 +727,66 @@ function buildJournalNotes(
         tags: ['summary', 'progress'],
       },
     ],
+    fez: [
+      {
+        date: d1,
+        title: 'Lean Bulk + Cardio Base',
+        content:
+          'Vegan fueling locked in; early AM sessions suit work. Shoulder hardware respected — neutral pressing only.',
+        tags: ['vegan', 'shoulder'],
+      },
+      {
+        date: d2,
+        title: 'Load Audit',
+        content:
+          'Back and legs taking overload well; chest volume via machines and cables. Added one low-impact cardio finisher.',
+        tags: ['volume', 'cardio'],
+      },
+      {
+        date: d3,
+        title: 'Deload + Surf Fitness',
+        content:
+          'Pull-back week on pressing; kept leg intensity moderate. Pool and board prep on weekends without junk volume.',
+        tags: ['deload', 'sport'],
+      },
+      {
+        date: d4,
+        title: 'Quarter Check',
+        content:
+          'Weight creeping toward 80 kg goal — slow is correct for this metabolism. Strength logs show honest progression.',
+        tags: ['summary', 'hypertrophy'],
+      },
+    ],
+    maria: [
+      {
+        date: d1,
+        title: 'Home + Pool Start',
+        content:
+          'Three quality windows per week when custody allows; stairs and pool for low-joint-impact cardio.',
+        tags: ['home', 'habits'],
+      },
+      {
+        date: d2,
+        title: 'Kid-Friendly Week',
+        content:
+          'Shortened sessions with bodyweight circuits; hit step target on hill repeats twice. Nutrition stayed relaxed but protein first.',
+        tags: ['schedule', 'family'],
+      },
+      {
+        date: d3,
+        title: 'Stress + Social',
+        content:
+          'More social drinking this week; sleep ok but HRV dipped. Kept training modest and added an extra pool recovery day.',
+        tags: ['stress', 'recovery'],
+      },
+      {
+        date: d4,
+        title: 'Recomposition Note',
+        content:
+          'Scale barely moved but tape trending better — expected for a fast burner adding strength. Next block nudges stair density.',
+        tags: ['summary', 'strength'],
+      },
+    ],
   };
 
   return byPersona[personaId];
@@ -667,28 +812,132 @@ function workoutSessionNotes(
   if (personaId === 'jordan' && weekIndex >= 7) {
     return 'Time-capped session; prioritized compounds and single top set per pattern.';
   }
+  if (personaId === 'fez' && weekIndex >= 2) {
+    return 'Pinned shoulder work: neutral grips, stop short of pain; log overhead tolerance.';
+  }
+  if (personaId === 'maria' && weekIndex === 5) {
+    return 'Custody swap week — shorter sessions, kept pool laps and stairs easy.';
+  }
   return undefined;
 }
 
-function checkInCoachNotes(
-  personaId: DemoPersonaId,
-  weekIndex: number,
-  totalWeeks: number,
-): string {
-  const late = weekIndex >= totalWeeks - 2;
-  if (personaId === 'sheri') {
-    return late
-      ? 'Scale trend and tape measures align; next focus is tightening weekend structure.'
-      : 'Technique and routine are trending in the right direction.';
+/** One coaching note per check-in week (oldest → newest). Avoids copy-paste “generic progress” copy. */
+const DEMO_CHECK_IN_COACH_NOTES: Record<DemoPersonaId, readonly string[]> = {
+  morton: [
+    'Baseline tape + photos locked in; trust the trend line, not single-meal scale noise.',
+    'Pelvic tolerance holding; kept hinge top sets conservative after a heavy pull day.',
+    'Minor R–L difference after push day — no pain, log rear-delt balance for next block.',
+    'Higher-sodium weekend; scale jumped while waist still cooperated — sanity check passed.',
+    'Short sleep once; dropped one pump finish, kept KPI sets crisp and honest on RIR.',
+    'Entering planned deload — reps in reserve, ego stays out of the working sets.',
+    'Deload executed; shoulders feel less packed, bar speed on benchmarks already cleaner.',
+    'Re-ramp week one: extra warm-up sets on bench until the groove feels automatic again.',
+    'Upper-back tightness from volume — face pulls + thoracic work already helping.',
+    'Leg-day appetite up; peri timing consistent, digestion cooperating on training days.',
+    'Late-block tissue check: dull fatigue ok — flag anything sharp or nerve-like early.',
+    'Twelve-week close: strength retained, waist tighter vs week 0 — easy week before next bias.',
+  ],
+  sheri: [
+    'Foundation: repeatable week template beats one heroic week you cannot repeat.',
+    'Steps creeping up; keep protein anchored on the busiest workdays first.',
+    'Weekend structure is still the lever — pre-portion Sat/Sun when you can.',
+    'Stress week: shortened accessories, protected your staple lifts — smart trade.',
+    'Sleep fragmented; hydration steady — expect a noisy scale without changing the plan.',
+    'Routine back; waist responding again after the dip — behaviours over panic cuts.',
+    'Hunger spikes normal mid-run — volume foods added, not deprivation math.',
+    'Energy returning; celebrate consistency, not chasing a new low every morning.',
+    'Social calendar busy — pre-log drinks or shift meal timing, not both blind.',
+    'Training confidence rebuilt; one push session felt strong without anxiety.',
+    'Tape catching up to intention; next phase can tighten weekend guardrails.',
+    'Close-out: trend and story match — maintainable habits over sprint perfection.',
+  ],
+  alex: [
+    'KPIs set; execution quality is the product — not just load on the bar.',
+    'Elbow tolerating tempo tweaks; extension work after pressing, not before.',
+    'Upper volume tolerable — trap awareness, no sharp insertion symptoms.',
+    'Plateau “on paper” but bar speed up — trust process metrics, not one bad day.',
+    'One missed session; made it up without stacking two heavy lowers same week.',
+    'Optional cardio day used as real Zone 2 — recovery markers bounced next morning.',
+    'Intensification gate: hold volume, nudge top-set intent week to week.',
+    'Weak-point slot worked without trashing joints — log RIR like a coach would.',
+    'Digestion steady on surplus; fibre unchanged despite appetite swings.',
+    'Pull width improving; lockout still the limiter on pressing — noted for bias.',
+    'Pre-test week: fewer novel exercises; baseline KPI attempts when fresh.',
+    'Mesocycle close: weight and e1RM direction align — pick strength vs volume next.',
+  ],
+  jordan: [
+    'Three lifts + simple meals beats a complicated plan you cannot repeat weekly.',
+    'Home setup dialed; warm-up now standard before goblet and hinge patterns.',
+    'Time-capped day: compounds only — still a green week, not a failed one.',
+    'Holiday friction: shorter sessions, protein still hit — huge adherence win.',
+    'Steps back after a structured week — waist agrees before the scale does.',
+    'Confidence up on patterns; tempted to add load — held the technique standard.',
+    'School week chaos; one session moved to early AM, no all-or-nothing spiral.',
+    'Beginner DOMS noise; sleep + meal timing fixed the “fried” feeling fast.',
+    'Easy walks on off days without junk fatigue — habits stacking quietly.',
+    'Second tape read same time of day — less fake “progress” from measurement noise.',
+    'Small waist move finally visible; celebrate behaviours, not mirror days only.',
+    'Habit block done; loads honest, not heroic — ready for the next repeatable template.',
+  ],
+  fez: [
+    'Vegan fuel locked; AM sessions suit — log shoulder tolerance after every press variant.',
+    'Neutral-grip bias week; stop short on overhead extension, no hero reps on pins.',
+    'Legs taking overload; chest via machines/cables — beach muscle lives in safety.',
+    'Pool finisher once; surf prep without junk volume through the shoulder.',
+    'Higher-sodium day; scale bounced, tape on story — vegan mass is inherently noisy.',
+    'Pull week on pressing volume; legs moderate, cardio kept easy on joints.',
+    'Shoulder-friendly row angles trialled; pain diary shows improving overhead numbers.',
+    'Travel week sleep dip; reduced accessory density, not main movement patterns.',
+    'Back thickness improving; pressing cap still rule #0 on any joint complaint.',
+    'Plant protein spread daytime — leucine anchors still hugging training windows.',
+    'Slow gain correct for this metabolism; strength logs honest vs scale fairy tales.',
+    'Quarter close: drift toward goal weight — protect hardware on the next ramp.',
+  ],
+  maria: [
+    'Three windows when custody allows; stairs + pool for low-impact cardio base.',
+    'Home circuit template repeated; kid interruptions logged, not hidden from the coach.',
+    'Protein-first breakfast stuck on rush mornings — small but compounding win.',
+    'Custody handoff week: shorter sessions, easy pool laps, no guilt spiral.',
+    'Stress + social week; HRV dipped — modest training, extra easy pool recovery day.',
+    '“Big kid week” once; knees tolerated stairs after a longer warm-up block.',
+    'Scale flat expected; tape trending — fast-burner recomp story still intact.',
+    'Sleep ok after a late social; rehydration day reduced puff without panic cuts.',
+    'Hill repeats twice; step target hit without joint complaint — durable volume.',
+    'Pool warm-ups carried better posture into DB work — less neck-dominant shrug.',
+    'Stairs density nudge next block; this week stayed conservative post busy weekend.',
+    'Close-out: strength markers up while scale behaved — smart stair repeats next.',
+  ],
+};
+
+function demoSymmetryNotesForWeek(personaId: DemoPersonaId, weekIndex: number): string {
+  if (personaId === 'fez') {
+    const lines = [
+      'Post-surgical shoulder: mild R–L pressing tolerance; legs and back tracking evenly.',
+      'Overhead path still capped — rows and legs show clean bilateral progress.',
+      'Neutral-grip week: watch old compensation patterns on fatigued pressing sets.',
+    ];
+    return lines[weekIndex % lines.length];
   }
-  if (personaId === 'jordan') {
-    return late
-      ? 'Momentum returned after the compressed week; keep loads honest, not heroic.'
-      : 'Technique and routine are trending in the right direction.';
+  if (personaId === 'maria') {
+    const lines = [
+      'Home training bias; watch knee tracking on stairs volume — otherwise symmetrical.',
+      'Pool warm-ups helping posture; less neck-dominant shrug on light pressing.',
+      'Single-leg work: L leg slightly stronger on stairs — note for next block balance.',
+    ];
+    return lines[weekIndex % lines.length];
   }
-  return late
-    ? 'Final weeks show better consistency and improved fatigue management.'
-    : 'Technique and routine are trending in the right direction.';
+  const lines = [
+    'Stable symmetry. Minor right-left fatigue differences noted post-session.',
+    'No acute asymmetry flags; trivial DOMS side-to-side differences only.',
+    'Tape checkpoints: L–R limbs within normal measurement-variance window.',
+    'Daily steps: no favouring one side during warm-up or casual walking.',
+  ];
+  return lines[weekIndex % lines.length];
+}
+
+function checkInCoachNotes(personaId: DemoPersonaId, weekIndex: number): string {
+  const list = DEMO_CHECK_IN_COACH_NOTES[personaId];
+  return list[Math.min(weekIndex, list.length - 1)] ?? list[0];
 }
 
 function buildMeals(
@@ -761,6 +1010,8 @@ function inferBaseWeight(personaId: DemoPersonaId, exerciseName: string): number
     sheri: 14,
     alex: 42,
     jordan: 16,
+    fez: 38,
+    maria: 8,
   };
   let adjustment = 0;
   if (n.includes('squat')) adjustment += 16;
@@ -774,7 +1025,7 @@ function inferBaseWeight(personaId: DemoPersonaId, exerciseName: string): number
 
 function progressionStep(personaId: DemoPersonaId, exerciseName: string): number {
   const n = exerciseName.toLowerCase();
-  const base = personaId === 'sheri' || personaId === 'jordan' ? 0.5 : 1;
+  const base = personaId === 'sheri' || personaId === 'jordan' || personaId === 'maria' ? 0.5 : 1;
   if (n.includes('deadlift') || n.includes('squat')) return base + 0.7;
   if (n.includes('bench') || n.includes('row') || n.includes('pull')) return base + 0.4;
   return base;

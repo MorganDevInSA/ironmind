@@ -49,6 +49,20 @@ import { jordanSupplementProtocol } from './jordan-supplements';
 import { jordanInitialPhase } from './jordan-phase';
 import { jordanVolumeLandmarks } from './jordan-volume-landmarks';
 
+import { fezProfile } from './fez-profile';
+import { fezProgram } from './fez-program';
+import { fezNutritionPlan } from './fez-nutrition';
+import { fezSupplementProtocol } from './fez-supplements';
+import { fezInitialPhase } from './fez-phase';
+import { fezVolumeLandmarks } from './fez-volume-landmarks';
+
+import { mariaProfile } from './maria-profile';
+import { mariaProgram } from './maria-program';
+import { mariaNutritionPlan } from './maria-nutrition';
+import { mariaSupplementProtocol } from './maria-supplements';
+import { mariaInitialPhase } from './maria-phase';
+import { mariaVolumeLandmarks } from './maria-volume-landmarks';
+
 export type SeedJobStatus = 'running' | 'success' | 'failed';
 
 export interface SeedJobRecord {
@@ -341,6 +355,92 @@ export async function seedJordanData(userId: string): Promise<void> {
   await markUserSeeded(userId);
 }
 
+/**
+ * Seed Fez's data — overwrites any existing data for userId
+ */
+export async function seedFezData(userId: string): Promise<void> {
+  await updateProfile(userId, fezProfile);
+  const historyStartStr = getDemoHistoryStartDateString();
+  const programId = await createProgram(userId, {
+    ...fezProgram,
+    startDate: historyStartStr,
+  });
+  await setActiveProgram(userId, programId);
+  await saveProtocol(userId, fezSupplementProtocol);
+  const phaseId = await createPhase(userId, fezInitialPhase);
+  await setActivePhase(userId, phaseId);
+  await updateVolumeLandmarks(userId, fezVolumeLandmarks);
+
+  await saveNutritionPlan(userId, fezNutritionPlan);
+  const todayStr = today();
+  await saveNutritionDay(userId, todayStr, {
+    date: todayStr,
+    dayType: 'high',
+    meals: [],
+    macroTargets: fezNutritionPlan.macroTargetsByDayType.high,
+    macroActuals: { calories: 0, protein: 0, carbs: 0, fat: 0 },
+    complianceScore: 0,
+  });
+  await seedDemoHistoricalData({
+    personaId: 'fez',
+    userId,
+    profile: fezProfile,
+    programId,
+    program: {
+      ...fezProgram,
+      startDate: historyStartStr,
+    },
+    nutritionPlan: fezNutritionPlan,
+    supplementProtocol: fezSupplementProtocol,
+    days: DEMO_HISTORY_DAYS,
+    historyStartDate: historyStartStr,
+  });
+  await markUserSeeded(userId);
+}
+
+/**
+ * Seed Maria's data — overwrites any existing data for userId
+ */
+export async function seedMariaData(userId: string): Promise<void> {
+  await updateProfile(userId, mariaProfile);
+  const historyStartStr = getDemoHistoryStartDateString();
+  const programId = await createProgram(userId, {
+    ...mariaProgram,
+    startDate: historyStartStr,
+  });
+  await setActiveProgram(userId, programId);
+  await saveProtocol(userId, mariaSupplementProtocol);
+  const phaseId = await createPhase(userId, mariaInitialPhase);
+  await setActivePhase(userId, phaseId);
+  await updateVolumeLandmarks(userId, mariaVolumeLandmarks);
+
+  await saveNutritionPlan(userId, mariaNutritionPlan);
+  const todayStr = today();
+  await saveNutritionDay(userId, todayStr, {
+    date: todayStr,
+    dayType: 'moderate',
+    meals: [],
+    macroTargets: mariaNutritionPlan.macroTargetsByDayType.moderate,
+    macroActuals: { calories: 0, protein: 0, carbs: 0, fat: 0 },
+    complianceScore: 0,
+  });
+  await seedDemoHistoricalData({
+    personaId: 'maria',
+    userId,
+    profile: mariaProfile,
+    programId,
+    program: {
+      ...mariaProgram,
+      startDate: historyStartStr,
+    },
+    nutritionPlan: mariaNutritionPlan,
+    supplementProtocol: mariaSupplementProtocol,
+    days: DEMO_HISTORY_DAYS,
+    historyStartDate: historyStartStr,
+  });
+  await markUserSeeded(userId);
+}
+
 // Re-export all seed data for reference
 export { mortonProfile } from './profile';
 export { mortonProgram } from './program';
@@ -350,3 +450,14 @@ export { mortonInitialPhase } from './phase';
 export { mortonVolumeLandmarks } from './volume-landmarks';
 export { mortonInitialNotes } from './coaching-notes';
 export { DEMO_HISTORY_DAYS } from './demo-historical';
+export {
+  DEMO_THEME_BY_PROFILE_ID,
+  getDemoThemeForClientName,
+  getDemoThemeForProfileId,
+} from './demo-theme';
+export {
+  DEMO_PHYSIQUE_WEEKLY_BY_PERSONA,
+  getDemoPhysiqueWeeks,
+  type DemoPersonaId,
+  type DemoPhysiqueWeek,
+} from './demo-data/physique';

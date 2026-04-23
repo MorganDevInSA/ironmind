@@ -1,34 +1,35 @@
-import type { Metadata, Viewport } from "next";
-import "./globals.css";
-import { brandAssets } from "@/lib/constants/brand-assets";
-import { QueryProvider } from "@/components/providers/query-provider";
-import { Toaster } from "sonner";
-import { RegisterServiceWorker } from "@/components/pwa/register-service-worker";
-import { ThemeSync } from "@/components/theme/theme-sync";
-import { SheriThemeSync } from "@/components/theme/sheri-theme-sync";
+import type { Metadata, Viewport } from 'next';
+import './globals.css';
+import { brandAssets } from '@/lib/constants/brand-assets';
+import { QueryProvider } from '@/components/providers/query-provider';
+import { Toaster } from 'sonner';
+import { RegisterServiceWorker } from '@/components/pwa/register-service-worker';
+import { ThemeSync } from '@/components/theme/theme-sync';
+import { DemoThemeSync } from '@/components/theme/demo-theme-sync';
 
 export const metadata: Metadata = {
-  title: "IRONMIND — Elite Bodybuilding Performance",
-  description: "Elite solo-athlete bodybuilding performance system. Track training, nutrition, recovery, and physique with data-driven precision.",
-  keywords: ["bodybuilding", "fitness", "strength training", "nutrition tracking", "workout log"],
-  authors: [{ name: "IRONMIND" }],
+  title: 'IRONMIND — Elite Bodybuilding Performance',
+  description:
+    'Elite solo-athlete bodybuilding performance system. Track training, nutrition, recovery, and physique with data-driven precision.',
+  keywords: ['bodybuilding', 'fitness', 'strength training', 'nutrition tracking', 'workout log'],
+  authors: [{ name: 'IRONMIND' }],
   other: {
-    "mobile-web-app-capable": "yes",
+    'mobile-web-app-capable': 'yes',
   },
-  manifest: "/manifest.json",
+  manifest: '/manifest.json',
   icons: {
     apple: brandAssets.appleTouchIcon,
   },
   appleWebApp: {
     capable: true,
-    statusBarStyle: "black-translucent",
-    title: "IRONMIND",
+    statusBarStyle: 'black-translucent',
+    title: 'IRONMIND',
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0A0A0A",
-  width: "device-width",
+  themeColor: '#0A0A0A',
+  width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
 };
@@ -43,7 +44,7 @@ export default function RootLayout({
       <body className="min-h-full text-foreground font-sans">
         <QueryProvider>
           <ThemeSync />
-          <SheriThemeSync />
+          <DemoThemeSync />
           {children}
           <RegisterServiceWorker />
           <Toaster

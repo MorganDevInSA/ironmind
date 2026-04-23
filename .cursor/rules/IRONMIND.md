@@ -10,7 +10,7 @@ These rules are enforced on every edit in this project. No exceptions.
 
 **Stack**: Next.js 14 (App Router) · TypeScript strict · Tailwind CSS v3 · shadcn/ui · Firebase (Auth + Firestore + Storage) · TanStack Query · Zustand · Framer Motion · Recharts · Lucide Icons.
 
-**Themes**: **Crimson** (default), **Hot Pink**, **Cobalt**, **Forge**, **Emerald**, **Violet**, plus **Custom** (user-chosen hex via `tinycolor2` in `ThemeSync`). Presets map to `html[data-theme="…"]` blocks in `globals.css`; all accent colors use CSS variables for theme support.
+**Themes**: **Crimson** (default), **Hot Pink**, **Cobalt**, **Forge**, **Emerald**, **Violet**, plus **Custom** (user-chosen hex via `tinycolor2` in `ThemeSync`). Presets map to `html[data-theme="…"]` blocks in `globals.css`; all accent colors use CSS variables for theme support. **Demo profiles:** `src/lib/seed/demo-theme.ts` maps profile id → preset (e.g. Fez → cobalt, Maria → violet); `DemoProfileModal` applies it after `seed*Data` succeeds, and `DemoThemeSync` reapplies on load when `clientName` matches a demo athlete. See `Documentation/EXPERT-DEMO-DATA-AND-STORAGE-GUIDE.md` §13.
 
 ---
 
