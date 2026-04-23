@@ -44,7 +44,7 @@
     "autoprefixer": "^10.5.0",
     "eslint": "^8.57.0",
     "eslint-config-next": "^14.2.35",
-    "lint-staged": "^15.2.11",
+    "lint-staged": "^16.4.0",
     "postcss": "^8.5.10",
     "prettier": "^3.4.2",
     "simple-git-hooks": "^2.12.1",
