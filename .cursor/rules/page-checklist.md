@@ -63,6 +63,11 @@ Every page must pass this checklist before being marked complete.
 - [ ] Back navigation works as expected
 - [ ] Active state shown in nav
 
+### Dashboard — trend day strip (`/dashboard`)
+
+- [ ] Changing the selected date updates **session**, **schedule row** (meals / vitamins / activity from logs), **nutrition**, **recovery**, and **supplements** for that date — use **`useNutritionDay`**, **`useRecoveryEntry`**, **`useSupplementLog`** keyed by selection, not only **`useDashboardData`**’s today bundle fields
+- [ ] **Start workout** / primary logging CTAs remain gated to **calendar today** when product requires it
+
 ### Shell — alerts bell (`TopBar`)
 
 - [ ] Alert list rows are keyboard-accessible (`<button>` or equivalent) with clear dismiss behavior

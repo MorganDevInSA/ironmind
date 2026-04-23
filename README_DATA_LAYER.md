@@ -89,7 +89,9 @@ IRONMIND never calls Firebase SDK methods directly from services. All SDK operat
 
 **Client API contract:** No Next.js route handlers for domain data today — services + Firestore + rules are the surface. **`CURRENT_DATA_SCHEMA_VERSION`** bump process lives in **`Documentation/ARCHITECTURE.md`** §7.5.
 
-**Dashboard bundle:** `getDashboardBundle` in `dashboard.service.ts` + `useDashboardData` load profile, program, today’s nutrition/recovery/supplements, latest recovery fallback, weekly volume, and alerts in **one** TanStack query (`queryKeys(userId).dashboard.bundle(calendarDate)`). Mutations call `invalidateDashboardBundle` so the shell refetches coherently without eight separate hook subscriptions.
+**Dashboard bundle:** `getDashboardBundle` in `dashboard.service.ts` + `useDashboardData` load profile, program, **a single calendar day’s** nutrition/recovery/supplements (the bundle’s `calendarDate`, typically **today**), latest recovery fallback, weekly volume, and alerts in **one** TanStack query (`queryKeys(userId).dashboard.bundle(calendarDate)`). Mutations call `invalidateDashboardBundle` so the shell refetches coherently without eight separate hook subscriptions.
+
+**`/dashboard` trend strip:** The page also composes **`useNutritionDay`**, **`useRecoveryEntry`**, and **`useSupplementLog`** for **`selectedTrendDate`** so browsing dates in the strip updates schedule and cards using the **same per-day query keys** as Nutrition / Recovery / Supplements pages — do not assume the bundle alone powers every dashboard metric.
 
 **Alerts vs bundle:** The layout **top bar** uses **`useActiveAlerts`** (its own query key). `invalidateDashboardBundle` also invalidates **`queryKeys(userId).alerts.all`** so shell alerts stay in sync with the same writes that refresh the dashboard bundle (see `invalidate-dashboard.ts`).
 

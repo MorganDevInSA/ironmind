@@ -102,7 +102,9 @@ When invalidating after a mutation:
 
 ## Composite dashboard reads
 
-**`useDashboardData`** (`src/controllers/use-dashboard.ts`) uses a **single** `useQuery` over `getDashboardBundle` (`dashboard.service.ts`): profile, active program, today’s nutrition/recovery/supplements (by **calendar date**), **`latestRecovery`** when today has no entry, weekly volume, and alerts — one cache key `queryKeys(userId).dashboard.bundle(today)`. **`invalidateDashboardBundle`** (`invalidate-dashboard.ts`) invalidates that key **and** `queryKeys(userId).alerts.all` so **`useActiveAlerts`** (layout top bar) stays aligned with bundle-driving mutations. You can also use `{ queryKey: queryKeys(userId).dashboard.all }` for dashboard-only invalidation when appropriate. New “always show latest X” dashboard metrics should extend the bundle (or add a dedicated `queryKeys.*.latest()` + service) rather than ad-hoc `useQuery` in pages.
+**`useDashboardData`** (`src/controllers/use-dashboard.ts`) uses a **single** `useQuery` over `getDashboardBundle` (`dashboard.service.ts`): profile, active program, **calendar-day** nutrition/recovery/supplements for the bundle’s `calendarDate` argument (call site uses **today**), **`latestRecovery`** when that day has no entry, weekly volume, and alerts — one cache key `queryKeys(userId).dashboard.bundle(todayStr)`. **`invalidateDashboardBundle`** (`invalidate-dashboard.ts`) invalidates that key **and** `queryKeys(userId).alerts.all` so **`useActiveAlerts`** (layout top bar) stays aligned with bundle-driving mutations. You can also use `{ queryKey: queryKeys(userId).dashboard.all }` for dashboard-only invalidation when appropriate. New “always show latest X” dashboard metrics should extend the bundle (or add a dedicated `queryKeys.*.latest()` + service) rather than ad-hoc `useQuery` in pages.
+
+**`/dashboard` and the trend day strip:** The page uses the bundle for **profile**, **active program**, **weekly volume**, and loading gate. For the **selected calendar date** in the trend strip (`selectedTrendDate`), it **also** composes **`useNutritionDay(userId, date)`**, **`useRecoveryEntry(userId, date)`**, and **`useSupplementLog(userId, date)`** so schedule + macro/recovery/supplement cards track the strip (same services/controllers as domain pages). **`useRecentWorkouts` / `useWorkouts`** supply the trend window for charts and the selected day’s workout row. Do not fold arbitrary per-date UI into the bundle query key unless product requires a single cache entry — prefer these existing per-day keys so mutations invalidate the right documents.
 
 **Top bar alert dismiss is client-only:** `TopBar` may **hide** individual alerts for the current browser session (e.g. `sessionStorage` keyed by user) without writing Firestore. That does **not** require invalidating `useActiveAlerts` or the dashboard bundle — the server-derived list is unchanged until underlying data fixes the condition.
 
@@ -159,25 +161,11 @@ export async function listDomainItems(userId: string, limitCount = 30): Promise<
 
 ## Seed Orchestrator Checklist
 
-When adding new seed data, complete ALL of these steps:
+**First-login baseline (`seedUserData`):** New **Morton** domains must be imported in [`src/lib/seed/index.ts`](../../src/lib/seed/index.ts), invoked inside `seedUserData()` with the existing rollback/`seedJobs` pattern, and logged on success (`✓` prefix where the file already uses it).
 
-```
-src/lib/seed/
-├── [domain].ts          ← 1. Create the data file
-└── index.ts             ← 2. Import it, 3. Call it in seedUserData(), 4. Log success
+**Alternate demo personas:** New roster athletes (pattern `name-*.ts`) must still be **imported and called** from `index.ts` via a dedicated **`seed*Data(userId)`** overwrite helper and wired from **`DemoProfileModal`** — not inside `seedUserData()`. **`seedDemoHistoricalData`** orchestrates **`deleteAllCheckIns`**, writes weekly physique from **`src/lib/seed/demo-data/physique/`**, and generates daily telemetry via **`personaTuning`** in **`demo-historical.ts`**. Demo **UI theme** presets live in **`demo-theme.ts`** and apply from **`DemoProfileModal`** + **`DemoThemeSync`**. See **[`ironmind-demo-data`](../ironmind-demo-data/SKILL.md)** and [`Documentation/EXPERT-DEMO-DATA-AND-STORAGE-GUIDE.md`](../../../Documentation/EXPERT-DEMO-DATA-AND-STORAGE-GUIDE.md).
 
-# In index.ts:
-import { morganDomainData } from './[domain]';
-
-export async function seedUserData(userId: string): Promise<boolean> {
-  // ...existing seeds...
-
-  // NEW — step 3
-  await saveDomainData(userId, morganDomainData);
-  console.log('✓ Domain data seeded');
-```
-
-**Nutrition** is already wired: `seedUserData()` calls `saveNutritionDay()` for **today** with moderate targets as a placeholder (`src/lib/seed/index.ts`). When adding a **new** seeded domain, mirror that pattern: import service + seed blob → call inside `seedUserData()` → `console.log('✓ … seeded')`.
+**Nutrition placeholder:** `seedUserData()` saves **today**’s nutrition day as a shell entry — mirror that pattern when adding new first-login domains that need a “today” row.
 
 ---
 

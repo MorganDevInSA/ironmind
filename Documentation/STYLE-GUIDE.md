@@ -198,7 +198,7 @@ Tailwind accent utilities (`text-accent`, `bg-accent`, `border-accent`, `focus:b
 
 ### Dashboard: trend window + schedule affordances
 
-- **Trend window** (`DashboardTrendWindow` on `/dashboard`): week-length presets (1–4 wk) plus optional **custom date range**; drives workout density and physique mini-charts for that window. A **horizontal day strip** lists every `yyyy-MM-dd` in the active range; picking a date previews that calendar day’s **program session** (via `getCycleDay`), while nutrition/supplements stay tied to true calendar today when shown.
+- **Trend window** (`DashboardTrendWindow` on `/dashboard`): week-length presets (1–4 wk) plus optional **custom date range**; drives workout density and physique mini-charts for that window. A **horizontal day strip** lists every `yyyy-MM-dd` in the active range; picking a date drives **session preview** (`getCycleDay`), **schedule / nutrition / recovery / supplements** for that date (via `useNutritionDay`, `useRecoveryEntry`, `useSupplementLog`), and **workout-done** state from workouts in the trend query. **Start workout** remains available only when the strip is on **calendar today**.
 - **Today's schedule** type cues use **themed icon chips** (meal / vitamins / activity), not multicolor type pills — keep schedule rows readable and on-brand.
 
 ### Nutrition page: meal plan-line `<select>`
