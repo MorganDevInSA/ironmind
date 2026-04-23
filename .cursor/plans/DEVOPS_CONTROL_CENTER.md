@@ -695,6 +695,38 @@ vercel promote <previous-deployment-url>    # instant, zero rebuild
 
 ---
 
+# The Chat Shortcut (NEW — Post-Session 3)
+
+For developers who prefer **zero terminal interaction**, a Cursor hook intercepts the chat phrase **"Complete CI/CD run"** and automatically executes the full publish workflow.
+
+**How it works:**
+
+1. Developer types `Complete CI/CD run` in Cursor chat
+2. Hook (`.cursor/hooks/cicd-shortcut.sh`) intercepts via `beforeSubmitPrompt` event
+3. Hook injects automation instructions to the agent
+4. Agent runs `npm run ci` → commits if needed → runs `npm run publish` → reports URL
+5. No further interaction required — the agent handles the entire sequence
+
+**Implementation:**
+
+- **Hook config:** `.cursor/hooks.json` (committed)
+- **Hook script:** `.cursor/hooks/cicd-shortcut.sh` (bash, requires `jq`, made executable)
+- **Matcher:** `"Complete CI/CD run"` (case-sensitive regex)
+- **Hook event:** `beforeSubmitPrompt`
+- **Output:** `permission: "allow"` + `additional_context` with step-by-step agent instructions
+
+**Advantages:**
+
+- No context switch to terminal
+- Full CI verification before push
+- Auto-commits if changes exist
+- Reports deployment status + live URL
+- Replicable pattern for other workflows
+
+**Verification:** Type the phrase in chat and verify the agent executes the publish sequence end-to-end.
+
+---
+
 # MCP Usage Log (fill in as tasks run)
 
 | Date | Tool     | Purpose                           | Outcome |

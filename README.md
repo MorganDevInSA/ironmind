@@ -93,7 +93,17 @@ On first login, the app auto-seeds with demo data. See "Seed Data" section below
 
 IRONMIND uses GitHub-triggered Vercel deployments with local verification before push. The entire flow is automated.
 
-### One-command publish (production or preview)
+### Chat shortcut (recommended)
+
+In Cursor chat, simply type:
+
+```
+Complete CI/CD run
+```
+
+A hook automatically triggers the full sequence: CI verification → commit if needed → push → deploy → report URL. Zero terminal commands needed.
+
+### One-command publish (terminal alternative)
 
 ```bash
 npm run publish

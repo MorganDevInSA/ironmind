@@ -170,11 +170,30 @@ Point the app at emulators only when testing rules / destructive operations — 
 | `format`         | `prettier --check .`                                                        | CI                        |
 | `format:fix`     | `prettier --write .`                                                        | local cleanup             |
 | `ci`             | `npm run lint && npm run typecheck && npm run build`                        | matches CI locally        |
+| `publish`        | `scripts/publish.mjs` — CI check → git push → Vercel auto-deploy            | push to prod or preview   |
 | `emulators`      | `firebase emulators:start`                                                  | local Firebase testing    |
 | `deploy:rules`   | `firebase deploy --only firestore:rules,storage:rules --project ironmindmp` | rules push (normally CI)  |
 | `deploy:indexes` | `firebase deploy --only firestore:indexes --project ironmindmp`             | index push (normally CI)  |
 
 Before marking any substantive work complete, run `npm run ci` locally — this mirrors the GitHub Actions `verify` job exactly.
+
+### Chat Shortcut (Agent Automation)
+
+A Cursor hook intercepts **"Complete CI/CD run"** in chat and automatically executes the publish workflow. When the user types this phrase:
+
+1. The hook (`.cursor/hooks/cicd-shortcut.sh`) injects instructions to the agent
+2. Agent runs `npm run ci` locally
+3. Agent checks git status and commits if needed
+4. Agent runs `npm run publish` (push → Vercel auto-deploy)
+5. Agent reports the live URL
+
+**Implementation:**
+
+- Hook configuration: `.cursor/hooks.json` → `beforeSubmitPrompt` event
+- Hook script: `.cursor/hooks/cicd-shortcut.sh` (bash, requires `jq`)
+- Matcher: `"Complete CI/CD run"` (case-sensitive regex)
+
+This pattern can be replicated for any repetitive workflow. The hook uses `permission: "allow"` + `additional_context` to inject automation instructions that the agent executes immediately without user confirmation.
 
 ---
 

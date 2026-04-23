@@ -34,6 +34,23 @@ Cursor is wired to three Model Context Protocol servers, so the agent can inspec
 
 Configuration lives in `.cursor/mcp.json`, committed to the repo. Any collaborator opening the project in Cursor inherits the exact same tooling surface — no manual setup, no "works on my machine" drift. This is the same pattern used by platform teams at Vercel, Supabase, and Linear to keep AI-augmented development consistent across contributors.
 
+### Chat-Driven Deployment
+
+A Cursor hook (`.cursor/hooks/cicd-shortcut.sh`) intercepts the phrase **"Complete CI/CD run"** in chat and automatically triggers the full publish workflow. No terminal needed:
+
+```
+Complete CI/CD run
+```
+
+The agent immediately executes:
+
+1. `npm run ci` (lint → typecheck → build)
+2. Git status check + commit if needed
+3. `npm run publish` (push → Vercel auto-deploy)
+4. Reports the live production URL
+
+This hook uses `beforeSubmitPrompt` to inject automation instructions when the trigger phrase is detected. Configuration lives in `.cursor/hooks.json`, and the hook script is version-controlled alongside the codebase. The same pattern works for any repetitive workflow you want to reduce to a single chat phrase.
+
 ### Typed Platform Configuration
 
 The Vercel project is configured through `vercel.ts`, not the dashboard or a JSON blob:
