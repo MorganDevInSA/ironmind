@@ -3,11 +3,26 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores';
-import { useDashboardData, useActiveProgram, useRecentWorkouts, useRecentCheckIns, useNutritionPlan, useProtocol } from '@/controllers';
+import {
+  useDashboardData,
+  useActiveProgram,
+  useRecentWorkouts,
+  useRecentCheckIns,
+  useNutritionPlan,
+  useProtocol,
+} from '@/controllers';
 import { getCycleDay, today, formatDisplayDate } from '@/lib/utils';
 import {
-  Activity, Dumbbell, Scale, Pill, TrendingUp, Zap,
-  Calendar, CheckCircle2, X, BarChart3,
+  Activity,
+  Dumbbell,
+  Scale,
+  Pill,
+  TrendingUp,
+  Zap,
+  Calendar,
+  CheckCircle2,
+  X,
+  BarChart3,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -39,14 +54,14 @@ import type { SupplementProtocol } from '@/lib/types';
    Muscle / density helpers
 ───────────────────────────────────────────────────────────────────── */
 const MUSCLE_PATTERNS: [RegExp, string][] = [
-  [/bench|chest|pec|fly|flye|cable cross|dip/i,       'chest'],
-  [/row|pull|lat|chin|deadlift|pulldown|rear delt/i,   'back'],
-  [/squat|leg press|hack|lunge|quad|leg ext/i,         'quads'],
-  [/hamstring|rdl|stiff|good morning|leg curl/i,       'hamstrings'],
-  [/ohp|shoulder|delt|lateral raise|shrug/i,           'delts'],
-  [/curl|bicep|hammer|preacher/i,                      'biceps'],
-  [/tricep|pushdown|extension|close grip|skull/i,      'triceps'],
-  [/calf/i,                                            'calves'],
+  [/bench|chest|pec|fly|flye|cable cross|dip/i, 'chest'],
+  [/row|pull|lat|chin|deadlift|pulldown|rear delt/i, 'back'],
+  [/squat|leg press|hack|lunge|quad|leg ext/i, 'quads'],
+  [/hamstring|rdl|stiff|good morning|leg curl/i, 'hamstrings'],
+  [/ohp|shoulder|delt|lateral raise|shrug/i, 'delts'],
+  [/curl|bicep|hammer|preacher/i, 'biceps'],
+  [/tricep|pushdown|extension|close grip|skull/i, 'triceps'],
+  [/calf/i, 'calves'],
 ];
 function inferMuscle(name: string) {
   for (const [re, g] of MUSCLE_PATTERNS) if (re.test(name)) return g;
@@ -55,16 +70,19 @@ function inferMuscle(name: string) {
 
 function calcDensity(workout: Workout) {
   type Row = { label: string; muscle: string; volume: number; sets: number };
-  const byExercise: Row[] = workout.exercises.map(ex => ({
-    label: ex.name,
-    muscle: ex.muscleGroup || inferMuscle(ex.name),
-    volume: ex.sets.filter(s => s.completed).reduce((s, set) => s + set.weight * set.reps, 0),
-    sets: ex.sets.filter(s => s.completed).length,
-  })).filter(r => r.volume > 0);
+  const byExercise: Row[] = workout.exercises
+    .map((ex) => ({
+      label: ex.name,
+      muscle: ex.muscleGroup || inferMuscle(ex.name),
+      volume: ex.sets.filter((s) => s.completed).reduce((s, set) => s + set.weight * set.reps, 0),
+      sets: ex.sets.filter((s) => s.completed).length,
+    }))
+    .filter((r) => r.volume > 0);
 
   const byMuscleMap: Record<string, Row> = {};
   for (const ex of byExercise) {
-    if (!byMuscleMap[ex.muscle]) byMuscleMap[ex.muscle] = { label: ex.muscle, muscle: ex.muscle, volume: 0, sets: 0 };
+    if (!byMuscleMap[ex.muscle])
+      byMuscleMap[ex.muscle] = { label: ex.muscle, muscle: ex.muscle, volume: 0, sets: 0 };
     byMuscleMap[ex.muscle].volume += ex.volume;
     byMuscleMap[ex.muscle].sets += ex.sets;
   }
@@ -84,7 +102,11 @@ function calcDensity(workout: Workout) {
    Today's Schedule
 ───────────────────────────────────────────────────────────────────── */
 const SUPPL_TIME: Record<string, string> = {
-  morning: '07:30', lunch: '13:00', afternoon: '16:00', dinner: '19:30', bed: '22:00',
+  morning: '07:30',
+  lunch: '13:00',
+  afternoon: '16:00',
+  dinner: '19:30',
+  bed: '22:00',
 };
 const KIND_META = {
   meal: {
@@ -107,7 +129,7 @@ const KIND_META = {
   },
 };
 
-type MealPayload     = { kind: 'meal';     slotKey: string; isLiftDay: boolean };
+type MealPayload = { kind: 'meal'; slotKey: string; isLiftDay: boolean };
 type VitaminsPayload = { kind: 'vitamins'; timing: string };
 type ActivityPayload = { kind: 'activity' };
 type ItemPayload = MealPayload | VitaminsPayload | ActivityPayload;
@@ -126,7 +148,9 @@ function toMin(t: string) {
   const [h, m] = t.split(':').map(Number);
   return h * 60 + (m ?? 0);
 }
-function capitalize(s: string) { return s.charAt(0).toUpperCase() + s.slice(1); }
+function capitalize(s: string) {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
 
 const MEASUREMENT_SERIES: { key: keyof Measurements; label: string; color: string }[] = [
   { key: 'waist', label: 'Waist', color: 'var(--accent-light)' },
@@ -166,7 +190,7 @@ function PhysiqueMiniCharts({
   });
 
   const hasMeas = measRows.some((row) =>
-    MEASUREMENT_SERIES.some(({ key }) => typeof row[key as string] === 'number')
+    MEASUREMENT_SERIES.some(({ key }) => typeof row[key as string] === 'number'),
   );
 
   if (!chron.length) {
@@ -180,7 +204,9 @@ function PhysiqueMiniCharts({
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">Trend</span>
+        <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">
+          Trend
+        </span>
         <div className="flex rounded-lg overflow-hidden border border-[rgba(65,50,50,0.35)]">
           <button
             type="button"
@@ -192,7 +218,7 @@ function PhysiqueMiniCharts({
               'px-3 py-1 text-xs font-semibold transition-colors',
               mode === 'weight'
                 ? 'bg-[rgba(220,38,38,0.2)] text-[color:var(--text-0)]'
-                : 'text-[color:var(--text-1)] hover:text-[color:var(--text-0)]'
+                : 'text-[color:var(--text-1)] hover:text-[color:var(--text-0)]',
             )}
           >
             Weight
@@ -209,13 +235,15 @@ function PhysiqueMiniCharts({
               mode === 'measurements'
                 ? 'bg-[rgba(220,38,38,0.2)] text-[color:var(--text-0)]'
                 : 'text-[color:var(--text-1)] hover:text-[color:var(--text-0)]',
-              !hasMeas && 'opacity-40 cursor-not-allowed'
+              !hasMeas && 'opacity-40 cursor-not-allowed',
             )}
           >
             Measurements
           </button>
         </div>
-        <span className="text-[10px] text-[color:var(--text-detail)] ml-auto font-mono tabular-nums">{chron.length} pts</span>
+        <span className="text-[10px] text-[color:var(--text-detail)] ml-auto font-mono tabular-nums">
+          {chron.length} pts
+        </span>
       </div>
 
       <div className="h-[132px] w-full">
@@ -229,7 +257,12 @@ function PhysiqueMiniCharts({
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(65,50,50,0.15)" />
-              <XAxis dataKey="date" tick={{ fontSize: 9, fill: '#B8B8B8' }} tickLine={false} axisLine={false} />
+              <XAxis
+                dataKey="date"
+                tick={{ fontSize: 9, fill: '#B8B8B8' }}
+                tickLine={false}
+                axisLine={false}
+              />
               <YAxis
                 domain={[
                   (min: number) => Math.floor(min - 0.5),
@@ -270,7 +303,12 @@ function PhysiqueMiniCharts({
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={measRows} margin={{ top: 4, right: 4, bottom: 0, left: -16 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(65,50,50,0.15)" />
-              <XAxis dataKey="date" tick={{ fontSize: 9, fill: '#B8B8B8' }} tickLine={false} axisLine={false} />
+              <XAxis
+                dataKey="date"
+                tick={{ fontSize: 9, fill: '#B8B8B8' }}
+                tickLine={false}
+                axisLine={false}
+              />
               <YAxis tick={{ fontSize: 9, fill: '#B8B8B8' }} tickLine={false} axisLine={false} />
               <Tooltip
                 contentStyle={{
@@ -306,30 +344,47 @@ function PhysiqueMiniCharts({
 /* ─────────────────────────────────────────────────────────────────────
    Modal content components
 ───────────────────────────────────────────────────────────────────── */
-function MealContent({ slotKey, isLiftDay, nutrition, nutritionPlan: nutritionPlanProp }: {
-  slotKey: string; isLiftDay: boolean; nutrition: NutritionDay | null | undefined;
+function MealContent({
+  slotKey,
+  isLiftDay,
+  nutrition,
+  nutritionPlan: nutritionPlanProp,
+}: {
+  slotKey: string;
+  isLiftDay: boolean;
+  nutrition: NutritionDay | null | undefined;
   nutritionPlan?: NutritionPlanSeed | null;
 }) {
   const nutritionPlan = nutritionPlanProp ?? mortonNutritionPlan;
-  const slot = nutritionPlan.mealSchedule.find(s => s.slot === slotKey);
+  const slot = nutritionPlan.mealSchedule.find((s) => s.slot === slotKey);
   if (!slot) return null;
-  const description = isLiftDay ? (slot.liftDay ?? slot.default) : (slot.recoveryDay ?? slot.default);
-  const loggedMeal = nutrition?.meals.find(m => m.slot === slotKey);
+  const description = isLiftDay
+    ? (slot.liftDay ?? slot.default)
+    : (slot.recoveryDay ?? slot.default);
+  const loggedMeal = nutrition?.meals.find((m) => m.slot === slotKey);
 
   return (
     <div className="space-y-4">
       <div>
-        <p className="text-[10px] text-[color:var(--text-detail)] uppercase tracking-wider mb-1">Plan</p>
+        <p className="text-[10px] text-[color:var(--text-detail)] uppercase tracking-wider mb-1">
+          Plan
+        </p>
         <p className="text-[color:var(--text-0)]">{description}</p>
       </div>
       {loggedMeal && loggedMeal.foods.length > 0 ? (
         <div>
-          <p className="text-[10px] text-[color:var(--text-detail)] uppercase tracking-wider mb-2">Logged Foods</p>
+          <p className="text-[10px] text-[color:var(--text-detail)] uppercase tracking-wider mb-2">
+            Logged Foods
+          </p>
           <div className="space-y-1.5">
             {loggedMeal.foods.map((food, i) => (
               <div key={i} className="flex justify-between text-sm">
                 <span className="text-[color:var(--text-0)]">
-                  {food.name} <span className="text-[color:var(--text-detail)]">× {food.quantity}{food.unit}</span>
+                  {food.name}{' '}
+                  <span className="text-[color:var(--text-detail)]">
+                    × {food.quantity}
+                    {food.unit}
+                  </span>
                 </span>
                 <span className="font-mono tabular-nums text-[color:var(--text-detail)] text-xs">
                   {food.protein}g P · {food.calories} kcal
@@ -339,18 +394,25 @@ function MealContent({ slotKey, isLiftDay, nutrition, nutritionPlan: nutritionPl
           </div>
         </div>
       ) : (
-        <p className="text-sm text-[color:var(--text-detail)]">No foods logged yet — follow the plan above.</p>
+        <p className="text-sm text-[color:var(--text-detail)]">
+          No foods logged yet — follow the plan above.
+        </p>
       )}
     </div>
   );
 }
 
-function VitaminsContent({ timing, supplements, protocol: protocolProp }: {
-  timing: string; supplements: SupplementLog | null | undefined;
+function VitaminsContent({
+  timing,
+  supplements,
+  protocol: protocolProp,
+}: {
+  timing: string;
+  supplements: SupplementLog | null | undefined;
   protocol?: SupplementProtocol | null;
 }) {
   const protocol = protocolProp ?? mortonSupplementProtocol;
-  const win = protocol.windows.find(w => w.timing === timing);
+  const win = protocol.windows.find((w) => w.timing === timing);
   if (!win) return null;
   const winLog = supplements?.windows?.[timing] ?? {};
 
@@ -360,17 +422,32 @@ function VitaminsContent({ timing, supplements, protocol: protocolProp }: {
         <p className="text-sm text-[color:var(--text-detail)]">Take with {win.withMeal}</p>
       )}
       <div>
-        <p className="text-[10px] text-[color:var(--text-detail)] uppercase tracking-wider mb-2">Supplements</p>
+        <p className="text-[10px] text-[color:var(--text-detail)] uppercase tracking-wider mb-2">
+          Supplements
+        </p>
         <div className="space-y-1.5">
           {win.supplements.map((name, i) => {
             const taken = winLog[name] === true;
             return (
-              <div key={i} className={cn('flex items-center gap-3 text-sm py-1.5 px-2 rounded-lg',
-                taken ? 'opacity-50' : 'bg-[color:var(--surface-track)]')}>
-                {taken
-                  ? <CheckCircle2 size={14} className="text-[#10B981] shrink-0" />
-                  : <span className="w-3.5 h-3.5 rounded-full border border-[rgba(65,50,50,0.22)] shrink-0 inline-block" />}
-                <span className={taken ? 'text-[color:var(--text-detail)]' : 'text-[color:var(--text-0)]'}>{name}</span>
+              <div
+                key={i}
+                className={cn(
+                  'flex items-center gap-3 text-sm py-1.5 px-2 rounded-lg',
+                  taken ? 'opacity-50' : 'bg-[color:var(--surface-track)]',
+                )}
+              >
+                {taken ? (
+                  <CheckCircle2 size={14} className="text-[#10B981] shrink-0" />
+                ) : (
+                  <span className="w-3.5 h-3.5 rounded-full border border-[rgba(65,50,50,0.22)] shrink-0 inline-block" />
+                )}
+                <span
+                  className={
+                    taken ? 'text-[color:var(--text-detail)]' : 'text-[color:var(--text-0)]'
+                  }
+                >
+                  {name}
+                </span>
               </div>
             );
           })}
@@ -378,10 +455,14 @@ function VitaminsContent({ timing, supplements, protocol: protocolProp }: {
       </div>
       {win.optional && win.optional.length > 0 && (
         <div>
-          <p className="text-[10px] text-[color:var(--text-detail)] uppercase tracking-wider mb-2">Optional</p>
+          <p className="text-[10px] text-[color:var(--text-detail)] uppercase tracking-wider mb-2">
+            Optional
+          </p>
           <div className="space-y-1">
             {win.optional.map((name, i) => (
-              <p key={i} className="text-sm text-[color:var(--text-detail)] pl-2">{name}</p>
+              <p key={i} className="text-sm text-[color:var(--text-detail)] pl-2">
+                {name}
+              </p>
             ))}
           </div>
         </div>
@@ -402,14 +483,15 @@ function SessionProgramPreview({ session }: { session: ProgramSession }) {
   const hasMobility = mobility.length > 0;
   const hasNotes = !!session.notes?.trim();
 
-  const hasAnyDetail =
-    hasNotes || hasLift || hasCardio || hasBreath || hasCore || hasMobility;
+  const hasAnyDetail = hasNotes || hasLift || hasCardio || hasBreath || hasCore || hasMobility;
 
   return (
     <div className="space-y-4">
       {hasNotes && (
-        <div className="p-3 rounded-lg border-l-4 border-[#F59E0B] bg-[rgba(245,158,11,0.05)]">
-          <p className="text-sm text-[color:var(--text-detail)] whitespace-pre-wrap">{session.notes}</p>
+        <div className="p-3 rounded-lg border-l-4 border-[color:color-mix(in_srgb,var(--accent)_55%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_7%,transparent)]">
+          <p className="text-sm text-[color:var(--text-detail)] whitespace-pre-wrap">
+            {session.notes}
+          </p>
         </div>
       )}
       {hasLift && (
@@ -424,7 +506,12 @@ function SessionProgramPreview({ session }: { session: ProgramSession }) {
                   <span className="exercise-index-badge shrink-0">{i + 1}</span>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className={cn('font-medium', ex.isKPI ? 'text-[color:var(--accent)]' : 'text-[color:var(--text-0)]')}>
+                      <span
+                        className={cn(
+                          'font-medium',
+                          ex.isKPI ? 'text-[color:var(--accent)]' : 'text-[color:var(--text-0)]',
+                        )}
+                      >
                         {ex.name}
                       </span>
                       {ex.isKPI && (
@@ -434,7 +521,9 @@ function SessionProgramPreview({ session }: { session: ProgramSession }) {
                       )}
                     </div>
                     {ex.notes ? (
-                      <p className="text-xs text-[color:var(--text-detail)] mt-1 whitespace-pre-wrap">{ex.notes}</p>
+                      <p className="text-xs text-[color:var(--text-detail)] mt-1 whitespace-pre-wrap">
+                        {ex.notes}
+                      </p>
                     ) : null}
                   </div>
                 </div>
@@ -463,14 +552,15 @@ function SessionProgramPreview({ session }: { session: ProgramSession }) {
       )}
       {hasBreath && (
         <div>
-          <p className="text-[10px] text-[color:var(--text-detail)] uppercase tracking-wider mb-2">Breath work</p>
+          <p className="text-[10px] text-[color:var(--text-detail)] uppercase tracking-wider mb-2">
+            Breath work
+          </p>
           <ul className="space-y-2">
             {breath.map((bw, i) => (
               <li key={i} className="text-sm">
                 <span className="font-medium text-[color:var(--text-0)]">{bw.name}</span>
                 <span className="text-[color:var(--text-detail)] text-xs font-mono tabular-nums ml-2">
-                  in {bw.inhale}s
-                  {bw.hold != null ? ` · hold ${bw.hold}s` : ''} · out {bw.exhale}s
+                  in {bw.inhale}s{bw.hold != null ? ` · hold ${bw.hold}s` : ''} · out {bw.exhale}s
                   {bw.holdOut != null ? ` · pause ${bw.holdOut}s` : ''} · {bw.rounds} rnd
                 </span>
               </li>
@@ -480,14 +570,15 @@ function SessionProgramPreview({ session }: { session: ProgramSession }) {
       )}
       {hasCore && (
         <div>
-          <p className="text-[10px] text-[color:var(--text-detail)] uppercase tracking-wider mb-2">Core</p>
+          <p className="text-[10px] text-[color:var(--text-detail)] uppercase tracking-wider mb-2">
+            Core
+          </p>
           <div className="divide-y divide-[rgba(65,50,50,0.14)]">
             {core.map((c, i) => (
               <div key={i} className="flex items-start justify-between gap-2 py-2 text-sm">
                 <span className="text-[color:var(--text-0)]">{c.name}</span>
                 <span className="font-mono tabular-nums text-[color:var(--text-detail)] text-xs shrink-0 text-right">
-                  {c.sets}×
-                  {c.reps != null ? c.reps : c.holdSec != null ? `${c.holdSec}s` : '—'}
+                  {c.sets}×{c.reps != null ? c.reps : c.holdSec != null ? `${c.holdSec}s` : '—'}
                   {c.perSide ? ' / side' : ''}
                 </span>
               </div>
@@ -497,7 +588,9 @@ function SessionProgramPreview({ session }: { session: ProgramSession }) {
       )}
       {hasMobility && (
         <div>
-          <p className="text-[10px] text-[color:var(--text-detail)] uppercase tracking-wider mb-2">Mobility</p>
+          <p className="text-[10px] text-[color:var(--text-detail)] uppercase tracking-wider mb-2">
+            Mobility
+          </p>
           <ul className="space-y-1.5">
             {mobility.map((m, i) => (
               <li
@@ -526,7 +619,8 @@ function SessionProgramPreview({ session }: { session: ProgramSession }) {
 const sessionTableTh =
   'text-left py-2.5 px-3 text-[10px] font-semibold uppercase tracking-wider text-[color:var(--text-detail)]';
 const sessionTableTd = 'py-2.5 px-3 align-top border-t border-[rgba(65,50,50,0.14)]';
-const sessionTableWrap = 'overflow-x-auto rounded-lg border border-[rgba(65,50,50,0.28)] bg-[rgba(0,0,0,0.18)]';
+const sessionTableWrap =
+  'overflow-x-auto rounded-lg border border-[rgba(65,50,50,0.28)] bg-[rgba(0,0,0,0.18)]';
 
 function SessionProgramTable({ session }: { session: ProgramSession }) {
   const exercises = session.exercises ?? [];
@@ -538,23 +632,20 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
   const sessionNotes = session.notes?.trim();
 
   const corePrescription = (c: (typeof core)[number]) => {
-    const bit =
-      c.reps != null
-        ? `${c.reps} reps`
-        : c.holdSec != null
-          ? `${c.holdSec}s hold`
-          : '—';
+    const bit = c.reps != null ? `${c.reps} reps` : c.holdSec != null ? `${c.holdSec}s hold` : '—';
     return `${c.sets}×${bit}${c.perSide ? ' / side' : ''}`;
   };
 
   return (
     <div className="space-y-6">
       {sessionNotes ? (
-        <div className="p-3 rounded-lg border-l-4 border-[#F59E0B] bg-[rgba(245,158,11,0.05)]">
+        <div className="p-3 rounded-lg border-l-4 border-[color:color-mix(in_srgb,var(--accent)_55%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_7%,transparent)]">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-[color:var(--text-detail)] mb-1">
             Session notes
           </p>
-          <p className="text-sm text-[color:var(--text-detail)] whitespace-pre-wrap">{sessionNotes}</p>
+          <p className="text-sm text-[color:var(--text-detail)] whitespace-pre-wrap">
+            {sessionNotes}
+          </p>
         </div>
       ) : null}
 
@@ -577,7 +668,12 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
               <tbody>
                 {exercises.map((ex, i) => (
                   <tr key={`${ex.exerciseId}-${i}`}>
-                    <td className={cn(sessionTableTd, 'font-mono tabular-nums text-[color:var(--text-detail)]')}>
+                    <td
+                      className={cn(
+                        sessionTableTd,
+                        'font-mono tabular-nums text-[color:var(--text-detail)]',
+                      )}
+                    >
                       {i + 1}
                     </td>
                     <td className={cn(sessionTableTd, 'text-[color:var(--text-0)]')}>
@@ -595,13 +691,28 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
                         </p>
                       ) : null}
                     </td>
-                    <td className={cn(sessionTableTd, 'text-right font-mono tabular-nums text-[#D4D4D4]')}>
+                    <td
+                      className={cn(
+                        sessionTableTd,
+                        'text-right font-mono tabular-nums text-[#D4D4D4]',
+                      )}
+                    >
                       {ex.sets}
                     </td>
-                    <td className={cn(sessionTableTd, 'text-right font-mono tabular-nums text-[#D4D4D4]')}>
+                    <td
+                      className={cn(
+                        sessionTableTd,
+                        'text-right font-mono tabular-nums text-[#D4D4D4]',
+                      )}
+                    >
                       {ex.reps}
                     </td>
-                    <td className={cn(sessionTableTd, 'text-right font-mono tabular-nums text-[color:var(--text-detail)]')}>
+                    <td
+                      className={cn(
+                        sessionTableTd,
+                        'text-right font-mono tabular-nums text-[color:var(--text-detail)]',
+                      )}
+                    >
                       {ex.rest}s
                     </td>
                   </tr>
@@ -614,7 +725,9 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
 
       {cardio ? (
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)] mb-2">Cardio</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)] mb-2">
+            Cardio
+          </p>
           <div className={sessionTableWrap}>
             <table className="w-full text-sm">
               <thead>
@@ -626,17 +739,32 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
               </thead>
               <tbody>
                 <tr>
-                  <td className={cn(sessionTableTd, 'text-[color:var(--text-0)] font-medium')}>{cardio.type}</td>
-                  <td className={cn(sessionTableTd, 'text-right font-mono tabular-nums text-[#D4D4D4]')}>
+                  <td className={cn(sessionTableTd, 'text-[color:var(--text-0)] font-medium')}>
+                    {cardio.type}
+                  </td>
+                  <td
+                    className={cn(
+                      sessionTableTd,
+                      'text-right font-mono tabular-nums text-[#D4D4D4]',
+                    )}
+                  >
                     {cardio.duration} min
                   </td>
-                  <td className={cn(sessionTableTd, 'text-[color:var(--text-detail)] text-xs leading-snug')}>
+                  <td
+                    className={cn(
+                      sessionTableTd,
+                      'text-[color:var(--text-detail)] text-xs leading-snug',
+                    )}
+                  >
                     {cardio.intervals ? (
                       <span className="font-mono tabular-nums block mb-1">
-                        {cardio.intervals.work}s work / {cardio.intervals.rest}s rest × {cardio.intervals.rounds} rounds
+                        {cardio.intervals.work}s work / {cardio.intervals.rest}s rest ×{' '}
+                        {cardio.intervals.rounds} rounds
                       </span>
                     ) : null}
-                    {cardio.note ? <span className="whitespace-pre-wrap">{cardio.note}</span> : null}
+                    {cardio.note ? (
+                      <span className="whitespace-pre-wrap">{cardio.note}</span>
+                    ) : null}
                     {!cardio.intervals && !cardio.note ? '—' : null}
                   </td>
                 </tr>
@@ -648,7 +776,9 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
 
       {breath.length > 0 ? (
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)] mb-2">Breath work</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)] mb-2">
+            Breath work
+          </p>
           <div className={sessionTableWrap}>
             <table className="w-full min-w-[480px] text-sm">
               <thead>
@@ -661,13 +791,24 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
               <tbody>
                 {breath.map((bw, i) => (
                   <tr key={`${bw.name}-${i}`}>
-                    <td className={cn(sessionTableTd, 'text-[color:var(--text-0)] font-medium')}>{bw.name}</td>
-                    <td className={cn(sessionTableTd, 'font-mono tabular-nums text-xs text-[color:var(--text-detail)]')}>
-                      in {bw.inhale}s
-                      {bw.hold != null ? ` · hold ${bw.hold}s` : ''} · out {bw.exhale}s
-                      {bw.holdOut != null ? ` · pause ${bw.holdOut}s` : ''}
+                    <td className={cn(sessionTableTd, 'text-[color:var(--text-0)] font-medium')}>
+                      {bw.name}
                     </td>
-                    <td className={cn(sessionTableTd, 'text-right font-mono tabular-nums text-[#D4D4D4]')}>
+                    <td
+                      className={cn(
+                        sessionTableTd,
+                        'font-mono tabular-nums text-xs text-[color:var(--text-detail)]',
+                      )}
+                    >
+                      in {bw.inhale}s{bw.hold != null ? ` · hold ${bw.hold}s` : ''} · out{' '}
+                      {bw.exhale}s{bw.holdOut != null ? ` · pause ${bw.holdOut}s` : ''}
+                    </td>
+                    <td
+                      className={cn(
+                        sessionTableTd,
+                        'text-right font-mono tabular-nums text-[#D4D4D4]',
+                      )}
+                    >
                       {bw.rounds}
                     </td>
                   </tr>
@@ -680,7 +821,9 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
 
       {core.length > 0 ? (
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)] mb-2">Core</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)] mb-2">
+            Core
+          </p>
           <div className={sessionTableWrap}>
             <table className="w-full text-sm">
               <thead>
@@ -693,7 +836,12 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
                 {core.map((c, i) => (
                   <tr key={`${c.name}-${i}`}>
                     <td className={cn(sessionTableTd, 'text-[color:var(--text-0)]')}>{c.name}</td>
-                    <td className={cn(sessionTableTd, 'text-right font-mono tabular-nums text-[#D4D4D4] text-xs')}>
+                    <td
+                      className={cn(
+                        sessionTableTd,
+                        'text-right font-mono tabular-nums text-[#D4D4D4] text-xs',
+                      )}
+                    >
                       {corePrescription(c)}
                     </td>
                   </tr>
@@ -706,7 +854,9 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
 
       {mobility.length > 0 ? (
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)] mb-2">Mobility</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)] mb-2">
+            Mobility
+          </p>
           <div className={sessionTableWrap}>
             <table className="w-full text-sm">
               <thead>
@@ -717,7 +867,12 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
               <tbody>
                 {mobility.map((m, i) => (
                   <tr key={`${m}-${i}`}>
-                    <td className={cn(sessionTableTd, 'text-[#D4D4D4] pl-4 border-l-2 border-[rgba(220,38,38,0.28)]')}>
+                    <td
+                      className={cn(
+                        sessionTableTd,
+                        'text-[#D4D4D4] pl-4 border-l-2 border-[rgba(220,38,38,0.28)]',
+                      )}
+                    >
                       {m}
                     </td>
                   </tr>
@@ -768,7 +923,10 @@ function SessionDetailModal({
   if (!open || !session) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4"
+      onClick={onClose}
+    >
       <div className="absolute inset-0 bg-black/65 backdrop-blur-sm" />
       <div
         className="relative w-full sm:max-w-2xl mx-0 sm:mx-4 glass-panel rounded-t-2xl sm:rounded-2xl max-h-[90vh] overflow-hidden flex flex-col border border-[rgba(65,50,50,0.35)]"
@@ -780,8 +938,12 @@ function SessionDetailModal({
               <Dumbbell size={22} />
             </span>
             <div className="min-w-0">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[color:var(--text-2)]">Session breakdown</p>
-              <h2 className="text-lg font-bold text-[color:var(--text-0)] leading-snug truncate">{session.name}</h2>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[color:var(--text-2)]">
+                Session breakdown
+              </p>
+              <h2 className="text-lg font-bold text-[color:var(--text-0)] leading-snug truncate">
+                {session.name}
+              </h2>
               <p className="text-xs text-[color:var(--text-detail)] mt-1">{sessionTypeLabel}</p>
             </div>
           </div>
@@ -829,8 +991,16 @@ function SessionDetailModal({
   );
 }
 
-function ActivityContent({ session, done, onStart, canStart }: {
-  session: ProgramSession | undefined; done: boolean; onStart: () => void; canStart?: boolean;
+function ActivityContent({
+  session,
+  done,
+  onStart,
+  canStart,
+}: {
+  session: ProgramSession | undefined;
+  done: boolean;
+  onStart: () => void;
+  canStart?: boolean;
 }) {
   if (!session) return <p className="text-[color:var(--text-detail)]">No session data.</p>;
   return (
@@ -858,7 +1028,17 @@ function ActivityContent({ session, done, onStart, canStart }: {
   );
 }
 
-function ScheduleModal({ item, onClose, session, nutrition, supplements, onStartWorkout, canStartWorkout, nutritionPlan, protocol }: {
+function ScheduleModal({
+  item,
+  onClose,
+  session,
+  nutrition,
+  supplements,
+  onStartWorkout,
+  canStartWorkout,
+  nutritionPlan,
+  protocol,
+}: {
   item: ScheduleItem;
   onClose: () => void;
   session: ProgramSession | undefined;
@@ -872,16 +1052,25 @@ function ScheduleModal({ item, onClose, session, nutrition, supplements, onStart
   const meta = KIND_META[item.kind];
   const p = item.payload;
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+      onClick={onClose}
+    >
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
       <div
         className="relative w-full sm:max-w-md mx-0 sm:mx-4 glass-panel dashboard-card-surface rounded-t-2xl sm:rounded-2xl overflow-hidden max-h-[85vh] flex flex-col"
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center gap-3 p-4 border-b border-[rgba(65,50,50,0.28)] shrink-0">
-          <span className={cn('text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border shrink-0',
-            meta.color, meta.bg, meta.border)}>
+          <span
+            className={cn(
+              'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border shrink-0',
+              meta.color,
+              meta.bg,
+              meta.border,
+            )}
+          >
             {meta.label}
           </span>
           <div className="flex-1 min-w-0">
@@ -889,14 +1078,26 @@ function ScheduleModal({ item, onClose, session, nutrition, supplements, onStart
             <p className="text-xs text-[color:var(--text-detail)]">{item.time}</p>
           </div>
           {item.done === true && <CheckCircle2 size={15} className="text-[#10B981] shrink-0" />}
-          <button onClick={onClose} className="p-1.5 text-[color:var(--text-detail)] hover:text-[color:var(--text-0)] shrink-0 transition-colors">
+          <button
+            onClick={onClose}
+            className="p-1.5 text-[color:var(--text-detail)] hover:text-[color:var(--text-0)] shrink-0 transition-colors"
+          >
             <X size={16} />
           </button>
         </div>
         {/* Body */}
         <div className="flex-1 overflow-y-auto p-4">
-          {p.kind === 'meal'     && <MealContent slotKey={p.slotKey} isLiftDay={p.isLiftDay} nutrition={nutrition} nutritionPlan={nutritionPlan} />}
-          {p.kind === 'vitamins' && <VitaminsContent timing={p.timing} supplements={supplements} protocol={protocol} />}
+          {p.kind === 'meal' && (
+            <MealContent
+              slotKey={p.slotKey}
+              isLiftDay={p.isLiftDay}
+              nutrition={nutrition}
+              nutritionPlan={nutritionPlan}
+            />
+          )}
+          {p.kind === 'vitamins' && (
+            <VitaminsContent timing={p.timing} supplements={supplements} protocol={protocol} />
+          )}
           {p.kind === 'activity' && (
             <ActivityContent
               session={session}
@@ -950,8 +1151,10 @@ function TodaySchedule({
   /* — Meals — */
   for (const slot of nutritionPlan.mealSchedule) {
     if (slot.liftDayOnly && !isLiftDay) continue;
-    const description = isLiftDay ? (slot.liftDay ?? slot.default) : (slot.recoveryDay ?? slot.default);
-    const mealData = nutrition?.meals.find(m => m.slot === slot.slot);
+    const description = isLiftDay
+      ? (slot.liftDay ?? slot.default)
+      : (slot.recoveryDay ?? slot.default);
+    const mealData = nutrition?.meals.find((m) => m.slot === slot.slot);
     items.push({
       sortKey: toMin(slot.time),
       time: slot.time,
@@ -969,7 +1172,9 @@ function TodaySchedule({
     const winData = supplements?.windows?.[win.timing];
     const takenCount = winData ? Object.values(winData).filter(Boolean).length : null;
     const total = win.supplements.length;
-    const names = win.supplements.slice(0, 3).join(', ') + (win.supplements.length > 3 ? ` +${win.supplements.length - 3}` : '');
+    const names =
+      win.supplements.slice(0, 3).join(', ') +
+      (win.supplements.length > 3 ? ` +${win.supplements.length - 3}` : '');
     items.push({
       sortKey: toMin(time) + 1,
       time,
@@ -991,8 +1196,8 @@ function TodaySchedule({
       detail: session.exercises?.length
         ? `${session.exercises.length} exercises`
         : session.cardio
-        ? `${session.cardio.type} · ${session.cardio.duration} min`
-        : session.type,
+          ? `${session.cardio.type} · ${session.cardio.duration} min`
+          : session.type,
       done: todayDone,
       payload: { kind: 'activity' },
     });
@@ -1009,7 +1214,9 @@ function TodaySchedule({
           <span className="text-xs text-[color:var(--text-detail)] ml-auto">{dateBadge}</span>
         </div>
         {previewHint && (
-          <p className="text-xs text-[color:var(--text-detail)] mb-3 border-l-2 border-[rgba(220,38,38,0.42)] pl-3 bg-[rgba(220,38,38,0.04)] rounded-r-lg py-1">{previewHint}</p>
+          <p className="text-xs text-[color:var(--text-detail)] mb-3 border-l-2 border-[rgba(220,38,38,0.42)] pl-3 bg-[rgba(220,38,38,0.04)] rounded-r-lg py-1">
+            {previewHint}
+          </p>
         )}
 
         <div className="overflow-x-auto">
@@ -1049,25 +1256,35 @@ function TodaySchedule({
                       {item.time}
                     </td>
                     <td className="py-2.5 pr-4 align-top">
-                      <span className={cn(
-                        'inline-flex text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border',
-                        meta.color, meta.bg, meta.border
-                      )}>
+                      <span
+                        className={cn(
+                          'inline-flex text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border',
+                          meta.color,
+                          meta.bg,
+                          meta.border,
+                        )}
+                      >
                         {meta.label}
                       </span>
                     </td>
                     <td className="py-2.5 pr-4 align-top">
                       <div className="flex items-start gap-2 min-w-0">
-                        <span className={cn(
-                          'font-semibold leading-snug',
-                          item.done ? 'text-[color:var(--text-detail)]' : 'text-[color:var(--text-0)]'
-                        )}>
+                        <span
+                          className={cn(
+                            'font-semibold leading-snug',
+                            item.done
+                              ? 'text-[color:var(--text-detail)]'
+                              : 'text-[color:var(--text-0)]',
+                          )}
+                        >
                           {item.label}
                         </span>
-                        <span className={cn(
-                          'text-[11px] font-semibold shrink-0 opacity-0 group-hover:opacity-100 transition-opacity pt-0.5',
-                          meta.color
-                        )}>
+                        <span
+                          className={cn(
+                            'text-[11px] font-semibold shrink-0 opacity-0 group-hover:opacity-100 transition-opacity pt-0.5',
+                            meta.color,
+                          )}
+                        >
                           →
                         </span>
                       </div>
@@ -1077,7 +1294,7 @@ function TodaySchedule({
                         <p
                           className={cn(
                             'text-[13px] leading-relaxed text-[color:var(--text-detail)] break-words',
-                            item.done && 'opacity-80'
+                            item.done && 'opacity-80',
                           )}
                         >
                           {item.detail}
@@ -1088,7 +1305,11 @@ function TodaySchedule({
                     </td>
                     <td className="py-2.5 text-right align-top">
                       {item.done === true ? (
-                        <CheckCircle2 size={15} className="text-[#10B981] inline-block mt-0.5" aria-hidden />
+                        <CheckCircle2
+                          size={15}
+                          className="text-[#10B981] inline-block mt-0.5"
+                          aria-hidden
+                        />
                       ) : item.done === false ? (
                         <span className="inline-block w-3.5 h-3.5 rounded-full border border-[rgba(65,50,50,0.22)] mt-1" />
                       ) : (
@@ -1110,7 +1331,10 @@ function TodaySchedule({
           session={session}
           nutrition={nutrition}
           supplements={supplements}
-          onStartWorkout={() => { setSelected(null); onActivityClick(); }}
+          onStartWorkout={() => {
+            setSelected(null);
+            onActivityClick();
+          }}
           canStartWorkout={canStartWorkout}
           nutritionPlan={nutritionPlan}
           protocol={protocol}
@@ -1127,7 +1351,7 @@ function DensityCard({ workout, onOpen }: { workout: Workout; onOpen?: () => voi
   const [view, setView] = useState<'exercise' | 'bodypart'>('exercise');
   const { byExercise, byMuscle, totalVolume, durationMin, density } = calcDensity(workout);
   const rows = view === 'exercise' ? byExercise : byMuscle;
-  const maxVol = Math.max(...rows.map(r => r.volume), 1);
+  const maxVol = Math.max(...rows.map((r) => r.volume), 1);
 
   return (
     <div
@@ -1147,7 +1371,7 @@ function DensityCard({ workout, onOpen }: { workout: Workout; onOpen?: () => voi
       className={cn(
         'glass-panel dashboard-card-surface p-4 col-span-full space-y-4 text-left w-full',
         onOpen &&
-          'cursor-pointer hover:border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent)]/50'
+          'cursor-pointer hover:border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent)]/50',
       )}
     >
       <div className="flex items-center justify-between flex-wrap gap-2">
@@ -1162,13 +1386,18 @@ function DensityCard({ workout, onOpen }: { workout: Workout; onOpen?: () => voi
         </div>
         <div className="flex gap-4">
           {[
-            { label: 'Volume',   value: `${Math.round(totalVolume).toLocaleString()} kg` },
+            { label: 'Volume', value: `${Math.round(totalVolume).toLocaleString()} kg` },
             { label: 'Duration', value: `${durationMin} min` },
-            { label: 'Density',  value: `${density} kg/min`, gold: true },
-          ].map(s => (
+            { label: 'Density', value: `${density} kg/min`, gold: true },
+          ].map((s) => (
             <div key={s.label} className="text-center">
               <p className="text-xs text-[color:var(--text-detail)]">{s.label}</p>
-              <p className={cn('font-mono tabular-nums font-bold', s.gold ? 'text-[color:var(--accent)]' : 'text-[color:var(--text-0)]')}>
+              <p
+                className={cn(
+                  'font-mono tabular-nums font-bold',
+                  s.gold ? 'text-[color:var(--accent)]' : 'text-[color:var(--text-0)]',
+                )}
+              >
                 {s.value}
               </p>
             </div>
@@ -1179,13 +1408,16 @@ function DensityCard({ workout, onOpen }: { workout: Workout; onOpen?: () => voi
           onClick={(e) => e.stopPropagation()}
           onKeyDown={(e) => e.stopPropagation()}
         >
-          {(['exercise', 'bodypart'] as const).map(v => (
+          {(['exercise', 'bodypart'] as const).map((v) => (
             <button
               key={v}
               type="button"
               onClick={() => setView(v)}
-              className={cn('px-3 py-1.5 text-xs font-semibold capitalize transition-all',
-                view === v ? 'bg-[rgba(245,158,11,0.15)] text-[#F59E0B]' : 'text-[color:var(--text-detail)] hover:text-[color:var(--text-0)]'
+              className={cn(
+                'px-3 py-1.5 text-xs font-semibold capitalize transition-all',
+                view === v
+                  ? 'bg-[rgba(245,158,11,0.15)] text-[#F59E0B]'
+                  : 'text-[color:var(--text-detail)] hover:text-[color:var(--text-0)]',
               )}
             >
               By {v}
@@ -1198,12 +1430,18 @@ function DensityCard({ workout, onOpen }: { workout: Workout; onOpen?: () => voi
         <p className="text-sm text-[color:var(--text-detail)]">No completed sets recorded.</p>
       ) : (
         <div className="space-y-2.5">
-          {rows.map(row => (
+          {rows.map((row) => (
             <div key={row.label} className="space-y-1">
               <div className="flex justify-between text-sm">
                 <div className="flex items-center gap-2 min-w-0">
-                  <span className="font-medium text-[color:var(--text-0)] capitalize truncate">{row.label}</span>
-                  {view === 'exercise' && <span className="text-xs text-[color:var(--text-detail)] capitalize shrink-0">{row.muscle}</span>}
+                  <span className="font-medium text-[color:var(--text-0)] capitalize truncate">
+                    {row.label}
+                  </span>
+                  {view === 'exercise' && (
+                    <span className="text-xs text-[color:var(--text-detail)] capitalize shrink-0">
+                      {row.muscle}
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
                   <span className="font-mono tabular-nums text-[color:var(--text-0)]">
@@ -1245,7 +1483,9 @@ function CycleDayTabs({
   const days = Array.from({ length: cycleLengthDays }, (_, i) => i + 1);
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[color:var(--text-2)]">Cycle days</p>
+      <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[color:var(--text-2)]">
+        Cycle days
+      </p>
       <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-thin">
         {days.map((day) => {
           const isTodayTab = todayCycleDay !== null && day === todayCycleDay;
@@ -1260,7 +1500,7 @@ function CycleDayTabs({
                 isSelected
                   ? 'is-selected text-[#FAFAFA]'
                   : 'border-[rgba(65,50,50,0.35)] text-[color:var(--text-1)] hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]',
-                isTodayTab && !isSelected && 'ring-1 ring-[rgba(220,38,38,0.35)]'
+                isTodayTab && !isSelected && 'ring-1 ring-[rgba(220,38,38,0.35)]',
               )}
               aria-pressed={isSelected}
               title={isTodayTab ? 'Today (calendar)' : `Cycle day ${day}`}
@@ -1284,8 +1524,15 @@ export default function DashboardPage() {
 
   const [sessionDetailOpen, setSessionDetailOpen] = useState(false);
 
-  const { profile, todayNutrition, todayRecovery, latestRecovery, todaySupplements, weeklyVolume, isLoading } =
-    useDashboardData(userId);
+  const {
+    profile,
+    todayNutrition,
+    todayRecovery,
+    latestRecovery,
+    todaySupplements,
+    weeklyVolume,
+    isLoading,
+  } = useDashboardData(userId);
   const { data: activeProgram } = useActiveProgram(userId);
   const { data: recentWorkouts } = useRecentWorkouts(userId, 7);
   const { data: physiqueCheckIns } = useRecentCheckIns(userId, 40);
@@ -1313,20 +1560,22 @@ export default function DashboardPage() {
   }, [cycleLen]);
   const safeDay = Math.min(Math.max(selectedCycleDay, 1), cycleLen);
 
-  const selectedSession = activeProgram?.sessions.find(s => s.dayNumber === safeDay);
+  const selectedSession = activeProgram?.sessions.find((s) => s.dayNumber === safeDay);
   const isLiftForSelected = selectedSession?.type === 'lift';
   const isViewingToday = cycleDay !== null && safeDay === cycleDay;
 
-  const todayWorkout = recentWorkouts?.find(w => w.date === todayStr);
-  const lastWorkout = recentWorkouts?.find(w => w.exercises.some(ex => ex.sets.some(s => s.completed)));
+  const todayWorkout = recentWorkouts?.find((w) => w.date === todayStr);
+  const lastWorkout = recentWorkouts?.find((w) =>
+    w.exercises.some((ex) => ex.sets.some((s) => s.completed)),
+  );
 
   const recoveryDashEntry = todayRecovery ?? latestRecovery ?? null;
   const recoveryDashHistorical = !todayRecovery && !!latestRecovery;
 
-  const scheduleTitle = isViewingToday ? 'Today\'s Schedule' : `Day ${safeDay} — Plan`;
+  const scheduleTitle = isViewingToday ? "Today's Schedule" : `Day ${safeDay} — Plan`;
   const dateBadge = isViewingToday ? formatDisplayDate(todayStr) : 'Preview';
   const previewHint = !isViewingToday
-    ? 'Nutrition and supplement cards below reflect calendar today only when the highlighted tab matches today\'s cycle day. Recovery shows your latest saved check-in.'
+    ? "Nutrition and supplement cards below reflect calendar today only when the highlighted tab matches today's cycle day. Recovery shows your latest saved check-in."
     : null;
 
   const dashboardSubtitle =
@@ -1384,265 +1633,326 @@ export default function DashboardPage() {
 
         {/* Schedule + cycle-tab cards */}
         <section key={safeDay} className="space-y-4">
-        <div className="grid grid-cols-1 gap-4">
-          <TodaySchedule
-            session={selectedSession}
-            isLiftDay={isLiftForSelected ?? false}
-            nutrition={isViewingToday ? todayNutrition : undefined}
-            supplements={isViewingToday ? todaySupplements : undefined}
-            todayDone={isViewingToday ? !!todayWorkout : false}
-            onActivityClick={() => router.push('/training/workout')}
-            scheduleTitle={scheduleTitle}
-            dateBadge={dateBadge}
-            previewHint={previewHint}
-            canStartWorkout={isViewingToday}
-            nutritionPlan={activePlan}
-            protocol={activeProtocol}
-          />
-        </div>
+          <div className="grid grid-cols-1 gap-4">
+            <TodaySchedule
+              session={selectedSession}
+              isLiftDay={isLiftForSelected ?? false}
+              nutrition={isViewingToday ? todayNutrition : undefined}
+              supplements={isViewingToday ? todaySupplements : undefined}
+              todayDone={isViewingToday ? !!todayWorkout : false}
+              onActivityClick={() => router.push('/training/workout')}
+              scheduleTitle={scheduleTitle}
+              dateBadge={dateBadge}
+              previewHint={previewHint}
+              canStartWorkout={isViewingToday}
+              nutritionPlan={activePlan}
+              protocol={activeProtocol}
+            />
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-
-          {/* Session | Recovery+Physique — two cols on lg+; right stack matches session column height */}
-          <div className="col-span-full grid grid-cols-1 gap-4 lg:grid-cols-2 lg:items-stretch lg:gap-4">
-            <Card
-              className="min-h-0 lg:flex lg:flex-col lg:h-full"
-              title={isViewingToday ? 'Today\'s Session' : `Day ${safeDay} — Session plan`}
-              icon={<Dumbbell size={20} />}
-              iconColor="text-[color:var(--accent)]"
-              selected
-              onClick={() => {
-                if (selectedSession) setSessionDetailOpen(true);
-                else router.push('/training');
-              }}
-            >
-              {selectedSession ? (
-                <div className="flex min-h-0 flex-1 flex-col space-y-3">
-                  <p className="font-medium text-[color:var(--text-0)]">{selectedSession.name}</p>
-                  <p className="text-xs text-[color:var(--text-detail)]">
-                    {selectedSession.type === 'lift' && 'Strength'}
-                    {selectedSession.type === 'cardio' && 'Cardio / conditioning'}
-                    {selectedSession.type === 'recovery' && 'Recovery'}
-                  </p>
-                  <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1 -mr-0.5 max-h-[min(72vh,42rem)] lg:max-h-none">
-                    <SessionProgramPreview session={selectedSession} />
-                  </div>
-                  <div className="border-t border-[rgba(65,50,50,0.25)] pt-3 space-y-1.5 shrink-0">
-                    <p className="text-xs text-[color:var(--accent)]/90 font-medium">
-                      {isViewingToday
-                        ? todayWorkout
-                          ? 'Open workout →'
-                          : 'Start workout →'
-                        : 'Open training →'}
-                    </p>
-                    {!isViewingToday && (
-                      <p className="text-[10px] text-[color:var(--text-detail)] leading-snug">
-                        Logging runs on calendar today when you select today&apos;s cycle-day tab.
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <p className="text-[color:var(--text-detail)]">Rest day — focus on recovery</p>
-              )}
-            </Card>
-
-            <div className="flex min-h-0 flex-col gap-4 lg:h-full lg:min-h-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {/* Session | Recovery+Physique — two cols on lg+; right stack matches session column height */}
+            <div className="col-span-full grid grid-cols-1 gap-4 lg:grid-cols-2 lg:items-stretch lg:gap-4">
               <Card
-                className="shrink-0 lg:min-h-0"
-                title="Recovery"
-                icon={<Activity size={20} />}
-                iconColor="text-[#10B981]"
-                onClick={() => router.push('/recovery')}
+                className="min-h-0 lg:flex lg:flex-col lg:h-full"
+                title={isViewingToday ? "Today's Session" : `Day ${safeDay} — Session plan`}
+                icon={<Dumbbell size={20} />}
+                iconColor="text-[color:var(--accent)]"
+                selected
+                onClick={() => {
+                  if (selectedSession) setSessionDetailOpen(true);
+                  else router.push('/training');
+                }}
               >
-                {!recoveryDashEntry ? (
-                  <div className="space-y-3">
-                    <p className="text-[color:var(--text-detail)]">No recovery data logged yet</p>
-                    <p className="text-xs text-[#10B981]/90 font-medium">Log on Recovery page →</p>
+                {selectedSession ? (
+                  <div className="flex min-h-0 flex-1 flex-col space-y-3">
+                    <p className="font-medium text-[color:var(--text-0)]">{selectedSession.name}</p>
+                    <p className="text-xs text-[color:var(--text-detail)]">
+                      {selectedSession.type === 'lift' && 'Strength'}
+                      {selectedSession.type === 'cardio' && 'Cardio / conditioning'}
+                      {selectedSession.type === 'recovery' && 'Recovery'}
+                    </p>
+                    <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1 -mr-0.5 max-h-[min(72vh,42rem)] lg:max-h-none">
+                      <SessionProgramPreview session={selectedSession} />
+                    </div>
+                    <div className="border-t border-[rgba(65,50,50,0.25)] pt-3 space-y-1.5 shrink-0">
+                      <p className="text-xs text-[color:var(--accent)]/90 font-medium">
+                        {isViewingToday
+                          ? todayWorkout
+                            ? 'Open workout →'
+                            : 'Start workout →'
+                          : 'Open training →'}
+                      </p>
+                      {!isViewingToday && (
+                        <p className="text-[10px] text-[color:var(--text-detail)] leading-snug">
+                          Logging runs on calendar today when you select today&apos;s cycle-day tab.
+                        </p>
+                      )}
+                    </div>
                   </div>
                 ) : (
-                  <div className="space-y-2">
-                    {recoveryDashHistorical && latestRecovery && (
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-detail)] leading-snug">
-                        {latestRecovery.date === todayStr
-                          ? 'Latest entry'
-                          : `Last logged · ${formatDisplayDate(latestRecovery.date)}`}
+                  <p className="text-[color:var(--text-detail)]">Rest day — focus on recovery</p>
+                )}
+              </Card>
+
+              <div className="flex min-h-0 flex-col gap-4 lg:h-full lg:min-h-0">
+                <Card
+                  className="shrink-0 lg:min-h-0"
+                  title="Recovery"
+                  icon={<Activity size={20} />}
+                  iconColor="text-[color:var(--accent)]"
+                  onClick={() => router.push('/recovery')}
+                >
+                  {!recoveryDashEntry ? (
+                    <div className="space-y-3">
+                      <p className="text-[color:var(--text-detail)]">No recovery data logged yet</p>
+                      <p className="text-xs text-[color:var(--accent)]/90 font-medium">
+                        Log on Recovery page →
                       </p>
-                    )}
-                    {todayRecovery && (
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-detail)]">
-                        Today · {formatDisplayDate(todayStr)}
-                      </p>
-                    )}
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-3xl font-bold font-mono tabular-nums text-[color:var(--text-0)]">
-                        {Math.round(recoveryDashEntry.readinessScore)}
-                      </span>
-                      <span className="text-sm text-[color:var(--text-detail)]">/100</span>
                     </div>
-                    <p className="text-sm text-[color:var(--text-detail)]">
-                      Sleep: {recoveryDashEntry.sleepHours}h · HRV: {recoveryDashEntry.hrv}
-                    </p>
-                    {!isViewingToday && (
-                      <p className="text-[10px] text-[color:var(--text-2)] pt-1 leading-snug">
-                        Saved recovery is by calendar date (not the selected cycle day).
+                  ) : (
+                    <div className="space-y-2">
+                      {recoveryDashHistorical && latestRecovery && (
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-detail)] leading-snug">
+                          {latestRecovery.date === todayStr
+                            ? 'Latest entry'
+                            : `Last logged · ${formatDisplayDate(latestRecovery.date)}`}
+                        </p>
+                      )}
+                      {todayRecovery && (
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-detail)]">
+                          Today · {formatDisplayDate(todayStr)}
+                        </p>
+                      )}
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-3xl font-bold font-mono tabular-nums text-[color:var(--text-0)]">
+                          {Math.round(recoveryDashEntry.readinessScore)}
+                        </span>
+                        <span className="text-sm text-[color:var(--text-detail)]">/100</span>
+                      </div>
+                      <p className="text-sm text-[color:var(--text-detail)]">
+                        Sleep: {recoveryDashEntry.sleepHours}h · HRV: {recoveryDashEntry.hrv}
                       </p>
-                    )}
-                    <p className="text-xs text-[#10B981]/90 font-medium pt-1">Open recovery →</p>
+                      {!isViewingToday && (
+                        <p className="text-[10px] text-[color:var(--text-2)] pt-1 leading-snug">
+                          Saved recovery is by calendar date (not the selected cycle day).
+                        </p>
+                      )}
+                      <p className="text-xs text-[color:var(--accent)]/90 font-medium pt-1">
+                        Open recovery →
+                      </p>
+                    </div>
+                  )}
+                </Card>
+
+                <Card
+                  className="min-h-0 flex-1 lg:flex lg:flex-col"
+                  title="Physique"
+                  icon={<Scale size={20} />}
+                  iconColor="text-[color:var(--accent)]"
+                  onClick={() => router.push('/physique')}
+                >
+                  <div className="flex min-h-0 flex-1 flex-col space-y-2">
+                    <div className="flex items-baseline justify-between gap-2 shrink-0">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-3xl font-bold font-mono tabular-nums text-[color:var(--text-0)]">
+                          {profile?.currentWeight ?? '—'}
+                        </span>
+                        <span className="text-sm text-[color:var(--text-detail)]">kg</span>
+                      </div>
+                      <BarChart3
+                        size={18}
+                        className="text-[color:var(--accent)]/60 shrink-0"
+                        aria-hidden
+                      />
+                    </div>
+                    <p className="text-sm text-[color:var(--text-detail)] shrink-0">
+                      Target: {profile?.targetWeight ?? '—'} kg
+                    </p>
+                    <div className="min-h-0 flex-1">
+                      <PhysiqueMiniCharts
+                        checkIns={physiqueCheckIns}
+                        targetWeight={profile?.targetWeight}
+                      />
+                    </div>
+                    <p className="text-xs text-[color:var(--accent)]/80 font-medium shrink-0">
+                      Full check-in &amp; history →
+                    </p>
                   </div>
+                </Card>
+              </div>
+            </div>
+
+            {/* Full-width row: nutrition · supplements · coaching — always three columns from md */}
+            <div className="col-span-full grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-4">
+              <Card
+                title="Today's Nutrition"
+                icon={<TrendingUp size={20} />}
+                iconColor="text-[color:var(--accent)]"
+                onClick={() => router.push('/nutrition')}
+              >
+                {!isViewingToday ? (
+                  <p className="text-sm text-[color:var(--text-detail)]">
+                    Meal logging and macro totals are for calendar today. Select today&apos;s
+                    cycle-day tab ({cycleDay !== null ? `day ${cycleDay}` : ''}) to edit
+                    today&apos;s intake.
+                  </p>
+                ) : todayNutrition ? (
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-[color:var(--text-detail)]">Protein</span>
+                      <span className="font-mono tabular-nums text-[color:var(--text-0)]">
+                        {Math.round(todayNutrition.macroActuals.protein)}g /{' '}
+                        {todayNutrition.macroTargets.protein}g
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-[color:var(--text-detail)]">Meals</span>
+                      <span className="font-mono tabular-nums text-[color:var(--text-0)]">
+                        {todayNutrition.meals.filter((m) => m.completed).length}/
+                        {todayNutrition.meals.length} eaten
+                      </span>
+                    </div>
+                    <div className="h-2 rounded-full overflow-hidden bg-[color:var(--surface-track)] ring-1 ring-inset ring-black/35">
+                      <div
+                        className="h-full bg-[color:var(--accent)] rounded-full transition-all"
+                        style={{ width: `${Math.min(100, todayNutrition.complianceScore)}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-[color:var(--accent)]/80 font-medium pt-1">
+                      Open nutrition →
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-[color:var(--text-detail)]">No meals logged today</p>
+                    <p className="text-xs text-[color:var(--accent)]/80 font-medium pt-2">
+                      Open nutrition →
+                    </p>
+                  </>
                 )}
               </Card>
 
               <Card
-                className="min-h-0 flex-1 lg:flex lg:flex-col"
-                title="Physique"
-                icon={<Scale size={20} />}
-                iconColor="text-[#F59E0B]"
-                onClick={() => router.push('/physique')}
+                title="Supplements"
+                icon={<Pill size={20} />}
+                iconColor="text-[color:var(--accent)]"
+                onClick={() => router.push('/supplements')}
               >
-                <div className="flex min-h-0 flex-1 flex-col space-y-2">
-                  <div className="flex items-baseline justify-between gap-2 shrink-0">
+                {!isViewingToday ? (
+                  <p className="text-sm text-[color:var(--text-detail)]">
+                    Supplement checklist reflects calendar today. Switch to today&apos;s cycle tab
+                    to tick off today&apos;s windows.
+                  </p>
+                ) : todaySupplements ? (
+                  <div className="space-y-2">
                     <div className="flex items-baseline gap-2">
                       <span className="text-3xl font-bold font-mono tabular-nums text-[color:var(--text-0)]">
-                        {profile?.currentWeight ?? '—'}
+                        {todaySupplements.compliancePercent}
                       </span>
-                      <span className="text-sm text-[color:var(--text-detail)]">kg</span>
+                      <span className="text-sm text-[color:var(--text-detail)]">%</span>
                     </div>
-                    <BarChart3 size={18} className="text-[color:var(--accent)]/60 shrink-0" aria-hidden />
+                    <p className="text-sm text-[color:var(--text-detail)]">compliance today</p>
+                    <p className="text-xs text-[color:var(--accent)]/80 font-medium">
+                      Open supplements →
+                    </p>
                   </div>
-                  <p className="text-sm text-[color:var(--text-detail)] shrink-0">
-                    Target: {profile?.targetWeight ?? '—'} kg
-                  </p>
-                  <div className="min-h-0 flex-1">
-                    <PhysiqueMiniCharts checkIns={physiqueCheckIns} targetWeight={profile?.targetWeight} />
-                  </div>
-                  <p className="text-xs text-[color:var(--accent)]/80 font-medium shrink-0">Full check-in &amp; history →</p>
-                </div>
+                ) : (
+                  <>
+                    <p className="text-[color:var(--text-detail)]">No supplements logged today</p>
+                    <p className="text-xs text-[color:var(--accent)]/80 font-medium pt-2">
+                      Open supplements →
+                    </p>
+                  </>
+                )}
               </Card>
             </div>
-          </div>
 
-          {/* Full-width row: nutrition · supplements · coaching — always three columns from md */}
-          <div className="col-span-full grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-4">
-          <Card
-            title="Today's Nutrition"
-            icon={<TrendingUp size={20} />}
-            iconColor="text-[color:var(--accent)]"
-            onClick={() => router.push('/nutrition')}
-          >
-            {!isViewingToday ? (
-              <p className="text-sm text-[color:var(--text-detail)]">
-                Meal logging and macro totals are for calendar today. Select today&apos;s cycle-day tab ({cycleDay !== null ? `day ${cycleDay}` : ''}) to edit today&apos;s intake.
-              </p>
-            ) : todayNutrition ? (
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-[color:var(--text-detail)]">Protein</span>
-                  <span className="font-mono tabular-nums text-[color:var(--text-0)]">
-                    {Math.round(todayNutrition.macroActuals.protein)}g / {todayNutrition.macroTargets.protein}g
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-[color:var(--text-detail)]">Meals</span>
-                  <span className="font-mono tabular-nums text-[color:var(--text-0)]">
-                    {todayNutrition.meals.filter(m => m.completed).length}/{todayNutrition.meals.length} eaten
-                  </span>
-                </div>
-                <div className="h-2 rounded-full overflow-hidden bg-[color:var(--surface-track)] ring-1 ring-inset ring-black/35">
-                  <div
-                    className="h-full bg-[color:var(--accent)] rounded-full transition-all"
-                    style={{ width: `${Math.min(100, todayNutrition.complianceScore)}%` }}
-                  />
-                </div>
-                <p className="text-xs text-[color:var(--accent)]/80 font-medium pt-1">Open nutrition →</p>
-              </div>
-            ) : (
-              <>
-                <p className="text-[color:var(--text-detail)]">No meals logged today</p>
-                <p className="text-xs text-[color:var(--accent)]/80 font-medium pt-2">Open nutrition →</p>
-              </>
+            {isViewingToday && lastWorkout && (
+              <DensityCard workout={lastWorkout} onOpen={() => router.push('/training/history')} />
             )}
-          </Card>
-
-          <Card
-            title="Supplements"
-            icon={<Pill size={20} />}
-            iconColor="text-[color:var(--accent)]"
-            onClick={() => router.push('/supplements')}
-          >
-            {!isViewingToday ? (
-              <p className="text-sm text-[color:var(--text-detail)]">
-                Supplement checklist reflects calendar today. Switch to today&apos;s cycle tab to tick off today&apos;s windows.
-              </p>
-            ) : todaySupplements ? (
-              <div className="space-y-2">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold font-mono tabular-nums text-[color:var(--text-0)]">
-                    {todaySupplements.compliancePercent}
-                  </span>
-                  <span className="text-sm text-[color:var(--text-detail)]">%</span>
-                </div>
-                <p className="text-sm text-[color:var(--text-detail)]">compliance today</p>
-                <p className="text-xs text-[color:var(--accent)]/80 font-medium">Open supplements →</p>
-              </div>
-            ) : (
-              <>
-                <p className="text-[color:var(--text-detail)]">No supplements logged today</p>
-                <p className="text-xs text-[color:var(--accent)]/80 font-medium pt-2">Open supplements →</p>
-              </>
-            )}
-          </Card>
           </div>
+        </section>
 
-          {isViewingToday && lastWorkout && (
-            <DensityCard workout={lastWorkout} onOpen={() => router.push('/training/history')} />
-          )}
-        </div>
-      </section>
-
-      {/* Weekly volume — not driven by cycle tab */}
-      {weeklyVolume && weeklyVolume.length > 0 && (
-      <section
-        className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3"
-        aria-label="Weekly training volume"
-      >
-          <Card title="Weekly Volume vs Landmarks" icon={<TrendingUp size={20} />} iconColor="text-[color:var(--text-1)]" fullWidth>
-            <div className="space-y-3">
-              {weeklyVolume.map((muscle: {
-                muscleGroup: string; currentSets: number; targetSets: number;
-                mev: number; mav: number; mrv: number;
-              }) => (
-                <div key={muscle.muscleGroup} className="space-y-1">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-[color:var(--text-0)] capitalize">{muscle.muscleGroup}</span>
-                    <span className="font-mono tabular-nums text-[color:var(--text-detail)]">
-                      {muscle.currentSets} / {muscle.targetSets} sets
-                    </span>
-                  </div>
-                  <div className="h-2 bg-[color:var(--surface-track)] rounded-full overflow-hidden relative">
-                    <div className="absolute h-full bg-[rgba(120,100,98,0.38)] rounded-l-full"
-                      style={{ width: `${(muscle.mev / muscle.mrv) * 100}%` }} />
-                    <div className="absolute h-full bg-[color:var(--accent)]/30"
-                      style={{ left: `${(muscle.mev / muscle.mrv) * 100}%`, width: `${((muscle.mav - muscle.mev) / muscle.mrv) * 100}%` }} />
-                    <div className="absolute h-full bg-[color:var(--accent)]/60"
-                      style={{ left: `${(muscle.mav / muscle.mrv) * 100}%`, width: `${((muscle.mrv - muscle.mav) / muscle.mrv) * 100}%` }} />
-                    <div className="absolute top-0 w-0.5 h-full bg-[color:var(--accent)]"
-                      style={{ left: `${Math.min(99, (muscle.currentSets / muscle.mrv) * 100)}%` }} />
-                  </div>
+        {/* Weekly volume — not driven by cycle tab */}
+        {weeklyVolume && weeklyVolume.length > 0 && (
+          <section
+            className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3"
+            aria-label="Weekly training volume"
+          >
+            <Card
+              title="Weekly Volume vs Landmarks"
+              icon={<TrendingUp size={20} />}
+              iconColor="text-[color:var(--text-1)]"
+              fullWidth
+            >
+              <div className="space-y-3">
+                {weeklyVolume.map(
+                  (muscle: {
+                    muscleGroup: string;
+                    currentSets: number;
+                    targetSets: number;
+                    mev: number;
+                    mav: number;
+                    mrv: number;
+                  }) => (
+                    <div key={muscle.muscleGroup} className="space-y-1">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-[color:var(--text-0)] capitalize">
+                          {muscle.muscleGroup}
+                        </span>
+                        <span className="font-mono tabular-nums text-[color:var(--text-detail)]">
+                          {muscle.currentSets} / {muscle.targetSets} sets
+                        </span>
+                      </div>
+                      <div className="h-2 bg-[color:var(--surface-track)] rounded-full overflow-hidden relative">
+                        <div
+                          className="absolute h-full bg-[rgba(120,100,98,0.38)] rounded-l-full"
+                          style={{ width: `${(muscle.mev / muscle.mrv) * 100}%` }}
+                        />
+                        <div
+                          className="absolute h-full bg-[color:var(--accent)]/30"
+                          style={{
+                            left: `${(muscle.mev / muscle.mrv) * 100}%`,
+                            width: `${((muscle.mav - muscle.mev) / muscle.mrv) * 100}%`,
+                          }}
+                        />
+                        <div
+                          className="absolute h-full bg-[color:var(--accent)]/60"
+                          style={{
+                            left: `${(muscle.mav / muscle.mrv) * 100}%`,
+                            width: `${((muscle.mrv - muscle.mav) / muscle.mrv) * 100}%`,
+                          }}
+                        />
+                        <div
+                          className="absolute top-0 w-0.5 h-full bg-[color:var(--accent)]"
+                          style={{
+                            left: `${Math.min(99, (muscle.currentSets / muscle.mrv) * 100)}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ),
+                )}
+                <div className="flex gap-4 pt-1">
+                  {[
+                    ['#948A88', 'MV→MEV'],
+                    ['var(--accent)', 'MEV→MRV'],
+                    ['var(--accent)', 'Current'],
+                  ].map(([c, l]) => (
+                    <div
+                      key={l}
+                      className="flex items-center gap-1.5 text-xs text-[color:var(--text-detail)]"
+                    >
+                      <div className="w-2 h-2 rounded-full" style={{ background: c }} />
+                      {l}
+                    </div>
+                  ))}
                 </div>
-              ))}
-              <div className="flex gap-4 pt-1">
-                {[['#948A88', 'MV→MEV'], ['var(--accent)', 'MEV→MRV'], ['var(--accent)', 'Current']].map(([c, l]) => (
-                  <div key={l} className="flex items-center gap-1.5 text-xs text-[color:var(--text-detail)]">
-                    <div className="w-2 h-2 rounded-full" style={{ background: c }} />
-                    {l}
-                  </div>
-                ))}
               </div>
-            </div>
-          </Card>
-      </section>
-      )}
+            </Card>
+          </section>
+        )}
       </div>
     </>
   );
@@ -1688,7 +1998,7 @@ function Card({
         selected && 'is-selected',
         interactive &&
           'cursor-pointer select-none hover:border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent)]/55',
-        className
+        className,
       )}
     >
       <div className="flex items-center gap-2 mb-3">

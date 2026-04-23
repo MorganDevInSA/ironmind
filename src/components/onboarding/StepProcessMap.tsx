@@ -77,13 +77,17 @@ export function StepProcessMap({ onNext }: StepProcessMapProps) {
               return (
                 <div key={node.number} className="flex flex-row items-center">
                   {/* Node card */}
-                  <div className="flex flex-col items-center gap-3 p-4 rounded-[14px] w-[148px] sm:w-auto
+                  <div
+                    className="flex flex-col items-center gap-3 p-4 rounded-[14px] w-[148px] sm:w-auto
                     bg-[rgba(18,14,14,0.78)] backdrop-blur-xl border border-[rgba(65,50,50,0.40)]
-                    shadow-[0_10px_24px_rgba(0,0,0,0.45)]">
+                    shadow-[0_10px_24px_rgba(0,0,0,0.45)]"
+                  >
                     {/* Number badge */}
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold
+                    <div
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold
                       bg-[rgba(220,38,38,0.15)] border border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)] text-[color:var(--accent-light)]
-                      [text-shadow:0_0_8px_rgba(220,38,38,0.4)]">
+                      [text-shadow:0_0_8px_rgba(220,38,38,0.4)]"
+                    >
                       {node.number}
                     </div>
                     <Icon size={20} className="text-[color:var(--accent)]" />
@@ -113,21 +117,20 @@ export function StepProcessMap({ onNext }: StepProcessMapProps) {
       </div>
 
       {/* Summary text */}
-      <div className="rounded-[14px] p-5 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)]
-        shadow-[0_10px_24px_rgba(0,0,0,0.45)] text-[color:var(--text-1)] text-sm leading-relaxed text-center">
-        This process turns a general AI into your personal elite bodybuilding coach, then seeds
-        your IRONMIND app with a fully individualised program, nutrition plan, and supplement
-        protocol. Each session you log sharpens the coach&apos;s ability to analyse and adapt.
+      <div
+        className="rounded-[14px] p-5 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)]
+        shadow-[0_10px_24px_rgba(0,0,0,0.45)] text-[color:var(--text-1)] text-sm leading-relaxed text-center"
+      >
+        This process turns a general AI into your personal elite bodybuilding coach, then seeds your
+        IRONMIND app with a fully individualised program, nutrition plan, and supplement protocol.
+        Each session you log sharpens the coach&apos;s ability to analyse and adapt.
       </div>
 
       {/* CTA */}
       <div className="flex flex-col items-center gap-3">
         <button
           onClick={onNext}
-          className="flex items-center gap-3 px-8 py-4 rounded-lg font-semibold text-white text-base
-            bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-2)] border border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]
-            shadow-[0_12px_30px_rgba(220,38,38,0.30)]
-            hover:brightness-110 active:scale-95 transition-all duration-200"
+          className="btn-primary inline-flex items-center justify-center gap-2 min-w-[172px] px-6 py-2.5 text-sm"
         >
           Let&apos;s Start
           <ArrowRight size={18} />
@@ -135,11 +138,7 @@ export function StepProcessMap({ onNext }: StepProcessMapProps) {
 
         <button
           onClick={() => setDemoOpen(true)}
-          className="flex items-center gap-2 px-6 py-2.5 rounded-lg font-semibold text-sm
-            text-[#1a3d1a] bg-gradient-to-r from-[#4ade80] to-[#22c55e]
-            border border-[rgba(74,222,128,0.5)]
-            shadow-[0_6px_18px_rgba(74,222,128,0.22)]
-            hover:brightness-110 active:scale-95 transition-all duration-200"
+          className="btn-primary inline-flex items-center justify-center gap-2 min-w-[172px] px-6 py-2.5 text-sm"
         >
           <Zap size={15} />
           Load Demo

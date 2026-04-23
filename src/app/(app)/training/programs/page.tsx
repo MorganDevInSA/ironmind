@@ -38,18 +38,18 @@ export default function ProgramsPage() {
                 </p>
                 <h2 className="text-lg font-bold text-[color:var(--text-0)]">{program.name}</h2>
               </div>
-              <span className="px-2 py-1 rounded-md bg-[rgba(16,185,129,0.12)] border border-[rgba(16,185,129,0.35)] text-[#10B981] text-xs font-semibold uppercase">
+              <span className="px-2 py-1 rounded-md bg-[color:color-mix(in_srgb,var(--accent)_12%,transparent)] border border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)] text-[color:var(--accent)] text-xs font-semibold uppercase">
                 Active
               </span>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-[rgba(18,14,14,0.6)] rounded-lg p-3">
+              <div className="bg-[color:var(--surface-well)] rounded-lg p-3">
                 <p className="text-xs text-[color:var(--text-2)] mb-1">Cycle length</p>
                 <p className="font-mono tabular-nums text-[color:var(--text-0)] font-semibold">
                   {program.cycleLengthDays} days
                 </p>
               </div>
-              <div className="bg-[rgba(18,14,14,0.6)] rounded-lg p-3">
+              <div className="bg-[color:var(--surface-well)] rounded-lg p-3">
                 <p className="text-xs text-[color:var(--text-2)] mb-1">Lift sessions</p>
                 <p className="font-mono tabular-nums text-[color:var(--text-0)] font-semibold">
                   {program.sessions.filter((s) => s.type === 'lift').length} / cycle
@@ -64,9 +64,9 @@ export default function ProgramsPage() {
               {program.sessions.map((s) => (
                 <div
                   key={s.dayNumber}
-                  className="flex items-center gap-3 py-2 border-b border-[rgba(65,50,50,0.15)] last:border-0"
+                  className="flex items-center gap-3 py-2 border-b border-[color:color-mix(in_srgb,var(--chrome-border)_40%,transparent)] last:border-0"
                 >
-                  <span className="w-8 h-8 rounded-lg bg-[rgba(18,14,14,0.6)] flex items-center justify-center font-mono text-xs font-bold text-[color:var(--text-2)]">
+                  <span className="w-8 h-8 rounded-lg bg-[color:var(--surface-well)] flex items-center justify-center font-mono text-xs font-bold text-[color:var(--text-2)]">
                     {s.dayNumber}
                   </span>
                   <div className="flex-1">
@@ -77,7 +77,7 @@ export default function ProgramsPage() {
                       s.type === 'lift'
                         ? 'text-[color:var(--accent)]'
                         : s.type === 'recovery'
-                          ? 'text-[#10B981]'
+                          ? 'text-[color:var(--accent)]'
                           : 'text-[color:var(--text-2)]'
                     }`}
                   >
