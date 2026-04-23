@@ -33,6 +33,9 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# local npm prefix (never commit — breaks Vercel builds with "prefix cannot be changed")
+.npmrc
+
 # vercel
 .vercel
 
