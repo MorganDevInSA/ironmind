@@ -2,9 +2,16 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys, staleTimes } from '@/lib/constants';
-import { getNutritionDay, saveNutritionDay, getNutritionHistory, getRecentNutritionDays, getNutritionPlan } from '@/services';
+import {
+  getNutritionDay,
+  saveNutritionDay,
+  getNutritionHistory,
+  getRecentNutritionDays,
+  getNutritionPlan,
+} from '@/services';
 import type { NutritionDay } from '@/lib/types';
 import { onMutationError } from './_shared/on-error';
+import { invalidateDashboardBundle } from './_shared/invalidate-dashboard';
 
 export function useNutritionDay(userId: string, date: string) {
   return useQuery({
@@ -51,6 +58,7 @@ export function useSaveNutritionDay(userId: string) {
     onSuccess: (_, { date }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys(userId).nutrition.day(date) });
       queryClient.invalidateQueries({ queryKey: queryKeys(userId).nutrition.all });
+      invalidateDashboardBundle(queryClient, userId);
     },
     onError: onMutationError,
   });

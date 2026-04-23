@@ -5,6 +5,8 @@ description: Enforce the IRONMIND three-layer data architecture (Pages → Contr
 
 # IRONMIND Data Layer Architecture
 
+**Principal hardening checklist:** [`Documentation/PRINCIPAL-REVIEW-DATA-2026-04-23.md`](../../Documentation/PRINCIPAL-REVIEW-DATA-2026-04-23.md) — keep implementation status in sync when changing transactions, indexes, import semantics, or dashboard reads.
+
 ## The Three Layers — Never Skip
 
 ```
@@ -18,6 +20,7 @@ Firebase     src/lib/firebase/          (SDK wrappers)
 ```
 
 **Hard rules:**
+
 - Pages call **controllers only** — never services, never Firebase directly
 - Controllers call **services only** — never Firebase directly
 - Services call **`src/lib/firebase/` helpers only** — never raw Firebase SDK
@@ -35,6 +38,7 @@ import { queryKeys } from '@/lib/constants/query-keys';
 import { staleTimes } from '@/lib/constants/stale-times';
 import { useAuthStore } from '@/stores';
 import { getDomainData, saveDomainData } from '@/services/[domain].service';
+import { onMutationError } from '@/controllers/_shared/on-error';
 
 export function useDomainData() {
   const { user } = useAuthStore();
@@ -58,10 +62,7 @@ export function useSaveDomainData() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.domain.all(userId) });
     },
-    onError: (error) => {
-      console.error('[domain] save failed:', error);
-      // TODO: wire to toast notification
-    },
+    onError: onMutationError,
   });
 }
 ```
@@ -92,6 +93,7 @@ export const queryKeys = {
 ```
 
 When invalidating after a mutation:
+
 - Invalidate the **specific** document key (e.g. `queryKeys.recovery.entry(date)`).
 - Invalidate any **derived** lists (`queryKeys.recovery.latest()`, trend queries) when the mutation changes “most recent” or aggregates.
 - `invalidateQueries({ queryKey: queryKeys.recovery.all })` matches every key **starting with** `['recovery']` (TanStack Query prefix semantics).
@@ -100,7 +102,13 @@ When invalidating after a mutation:
 
 ## Composite dashboard reads
 
-**`useDashboardData`** (`src/controllers/use-dashboard.ts`) bundles profile, today’s nutrition/recovery/supplements (by **calendar date**), **`latestRecovery`** (`getLatestRecoveryEntry`) for dashboard cards when today has no entry, weekly volume, alerts, recent journal notes. New “always show latest X” dashboard metrics should follow the same pattern: dedicated `queryKeys.*.latest()` + service + hook field, not ad-hoc `useQuery` in pages.
+**`useDashboardData`** (`src/controllers/use-dashboard.ts`) uses a **single** `useQuery` over `getDashboardBundle` (`dashboard.service.ts`): profile, active program, today’s nutrition/recovery/supplements (by **calendar date**), **`latestRecovery`** when today has no entry, weekly volume, and alerts — one cache key `queryKeys(userId).dashboard.bundle(today)`. **`invalidateDashboardBundle`** (`invalidate-dashboard.ts`) invalidates that key **and** `queryKeys(userId).alerts.all` so **`useActiveAlerts`** (layout top bar) stays aligned with bundle-driving mutations. You can also use `{ queryKey: queryKeys(userId).dashboard.all }` for dashboard-only invalidation when appropriate. New “always show latest X” dashboard metrics should extend the bundle (or add a dedicated `queryKeys.*.latest()` + service) rather than ad-hoc `useQuery` in pages.
+
+**Volume rollup:** `getWeeklyVolumeSummary` reads/writes **`weeklyVolumeRollups/{weekStart}`** (`volume.service.ts`). After **workout** writes, controllers call **`deleteCurrentWeekVolumeRollup`** (via `use-training`) so the next summary recomputes; **`invalidatePostImportDomains`** also clears the current week rollup.
+
+**Import / seed jobs:** Coach import uses **`importJobs`** + **`import-compensation.ts`** (snapshots + LIFO rollback) and **`import-firestore-batch.ts`** for Firestore **`writeBatch`** groupings (profile + protocol + landmarks; nutrition plan + day + journal; first-only program/phase fast paths). First-login **`seedUserData`** uses **`seedJobs`** and the same rollback helpers; return type **`SeedUserDataResult`**. Extend those flows with new artifacts if you add post-write steps.
+
+**Multi-active repair:** **`repairMultipleActivePrograms`** / **`repairMultipleActivePhases`** in training/coaching — idempotent, **not** auto-run; wire from support or Settings when needed. **`getActiveAlerts`** has an input catalog table at the top of **`alerts.service.ts`** — update when adding alert branches. Derived-field ownership and journal scan limits: **ARCHITECTURE** §8.
 
 ---
 
@@ -116,8 +124,15 @@ Single source of truth: **`src/lib/constants/stale-times.ts`**. Use the tier tha
 // src/services/[domain].service.ts
 import type { DomainType } from '@/lib/types';
 import {
-  getDocument, setDocument, addDocument, queryDocuments, getAllDocuments,
-  createConverter, where, orderBy, limit,
+  getDocument,
+  setDocument,
+  addDocument,
+  queryDocuments,
+  getAllDocuments,
+  createConverter,
+  where,
+  orderBy,
+  limit,
 } from '@/lib/firebase';
 import { collections } from '@/lib/firebase/config';
 import type { QueryConstraint } from 'firebase/firestore';
@@ -128,26 +143,12 @@ export async function getDomainData(userId: string): Promise<DomainType | null> 
   return getDocument<DomainType>(collections.domain(userId), 'data', converter);
 }
 
-export async function saveDomainData(
-  userId: string,
-  data: Partial<DomainType>
-): Promise<void> {
-  await setDocument<DomainType>(
-    collections.domain(userId),
-    'data',
-    data as DomainType,
-    converter
-  );
+export async function saveDomainData(userId: string, data: Partial<DomainType>): Promise<void> {
+  await setDocument<DomainType>(collections.domain(userId), 'data', data as DomainType, converter);
 }
 
-export async function listDomainItems(
-  userId: string,
-  limitCount = 30
-): Promise<DomainType[]> {
-  const constraints: QueryConstraint[] = [
-    orderBy('createdAt', 'desc'),
-    limit(limitCount),
-  ];
+export async function listDomainItems(userId: string, limitCount = 30): Promise<DomainType[]> {
+  const constraints: QueryConstraint[] = [orderBy('createdAt', 'desc'), limit(limitCount)];
   return queryDocuments<DomainType>(collections.domain(userId), constraints, converter);
 }
 ```
@@ -192,13 +193,13 @@ When adding a new alert type:
 // ✅ Template for a new alert check
 async function checkMyNewCondition(
   userId: string,
-  context: AlertContext
+  context: AlertContext,
 ): Promise<SmartAlert | null> {
   // Logic here
   if (conditionMet) {
     return {
       id: `my-alert-${Date.now()}`,
-      type: 'my-type',      // Must exist in SmartAlert.type union first
+      type: 'my-type', // Must exist in SmartAlert.type union first
       severity: 'warning',
       title: 'Alert Title',
       message: 'Alert message',
@@ -217,10 +218,12 @@ export async function getActiveAlerts(userId: string): Promise<SmartAlert[]> {
     checkCalorieEmergency(userId),
     checkPelvicComfort(userId),
     checkProgressionDue(userId),
-    checkRecoveryIssues(userId),  // ← was missing, now added
-    checkMyNewCondition(userId),  // ← new alerts go here
+    checkRecoveryIssues(userId), // ← was missing, now added
+    checkMyNewCondition(userId), // ← new alerts go here
   ]);
-  results.forEach(r => { if (r.status === 'fulfilled' && r.value) alerts.push(r.value); });
+  results.forEach((r) => {
+    if (r.status === 'fulfilled' && r.value) alerts.push(r.value);
+  });
   return alerts;
 }
 ```
@@ -267,6 +270,7 @@ useMutation({
 ```
 
 Until a toast provider is built, at minimum log to console with a domain prefix:
+
 ```ts
 onError: (error) => console.error('[supplements] toggle failed:', error),
 ```

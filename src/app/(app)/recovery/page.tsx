@@ -56,6 +56,9 @@ function ChartTooltip({
 const MOODS = ['😫', '😔', '😐', '😊', '🔥'] as const;
 const chartGridStroke = 'color-mix(in srgb, var(--chrome-border) 35%, transparent)';
 const polarGridStroke = 'color-mix(in srgb, var(--chrome-border) 55%, transparent)';
+const sliderFillGradient =
+  'linear-gradient(90deg, color-mix(in srgb, var(--accent-light) 85%, white 15%) 0%, color-mix(in srgb, var(--accent) 72%, black 28%) 100%)';
+const sliderTrackColor = 'color-mix(in srgb, var(--surface-track) 88%, white 12%)';
 
 function legendFormatter(value: string) {
   return <span className="text-[color:var(--text-1)]">{value}</span>;
@@ -76,6 +79,8 @@ function SliderField({
   max?: number;
   unit?: string;
 }) {
+  const progress = ((value - min) / (max - min)) * 100;
+
   return (
     <div className="space-y-2">
       <div className="flex justify-between items-center">
@@ -92,8 +97,13 @@ function SliderField({
         step={1}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full h-2 rounded-full"
-        style={{ accentColor: 'var(--accent)' }}
+        className="recovery-slider w-full h-2 rounded-full"
+        style={{
+          accentColor: 'var(--accent)',
+          ['--slider-progress' as string]: `${progress}%`,
+          ['--slider-fill' as string]: sliderFillGradient,
+          ['--slider-track' as string]: sliderTrackColor,
+        }}
       />
       <div className="flex justify-between text-xs text-[color:var(--text-2)]">
         <span>
@@ -395,9 +405,27 @@ export default function RecoveryPage() {
                 <ResponsiveContainer width="100%" height={200}>
                   <AreaChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
                     <defs>
+                      <linearGradient id="recoveryLineGrad" x1="0" y1="0" x2="1" y2="0">
+                        <stop
+                          offset="0%"
+                          stopColor="color-mix(in srgb, var(--accent-light) 85%, white 15%)"
+                        />
+                        <stop
+                          offset="100%"
+                          stopColor="color-mix(in srgb, var(--accent) 72%, black 28%)"
+                        />
+                      </linearGradient>
                       <linearGradient id="readinessGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.28} />
-                        <stop offset="95%" stopColor="var(--accent)" stopOpacity={0.02} />
+                        <stop
+                          offset="5%"
+                          stopColor="color-mix(in srgb, var(--accent-light) 85%, white 15%)"
+                          stopOpacity={0.28}
+                        />
+                        <stop
+                          offset="95%"
+                          stopColor="color-mix(in srgb, var(--accent) 72%, black 28%)"
+                          stopOpacity={0.02}
+                        />
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke={chartGridStroke} />
@@ -417,11 +445,18 @@ export default function RecoveryPage() {
                     <Area
                       type="monotone"
                       dataKey="readiness"
-                      stroke="var(--accent)"
+                      stroke="url(#recoveryLineGrad)"
                       fill="url(#readinessGrad)"
                       strokeWidth={2}
-                      dot={{ r: 3, fill: 'var(--accent)', strokeWidth: 0 }}
-                      activeDot={{ r: 5, fill: 'var(--accent)' }}
+                      dot={{
+                        r: 3,
+                        fill: 'color-mix(in srgb, var(--accent-light) 85%, white 15%)',
+                        strokeWidth: 0,
+                      }}
+                      activeDot={{
+                        r: 5,
+                        fill: 'color-mix(in srgb, var(--accent) 72%, black 28%)',
+                      }}
                     />
                   </AreaChart>
                 </ResponsiveContainer>

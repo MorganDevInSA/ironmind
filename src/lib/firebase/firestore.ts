@@ -11,6 +11,9 @@ import {
   where,
   orderBy,
   limit,
+  runTransaction,
+  writeBatch,
+  getCountFromServer,
   Timestamp,
   DocumentData,
   QueryDocumentSnapshot,
@@ -21,6 +24,7 @@ import {
   WithFieldValue,
   serverTimestamp,
 } from 'firebase/firestore';
+import type { Transaction, WriteBatch } from 'firebase/firestore';
 import { db } from './config';
 
 /**
@@ -181,6 +185,33 @@ export async function getAllDocuments<T>(
 
 // Query constraint helpers
 export { where, orderBy, limit };
+
+/** Firestore transaction wrapper (all reads in `updateFn` must complete before writes). */
+export async function runFirestoreTransaction<T>(
+  updateFn: (transaction: Transaction) => Promise<T>,
+): Promise<T> {
+  if (!db) throw new Error('Firestore not initialized');
+  return runTransaction(db, updateFn);
+}
+
+export function createWriteBatch(): WriteBatch {
+  if (!db) throw new Error('Firestore not initialized');
+  return writeBatch(db);
+}
+
+export type { Transaction, WriteBatch };
+
+/** Document count for a collection (optionally filtered). */
+export async function getCollectionCount(
+  collectionPath: string,
+  constraints: QueryConstraint[] = [],
+): Promise<number> {
+  if (!db) throw new Error('Firestore not initialized');
+  const colRef = collection(db, collectionPath);
+  const q = constraints.length ? query(colRef, ...constraints) : query(colRef);
+  const snapshot = await getCountFromServer(q);
+  return snapshot.data().count;
+}
 
 // Timestamp helpers
 export function toTimestamp(date: Date | string): Timestamp {

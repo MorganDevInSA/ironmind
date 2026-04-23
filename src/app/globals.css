@@ -997,6 +997,55 @@ h4 {
   animation: knight-pulse 1.8s ease-in-out infinite;
 }
 
+.recovery-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+}
+
+.recovery-slider::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 9999px;
+  background-image: var(--slider-fill), linear-gradient(var(--slider-track), var(--slider-track));
+  background-size:
+    var(--slider-progress) 100%,
+    100% 100%;
+  background-repeat: no-repeat;
+}
+
+.recovery-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  margin-top: -5px;
+  border: 1px solid color-mix(in srgb, var(--accent-light) 70%, white 30%);
+  background: color-mix(in srgb, var(--accent-light) 88%, white 12%);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.recovery-slider::-moz-range-track {
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--slider-track);
+}
+
+.recovery-slider::-moz-range-progress {
+  height: 8px;
+  border-radius: 9999px;
+  background-image: var(--slider-fill);
+}
+
+.recovery-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in srgb, var(--accent-light) 70%, white 30%);
+  background: color-mix(in srgb, var(--accent-light) 88%, white 12%);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
 @keyframes pulse-soft {
   0%,
   100% {

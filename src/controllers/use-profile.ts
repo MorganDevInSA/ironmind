@@ -5,6 +5,7 @@ import { queryKeys, staleTimes } from '@/lib/constants';
 import { getProfile, updateProfile, isUserSeeded } from '@/services';
 import type { AthleteProfile } from '@/lib/types';
 import { onMutationError } from './_shared/on-error';
+import { invalidateDashboardBundle } from './_shared/invalidate-dashboard';
 
 export function useProfile(userId: string) {
   return useQuery({
@@ -22,6 +23,7 @@ export function useUpdateProfile(userId: string) {
     mutationFn: (updates: Partial<AthleteProfile>) => updateProfile(userId, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys(userId).profile.all });
+      invalidateDashboardBundle(queryClient, userId);
     },
     onError: onMutationError,
   });

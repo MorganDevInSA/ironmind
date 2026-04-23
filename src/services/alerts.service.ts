@@ -1,3 +1,18 @@
+/**
+ * **`getActiveAlerts` input catalog** (principal review — keep in sync when adding checks):
+ *
+ * | Check / branch | Reads (services) |
+ * | --- | --- |
+ * | Day 13 fatigue | `getActiveProgram`, `getRecentWorkouts` |
+ * | Calorie emergency | `checkConsecutiveWeightDrops` → physique reads |
+ * | Pelvic comfort | `getPelvicComfortFlags` → recovery |
+ * | Progression | `checkProgressionOpportunities` → `getActiveProgram`, `getRecentWorkouts` |
+ * | Recovery issues | `checkRecoveryIssues` → `getRecentRecoveryEntries` |
+ * | Supplement compliance | `getProtocol`, dynamic `getAverageCompliance` |
+ *
+ * Cache: shell uses `useActiveAlerts`; bundle embeds alerts — invalidate via
+ * `invalidateDashboardBundle` (see ARCHITECTURE *Alert cache contract*).
+ */
 import type { SmartAlert } from '@/lib/types';
 import { getRecentWorkouts, getActiveProgram } from './training.service';
 import { getRecentRecoveryEntries, getPelvicComfortFlags } from './recovery.service';
@@ -5,83 +20,84 @@ import { checkConsecutiveWeightDrops } from './physique.service';
 import { getProtocol } from './supplements.service';
 import { withService } from '@/lib/errors';
 
-// Generate smart alerts based on data analysis
+/** Generate smart alerts from the catalogued reads above. */
 export async function getActiveAlerts(userId: string): Promise<SmartAlert[]> {
   return withService('alerts', 'generate active alerts', async () => {
     const alerts: SmartAlert[] = [];
     const now = new Date().toISOString();
 
-  // TODO(alerts): implement shoulder spillover detection when Day 5 KPI
-  // history is available (needs 2+ full cycles of db-incline-press data).
+    // TODO(alerts): implement shoulder spillover detection when Day 5 KPI
+    // history is available (needs 2+ full cycles of db-incline-press data).
 
-  // Check for Day 13 fatigue
-  const fatigueAlert = await checkDay13Fatigue(userId);
-  if (fatigueAlert) {
-    alerts.push({
-      id: 'fatigue-alert',
-      type: 'fatigue',
-      severity: 'warning',
-      title: 'Day 13 Fatigue Warning',
-      message: fatigueAlert.message,
-      action: fatigueAlert.action,
-      createdAt: now,
-    });
-  }
-
-  // Check calorie emergency (consecutive weight drops)
-  const calorieEmergency = await checkConsecutiveWeightDrops(userId, 2);
-  if (calorieEmergency) {
-    alerts.push({
-      id: 'calorie-emergency',
-      type: 'calorie_emergency',
-      severity: 'critical',
-      title: 'Calorie Emergency',
-      message: 'Bodyweight has dropped 2 consecutive mornings. Add +1 gainer scoop, +40-80g carbs, or +15-20g fat from nuts/oils.',
-      action: 'Adjust nutrition immediately',
-      createdAt: now,
-    });
-  }
-
-  // Check pelvic comfort warnings
-  const pelvicFlags = await getPelvicComfortFlags(userId, 7);
-  if (pelvicFlags.length > 0) {
-    alerts.push({
-      id: 'pelvic-warning',
-      type: 'pelvic_comfort',
-      severity: 'warning',
-      title: 'Pelvic Comfort Warning',
-      message: `Low pelvic comfort scores detected on ${pelvicFlags.length} day(s) this week. Consider reducing core volume or swapping movements.`,
-      action: 'Review core exercises',
-      createdAt: now,
-    });
-  }
-
-  // Check for progression opportunities
-  const progressionAlerts = await checkProgressionOpportunities(userId);
-  alerts.push(...progressionAlerts);
-
-  // Check recovery trends
-  const recoveryAlerts = await checkRecoveryIssues(userId);
-  alerts.push(...recoveryAlerts);
-
-  // Check supplement compliance
-  const protocol = await getProtocol(userId);
-  if (protocol) {
-    const { getAverageCompliance } = await import('./supplements.service');
-    const compliance = await getAverageCompliance(userId, 7);
-
-    if (compliance < 70) {
+    // Check for Day 13 fatigue
+    const fatigueAlert = await checkDay13Fatigue(userId);
+    if (fatigueAlert) {
       alerts.push({
-        id: 'supplement-compliance',
-        type: 'info',
-        severity: 'info',
-        title: 'Supplement Compliance Low',
-        message: `Weekly supplement compliance at ${compliance}%. Consider setting reminders.`,
-        action: 'Review protocol',
+        id: 'fatigue-alert',
+        type: 'fatigue',
+        severity: 'warning',
+        title: 'Day 13 Fatigue Warning',
+        message: fatigueAlert.message,
+        action: fatigueAlert.action,
         createdAt: now,
       });
     }
-  }
+
+    // Check calorie emergency (consecutive weight drops)
+    const calorieEmergency = await checkConsecutiveWeightDrops(userId, 2);
+    if (calorieEmergency) {
+      alerts.push({
+        id: 'calorie-emergency',
+        type: 'calorie_emergency',
+        severity: 'critical',
+        title: 'Calorie Emergency',
+        message:
+          'Bodyweight has dropped 2 consecutive mornings. Add +1 gainer scoop, +40-80g carbs, or +15-20g fat from nuts/oils.',
+        action: 'Adjust nutrition immediately',
+        createdAt: now,
+      });
+    }
+
+    // Check pelvic comfort warnings
+    const pelvicFlags = await getPelvicComfortFlags(userId, 7);
+    if (pelvicFlags.length > 0) {
+      alerts.push({
+        id: 'pelvic-warning',
+        type: 'pelvic_comfort',
+        severity: 'warning',
+        title: 'Pelvic Comfort Warning',
+        message: `Low pelvic comfort scores detected on ${pelvicFlags.length} day(s) this week. Consider reducing core volume or swapping movements.`,
+        action: 'Review core exercises',
+        createdAt: now,
+      });
+    }
+
+    // Check for progression opportunities
+    const progressionAlerts = await checkProgressionOpportunities(userId);
+    alerts.push(...progressionAlerts);
+
+    // Check recovery trends
+    const recoveryAlerts = await checkRecoveryIssues(userId);
+    alerts.push(...recoveryAlerts);
+
+    // Check supplement compliance
+    const protocol = await getProtocol(userId);
+    if (protocol) {
+      const { getAverageCompliance } = await import('./supplements.service');
+      const compliance = await getAverageCompliance(userId, 7);
+
+      if (compliance < 70) {
+        alerts.push({
+          id: 'supplement-compliance',
+          type: 'info',
+          severity: 'info',
+          title: 'Supplement Compliance Low',
+          message: `Weekly supplement compliance at ${compliance}%. Consider setting reminders.`,
+          action: 'Review protocol',
+          createdAt: now,
+        });
+      }
+    }
 
     return alerts.sort((a, b) => {
       const severityOrder = { critical: 0, warning: 1, info: 2 };
@@ -91,23 +107,26 @@ export async function getActiveAlerts(userId: string): Promise<SmartAlert[]> {
 }
 
 // Check Day 13 fatigue warning
-async function checkDay13Fatigue(userId: string): Promise<{ message: string; action: string } | null> {
+async function checkDay13Fatigue(
+  userId: string,
+): Promise<{ message: string; action: string } | null> {
   const program = await getActiveProgram(userId);
   if (!program) return null;
 
   const workouts = await getRecentWorkouts(userId, 14);
 
   // Check if Day 13 has been performed multiple times with decreasing performance
-  const day13Workouts = workouts.filter(w => w.cycleDayNumber === 13);
+  const day13Workouts = workouts.filter((w) => w.cycleDayNumber === 13);
 
   if (day13Workouts.length >= 3) {
     // Analyze trend
-    const durations = day13Workouts.map(w => w.durationMinutes);
+    const durations = day13Workouts.map((w) => w.durationMinutes);
     const isDecreasing = durations.every((d, i) => i === 0 || d <= durations[i - 1]);
 
     if (isDecreasing && durations[0] < durations[durations.length - 1] * 0.85) {
       return {
-        message: 'Day 13 session duration has decreased by 15%+ over last 3 cycles. Consider splitting the session or dropping calves/curls.',
+        message:
+          'Day 13 session duration has decreased by 15%+ over last 3 cycles. Consider splitting the session or dropping calves/curls.',
         action: 'Review Day 13 structure',
       };
     }
@@ -129,18 +148,20 @@ async function checkProgressionOpportunities(userId: string): Promise<SmartAlert
   const workouts = await getRecentWorkouts(userId, 14);
 
   // Check DB Bench progression
-  const dbBenchWorkouts = workouts.filter(w =>
-    w.exercises.some(e => e.exerciseId === 'db-bench')
+  const dbBenchWorkouts = workouts.filter((w) =>
+    w.exercises.some((e) => e.exerciseId === 'db-bench'),
   );
 
   if (dbBenchWorkouts.length >= 2) {
     const latest = dbBenchWorkouts[0];
     const previous = dbBenchWorkouts[1];
 
-    const latestSet = latest.exercises.find(e => e.exerciseId === 'db-bench')?.sets
-      .filter(s => s.completed && s.type === 'working')[0];
-    const previousSet = previous.exercises.find(e => e.exerciseId === 'db-bench')?.sets
-      .filter(s => s.completed && s.type === 'working')[0];
+    const latestSet = latest.exercises
+      .find((e) => e.exerciseId === 'db-bench')
+      ?.sets.filter((s) => s.completed && s.type === 'working')[0];
+    const previousSet = previous.exercises
+      .find((e) => e.exerciseId === 'db-bench')
+      ?.sets.filter((s) => s.completed && s.type === 'working')[0];
 
     if (latestSet && previousSet) {
       const latestVolume = latestSet.weight * latestSet.reps;
@@ -205,17 +226,20 @@ async function checkRecoveryIssues(userId: string): Promise<SmartAlert[]> {
 
 // Get alert count by severity (sync - operates on already-fetched alerts)
 export function summarizeAlerts(alerts: SmartAlert[]): {
-  total: number; critical: number; warning: number; info: number;
+  total: number;
+  critical: number;
+  warning: number;
+  info: number;
 } {
   return {
     total: alerts.length,
-    critical: alerts.filter(a => a.severity === 'critical').length,
-    warning: alerts.filter(a => a.severity === 'warning').length,
-    info: alerts.filter(a => a.severity === 'info').length,
+    critical: alerts.filter((a) => a.severity === 'critical').length,
+    warning: alerts.filter((a) => a.severity === 'warning').length,
+    info: alerts.filter((a) => a.severity === 'info').length,
   };
 }
 
 // Dismiss alert (client-side only - alerts are computed, not stored)
 export function dismissAlert(alerts: SmartAlert[], alertId: string): SmartAlert[] {
-  return alerts.filter(a => a.id !== alertId);
+  return alerts.filter((a) => a.id !== alertId);
 }

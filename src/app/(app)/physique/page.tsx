@@ -42,7 +42,9 @@ const measurementSeries: Array<{
   { key: 'chest', label: 'Chest', dash: '8 3' },
   { key: 'hips', label: 'Hips', dash: '1 4' },
   { key: 'leftArm', label: 'L arm', dash: '12 3 2 3' },
+  { key: 'rightArm', label: 'R arm', dash: '3 3 1 3' },
   { key: 'leftThigh', label: 'L thigh', dash: '2 2 10 2' },
+  { key: 'rightThigh', label: 'R thigh', dash: '10 2' },
 ];
 
 function LegendLineSwatch({ dash }: { dash?: string }) {
@@ -240,12 +242,15 @@ export default function PhysiquePage() {
       chest: c.measurements?.chest,
       hips: c.measurements?.hips,
       leftArm: c.measurements?.leftArm,
+      rightArm: c.measurements?.rightArm,
       leftThigh: c.measurements?.leftThigh,
+      rightThigh: c.measurements?.rightThigh,
     }));
 
-  const hasAnyMeasurements = measurementData.some((d) =>
-    measurementSeries.some(({ key }) => d[key as keyof typeof d] !== undefined),
+  const activeMeasurementSeries = measurementSeries.filter(({ key }) =>
+    measurementData.some((d) => d[key as keyof typeof d] !== undefined),
   );
+  const hasAnyMeasurements = activeMeasurementSeries.length > 0;
 
   const lastCheckIn = recentCheckIns?.[0];
   const prevCheckIn = recentCheckIns?.[1];
@@ -481,7 +486,7 @@ export default function PhysiquePage() {
               <CartesianGrid strokeDasharray="3 3" stroke={chartGridStroke} />
               <XAxis
                 dataKey="date"
-                tick={{ fontSize: 10, fill: 'color:var(--text-2)' }}
+                tick={{ fontSize: 10, fill: 'var(--text-2)' }}
                 tickLine={false}
                 axisLine={false}
               />
@@ -490,7 +495,7 @@ export default function PhysiquePage() {
                   (dataMin: number) => Math.floor(dataMin - 1),
                   (dataMax: number) => Math.ceil(dataMax + 1),
                 ]}
-                tick={{ fontSize: 10, fill: 'color:var(--text-2)' }}
+                tick={{ fontSize: 10, fill: 'var(--text-2)' }}
                 tickLine={false}
                 axisLine={false}
               />
@@ -534,17 +539,17 @@ export default function PhysiquePage() {
               <CartesianGrid strokeDasharray="3 3" stroke={chartGridStroke} />
               <XAxis
                 dataKey="date"
-                tick={{ fontSize: 10, fill: 'color:var(--text-2)' }}
+                tick={{ fontSize: 10, fill: 'var(--text-2)' }}
                 tickLine={false}
                 axisLine={false}
               />
               <YAxis
-                tick={{ fontSize: 10, fill: 'color:var(--text-2)' }}
+                tick={{ fontSize: 10, fill: 'var(--text-2)' }}
                 tickLine={false}
                 axisLine={false}
               />
               <Tooltip content={<MeasurementTooltip />} />
-              {measurementSeries.map(({ key, label, dash }) => (
+              {activeMeasurementSeries.map(({ key, label, dash }) => (
                 <Line
                   key={key}
                   type="monotone"
@@ -562,7 +567,7 @@ export default function PhysiquePage() {
           </ResponsiveContainer>
           {/* Legend */}
           <div className="flex flex-wrap gap-3 mt-3">
-            {measurementSeries.map(({ key, label, dash }) => (
+            {activeMeasurementSeries.map(({ key, label, dash }) => (
               <div
                 key={key}
                 className="flex items-center gap-1.5 text-xs text-[color:var(--text-2)]"

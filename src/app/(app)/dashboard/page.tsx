@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores';
 import {
   useDashboardData,
-  useActiveProgram,
   useRecentWorkouts,
   useRecentCheckIns,
   useNutritionPlan,
@@ -153,14 +152,24 @@ function capitalize(s: string) {
 }
 
 const MEASUREMENT_SERIES: { key: keyof Measurements; label: string; color: string }[] = [
-  { key: 'waist', label: 'Waist', color: 'var(--accent-light)' },
+  { key: 'waist', label: 'Waist', color: 'color-mix(in srgb, var(--accent-light) 92%, white 8%)' },
   { key: 'chest', label: 'Chest', color: 'var(--accent)' },
-  { key: 'hips', label: 'Hips', color: '#F59E0B' },
-  { key: 'leftArm', label: 'L arm', color: '#10B981' },
-  { key: 'rightArm', label: 'R arm', color: '#22C55E' },
-  { key: 'leftThigh', label: 'L thigh', color: '#A855F7' },
-  { key: 'rightThigh', label: 'R thigh', color: '#EC4899' },
+  { key: 'hips', label: 'Hips', color: 'color-mix(in srgb, var(--accent) 86%, white 14%)' },
+  { key: 'leftArm', label: 'L arm', color: 'color-mix(in srgb, var(--accent) 78%, black 22%)' },
+  { key: 'rightArm', label: 'R arm', color: 'color-mix(in srgb, var(--accent) 72%, black 28%)' },
+  {
+    key: 'leftThigh',
+    label: 'L thigh',
+    color: 'color-mix(in srgb, var(--accent-light) 80%, white 20%)',
+  },
+  {
+    key: 'rightThigh',
+    label: 'R thigh',
+    color: 'color-mix(in srgb, var(--accent) 68%, black 32%)',
+  },
 ];
+const THEME_FILL_GRADIENT =
+  'linear-gradient(90deg, color-mix(in srgb, var(--accent-light) 85%, white 15%) 0%, color-mix(in srgb, var(--accent) 72%, black 28%) 100%)';
 
 function PhysiqueMiniCharts({
   checkIns,
@@ -217,7 +226,7 @@ function PhysiqueMiniCharts({
             className={cn(
               'px-3 py-1 text-xs font-semibold transition-colors',
               mode === 'weight'
-                ? 'bg-[rgba(220,38,38,0.2)] text-[color:var(--text-0)]'
+                ? 'bg-[color:color-mix(in_srgb,var(--accent)_20%,transparent)] text-[color:var(--text-0)]'
                 : 'text-[color:var(--text-1)] hover:text-[color:var(--text-0)]',
             )}
           >
@@ -233,7 +242,7 @@ function PhysiqueMiniCharts({
             className={cn(
               'px-3 py-1 text-xs font-semibold transition-colors',
               mode === 'measurements'
-                ? 'bg-[rgba(220,38,38,0.2)] text-[color:var(--text-0)]'
+                ? 'bg-[color:color-mix(in_srgb,var(--accent)_20%,transparent)] text-[color:var(--text-0)]'
                 : 'text-[color:var(--text-1)] hover:text-[color:var(--text-0)]',
               !hasMeas && 'opacity-40 cursor-not-allowed',
             )}
@@ -252,11 +261,14 @@ function PhysiqueMiniCharts({
             <AreaChart data={weightRows} margin={{ top: 4, right: 4, bottom: 0, left: -16 }}>
               <defs>
                 <linearGradient id="dashPhysWeight" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#F59E0B" stopOpacity={0.02} />
+                  <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="var(--accent)" stopOpacity={0.02} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(65,50,50,0.15)" />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="color-mix(in srgb, var(--chrome-border) 45%, transparent)"
+              />
               <XAxis
                 dataKey="date"
                 tick={{ fontSize: 9, fill: '#B8B8B8' }}
@@ -285,24 +297,27 @@ function PhysiqueMiniCharts({
               {targetWeight != null && (
                 <ReferenceLine
                   y={targetWeight}
-                  stroke="rgba(16,185,129,0.45)"
-                  strokeDasharray="4 4"
+                  stroke="color-mix(in srgb, var(--accent) 58%, transparent)"
+                  strokeDasharray="6 4"
                 />
               )}
               <Area
                 type="monotone"
                 dataKey="weight"
-                stroke="#F59E0B"
+                stroke="var(--accent)"
                 fill="url(#dashPhysWeight)"
                 strokeWidth={2}
-                dot={{ r: 3, fill: '#F59E0B' }}
+                dot={{ r: 3, fill: 'var(--accent)' }}
               />
             </AreaChart>
           </ResponsiveContainer>
         ) : mode === 'measurements' && hasMeas ? (
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={measRows} margin={{ top: 4, right: 4, bottom: 0, left: -16 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(65,50,50,0.15)" />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="color-mix(in srgb, var(--chrome-border) 45%, transparent)"
+              />
               <XAxis
                 dataKey="date"
                 tick={{ fontSize: 9, fill: '#B8B8B8' }}
@@ -1214,7 +1229,7 @@ function TodaySchedule({
           <span className="text-xs text-[color:var(--text-detail)] ml-auto">{dateBadge}</span>
         </div>
         {previewHint && (
-          <p className="text-xs text-[color:var(--text-detail)] mb-3 border-l-2 border-[rgba(220,38,38,0.42)] pl-3 bg-[rgba(220,38,38,0.04)] rounded-r-lg py-1">
+          <p className="text-xs text-[color:var(--text-detail)] mb-3 border-l-2 border-[color:color-mix(in_srgb,var(--accent)_42%,transparent)] pl-3 bg-[color:color-mix(in_srgb,var(--accent)_6%,transparent)] rounded-r-lg py-1">
             {previewHint}
           </p>
         )}
@@ -1248,7 +1263,7 @@ function TodaySchedule({
                     key={i}
                     onClick={() => setSelected(item)}
                     className={cn(
-                      'cursor-pointer transition-colors group hover:bg-[rgba(220,38,38,0.055)]',
+                      'cursor-pointer transition-colors group hover:bg-[color:color-mix(in_srgb,var(--accent)_7%,transparent)]',
                       item.done === true && 'opacity-50',
                     )}
                   >
@@ -1376,7 +1391,7 @@ function DensityCard({ workout, onOpen }: { workout: Workout; onOpen?: () => voi
     >
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
-          <Zap size={18} className="text-[#F59E0B]" />
+          <Zap size={18} className="text-[color:var(--accent)]" />
           <div>
             <h3 className="font-semibold text-[color:var(--text-0)]">Training Density</h3>
             <p className="text-xs text-[color:var(--text-detail)]">
@@ -1416,7 +1431,7 @@ function DensityCard({ workout, onOpen }: { workout: Workout; onOpen?: () => voi
               className={cn(
                 'px-3 py-1.5 text-xs font-semibold capitalize transition-all',
                 view === v
-                  ? 'bg-[rgba(245,158,11,0.15)] text-[#F59E0B]'
+                  ? 'bg-[color:color-mix(in_srgb,var(--accent)_18%,transparent)] text-[color:var(--accent)]'
                   : 'text-[color:var(--text-detail)] hover:text-[color:var(--text-0)]',
               )}
             >
@@ -1447,15 +1462,18 @@ function DensityCard({ workout, onOpen }: { workout: Workout; onOpen?: () => voi
                   <span className="font-mono tabular-nums text-[color:var(--text-0)]">
                     {Math.round(row.volume).toLocaleString()} kg
                   </span>
-                  <span className="font-mono tabular-nums text-[#F59E0B] text-xs w-20 text-right">
+                  <span className="font-mono tabular-nums text-[color:var(--accent)] text-xs w-20 text-right">
                     {Math.round(row.volume / durationMin)} kg/min
                   </span>
                 </div>
               </div>
               <div className="h-2 rounded-full overflow-hidden bg-[color:var(--surface-track)] ring-1 ring-inset ring-black/35">
                 <div
-                  className="h-full bg-gradient-to-r from-[#F59E0B] to-[color:var(--accent)] rounded-full transition-all duration-500"
-                  style={{ width: `${(row.volume / maxVol) * 100}%` }}
+                  className="h-full rounded-full transition-all duration-500"
+                  style={{
+                    width: `${(row.volume / maxVol) * 100}%`,
+                    background: THEME_FILL_GRADIENT,
+                  }}
                 />
               </div>
             </div>
@@ -1526,6 +1544,7 @@ export default function DashboardPage() {
 
   const {
     profile,
+    activeProgram,
     todayNutrition,
     todayRecovery,
     latestRecovery,
@@ -1533,7 +1552,6 @@ export default function DashboardPage() {
     weeklyVolume,
     isLoading,
   } = useDashboardData(userId);
-  const { data: activeProgram } = useActiveProgram(userId);
   const { data: recentWorkouts } = useRecentWorkouts(userId, 7);
   const { data: physiqueCheckIns } = useRecentCheckIns(userId, 40);
   const { data: nutritionPlanData } = useNutritionPlan(userId);
@@ -1868,9 +1886,7 @@ export default function DashboardPage() {
               </Card>
             </div>
 
-            {isViewingToday && lastWorkout && (
-              <DensityCard workout={lastWorkout} onOpen={() => router.push('/training/history')} />
-            )}
+            {isViewingToday && lastWorkout && <DensityCard workout={lastWorkout} />}
           </div>
         </section>
 
@@ -1905,29 +1921,12 @@ export default function DashboardPage() {
                           {muscle.currentSets} / {muscle.targetSets} sets
                         </span>
                       </div>
-                      <div className="h-2 bg-[color:var(--surface-track)] rounded-full overflow-hidden relative">
+                      <div className="h-2 bg-[color:var(--surface-track)] rounded-full overflow-hidden relative ring-1 ring-inset ring-black/35">
                         <div
-                          className="absolute h-full bg-[rgba(120,100,98,0.38)] rounded-l-full"
-                          style={{ width: `${(muscle.mev / muscle.mrv) * 100}%` }}
-                        />
-                        <div
-                          className="absolute h-full bg-[color:var(--accent)]/30"
+                          className="absolute top-0 left-0 h-full rounded-full"
                           style={{
-                            left: `${(muscle.mev / muscle.mrv) * 100}%`,
-                            width: `${((muscle.mav - muscle.mev) / muscle.mrv) * 100}%`,
-                          }}
-                        />
-                        <div
-                          className="absolute h-full bg-[color:var(--accent)]/60"
-                          style={{
-                            left: `${(muscle.mav / muscle.mrv) * 100}%`,
-                            width: `${((muscle.mrv - muscle.mav) / muscle.mrv) * 100}%`,
-                          }}
-                        />
-                        <div
-                          className="absolute top-0 w-0.5 h-full bg-[color:var(--accent)]"
-                          style={{
-                            left: `${Math.min(99, (muscle.currentSets / muscle.mrv) * 100)}%`,
+                            width: `${Math.min(100, (muscle.currentSets / muscle.mrv) * 100)}%`,
+                            background: THEME_FILL_GRADIENT,
                           }}
                         />
                       </div>
@@ -1935,11 +1934,7 @@ export default function DashboardPage() {
                   ),
                 )}
                 <div className="flex gap-4 pt-1">
-                  {[
-                    ['#948A88', 'MV→MEV'],
-                    ['var(--accent)', 'MEV→MRV'],
-                    ['var(--accent)', 'Current'],
-                  ].map(([c, l]) => (
+                  {[['var(--accent-light)', 'Current']].map(([c, l]) => (
                     <div
                       key={l}
                       className="flex items-center gap-1.5 text-xs text-[color:var(--text-detail)]"

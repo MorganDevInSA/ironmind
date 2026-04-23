@@ -199,9 +199,16 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleUseDemoData = () => {
     seedMutation.mutate(undefined, {
-      onSuccess: () => {
-        setImportResult({ success: true, message: 'Demo data loaded.' });
-        setSubStep('done');
+      onSuccess: (data) => {
+        if (data.seeded) {
+          setImportResult({ success: true, message: 'Demo data loaded.' });
+          setSubStep('done');
+        } else {
+          setImportResult({
+            success: false,
+            message: 'Your account already has data — demo seed was skipped.',
+          });
+        }
       },
       onError: (error) => {
         setImportResult({ success: false, message: String(error) });

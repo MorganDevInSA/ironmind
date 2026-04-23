@@ -1,14 +1,18 @@
+import { toast } from 'sonner';
 import { ServiceError } from '@/lib/errors';
 
 /**
  * Standard mutation error handler for TanStack Query.
- * Shows user-friendly messages via toast for ServiceError, generic fallback otherwise.
+ * Surfaces `ServiceError` messages via toast; logs details for debugging.
  */
 export function onMutationError(error: unknown) {
   if (error instanceof ServiceError) {
-    // TODO: wire to your toast system
-    console.error(`[${error.domain}] ${error.message}`, error);
+    toast.error(error.message);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error(`[${error.domain}] ${error.message}`, error);
+    }
     return;
   }
+  toast.error('Something went wrong. Please try again.');
   console.error('Mutation failed', error);
 }

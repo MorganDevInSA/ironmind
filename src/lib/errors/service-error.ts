@@ -4,6 +4,7 @@ export type ServiceErrorCode =
   | 'OFFLINE'
   | 'VALIDATION'
   | 'UNAUTHENTICATED'
+  | 'CONFLICT'
   | 'WRITE_FAILED'
   | 'READ_FAILED'
   | 'UNKNOWN';
@@ -13,7 +14,7 @@ export class ServiceError extends Error {
     message: string,
     public readonly code: ServiceErrorCode,
     public readonly domain: string,
-    public readonly cause?: unknown
+    public readonly cause?: unknown,
   ) {
     super(message);
     this.name = 'ServiceError';
@@ -21,30 +22,32 @@ export class ServiceError extends Error {
 }
 
 /** Map a raw Firestore/Firebase error to a typed ServiceError. */
-export function toServiceError(
-  domain: string,
-  operation: string,
-  cause: unknown
-): ServiceError {
+export function toServiceError(domain: string, operation: string, cause: unknown): ServiceError {
   const raw = cause as { code?: string; message?: string } | undefined;
   const rawCode = raw?.code ?? '';
 
   if (rawCode === 'permission-denied') {
     return new ServiceError(
       `You do not have permission to perform this ${operation}.`,
-      'PERMISSION_DENIED', domain, cause
+      'PERMISSION_DENIED',
+      domain,
+      cause,
     );
   }
   if (rawCode === 'unavailable' || /offline/i.test(String(cause))) {
     return new ServiceError(
       `Cannot ${operation} while offline. Changes will sync when you reconnect.`,
-      'OFFLINE', domain, cause
+      'OFFLINE',
+      domain,
+      cause,
     );
   }
   if (rawCode === 'unauthenticated') {
     return new ServiceError(
       `Please sign in again to ${operation}.`,
-      'UNAUTHENTICATED', domain, cause
+      'UNAUTHENTICATED',
+      domain,
+      cause,
     );
   }
   if (rawCode === 'not-found') {
@@ -53,21 +56,23 @@ export function toServiceError(
   if (/invalid data|unsupported field/i.test(String(raw?.message ?? ''))) {
     return new ServiceError(
       `Invalid data for ${domain} ${operation}.`,
-      'VALIDATION', domain, cause
+      'VALIDATION',
+      domain,
+      cause,
     );
   }
   return new ServiceError(
     `Failed to ${operation} ${domain}.`,
     operation.startsWith('read') ? 'READ_FAILED' : 'WRITE_FAILED',
     domain,
-    cause
+    cause,
   );
 }
 
 export async function withService<T>(
   domain: string,
   operation: string,
-  fn: () => Promise<T>
+  fn: () => Promise<T>,
 ): Promise<T> {
   try {
     return await fn();

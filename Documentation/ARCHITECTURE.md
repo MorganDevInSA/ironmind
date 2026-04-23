@@ -113,7 +113,13 @@ flowchart LR
 
 **Export pipeline:** `src/lib/export/generate-summary.ts` aggregates by calling **services** (not controllers), suitable for reuse from server-like entry points or hooks that trigger async export.
 
-**Import pipeline:** `src/services/import.service.ts` parses onboarding JSON packs and writes via services; onboarding UI lives under `src/app/(onboarding)/`. This module is **not** re-exported from `src/services/index.ts` but is a first-class domain entry point.
+**Import pipeline:** `src/services/import.service.ts` parses onboarding JSON packs; onboarding UI lives under `src/app/(onboarding)/`. Each run that passes the seeded-user check creates **`users/{uid}/importJobs/{jobId}`** (`status`: `running` → terminal, optional **`compensationApplied`**). Independent paths are grouped into **Firestore `writeBatch` commits** where safe ([`import-firestore-batch.ts`](../src/services/import-firestore-batch.ts)): profile + supplement protocol + volume landmarks in one batch; nutrition plan + seed day + import journal note in one batch; the **first** program / phase on an **empty** `programs` / `phases` subcollection uses a single `batch.set` instead of the multi-doc active-pointer **transaction** (force re-import with existing docs still uses `createProgram` + `setActiveProgram` / `createPhase` + `setActivePhase`). The full coach pack is still **not** one global batch across every domain. On failure after writes began, **`rollbackImportArtifacts`** in [`import-compensation.ts`](../src/services/import-compensation.ts) reverses pushed writes using **`captureImportSnapshots`** (LIFO artifacts). **`jobId`** is on the result (omitted for **`blocked`** pre-check). Re-exported from `src/services/index.ts` for controllers.
+
+**First-login seed:** `src/lib/seed/index.ts` → **`users/{uid}/seedJobs`** with the same compensating pattern and **`SeedUserDataResult`** (`seeded`, `jobId?`) for parity with import observability.
+
+**Weekly volume rollup:** Persisted docs under **`users/{uid}/weeklyVolumeRollups/{weekStart}`** (`WeeklyVolumeRollup` in types) feed **`getWeeklyVolumeSummary`** when present; **`deleteCurrentWeekVolumeRollup`** keeps the card fresh after workout writes (see `use-training.ts` + post-import invalidation).
+
+**Data schema versioning:** `UserData` (`users/{uid}`) may include `dataSchemaVersion` (number). `CURRENT_DATA_SCHEMA_VERSION` is defined in `src/lib/types/index.ts` (currently `1`). Reads should treat a missing field as version `1`. `markUserSeeded` stamps the current constant when import/seed completes cleanly. On any breaking stored-shape change, increment the constant, add migration or read fallbacks, and note the change in this document and `README_DATA_LAYER.md` before shipping writes that depend on the new shape.
 
 ---
 
@@ -189,37 +195,51 @@ Use Zustand for **transient UI and auth identity**, not for Firestore document m
 
 All paths go through **`collections`** — never hand-roll `'users/...'` strings (enforced by rules):
 
-| Helper                                | Path pattern                            |
-| ------------------------------------- | --------------------------------------- |
-| `collections.users`                   | `users`                                 |
-| `collections.profiles(uid)`           | `users/{uid}/profile` (document `data`) |
-| `collections.programs(uid)`           | `users/{uid}/programs`                  |
-| `collections.workouts(uid)`           | `users/{uid}/workouts`                  |
-| `collections.nutritionDays(uid)`      | `users/{uid}/nutrition`                 |
-| `collections.supplementLogs(uid)`     | `users/{uid}/supplements`               |
-| `collections.supplementProtocol(uid)` | `users/{uid}/protocol`                  |
-| `collections.recoveryEntries(uid)`    | `users/{uid}/recovery`                  |
-| `collections.checkIns(uid)`           | `users/{uid}/checkins`                  |
-| `collections.phases(uid)`             | `users/{uid}/phases`                    |
-| `collections.journalEntries(uid)`     | `users/{uid}/journal`                   |
-| `collections.volumeLandmarks(uid)`    | `users/{uid}/landmarks`                 |
+| Helper                                 | Path pattern                            |
+| -------------------------------------- | --------------------------------------- |
+| `collections.users`                    | `users`                                 |
+| `collections.profiles(uid)`            | `users/{uid}/profile` (document `data`) |
+| `collections.programs(uid)`            | `users/{uid}/programs`                  |
+| `collections.workouts(uid)`            | `users/{uid}/workouts`                  |
+| `collections.nutritionDays(uid)`       | `users/{uid}/nutrition`                 |
+| `collections.supplementLogs(uid)`      | `users/{uid}/supplements`               |
+| `collections.supplementProtocol(uid)`  | `users/{uid}/protocol`                  |
+| `collections.recoveryEntries(uid)`     | `users/{uid}/recovery`                  |
+| `collections.checkIns(uid)`            | `users/{uid}/checkins`                  |
+| `collections.phases(uid)`              | `users/{uid}/phases`                    |
+| `collections.journalEntries(uid)`      | `users/{uid}/journal`                   |
+| `collections.volumeLandmarks(uid)`     | `users/{uid}/landmarks`                 |
+| `collections.importJobs(uid)`          | `users/{uid}/importJobs`                |
+| `collections.seedJobs(uid)`            | `users/{uid}/seedJobs`                  |
+| `collections.weeklyVolumeRollups(uid)` | `users/{uid}/weeklyVolumeRollups`       |
 
 ### 7.3 Firestore helpers (`src/lib/firebase/firestore.ts`)
 
 - **`createConverter<T>()`** — Serializes dates to Timestamp on write; reads Timestamps as **ISO strings**.
 - Correct **function names:** `getDocument`, `getAllDocuments`, `queryDocuments` — **not** ambiguous names like `getDocuments` (see IRONMIND rules).
 - Query constraint arrays typed as **`QueryConstraint[]`** from `firebase/firestore`.
+- **`runFirestoreTransaction`**, **`createWriteBatch`**, **`getCollectionCount`** — multi-document invariants, batched writes, and aggregate counts without loading full collections.
+
+**Service telemetry (minimal):** `src/lib/logging/service-write-log.ts` exports **`logServiceWrite`** — one-line JSON to `console` (Vercel log drain). Use for high-risk orchestration (`import`, `seed` failures); do not log PII or tokens.
 
 ### 7.4 Storage & auth
 
-- **`src/lib/firebase/storage.ts`** — Upload helpers for physique photos etc. (optional feature flags in app code when Storage is unavailable).
+- **`src/lib/firebase/storage.ts`** — Upload helpers for physique photos etc. (optional feature flags in app code when Storage is unavailable). Progress photos use a **pending → final** path: bytes land under `users/{uid}/photos/pending/…`, then **`commitPendingStorageUpload`** copies to `users/{uid}/photos/…` and deletes the pending object (so failed commits can drop orphans via `deleteFile` on the pending path). **`listPendingProgressPhotoPaths`** + **`deleteStoragePaths`** support bulk cleanup; **`physique.service`** exposes **`listOrphanPendingProgressPhotos`** / **`deletePendingProgressPhotos`** for hygiene or settings UI.
 - **`src/lib/firebase/auth.ts`** — Email/password + **OAuth** (`signInWithPopup`): Google; Facebook and Microsoft helpers exist and may be hidden in UI until provider console setup is complete.
+
+**Risk acceptance — client uploads (physique photos):** There is **no server-side malware scanning** or content inspection in the current pipeline; uploads are **owner-only** per `storage.rules`, feature-gated (`NEXT_PUBLIC_ENABLE_PHOTO_UPLOAD`), and stored as **opaque blobs**. That matches the product scope today (trusted athlete, small images). If the threat model changes (e.g. shared devices, untrusted packs, or server-side processing), add an explicit gate (Cloud Function + scanner, signed upload URLs with metadata checks, or a third-party pipeline) **before** widening who can upload or what runs on uploaded bytes.
+
+### 7.5 Client-side API contract (no HTTP layer)
+
+There is no `src/app/api/**` route surface today: the **contract** is **TypeScript service signatures** + **Firestore document shapes** + **`storage.rules` / `firestore.rules`**.
+
+- **Schema evolution:** `UserData.dataSchemaVersion` and **`CURRENT_DATA_SCHEMA_VERSION`** in `src/lib/types/index.ts`. When persisted shapes break backward compatibility, **increment the constant**, add read fallbacks or a one-time migration in the owning service, and note the bump in this file + `README_DATA_LAYER.md` before shipping writers that depend on the new shape.
 
 ---
 
 ## 8. Domain modules (services ↔ controllers ↔ UI)
 
-Exported services (`src/services/index.ts`): profile, training, nutrition, recovery, physique, supplements, coaching, volume, alerts, storage.
+Exported services (`src/services/index.ts`): profile, training, nutrition, recovery, physique, supplements, coaching, volume, alerts, **dashboard** (composite reads for the shell), storage.
 
 | Domain      | Service                   | Representative controller hooks | Primary UI                                                            |
 | ----------- | ------------------------- | ------------------------------- | --------------------------------------------------------------------- |
@@ -233,6 +253,16 @@ Exported services (`src/services/index.ts`): profile, training, nutrition, recov
 | Volume      | `volume.service.ts`       | `use-volume`, `use-dashboard`   | Dashboard charts, landmarks                                           |
 | Alerts      | `alerts.service.ts`       | `use-alerts`                    | Dashboard / notifications                                             |
 | Export      | (summary in `lib/export`) | `use-export`                    | Export page                                                           |
+
+**Alert cache contract:** `getActiveAlerts` is pure derivation over training, recovery, physique, supplements, etc. **`useActiveAlerts`** (`src/controllers/use-alerts.ts`) caches under **`queryKeys(userId).alerts.active()`** with **`staleTimes.alerts`** (5 minutes in `stale-times.ts`). The shell **top bar** uses `useActiveAlerts` directly, while **`getDashboardBundle`** also embeds alerts for the dashboard page — those are **separate** TanStack trees. **`invalidateDashboardBundle`** (`invalidate-dashboard.ts`) therefore invalidates **both** `[userId, 'dashboard']` and **`queryKeys(userId).alerts.all`**, so any mutation that already refreshed the bundle (workouts, nutrition, recovery, …) also refetches top-bar alerts instead of waiting for the 5‑minute stale window.
+
+**`getActiveAlerts` inputs:** Tabulated at the top of [`alerts.service.ts`](../src/services/alerts.service.ts) — update when adding a branch.
+
+**Multi-active recovery:** `getActiveProgram` / `getActivePhase` use `limit(1)`; multiple `isActive: true` rows yield an arbitrary winner until repaired. Idempotent **`repairMultipleActivePrograms`** (`training.service.ts`) and **`repairMultipleActivePhases`** (`coaching.service.ts`) pick a single winner (newest `updatedAt`, then `startDate` / `id`) and reuse the existing transactional **`setActiveProgram`** / **`setActivePhase`**. Not run on every read — call from support tooling or a future Settings repair action.
+
+**Derived persisted fields (recompute ownership):** **`readinessScore`** on recovery entries is stamped on write in **`recovery.service`** via **`calculateReadinessScore`**. **`complianceScore`** on nutrition days is recomputed in **`nutrition.service`** when saving a day. Supplement log **`compliancePercent`** is owned by **`supplements.service`** save paths. New code paths that persist these documents must reuse the same helpers or document an explicit exception.
+
+**Journal bounded scans:** [`coaching.service.ts`](../src/services/coaching.service.ts) — `DEFAULT_JOURNAL_LIST_LIMIT` (200), `JOURNAL_SEARCH_SCAN_LIMIT` (500), `JOURNAL_SEARCH_WINDOW_DAYS` (120), `JOURNAL_TAGS_WINDOW_DAYS` (180). Search/tag features are **best-effort within the window** by design; raising limits requires index and product review.
 
 ---
 
@@ -248,7 +278,7 @@ Single umbrella module for domain entities: `AthleteProfile`, `Program`, `Workou
 
 ### 10.1 Automatic seed (`src/lib/seed/index.ts`)
 
-`seedUserData(userId)` runs once when the user has no seed flag:
+`seedUserData(userId)` runs once when the user has no seed flag. It creates a **`seedJobs`** document (`running` → `success` | `failed`), uses **`captureImportSnapshots`** / **`rollbackImportArtifacts`** on failure (same helpers as coach import), and returns **`SeedUserDataResult`** (`seeded`, `jobId?`).
 
 1. Profile (`mortonProfile`)
 2. Program + active program (`mortonProgram`)
@@ -262,6 +292,8 @@ Single umbrella module for domain entities: `AthleteProfile`, `Program`, `Workou
 **Rule:** Any new `src/lib/seed/*.ts` file must be imported into `seed/index.ts`, invoked inside `seedUserData()`, and log **`✓`** lines on success (IRONMIND.md).
 
 ### 10.2 Coach JSON import (`import.service.ts` + onboarding UI)
+
+`collections.importJobs(uid)` is the subcollection path for per-run job documents (see **Import pipeline** above).
 
 Structured JSON files (e.g. `athlete_profile.json`, `training_program.json`, …) are validated, merged into `ParsedCoachData`, then persisted through the same services as seed data.
 
@@ -281,6 +313,8 @@ Current onboarding flow is **6 steps**:
 `getActiveAlerts(userId)` aggregates rule checks (shoulder spillover, day-13 fatigue, calorie emergency, progression, recovery, supplement compliance, etc.).
 
 **Invariant:** Every `check*` function must be referenced from `getActiveAlerts()` — no orphaned checks (IRONMIND.md).
+
+**Input catalog:** See the file-level table in `alerts.service.ts` (principal review) — it lists each alert branch and the underlying service reads so invalidation and future tests stay traceable.
 
 ---
 

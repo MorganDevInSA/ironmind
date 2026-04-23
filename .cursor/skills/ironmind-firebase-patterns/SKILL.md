@@ -9,19 +9,24 @@ description: Correct Firebase and Firestore patterns for IRONMIND. Use when writ
 
 These are the ONLY functions exported from `src/lib/firebase/firestore.ts`. Use exactly these names:
 
-| Function              | Signature                           | Use for                 |
-| --------------------- | ----------------------------------- | ----------------------- |
-| `getDocument<T>`      | `(path, docId, converter?)`         | Fetch single doc        |
-| `setDocument<T>`      | `(path, docId, data, converter?)`   | Create or merge doc     |
-| `updateDocument<T>`   | `(path, docId, data)`               | Partial update          |
-| `addDocument<T>`      | `(path, data, converter?)`          | Add with auto-ID        |
-| `deleteDocument`      | `(path, docId)`                     | Delete doc              |
-| `queryDocuments<T>`   | `(path, constraints[], converter?)` | Query with filters      |
-| `getAllDocuments<T>`  | `(path, converter?)`                | Fetch entire collection |
-| `getCollectionRef<T>` | `(path, converter?)`                | Raw collection ref      |
-| `getDocumentRef<T>`   | `(path, docId, converter?)`         | Raw document ref        |
+| Function                  | Signature                                             | Use for                       |
+| ------------------------- | ----------------------------------------------------- | ----------------------------- |
+| `getDocument<T>`          | `(path, docId, converter?)`                           | Fetch single doc              |
+| `setDocument<T>`          | `(path, docId, data, converter?)`                     | Create or merge doc           |
+| `updateDocument<T>`       | `(path, docId, data)`                                 | Partial update                |
+| `addDocument<T>`          | `(path, data, converter?)`                            | Add with auto-ID              |
+| `deleteDocument`          | `(path, docId)`                                       | Delete doc                    |
+| `queryDocuments<T>`       | `(path, constraints[], converter?)`                   | Query with filters            |
+| `getAllDocuments<T>`      | `(path, converter?)`                                  | Fetch entire collection       |
+| `getCollectionRef<T>`     | `(path, converter?)`                                  | Raw collection ref            |
+| `getDocumentRef<T>`       | `(path, docId, converter?)`                           | Raw document ref              |
+| `runFirestoreTransaction` | `(fn: (tx: Transaction) => Promise<T>) => Promise<T>` | Atomic multi-doc reads+writes |
+| `createWriteBatch`        | `() => WriteBatch`                                    | Up to 500 writes/commit       |
+| `getCollectionCount`      | `(path, constraints?) => Promise<number>`             | Server-side count             |
 
 > ⚠️ `getDocuments` does NOT exist. Use `getAllDocuments`.
+
+**Index IDs:** `firestore.indexes.json` `collectionGroup` must match the **Firestore collection segment** (last path part), e.g. `nutrition` not `nutritionDays`.
 
 ---
 
@@ -180,12 +185,21 @@ import { onAuthChange } from '@/lib/firebase';
 ## Firebase Storage — Photo Uploads
 
 ```ts
-import { uploadFile, getDownloadURL, deleteFile } from '@/services/storage.service';
-// OR directly:
-import { uploadBytes, getDownloadURL } from '@/lib/firebase';
+import {
+  uploadFile,
+  deleteFile,
+  generateFilePath,
+  commitPendingStorageUpload,
+} from '@/services/storage.service';
 
-// Path convention for progress photos:
-// users/{uid}/photos/{checkInId}.jpg
+// Progress photos: upload to pending, then commit to final (physique.service uses this pattern).
+// users/{uid}/photos/pending/{timestamp}_{name}  →  users/{uid}/photos/{timestamp}_{name}
+await uploadFile(pendingPath, file, { contentType: file.type });
+const url = await commitPendingStorageUpload({
+  pendingPath,
+  finalPath,
+  contentType: file.type,
+});
 ```
 
 ---

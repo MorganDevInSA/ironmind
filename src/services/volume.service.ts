@@ -1,10 +1,74 @@
-import type { VolumeLandmarks } from '@/lib/types';
-import { getDocument, setDocument, createConverter } from '@/lib/firebase';
+import type { VolumeLandmarks, WeeklyVolumeRollup, Workout } from '@/lib/types';
+import { getDocument, setDocument, deleteDocument, createConverter } from '@/lib/firebase';
 import { collections } from '@/lib/firebase/config';
 import { getWorkouts } from './training.service';
 import { withService } from '@/lib/errors';
 
 const converter = createConverter<VolumeLandmarks>();
+const rollupConverter = createConverter<WeeklyVolumeRollup>();
+
+/** Monday `yyyy-MM-dd` for the calendar week containing `ref` (local). */
+export function getCalendarWeekStartIso(ref: Date = new Date()): string {
+  const d = new Date(ref);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  d.setDate(diff);
+  d.setHours(0, 0, 0, 0);
+  return d.toISOString().split('T')[0];
+}
+
+function aggregateMuscleSetsFromWorkouts(
+  workouts: Workout[],
+  from: string,
+  to: string,
+): Record<string, number> {
+  const volumeByMuscle: Record<string, number> = {};
+  for (const workout of workouts) {
+    if (workout.date < from || workout.date > to) continue;
+    for (const exercise of workout.exercises ?? []) {
+      const completedSets = exercise.sets.filter((s) => s.completed).length;
+      if (!volumeByMuscle[exercise.muscleGroup]) {
+        volumeByMuscle[exercise.muscleGroup] = 0;
+      }
+      volumeByMuscle[exercise.muscleGroup] += completedSets;
+    }
+  }
+  return volumeByMuscle;
+}
+
+async function upsertWeeklyVolumeRollupDoc(
+  userId: string,
+  weekStartIso: string,
+  muscleSets: Record<string, number>,
+): Promise<void> {
+  const doc: WeeklyVolumeRollup = {
+    id: weekStartIso,
+    weekStart: weekStartIso,
+    muscleSets,
+    computedAt: new Date().toISOString(),
+  };
+  await setDocument<WeeklyVolumeRollup>(
+    collections.weeklyVolumeRollups(userId),
+    weekStartIso,
+    doc,
+    rollupConverter,
+  );
+}
+
+/** Drop persisted rollup so the next read recomputes from workouts (call after workout mutations). */
+export async function deleteWeeklyVolumeRollup(
+  userId: string,
+  weekStartIso: string,
+): Promise<void> {
+  return withService('volume', 'delete weekly rollup', () =>
+    deleteDocument(collections.weeklyVolumeRollups(userId), weekStartIso),
+  );
+}
+
+export async function deleteCurrentWeekVolumeRollup(userId: string): Promise<void> {
+  const ws = getCalendarWeekStartIso();
+  return deleteWeeklyVolumeRollup(userId, ws);
+}
 
 // Get volume landmarks
 export async function getVolumeLandmarks(userId: string): Promise<VolumeLandmarks | null> {
@@ -48,26 +112,29 @@ export async function getWeeklyVolumeSummary(
     const landmarks = await getVolumeLandmarks(userId);
     if (!landmarks) return [];
 
-    const start = weekStart ? new Date(weekStart) : getWeekStart();
+    const weekStartIso = weekStart
+      ? getCalendarWeekStartIso(new Date(weekStart))
+      : getCalendarWeekStartIso();
+    const start = new Date(weekStartIso + 'T12:00:00');
     const end = new Date(start);
     end.setDate(end.getDate() + 6);
-
-    const from = start.toISOString().split('T')[0];
+    const from = weekStartIso;
     const to = end.toISOString().split('T')[0];
 
-    const workouts = await getWorkouts(userId, { from, to });
+    const rollup = await getDocument<WeeklyVolumeRollup>(
+      collections.weeklyVolumeRollups(userId),
+      weekStartIso,
+      rollupConverter,
+    );
 
-    const volumeByMuscle: Record<string, number> = {};
+    let volumeByMuscle: Record<string, number>;
 
-    for (const workout of workouts) {
-      for (const exercise of workout.exercises) {
-        const completedSets = exercise.sets.filter((s) => s.completed).length;
-
-        if (!volumeByMuscle[exercise.muscleGroup]) {
-          volumeByMuscle[exercise.muscleGroup] = 0;
-        }
-        volumeByMuscle[exercise.muscleGroup] += completedSets;
-      }
+    if (rollup && rollup.weekStart === weekStartIso) {
+      volumeByMuscle = { ...rollup.muscleSets };
+    } else {
+      const workouts = await getWorkouts(userId, { from, to });
+      volumeByMuscle = aggregateMuscleSetsFromWorkouts(workouts, from, to);
+      await upsertWeeklyVolumeRollupDoc(userId, weekStartIso, volumeByMuscle);
     }
 
     const { getVolumeStatus } = await import('@/lib/utils/calculations');
@@ -97,10 +164,21 @@ export async function getVolumeTrend(
   weeks: number = 4,
 ): Promise<{ week: string; sets: number }[]> {
   return withService('volume', 'read volume trend', async () => {
+    const today = new Date();
+    const oldestWeekStart = new Date(today);
+    oldestWeekStart.setDate(oldestWeekStart.getDate() - (weeks - 1) * 7);
+    const minFrom = oldestWeekStart.toISOString().split('T')[0];
+
+    const newestWeekEnd = new Date(today);
+    newestWeekEnd.setDate(newestWeekEnd.getDate() + 6);
+    const maxTo = newestWeekEnd.toISOString().split('T')[0];
+
+    const workouts = await getWorkouts(userId, { from: minFrom, to: maxTo });
+
     const trend: { week: string; sets: number }[] = [];
 
     for (let i = weeks - 1; i >= 0; i--) {
-      const weekStart = new Date();
+      const weekStart = new Date(today);
       weekStart.setDate(weekStart.getDate() - i * 7);
 
       const from = weekStart.toISOString().split('T')[0];
@@ -108,11 +186,10 @@ export async function getVolumeTrend(
       toDate.setDate(toDate.getDate() + 6);
       const to = toDate.toISOString().split('T')[0];
 
-      const workouts = await getWorkouts(userId, { from, to });
-
       let sets = 0;
       for (const workout of workouts) {
-        for (const exercise of workout.exercises) {
+        if (workout.date < from || workout.date > to) continue;
+        for (const exercise of workout.exercises ?? []) {
           if (exercise.muscleGroup === muscleGroup) {
             sets += exercise.sets.filter((s) => s.completed).length;
           }
@@ -196,14 +273,4 @@ export async function initializeVolumeLandmarks(
 
     await updateVolumeLandmarks(userId, defaults as unknown as VolumeLandmarks);
   });
-}
-
-// Helper to get week start (Monday)
-function getWeekStart(): Date {
-  const now = new Date();
-  const day = now.getDay();
-  const diff = now.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
-  const weekStart = new Date(now.setDate(diff));
-  weekStart.setHours(0, 0, 0, 0);
-  return weekStart;
 }

@@ -8,4 +8,7 @@ export {
   getFileMetadata,
   createUploadTask,
   generateFilePath,
+  commitPendingStorageUpload,
+  listPendingProgressPhotoPaths,
+  deleteStoragePaths,
 } from '@/lib/firebase/storage';

@@ -2,7 +2,14 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { useProfile, useRecoveryEntry, useActivePhase, useActiveAlerts } from '@/controllers';
+import {
+  useProfile,
+  useRecoveryEntry,
+  useRecentRecoveryEntries,
+  useRecentCheckIns,
+  useActivePhase,
+  useActiveAlerts,
+} from '@/controllers';
 import { useAuthStore } from '@/stores';
 import { useOnlineStore } from '@/stores/online-store';
 import { formatDisplayDate, today } from '@/lib/utils';
@@ -13,8 +20,16 @@ import { IronmindLogo } from '@/components/brand/ironmind-logo';
 
 const LED_COUNT = 10;
 
-function LedBar({ ratio, variant }: { ratio: number; variant: 'primary' | 'secondary' }) {
-  const litCount = ratio > 0 ? Math.max(1, Math.round(ratio * LED_COUNT)) : 0;
+function LedBar({
+  ratio,
+  variant,
+  hasData = false,
+}: {
+  ratio: number;
+  variant: 'primary' | 'secondary';
+  hasData?: boolean;
+}) {
+  const litCount = hasData ? Math.max(1, Math.round(ratio * LED_COUNT)) : 0;
 
   return (
     <div className="flex items-center gap-[2px]" aria-hidden="true">
@@ -58,6 +73,8 @@ export function TopBar() {
 
   const { data: profile } = useProfile(userId);
   const { data: recovery } = useRecoveryEntry(userId, todayStr);
+  const { data: recoveryHistory } = useRecentRecoveryEntries(userId, 7);
+  const { data: recentCheckIns } = useRecentCheckIns(userId, 1);
   const { data: phase } = useActivePhase(userId);
   const { data: alerts } = useActiveAlerts(userId);
   const [alertsOpen, setAlertsOpen] = useState(false);
@@ -65,7 +82,9 @@ export function TopBar() {
   const [targetHover, setTargetHover] = useState(false);
 
   const alertCount = alerts?.length ?? 0;
-  const readinessScore = recovery ? calculateReadinessScore(recovery) : null;
+  const fallbackRecovery = recoveryHistory?.[0];
+  const readinessSource = recovery ?? fallbackRecovery ?? null;
+  const readinessScore = readinessSource ? calculateReadinessScore(readinessSource) : null;
 
   const readinessLabel = useMemo(
     () => (readinessScore !== null ? getReadinessLabel(readinessScore) : null),
@@ -74,7 +93,7 @@ export function TopBar() {
 
   const initialWeight = phase?.targets?.startWeight;
   const goalWeight = phase?.targets?.targetWeight ?? profile?.targetWeight;
-  const currentWeight = profile?.currentWeight;
+  const currentWeight = recentCheckIns?.[0]?.bodyweight ?? profile?.currentWeight;
   const targetDelta = useMemo(() => {
     if (
       initialWeight == null ||
@@ -178,6 +197,7 @@ export function TopBar() {
               <LedBar
                 ratio={readinessScore !== null ? readinessScore / 100 : 0}
                 variant="primary"
+                hasData={readinessScore !== null}
               />
             </div>
 
@@ -225,7 +245,11 @@ export function TopBar() {
             }
           >
             <div className="flex items-center justify-end">
-              <LedBar ratio={targetDelta?.ratio ?? 0} variant="secondary" />
+              <LedBar
+                ratio={targetDelta?.ratio ?? 0}
+                variant="secondary"
+                hasData={targetDelta !== null}
+              />
             </div>
 
             <div

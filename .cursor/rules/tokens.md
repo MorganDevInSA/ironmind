@@ -13,9 +13,9 @@ IRONMIND supports multiple color themes. The default is **Crimson**.
 ```html
 <!-- Default (Crimson) -->
 <html>
-
-<!-- Hot Pink theme -->
-<html data-theme="hot-pink">
+  <!-- Hot Pink theme -->
+  <html data-theme="hot-pink"></html>
+</html>
 ```
 
 Accent colors change per theme; neutrals remain fixed.
@@ -26,84 +26,84 @@ Accent colors change per theme; neutrals remain fixed.
 
 ### Backgrounds (Fixed)
 
-| Token | Value | Use |
-|-------|-------|-----|
+| Token    | Value     | Use                       |
+| -------- | --------- | ------------------------- |
 | `--bg-0` | `#080808` | Deepest black, base layer |
-| `--bg-1` | `#0D0D0D` | App background |
-| `--bg-2` | `#131313` | Elevated surfaces |
+| `--bg-1` | `#0D0D0D` | App background            |
+| `--bg-2` | `#131313` | Elevated surfaces         |
 
 ### Surfaces (Fixed)
 
-| Token | Value | Use |
-|-------|-------|-----|
-| `--surface-1` | `rgba(22, 16, 16, 0.95)` | Warm elevated surface |
-| `--surface-2` | `rgba(28, 20, 20, 0.95)` | Warmer elevated surface |
-| `--surface-track` | `rgba(22, 18, 18, 0.78)` | Progress bar tracks |
-| `--surface-well` | `rgba(14, 11, 11, 0.72)` | Inset wells |
+| Token             | Value                    | Use                     |
+| ----------------- | ------------------------ | ----------------------- |
+| `--surface-1`     | `rgba(22, 16, 16, 0.95)` | Warm elevated surface   |
+| `--surface-2`     | `rgba(28, 20, 20, 0.95)` | Warmer elevated surface |
+| `--surface-track` | `rgba(22, 18, 18, 0.78)` | Progress bar tracks     |
+| `--surface-well`  | `rgba(14, 11, 11, 0.72)` | Inset wells             |
 
 ### Panels (Fixed)
 
-| Token | Value | Use |
-|-------|-------|-----|
-| `--panel` | `rgba(18, 14, 14, 0.78)` | Standard glass panel |
-| `--panel-strong` | `rgba(18, 14, 14, 0.94)` | Modal/overlay panel |
-| `--panel-border` | `color-mix(in srgb, var(--accent) 6%, transparent)` | Panel border |
-| `--panel-border-width` | `1px` | Default border thickness |
-| `--panel-border-hover` | `color-mix(in srgb, var(--accent) 62%, transparent)` | Panel border on hover/focus-within |
-| `--panel-glow` | `0 0 14px color-mix(in srgb, var(--accent) 9%, transparent)` | Panel glow on hover |
+| Token                  | Value                                                        | Use                                |
+| ---------------------- | ------------------------------------------------------------ | ---------------------------------- |
+| `--panel`              | `rgba(18, 14, 14, 0.78)`                                     | Standard glass panel               |
+| `--panel-strong`       | `rgba(18, 14, 14, 0.94)`                                     | Modal/overlay panel                |
+| `--panel-border`       | `color-mix(in srgb, var(--accent) 6%, transparent)`          | Panel border                       |
+| `--panel-border-width` | `1px`                                                        | Default border thickness           |
+| `--panel-border-hover` | `color-mix(in srgb, var(--accent) 62%, transparent)`         | Panel border on hover/focus-within |
+| `--panel-glow`         | `0 0 14px color-mix(in srgb, var(--accent) 9%, transparent)` | Panel glow on hover                |
 
 ### Text (Fixed — theme-tinted overrides)
 
-| Token | Default | Use |
-|-------|---------|-----|
-| `--text-0` | `#F0F0F0` | Primary text |
-| `--text-1` | `#9A9A9A` | Secondary text |
-| `--text-2` | `#5E5E5E` | Muted text, labels |
+| Token           | Default   | Use                        |
+| --------------- | --------- | -------------------------- |
+| `--text-0`      | `#F0F0F0` | Primary text               |
+| `--text-1`      | `#9A9A9A` | Secondary text             |
+| `--text-2`      | `#5E5E5E` | Muted text, labels         |
 | `--text-detail` | `#BABABA` | Readable secondary on dark |
 
 > **Note:** `--text-1`, `--text-2`, and `--text-detail` are overridden per theme for accent tinting. For example, in the hot-pink theme: `--text-1: #CC80A8`, `--text-2: #9A5478`, `--text-detail: #D898B8`. Always reference the tokens — never hardcode text color values.
 
 ### Accent (Theme-Aware)
 
-| Token | Crimson | Hot Pink | Use |
-|-------|---------|----------|-----|
-| `--accent` | `#DC2626` | `#FF3EA5` | Primary accent |
+| Token            | Crimson   | Hot Pink  | Use                 |
+| ---------------- | --------- | --------- | ------------------- |
+| `--accent`       | `#DC2626` | `#FF3EA5` | Primary accent      |
 | `--accent-light` | `#EF4444` | `#FF7DC4` | Bright/hover accent |
-| `--accent-2` | `#991B1B` | `#C21877` | Dark accent |
+| `--accent-2`     | `#991B1B` | `#C21877` | Dark accent         |
 
 ### Legacy Aliases (Map to Accent)
 
-| Token | Maps To | Note |
-|-------|---------|------|
-| `--gold` | `var(--accent)` | Kept for back-compat |
+| Token          | Maps To               | Note                 |
+| -------------- | --------------------- | -------------------- |
+| `--gold`       | `var(--accent)`       | Kept for back-compat |
 | `--gold-light` | `var(--accent-light)` | Kept for back-compat |
-| `--gold-dark` | `var(--accent-2)` | Kept for back-compat |
-| `--crimson` | `var(--accent)` | Explicit crimson ref |
+| `--gold-dark`  | `var(--accent-2)`     | Kept for back-compat |
+| `--crimson`    | `var(--accent)`       | Explicit crimson ref |
 
 ### Status (Fixed)
 
-| Token | Value | Use |
-|-------|-------|-----|
+| Token    | Value     | Use                 |
+| -------- | --------- | ------------------- |
 | `--good` | `#22C55E` | Success, completion |
-| `--warn` | `#F59E0B` | Warning, caution |
-| `--bad` | `#EF4444` | Error, danger |
+| `--warn` | `#F59E0B` | Warning, caution    |
+| `--bad`  | `#EF4444` | Error, danger       |
 
 ### Chrome (Fixed)
 
-| Token | Value | Use |
-|-------|-------|-----|
-| `--chrome-bg` | `#141414` | Sidebar, mobile nav |
-| `--chrome-bg-topbar` | `var(--chrome-bg)` | Header (same as sidebar) |
-| `--chrome-bg-toggle` | `#101010` | Collapse toggle |
-| `--chrome-border` | `rgba(65, 50, 50, 0.38)` | Chrome hairlines |
-| `--chrome-border-subtle` | `rgba(42, 36, 36, 0.72)` | Subtle chrome borders |
+| Token                    | Value                    | Use                      |
+| ------------------------ | ------------------------ | ------------------------ |
+| `--chrome-bg`            | `#141414`                | Sidebar, mobile nav      |
+| `--chrome-bg-topbar`     | `var(--chrome-bg)`       | Header (same as sidebar) |
+| `--chrome-bg-toggle`     | `#101010`                | Collapse toggle          |
+| `--chrome-border`        | `rgba(65, 50, 50, 0.38)` | Chrome hairlines         |
+| `--chrome-border-subtle` | `rgba(42, 36, 36, 0.72)` | Subtle chrome borders    |
 
 ### Shadows
 
-| Token | Value |
-|-------|-------|
-| `--shadow-soft` | `0 10px 24px rgba(0, 0, 0, 0.45)` |
-| `--shadow-strong` | `0 16px 40px rgba(0, 0, 0, 0.60)` |
+| Token             | Value                                                           |
+| ----------------- | --------------------------------------------------------------- |
+| `--shadow-soft`   | `0 10px 24px rgba(0, 0, 0, 0.45)`                               |
+| `--shadow-strong` | `0 16px 40px rgba(0, 0, 0, 0.60)`                               |
 | `--shadow-accent` | `0 8px 32px color-mix(in srgb, var(--accent) 20%, transparent)` |
 
 ---
@@ -112,32 +112,32 @@ Accent colors change per theme; neutrals remain fixed.
 
 ### Font Families
 
-| Token/Class | Font | Use |
-|-------------|------|-----|
-| `font-heading` | Rajdhani | Headlines, section titles |
-| `font-sans` | Rajdhani | Body text (Tailwind default) |
-| `font-mono` | JetBrains Mono | All numbers, data |
-| `font-brand` | Cinzel | Logo, PR moments only |
+| Token/Class    | Font           | Use                          |
+| -------------- | -------------- | ---------------------------- |
+| `font-heading` | Rajdhani       | Headlines, section titles    |
+| `font-sans`    | Rajdhani       | Body text (Tailwind default) |
+| `font-mono`    | JetBrains Mono | All numbers, data            |
+| `font-brand`   | Cinzel         | Logo, PR moments only        |
 
 ### Type Scale
 
-| Element | Size | Weight | Tracking |
-|---------|------|--------|----------|
-| h1 | `1.875rem` (30px) | 700 | `0.02em` |
-| h2 | `1.5rem` (24px) | 600 | `0.02em` |
-| h3 | `1.25rem` (20px) | 600 | `0.02em` |
-| h4 | `1.125rem` (18px) | 600 | `0.02em` |
-| Body | `1rem` (16px) | 400 | normal |
-| Small | `0.875rem` (14px) | 400 | normal |
+| Element | Size              | Weight | Tracking |
+| ------- | ----------------- | ------ | -------- |
+| h1      | `1.875rem` (30px) | 700    | `0.02em` |
+| h2      | `1.5rem` (24px)   | 600    | `0.02em` |
+| h3      | `1.25rem` (20px)  | 600    | `0.02em` |
+| h4      | `1.125rem` (18px) | 600    | `0.02em` |
+| Body    | `1rem` (16px)     | 400    | normal   |
+| Small   | `0.875rem` (14px) | 400    | normal   |
 
 ### Data Typography
 
-| Class | Size | Weight | Font |
-|-------|------|--------|------|
-| `.data-label` | `0.625rem` (10px) | 600 | Rajdhani, uppercase, `0.3em` tracking |
-| `.data-value` | `1.875rem` (30px) | 600 | JetBrains Mono |
-| `.data-value-lg` | `2.25rem` (36px) | 700 | JetBrains Mono |
-| `.data-value-sm` | `1.25rem` (20px) | 600 | JetBrains Mono |
+| Class            | Size              | Weight | Font                                  |
+| ---------------- | ----------------- | ------ | ------------------------------------- |
+| `.data-label`    | `0.625rem` (10px) | 600    | Rajdhani, uppercase, `0.3em` tracking |
+| `.data-value`    | `1.875rem` (30px) | 600    | JetBrains Mono                        |
+| `.data-value-lg` | `2.25rem` (36px)  | 700    | JetBrains Mono                        |
+| `.data-value-sm` | `1.25rem` (20px)  | 600    | JetBrains Mono                        |
 
 ### Rules
 
@@ -155,45 +155,55 @@ Accent colors change per theme; neutrals remain fixed.
 
 Use Tailwind's default spacing scale. Key values:
 
-| Token | Value | Use |
-|-------|-------|-----|
-| `p-4` | `1rem` | Standard card padding |
-| `p-5` | `1.25rem` | Comfortable card padding |
-| `p-6` | `1.5rem` | Spacious card padding |
-| `gap-3` | `0.75rem` | Tight element gap |
-| `gap-4` | `1rem` | Standard element gap |
-| `gap-6` | `1.5rem` | Section gap |
+| Token   | Value     | Use                      |
+| ------- | --------- | ------------------------ |
+| `p-4`   | `1rem`    | Standard card padding    |
+| `p-5`   | `1.25rem` | Comfortable card padding |
+| `p-6`   | `1.5rem`  | Spacious card padding    |
+| `gap-3` | `0.75rem` | Tight element gap        |
+| `gap-4` | `1rem`    | Standard element gap     |
+| `gap-6` | `1.5rem`  | Section gap              |
 
 ### Border Radius
 
-| Token | Value | Use |
-|-------|-------|-----|
-| `rounded-lg` | `0.5rem` | Buttons, inputs |
-| `rounded-[14px]` | `14px` | Cards, panels |
-| `rounded-[12px]` | `12px` | Nav items |
-| `rounded-full` | `9999px` | Pills, badges |
+| Token            | Value    | Use             |
+| ---------------- | -------- | --------------- |
+| `rounded-lg`     | `0.5rem` | Buttons, inputs |
+| `rounded-[14px]` | `14px`   | Cards, panels   |
+| `rounded-[12px]` | `12px`   | Nav items       |
+| `rounded-full`   | `9999px` | Pills, badges   |
 
 ---
 
 ## Dashboard-Specific Tokens
 
-| Token | Value | Use |
-|-------|-------|-----|
-| `--dashboard-overview-max-width` | `72rem` | Max width on large screens |
-| `--exercise-index-bg` | `rgba(22, 18, 18, 0.96)` | Exercise number badge |
-| `--exercise-index-border` | `rgba(220, 38, 38, 0.42)` | Exercise badge border |
+| Token                            | Value                     | Use                        |
+| -------------------------------- | ------------------------- | -------------------------- |
+| `--dashboard-overview-max-width` | `72rem`                   | Max width on large screens |
+| `--exercise-index-bg`            | `rgba(22, 18, 18, 0.96)`  | Exercise number badge      |
+| `--exercise-index-border`        | `rgba(220, 38, 38, 0.42)` | Exercise badge border      |
+
+---
+
+## Visualization Conventions
+
+- Gradient progress treatment:
+  - filled: accent gradient (lighter -> darker)
+  - empty: `--surface-track` only (no accent tint)
+- Keep chart axis ticks readable with `var(--text-2)` token values.
+- Multi-series measurement charts should only show series with actual data points.
 
 ---
 
 ## Motion Tokens
 
-| Token | Value | Use |
-|-------|-------|-----|
-| `--duration-instant` | `100ms` | Button press |
-| `--duration-fast` | `150ms` | Quick feedback |
-| `--duration-normal` | `200ms` | Hover, modal open |
-| `--duration-slow` | `300ms` | Page transitions |
-| `--duration-page` | `500ms` | Chart animations |
+| Token                | Value    | Use                    |
+| -------------------- | -------- | ---------------------- |
+| `--duration-instant` | `100ms`  | Button press           |
+| `--duration-fast`    | `150ms`  | Quick feedback         |
+| `--duration-normal`  | `200ms`  | Hover, modal open      |
+| `--duration-slow`    | `300ms`  | Page transitions       |
+| `--duration-page`    | `500ms`  | Chart animations       |
 | `--duration-ambient` | `3000ms` | Glows, ambient effects |
 
 ---
@@ -202,19 +212,19 @@ Use Tailwind's default spacing scale. Key values:
 
 Replace on sight — these are legacy values:
 
-| Old Token | Replace With |
-|-----------|-------------|
-| `#D4AF37`, `#F4D03F`, `#B8860B` | `var(--accent)`, `var(--accent-light)` |
-| `#3B82F6`, `#2A6CFF` | `var(--accent)` |
-| `#B8C6DE`, `#7F91AD` | `var(--text-1)` |
-| `rgba(212, 175, 55, ...)` | `color-mix(in srgb, var(--accent) X%, transparent)` |
-| `rgba(59, 130, 246, ...)` | `color-mix(in srgb, var(--accent) X%, transparent)` |
-| `rgba(16, 22, 34, ...)` | `rgba(18, 14, 14, ...)` |
-| `bg-surface` | `bg-[color:var(--bg-2)]` |
-| `text-accent` | `text-[color:var(--accent)]` (Tailwind utility resolves to hardcoded hex, bypasses theme) |
-| `bg-accent` | Use `.btn-primary` class or `bg-[color:var(--accent)]` |
-| `border-accent` | `border-[color:var(--accent)]` |
-| `focus:border-accent` | `focus:border-[color:var(--accent)]` |
+| Old Token                       | Replace With                                                                              |
+| ------------------------------- | ----------------------------------------------------------------------------------------- |
+| `#D4AF37`, `#F4D03F`, `#B8860B` | `var(--accent)`, `var(--accent-light)`                                                    |
+| `#3B82F6`, `#2A6CFF`            | `var(--accent)`                                                                           |
+| `#B8C6DE`, `#7F91AD`            | `var(--text-1)`                                                                           |
+| `rgba(212, 175, 55, ...)`       | `color-mix(in srgb, var(--accent) X%, transparent)`                                       |
+| `rgba(59, 130, 246, ...)`       | `color-mix(in srgb, var(--accent) X%, transparent)`                                       |
+| `rgba(16, 22, 34, ...)`         | `rgba(18, 14, 14, ...)`                                                                   |
+| `bg-surface`                    | `bg-[color:var(--bg-2)]`                                                                  |
+| `text-accent`                   | `text-[color:var(--accent)]` (Tailwind utility resolves to hardcoded hex, bypasses theme) |
+| `bg-accent`                     | Use `.btn-primary` class or `bg-[color:var(--accent)]`                                    |
+| `border-accent`                 | `border-[color:var(--accent)]`                                                            |
+| `focus:border-accent`           | `focus:border-[color:var(--accent)]`                                                      |
 
 ---
 
@@ -222,13 +232,13 @@ Replace on sight — these are legacy values:
 
 ```tsx
 // CSS variable with Tailwind arbitrary value
-className="bg-[color:var(--panel)]"
-className="text-[color:var(--text-0)]"
-className="border-[color:var(--panel-border)]"
+className = 'bg-[color:var(--panel)]';
+className = 'text-[color:var(--text-0)]';
+className = 'border-[color:var(--panel-border)]';
 
 // Opacity via color-mix
-className="bg-[color:color-mix(in_srgb,var(--accent)_20%,transparent)]"
+className = 'bg-[color:color-mix(in_srgb,var(--accent)_20%,transparent)]';
 
 // Shadow variable
-className="shadow-[var(--shadow-soft)]"
+className = 'shadow-[var(--shadow-soft)]';
 ```

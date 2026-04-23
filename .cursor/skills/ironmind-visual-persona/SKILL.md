@@ -13,13 +13,13 @@ IRONMIND is a **raw performance system** for elite athletes. Not a finance dashb
 
 ### Core Attributes
 
-| Attribute | Visual Expression |
-|-----------|------------------|
-| **Strength** | Heavy weights, aggressive contrasts, accent fire |
-| **Precision** | Data-driven grids, monospace numbers, exact measurements |
-| **Rawness** | Pure dark backgrounds, no luxury softness — app chrome uses warm blacks (`var(--chrome-bg)`), not flat cool grey bars |
-| **Intelligence** | Smart data displays, clean information architecture |
-| **Masculine** | Angular geometry, deep blacks, blood-red accents |
+| Attribute        | Visual Expression                                                                                                     |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------- |
+| **Strength**     | Heavy weights, aggressive contrasts, accent fire                                                                      |
+| **Precision**    | Data-driven grids, monospace numbers, exact measurements                                                              |
+| **Rawness**      | Pure dark backgrounds, no luxury softness — app chrome uses warm blacks (`var(--chrome-bg)`), not flat cool grey bars |
+| **Intelligence** | Smart data displays, clean information architecture                                                                   |
+| **Masculine**    | Angular geometry, deep blacks, blood-red accents                                                                      |
 
 ---
 
@@ -36,11 +36,11 @@ IRONMIND supports multiple color themes via CSS custom properties. The default i
 
 ### Available Themes
 
-| Theme | `data-theme` | Accent | Use Case |
-|-------|--------------|--------|----------|
-| **Crimson** | (default) | `#DC2626` | Default — blood, intensity, power |
-| **Hot Pink** | `hot-pink` | `#FF3EA5` | Alternative — high energy, modern edge |
-| **Custom** | `custom` | User-chosen hex | Full personalization — `tinycolor2` derives full token set |
+| Theme        | `data-theme` | Accent          | Use Case                                                   |
+| ------------ | ------------ | --------------- | ---------------------------------------------------------- |
+| **Crimson**  | (default)    | `#DC2626`       | Default — blood, intensity, power                          |
+| **Hot Pink** | `hot-pink`   | `#FF3EA5`       | Alternative — high energy, modern edge                     |
+| **Custom**   | `custom`     | User-chosen hex | Full personalization — `tinycolor2` derives full token set |
 
 To apply a theme: `<html data-theme="hot-pink">`.
 
@@ -48,34 +48,35 @@ To apply a theme: `<html data-theme="hot-pink">`.
 
 ## Color Psychology (Theme-Aware)
 
-| Token | Default Hex | Emotion | Use When |
-|-------|-------------|---------|----------|
-| `--bg-0` | `#080808` | Power, void, foundation | Background base |
-| `--accent` | `#DC2626` | Blood, strength, drive | PRs, milestones, CTAs, active nav |
-| `--accent-light` | `#EF4444` | Fire, urgency | Active indicators, highlights |
-| `--accent-2` | `#991B1B` | Iron, depth, permanence | Shadows, glows, dark accents |
-| `--good` | `#22C55E` | Growth, completion | Goals hit, meals done, sets done |
-| `--warn` | `#F59E0B` | Warning, caution | Recovery flags, near-limits |
-| `--bad` | `#EF4444` | Danger, error | Failures, errors |
-| `--text-1` | `#9A9A9A` | Precision, neutral support | Secondary text |
-| `--text-2` | `#5E5E5E` | Silence, structure | Labels, hints |
+| Token            | Default Hex | Emotion                    | Use When                          |
+| ---------------- | ----------- | -------------------------- | --------------------------------- |
+| `--bg-0`         | `#080808`   | Power, void, foundation    | Background base                   |
+| `--accent`       | `#DC2626`   | Blood, strength, drive     | PRs, milestones, CTAs, active nav |
+| `--accent-light` | `#EF4444`   | Fire, urgency              | Active indicators, highlights     |
+| `--accent-2`     | `#991B1B`   | Iron, depth, permanence    | Shadows, glows, dark accents      |
+| `--good`         | `#22C55E`   | Growth, completion         | Goals hit, meals done, sets done  |
+| `--warn`         | `#F59E0B`   | Warning, caution           | Recovery flags, near-limits       |
+| `--bad`          | `#EF4444`   | Danger, error              | Failures, errors                  |
+| `--text-1`       | `#9A9A9A`   | Precision, neutral support | Secondary text                    |
+| `--text-2`       | `#5E5E5E`   | Silence, structure         | Labels, hints                     |
 
 **Color ratio rule**: 85% dark neutrals · 12% text · 3% accent at rest.
 
-The 3% accent rule holds for *resting* state; accent is now more visible because page titles are accented, interactive panels glow on hover, and LED indicators pulse in the header. Interactive states can push accent to ~8% momentarily. Accent is still precious — but it now marks identity and responsiveness, not just rare highlights.
+The 3% accent rule holds for _resting_ state; accent is now more visible because page titles are accented, interactive panels glow on hover, and LED indicators pulse in the header. Interactive states can push accent to ~8% momentarily. Accent is still precious — but it now marks identity and responsiveness, not just rare highlights.
 
 ---
 
 ## Typography Voice
 
-| Font | Feel | Usage |
-|------|------|-------|
-| **Rajdhani** | Bold, technical, precise | Headlines and section titles |
-| **Inter** | Clean, modern, neutral | Body text, labels, UI chrome |
-| **JetBrains Mono** | Data, code, precision | All numbers and metrics |
-| **Cinzel** | Luxury, timeless strength | Brand logo, PR moments only |
+| Font               | Feel                      | Usage                        |
+| ------------------ | ------------------------- | ---------------------------- |
+| **Rajdhani**       | Bold, technical, precise  | Headlines and section titles |
+| **Inter**          | Clean, modern, neutral    | Body text, labels, UI chrome |
+| **JetBrains Mono** | Data, code, precision     | All numbers and metrics      |
+| **Cinzel**         | Luxury, timeless strength | Brand logo, PR moments only  |
 
 **Rules**:
+
 - Headlines: `font-heading`, `-0.02em` letter-spacing, `font-weight: 600-700`
 - Labels: ALL CAPS, `tracking-[0.3em]`, muted color (`var(--text-2)`)
 - Numbers: always `font-mono tabular-nums` — no exceptions
@@ -179,11 +180,23 @@ Nutrition Adherence  ← label below
 
 ```
 ┌─────────────────────────┐
-│ ██████████░░  74  │  ← readiness (accent-light)
-│ ████████░░░░  95  │  ← weight (accent-2)
+│ ██████████░░        │  ← readiness
+│ ████████░░░░        │  ← target progress
 └─────────────────────────┘
-Hover → tooltip with label + score
+Each indicator has its own hover/focus detail modal.
+Keep faint themed backlight on unfilled segments so bars remain visible at rest.
+If a metric is valid but currently 0%, light at least one segment to signal "data present".
 ```
+
+### Progress Fill Pattern
+
+```
+Filled: accent gradient (lighter → darker)
+Empty: neutral track, no accent tint
+```
+
+Apply this uniformly across dashboard indicators, weekly volume bars, training density bars,
+and recovery range sliders.
 
 ---
 

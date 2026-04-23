@@ -2,6 +2,7 @@ import type { NutritionDay, MacroTargetRange, DayType } from '@/lib/types';
 import {
   getDocument,
   setDocument,
+  deleteDocument,
   queryDocuments,
   where,
   orderBy,
@@ -15,16 +16,9 @@ import { withService } from '@/lib/errors';
 const converter = createConverter<NutritionDay>();
 
 // Get nutrition day
-export async function getNutritionDay(
-  userId: string,
-  date: string
-): Promise<NutritionDay | null> {
+export async function getNutritionDay(userId: string, date: string): Promise<NutritionDay | null> {
   return withService('nutrition', 'read nutrition day', () =>
-    getDocument<NutritionDay>(
-      collections.nutritionDays(userId),
-      date,
-      converter
-    )
+    getDocument<NutritionDay>(collections.nutritionDays(userId), date, converter),
   );
 }
 
@@ -32,22 +26,22 @@ export async function getNutritionDay(
 export async function saveNutritionDay(
   userId: string,
   date: string,
-  data: Partial<NutritionDay>
+  data: Partial<NutritionDay>,
 ): Promise<void> {
   return withService('nutrition', 'save nutrition day', () =>
     setDocument<NutritionDay>(
       collections.nutritionDays(userId),
       date,
       { ...data, date } as NutritionDay,
-      converter
-    )
+      converter,
+    ),
   );
 }
 
 // Get nutrition history
 export async function getNutritionHistory(
   userId: string,
-  dateRange: { from: string; to: string }
+  dateRange: { from: string; to: string },
 ): Promise<NutritionDay[]> {
   return withService('nutrition', 'read nutrition history', () =>
     queryDocuments<NutritionDay>(
@@ -57,15 +51,15 @@ export async function getNutritionHistory(
         where('date', '<=', dateRange.to),
         orderBy('date', 'desc'),
       ],
-      converter
-    )
+      converter,
+    ),
   );
 }
 
 // Get recent nutrition days
 export async function getRecentNutritionDays(
   userId: string,
-  days: number = 14
+  days: number = 14,
 ): Promise<NutritionDay[]> {
   return withService('nutrition', 'read recent nutrition days', () => {
     const fromDate = new Date();
@@ -73,41 +67,33 @@ export async function getRecentNutritionDays(
 
     return queryDocuments<NutritionDay>(
       collections.nutritionDays(userId),
-      [
-        where('date', '>=', fromDate.toISOString().split('T')[0]),
-        orderBy('date', 'desc'),
-      ],
-      converter
+      [where('date', '>=', fromDate.toISOString().split('T')[0]), orderBy('date', 'desc')],
+      converter,
     );
   });
 }
 
 // Save the user's nutrition plan (meal schedule + macro targets)
-export async function saveNutritionPlan(
-  userId: string,
-  plan: NutritionPlanSeed
-): Promise<void> {
+export async function saveNutritionPlan(userId: string, plan: NutritionPlanSeed): Promise<void> {
   return withService('nutrition', 'save nutrition plan', () => {
     const planConverter = createConverter<NutritionPlanSeed>();
     return setDocument<NutritionPlanSeed>(
       collections.nutritionPlan(userId),
       'current',
       plan,
-      planConverter
+      planConverter,
     );
   });
 }
 
 // Get the user's active nutrition plan
-export async function getNutritionPlan(
-  userId: string
-): Promise<NutritionPlanSeed | null> {
+export async function getNutritionPlan(userId: string): Promise<NutritionPlanSeed | null> {
   return withService('nutrition', 'read nutrition plan', () => {
     const planConverter = createConverter<NutritionPlanSeed>();
     return getDocument<NutritionPlanSeed>(
       collections.nutritionPlan(userId),
       'current',
-      planConverter
+      planConverter,
     );
   });
 }
@@ -131,7 +117,7 @@ export function calculateCompliance(nutritionDay: NutritionDay): number {
   const calorieCompliance = Math.max(0, 100 - (calorieDiff / calorieRange) * 100);
 
   // Weight protein more heavily (60/40 split)
-  return Math.round((proteinCompliance * 0.6) + (calorieCompliance * 0.4));
+  return Math.round(proteinCompliance * 0.6 + calorieCompliance * 0.4);
 }
 
 // Update a meal in a nutrition day
@@ -139,7 +125,7 @@ export async function updateMeal(
   userId: string,
   date: string,
   mealSlot: string,
-  updates: Partial<NutritionDay['meals'][0]>
+  updates: Partial<NutritionDay['meals'][0]>,
 ): Promise<void> {
   return withService('nutrition', 'update meal', async () => {
     const day = await getNutritionDay(userId, date);
@@ -148,7 +134,7 @@ export async function updateMeal(
       throw new Error('Nutrition day not found');
     }
 
-    const mealIndex = day.meals.findIndex(m => m.slot === mealSlot);
+    const mealIndex = day.meals.findIndex((m) => m.slot === mealSlot);
     if (mealIndex === -1) {
       throw new Error('Meal slot not found');
     }
@@ -156,12 +142,15 @@ export async function updateMeal(
     day.meals[mealIndex] = { ...day.meals[mealIndex], ...updates };
 
     const { calculateCalories } = await import('@/lib/utils/calculations');
-    const protein = day.meals.reduce((sum, meal) =>
-      sum + meal.foods.reduce((s, f) => s + f.protein, 0), 0);
-    const carbs = day.meals.reduce((sum, meal) =>
-      sum + meal.foods.reduce((s, f) => s + f.carbs, 0), 0);
-    const fat = day.meals.reduce((sum, meal) =>
-      sum + meal.foods.reduce((s, f) => s + f.fat, 0), 0);
+    const protein = day.meals.reduce(
+      (sum, meal) => sum + meal.foods.reduce((s, f) => s + f.protein, 0),
+      0,
+    );
+    const carbs = day.meals.reduce(
+      (sum, meal) => sum + meal.foods.reduce((s, f) => s + f.carbs, 0),
+      0,
+    );
+    const fat = day.meals.reduce((sum, meal) => sum + meal.foods.reduce((s, f) => s + f.fat, 0), 0);
 
     day.macroActuals = {
       protein,
@@ -181,7 +170,7 @@ export async function addFoodToMeal(
   userId: string,
   date: string,
   mealSlot: string,
-  food: NutritionDay['meals'][0]['foods'][0]
+  food: NutritionDay['meals'][0]['foods'][0],
 ): Promise<void> {
   return withService('nutrition', 'add food to meal', async () => {
     const day = await getNutritionDay(userId, date);
@@ -190,7 +179,7 @@ export async function addFoodToMeal(
       throw new Error('Nutrition day not found');
     }
 
-    const mealIndex = day.meals.findIndex(m => m.slot === mealSlot);
+    const mealIndex = day.meals.findIndex((m) => m.slot === mealSlot);
     if (mealIndex === -1) {
       throw new Error('Meal slot not found');
     }
@@ -207,7 +196,7 @@ export async function removeFoodFromMeal(
   userId: string,
   date: string,
   mealSlot: string,
-  foodId: string
+  foodId: string,
 ): Promise<void> {
   return withService('nutrition', 'remove food from meal', async () => {
     const day = await getNutritionDay(userId, date);
@@ -216,13 +205,27 @@ export async function removeFoodFromMeal(
       throw new Error('Nutrition day not found');
     }
 
-    const mealIndex = day.meals.findIndex(m => m.slot === mealSlot);
+    const mealIndex = day.meals.findIndex((m) => m.slot === mealSlot);
     if (mealIndex === -1) {
       throw new Error('Meal slot not found');
     }
 
-    day.meals[mealIndex].foods = day.meals[mealIndex].foods.filter(f => f.id !== foodId);
+    day.meals[mealIndex].foods = day.meals[mealIndex].foods.filter((f) => f.id !== foodId);
 
     await saveNutritionDay(userId, date, day);
   });
+}
+
+/** Used by import compensating rollback — removes one day doc. */
+export async function deleteNutritionDay(userId: string, date: string): Promise<void> {
+  return withService('nutrition', 'delete nutrition day', () =>
+    deleteDocument(collections.nutritionDays(userId), date),
+  );
+}
+
+/** Removes the stored plan doc (`current`) — import rollback when no prior plan existed. */
+export async function deleteNutritionPlanCurrent(userId: string): Promise<void> {
+  return withService('nutrition', 'delete nutrition plan', () =>
+    deleteDocument(collections.nutritionPlan(userId), 'current'),
+  );
 }

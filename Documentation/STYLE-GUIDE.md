@@ -23,29 +23,29 @@ IRONMIND should feel like a disciplined performance war room:
 
 ### Background + text
 
-| Token | Value | Role |
-|------|------|------|
-| `--bg-0` | `#080808` | Main canvas |
-| `--bg-1` | `#0D0D0D` | Section background |
-| `--bg-2` | `#131313` | Elevated background |
-| `--panel` | `rgba(18, 14, 14, 0.78)` | Glass panel base |
-| `--panel-border` | `color-mix(in srgb, var(--accent) 6%, transparent)` | Panel edge (resting) |
-| `--panel-border-hover` | `color-mix(in srgb, var(--accent) 62%, transparent)` | Panel edge (hover/focus-within) |
-| `--panel-glow` | `0 0 14px color-mix(in srgb, var(--accent) 9%, transparent)` | Panel hover glow |
-| `--text-0` | `#F0F0F0` | Primary text |
-| `--text-1` | `#9A9A9A` | Secondary text (theme-tinted in hot-pink and custom themes) |
-| `--text-2` | `#5E5E5E` | Labels/meta (theme-tinted in hot-pink and custom themes) |
+| Token                  | Value                                                        | Role                                                        |
+| ---------------------- | ------------------------------------------------------------ | ----------------------------------------------------------- |
+| `--bg-0`               | `#080808`                                                    | Main canvas                                                 |
+| `--bg-1`               | `#0D0D0D`                                                    | Section background                                          |
+| `--bg-2`               | `#131313`                                                    | Elevated background                                         |
+| `--panel`              | `rgba(18, 14, 14, 0.78)`                                     | Glass panel base                                            |
+| `--panel-border`       | `color-mix(in srgb, var(--accent) 6%, transparent)`          | Panel edge (resting)                                        |
+| `--panel-border-hover` | `color-mix(in srgb, var(--accent) 62%, transparent)`         | Panel edge (hover/focus-within)                             |
+| `--panel-glow`         | `0 0 14px color-mix(in srgb, var(--accent) 9%, transparent)` | Panel hover glow                                            |
+| `--text-0`             | `#F0F0F0`                                                    | Primary text                                                |
+| `--text-1`             | `#9A9A9A`                                                    | Secondary text (theme-tinted in hot-pink and custom themes) |
+| `--text-2`             | `#5E5E5E`                                                    | Labels/meta (theme-tinted in hot-pink and custom themes)    |
 
 ### Accent + status
 
-| Token | Value | Role |
-|------|------|------|
-| `--accent` | `#DC2626` | Primary accent |
-| `--accent-2` | `#991B1B` | Dark accent |
-| `--accent-light` | `#EF4444` | Bright accent |
-| `--good` | `#22C55E` | Positive state |
-| `--warn` | `#F59E0B` | Warning |
-| `--bad` | `#EF4444` | Error |
+| Token            | Value     | Role           |
+| ---------------- | --------- | -------------- |
+| `--accent`       | `#DC2626` | Primary accent |
+| `--accent-2`     | `#991B1B` | Dark accent    |
+| `--accent-light` | `#EF4444` | Bright accent  |
+| `--good`         | `#22C55E` | Positive state |
+| `--warn`         | `#F59E0B` | Warning        |
+| `--bad`          | `#EF4444` | Error          |
 
 ### Theme modes
 
@@ -107,7 +107,9 @@ Persistent navigation chrome uses:
 
 Use these in sidebar/topbar/mobile-nav. Do not hardcode cool greys for app rails.
 
-The top bar includes **Knight Rider LED readiness/weight bars**: two LED indicators (readiness + weight) with synced pulse animation and hover tooltip, themed via accent CSS variables.
+The top bar includes **stacked Knight Rider LED bars**: readiness + target progress, each with
+its own hover/focus detail panel. Inline metric labels are intentionally removed from the header
+row for cleaner chrome.
 
 ---
 
@@ -120,17 +122,17 @@ The top bar includes **Knight Rider LED readiness/weight bars**: two LED indicat
 
 ### Text color hierarchy
 
-| Element | Color | Rationale |
-|---------|-------|-----------|
-| h1 page titles | `var(--accent)` | Brand anchor, short and large — accent is readable at this scale |
-| Section headings inside panels | `var(--text-0)` (white) | Readable structural headers — accent would hurt readability |
-| Bold/strong text within body | `var(--text-0)` (white) | Emphasis within readable content — never accent |
-| User names, phase info | `var(--text-0)` / `var(--text-1)` | Informational metadata — white for names, grey for context |
-| Body paragraphs | `var(--text-1)` | Secondary readable text |
-| Micro-labels ("Step X of 6") | `var(--accent)` | Tiny metadata labels (10px uppercase) — accent is a brand signal here |
-| Icons | `var(--accent)` | Visual markers, not readable text |
-| Links | `var(--accent)` | Interactive, clickable — accent signals affordance |
-| CTA button text | `var(--accent)` | Interactive link-style actions ("Open nutrition →") |
+| Element                        | Color                             | Rationale                                                             |
+| ------------------------------ | --------------------------------- | --------------------------------------------------------------------- |
+| h1 page titles                 | `var(--accent)`                   | Brand anchor, short and large — accent is readable at this scale      |
+| Section headings inside panels | `var(--text-0)` (white)           | Readable structural headers — accent would hurt readability           |
+| Bold/strong text within body   | `var(--text-0)` (white)           | Emphasis within readable content — never accent                       |
+| User names, phase info         | `var(--text-0)` / `var(--text-1)` | Informational metadata — white for names, grey for context            |
+| Body paragraphs                | `var(--text-1)`                   | Secondary readable text                                               |
+| Micro-labels ("Step X of 6")   | `var(--accent)`                   | Tiny metadata labels (10px uppercase) — accent is a brand signal here |
+| Icons                          | `var(--accent)`                   | Visual markers, not readable text                                     |
+| Links                          | `var(--accent)`                   | Interactive, clickable — accent signals affordance                    |
+| CTA button text                | `var(--accent)`                   | Interactive link-style actions ("Open nutrition →")                   |
 
 ---
 
@@ -172,3 +174,14 @@ Old blue/gold token guidance is intentionally retired. If you see references to 
 
 Tailwind accent utilities (`text-accent`, `bg-accent`, `border-accent`, `focus:border-accent`, etc.) are hardcoded in `tailwind.config.js` and do NOT respond to theme changes. Always use CSS variable syntax (`text-[color:var(--accent)]`, `bg-[color:var(--accent)]`, etc.) instead.
 
+---
+
+## 9) Charts and Indicator Bars (Current)
+
+- Use **accent-only hue variants** (via `color-mix`) when differentiating series under one theme.
+- Progress visuals follow a **filled-only gradient** rule:
+  - filled area: accent gradient (lighter -> darker)
+  - empty area: neutral track (`--surface-track`) with no accent fill
+- Keep bar endings clean (match Training Density style) unless a specific threshold marker is required.
+- Axis tick labels must use valid token values (e.g. `fill: 'var(--text-2)'`), not invalid strings like `fill: 'color:var(--text-2)'`.
+- Multi-series measurement charts should render only series that actually have data points in the current dataset.

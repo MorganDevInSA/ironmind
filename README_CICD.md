@@ -137,11 +137,11 @@ Deployment to production triggers automatically on merge to `main`. There is no 
 
 ### Observability
 
-Three layers of observability run in production:
+Production observability today is **Vercel-native** plus structured logs:
 
 - **Vercel Speed Insights** — real-user Core Web Vitals (LCP, INP, CLS), broken down by route and device class
 - **Vercel Analytics** — privacy-respecting page-view and referrer analytics, no cookies required
-- **Sentry** (via `@sentry/nextjs`) — client and server error capture with release tracking, source maps, and breadcrumb trails
+- **Sentry** — _not installed in this repo_ (`package.json` has no `@sentry/*`). If you add `@sentry/nextjs` and wire `next.config`, update this section to describe release tracking, source maps, and breadcrumbs; until then treat Sentry as **optional future work**, not a guaranteed production layer.
 
 A minimal `/api/health` route returns `{ ok: true, ts }` for external uptime checks (UptimeRobot, BetterStack). Structured logs — plain JSON to `console` — flow into Vercel's log drain for aggregation.
 

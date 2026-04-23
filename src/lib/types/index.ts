@@ -111,6 +111,8 @@ export interface Workout {
   notes?: string;
   startedAt?: string;
   completedAt?: string;
+  /** Firestore `updatedAt` (ISO) — used for optimistic concurrency on set-level writes */
+  updatedAt?: string;
 }
 
 export interface WorkoutExercise {
@@ -314,6 +316,16 @@ export interface JournalEntry {
 }
 
 // Volume Landmarks
+/** Persisted aggregate for dashboard weekly volume card (`weeklyVolumeRollups/{weekStart}`). */
+export interface WeeklyVolumeRollup {
+  id: string;
+  /** Monday calendar date `yyyy-MM-dd` (same as document id). */
+  weekStart: string;
+  /** Completed set counts per muscle group key for this ISO week. */
+  muscleSets: Record<string, number>;
+  computedAt: string;
+}
+
 export interface VolumeLandmarks {
   chest: LandmarkRange;
   back: LandmarkRange;
@@ -345,6 +357,9 @@ export interface SmartAlert {
   createdAt: string;
 }
 
+/** Bump when stored shapes or parsers change in a breaking way (see ARCHITECTURE.md). */
+export const CURRENT_DATA_SCHEMA_VERSION = 1 as const;
+
 // User
 export interface UserData {
   uid: string;
@@ -352,6 +367,8 @@ export interface UserData {
   email: string;
   createdAt: string;
   isSeeded: boolean;
+  /** Optional; missing treated as `1` for reads. */
+  dataSchemaVersion?: number;
 }
 
 // Export Options

@@ -36,14 +36,21 @@ const DEMO_PROFILES: DemoProfile[] = [
     sex: 'Male',
     level: 'Advanced',
     goal: 'Off-season muscle gain',
-    description: 'Advanced rebuild block with high-capacity progression and pelvic-safe loading strategy.',
+    description:
+      'Advanced rebuild block with high-capacity progression and pelvic-safe loading strategy.',
     tag: 'Masters athlete',
-    tagColor: 'text-[color:var(--accent)] bg-[rgba(16,16,16,0.78)] border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)]',
-    lifestyle: 'Remote high-pressure professional role with flexible windows for training and recovery.',
-    trainingHistory: 'Natural, highly trained athlete with deep lifting history and advanced exercise literacy.',
-    geneticsNote: 'Elite responder profile: lower training dose produces outsized hypertrophy and strength carryover.',
-    equipment: 'Fully equipped home-gym environment with reliable access to high-quality nutrition.',
-    coachNote: 'Primary coaching focus is intelligent load progression around pelvic constraints, not motivation or access.',
+    tagColor:
+      'text-[color:var(--accent)] bg-[rgba(16,16,16,0.78)] border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)]',
+    lifestyle:
+      'Remote high-pressure professional role with flexible windows for training and recovery.',
+    trainingHistory:
+      'Natural, highly trained athlete with deep lifting history and advanced exercise literacy.',
+    geneticsNote:
+      'Elite responder profile: lower training dose produces outsized hypertrophy and strength carryover.',
+    equipment:
+      'Fully equipped home-gym environment with reliable access to high-quality nutrition.',
+    coachNote:
+      'Primary coaching focus is intelligent load progression around pelvic constraints, not motivation or access.',
   },
   {
     id: 'sheri',
@@ -52,14 +59,19 @@ const DEMO_PROFILES: DemoProfile[] = [
     sex: 'Female',
     level: 'Beginner',
     goal: 'Fat loss — 95 kg → 83 kg',
-    description: 'Structured reduction phase with adherence-first planning and repeatable meal architecture.',
+    description:
+      'Structured reduction phase with adherence-first planning and repeatable meal architecture.',
     tag: 'Foundation cut',
     tagColor: 'text-[#F59E0B] bg-[rgba(245,158,11,0.12)] border-[rgba(245,158,11,0.35)]',
-    lifestyle: 'Up at 06:00 in winter (South Africa), office workload 07:00–18:00 with compressed daytime eating windows.',
-    trainingHistory: 'Former high-level dance background with strong neuromuscular patterning and retained muscle memory.',
-    geneticsNote: 'Normal-to-slower metabolic profile with increased fat-gain sensitivity under stress and low sleep.',
+    lifestyle:
+      'Up at 06:00 in winter (South Africa), office workload 07:00–18:00 with compressed daytime eating windows.',
+    trainingHistory:
+      'Former high-level dance background with strong neuromuscular patterning and retained muscle memory.',
+    geneticsNote:
+      'Normal-to-slower metabolic profile with increased fat-gain sensitivity under stress and low sleep.',
     equipment: 'Home-only training setup with constrained meal prep time on workdays.',
-    coachNote: 'Program design prioritizes schedule durability, dance-transfer movement quality, and late-day session execution.',
+    coachNote:
+      'Program design prioritizes schedule durability, dance-transfer movement quality, and late-day session execution.',
   },
   {
     id: 'alex',
@@ -68,14 +80,19 @@ const DEMO_PROFILES: DemoProfile[] = [
     sex: 'Male',
     level: 'Intermediate',
     goal: 'Strength & size',
-    description: 'Intermediate mass-and-strength block with high compliance and measurable progression markers.',
+    description:
+      'Intermediate mass-and-strength block with high compliance and measurable progression markers.',
     tag: 'Hypertrophy',
     tagColor: 'text-[#22C55E] bg-[rgba(34,197,94,0.12)] border-[rgba(34,197,94,0.35)]',
-    lifestyle: 'Office-based schedule with regular commute and stable sleep routine during weekdays.',
-    trainingHistory: '5+ years of uninterrupted resistance training with strong competency on compound lifts.',
+    lifestyle:
+      'Office-based schedule with regular commute and stable sleep routine during weekdays.',
+    trainingHistory:
+      '5+ years of uninterrupted resistance training with strong competency on compound lifts.',
     geneticsNote: 'Moderate recovery curve and predictable adaptation when volume is periodized.',
-    equipment: 'Commercial gym access with full machine, free-weight, and cable station availability.',
-    coachNote: 'High upside candidate for structured hypertrophy mesocycles with periodic strength expression blocks.',
+    equipment:
+      'Commercial gym access with full machine, free-weight, and cable station availability.',
+    coachNote:
+      'High upside candidate for structured hypertrophy mesocycles with periodic strength expression blocks.',
   },
   {
     id: 'jordan',
@@ -84,14 +101,19 @@ const DEMO_PROFILES: DemoProfile[] = [
     sex: 'Female',
     level: 'Beginner',
     goal: 'General fitness',
-    description: 'Beginner progression template focused on consistency, body composition, and sustainable weekly output.',
+    description:
+      'Beginner progression template focused on consistency, body composition, and sustainable weekly output.',
     tag: 'Beginner friendly',
-    tagColor: 'text-[color:var(--accent-light)] bg-[rgba(16,16,16,0.78)] border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)]',
+    tagColor:
+      'text-[color:var(--accent-light)] bg-[rgba(16,16,16,0.78)] border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)]',
     lifestyle: 'Parent-led schedule with narrow training windows and 45-minute session ceilings.',
-    trainingHistory: 'Early-stage trainee with completed restart phase and reliable baseline movement patterns.',
-    geneticsNote: 'Responds well to moderate deficits, high-protein intake, and repeatable habit loops.',
+    trainingHistory:
+      'Early-stage trainee with completed restart phase and reliable baseline movement patterns.',
+    geneticsNote:
+      'Responds well to moderate deficits, high-protein intake, and repeatable habit loops.',
     equipment: 'Compact home setup with adjustable dumbbells, bench, and resistance bands.',
-    coachNote: 'Best outcomes come from time-efficient templates that remove scheduling friction and decision fatigue.',
+    coachNote:
+      'Best outcomes come from time-efficient templates that remove scheduling friction and decision fatigue.',
   },
 ];
 
@@ -135,6 +157,7 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
       await queryClient.invalidateQueries({ queryKey: qk.training.all });
       await queryClient.invalidateQueries({ queryKey: qk.supplements.all });
       await queryClient.invalidateQueries({ queryKey: qk.volume.all });
+      await queryClient.invalidateQueries({ queryKey: qk.dashboard.all });
       setDone(true);
       setTimeout(() => {
         onClose();
@@ -151,22 +174,22 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-[rgba(0,0,0,0.75)] backdrop-blur-sm"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-[rgba(0,0,0,0.75)] backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative w-full max-w-lg rounded-[16px] flex flex-col
+      <div
+        className="relative w-full max-w-lg rounded-[16px] flex flex-col
         bg-[rgba(14,10,10,0.98)] border border-[rgba(65,50,50,0.50)]
-        shadow-[0_24px_60px_rgba(0,0,0,0.80)] overflow-hidden">
-
+        shadow-[0_24px_60px_rgba(0,0,0,0.80)] overflow-hidden"
+      >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-[rgba(65,50,50,0.35)]">
           <div className="flex items-center gap-3">
             <Zap size={18} className="text-[color:var(--accent)]" />
             <div>
-              <h2 className="text-base font-bold text-[color:var(--text-0)]">Choose a Demo Profile</h2>
+              <h2 className="text-base font-bold text-[color:var(--text-0)]">
+                Choose a Demo Profile
+              </h2>
               <p className="text-xs text-[color:var(--text-2)] mt-0.5">
                 Loads a pre-built plan so you can explore every feature
               </p>
@@ -189,7 +212,8 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
               className="p-3 rounded-lg text-xs border border-[color:color-mix(in_srgb,var(--accent)_32%,transparent)]
               bg-[rgba(16,16,16,0.78)] text-[color:var(--accent-light)]"
             >
-              <strong>Note:</strong> You already have data loaded. Selecting a demo profile will replace it.
+              <strong>Note:</strong> You already have data loaded. Selecting a demo profile will
+              replace it.
             </div>
           )}
 
@@ -199,7 +223,7 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
             </div>
           )}
 
-          {DEMO_PROFILES.map(profile => (
+          {DEMO_PROFILES.map((profile) => (
             <button
               key={profile.id}
               onClick={() => setSelected(profile.id)}
@@ -207,51 +231,85 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
                 'w-full text-left p-4 rounded-[12px] border transition-all duration-200',
                 selected === profile.id
                   ? 'is-selected'
-                  : 'border-[rgba(65,50,50,0.40)] bg-[rgba(18,14,14,0.60)] hover:border-[rgba(65,50,50,0.70)] hover:bg-[rgba(22,16,16,0.80)]'
+                  : 'border-[rgba(65,50,50,0.40)] bg-[rgba(18,14,14,0.60)] hover:border-[rgba(65,50,50,0.70)] hover:bg-[rgba(22,16,16,0.80)]',
               )}
             >
               <div className="flex items-start gap-3">
                 {/* Selection indicator */}
-                <div className={`mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-200
-                  ${selected === profile.id
-                    ? 'border-[color:var(--accent)] bg-[color:var(--accent)]'
-                    : 'border-[rgba(65,50,50,0.60)] bg-transparent'}`}>
-                  {selected === profile.id && <Check size={10} className="text-white" strokeWidth={3} />}
+                <div
+                  className={`mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-200
+                  ${
+                    selected === profile.id
+                      ? 'border-[color:var(--accent)] bg-[color:var(--accent)]'
+                      : 'border-[rgba(65,50,50,0.60)] bg-transparent'
+                  }`}
+                >
+                  {selected === profile.id && (
+                    <Check size={10} className="text-white" strokeWidth={3} />
+                  )}
                 </div>
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <span className="font-bold text-[color:var(--text-0)] text-sm">{profile.name}</span>
+                    <span className="font-bold text-[color:var(--text-0)] text-sm">
+                      {profile.name}
+                    </span>
                     <span className="text-xs text-[color:var(--text-2)]">
                       {profile.age} · {profile.sex} · {profile.level}
                     </span>
-                    <span className={`text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border ${profile.tagColor}`}>
+                    <span
+                      className={`text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border ${profile.tagColor}`}
+                    >
                       {profile.tag}
                     </span>
                   </div>
-                  <p className="text-xs font-semibold text-[color:var(--text-0)] mb-1">{profile.goal}</p>
-                  <p className="text-xs text-[color:var(--text-2)] leading-relaxed">{profile.description}</p>
+                  <p className="text-xs font-semibold text-[color:var(--text-0)] mb-1">
+                    {profile.goal}
+                  </p>
+                  <p className="text-xs text-[color:var(--text-2)] leading-relaxed">
+                    {profile.description}
+                  </p>
                   {selected === profile.id && (
                     <div className="mt-3 space-y-2 border-t border-[rgba(65,50,50,0.35)] pt-3">
                       <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">Lifestyle</p>
-                        <p className="text-xs text-[color:var(--text-1)] leading-relaxed">{profile.lifestyle}</p>
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">
+                          Lifestyle
+                        </p>
+                        <p className="text-xs text-[color:var(--text-1)] leading-relaxed">
+                          {profile.lifestyle}
+                        </p>
                       </div>
                       <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">Training History</p>
-                        <p className="text-xs text-[color:var(--text-1)] leading-relaxed">{profile.trainingHistory}</p>
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">
+                          Training History
+                        </p>
+                        <p className="text-xs text-[color:var(--text-1)] leading-relaxed">
+                          {profile.trainingHistory}
+                        </p>
                       </div>
                       <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">Genetics & Recovery</p>
-                        <p className="text-xs text-[color:var(--text-1)] leading-relaxed">{profile.geneticsNote}</p>
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">
+                          Genetics & Recovery
+                        </p>
+                        <p className="text-xs text-[color:var(--text-1)] leading-relaxed">
+                          {profile.geneticsNote}
+                        </p>
                       </div>
                       <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">Equipment & Resources</p>
-                        <p className="text-xs text-[color:var(--text-1)] leading-relaxed">{profile.equipment}</p>
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">
+                          Equipment & Resources
+                        </p>
+                        <p className="text-xs text-[color:var(--text-1)] leading-relaxed">
+                          {profile.equipment}
+                        </p>
                       </div>
                       <div>
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">Coach Summary</p>
-                        <p className="text-xs text-[color:var(--text-0)] leading-relaxed">{profile.coachNote}</p>
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">
+                          Coach Summary
+                        </p>
+                        <p className="text-xs text-[color:var(--text-0)] leading-relaxed">
+                          {profile.coachNote}
+                        </p>
                       </div>
                     </div>
                   )}
@@ -287,11 +345,17 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
               disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {done ? (
-              <><Check size={15} /> Loaded!</>
+              <>
+                <Check size={15} /> Loaded!
+              </>
             ) : loading ? (
-              <><Loader2 size={15} className="animate-spin" /> Loading…</>
+              <>
+                <Loader2 size={15} className="animate-spin" /> Loading…
+              </>
             ) : (
-              <><Zap size={15} /> Load Demo Data</>
+              <>
+                <Zap size={15} /> Load Demo Data
+              </>
             )}
           </button>
         </div>

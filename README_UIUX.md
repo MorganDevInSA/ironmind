@@ -1,6 +1,6 @@
 ## UI/UX Architecture
 
-> *Independent assessment by UI/UX consulting review — April 2026*
+> _Independent assessment by UI/UX consulting review — April 2026_
 
 IRONMIND's interface layer is not a Bootstrap template with a dark mode toggle. It is a
 design-engineered system built from first principles, implementing patterns found in
@@ -76,15 +76,17 @@ buttons to full-page loading. Skeleton loaders exist but spinners are the defaul
 
 ### Knight Rider LED Indicators
 
-The top bar features two synced LED bar indicators for readiness score and weight-to-target
-ratio. Each bar renders 10-12 segments with:
+The top bar now uses two **stacked** LED bars (readiness + target progress), positioned beside
+the alert bell. Each bar renders 10 segments with:
 
-- **Primary bar** (`--accent-light`): readiness score proportionally fills segments
-- **Secondary bar** (`--accent-2`): weight proximity to target
-- **Synced pulse**: `knight-pulse` keyframe with `brightness(1.5)` and `saturate(1.4)` at
-  peak, staggered 60ms per segment for the classic scanner sweep
-- **Hover tooltip**: slides down with readiness label (Peak/Primed/Solid/Moderate/Fatigued)
-  and weight status (On Target/Close/Cutting/Building)
+- **Primary bar**: readiness score
+- **Secondary bar**: target-range progress (`startWeight → targetWeight`, using latest check-in
+  weight first, profile weight fallback)
+- **Visible idle state**: unfilled LEDs keep a faint themed backlight so indicators never vanish
+- **Minimal data-visible state**: if data exists at 0%, at least one segment lights to signal
+  "valid metric, zero progress"
+- **Per-indicator detail panels**: each bar has its own hover/focus detail modal (no inline titles
+  or inline numeric labels in the header row)
 
 ### Atmospheric Design
 
@@ -97,6 +99,15 @@ reserved for icons, links, interactive elements, and micro-labels; readable cont
 uses the neutral text hierarchy (`--text-0`, `--text-1`, `--text-2`). These details are
 invisible individually but collectively produce the "this feels expensive" perception that
 separates polished products from functional ones.
+
+### Data Visualization Fill Rule
+
+Dashboard and recovery indicators/charts now share a strict fill language:
+
+- **Filled portion only** receives accent gradation (light -> darker)
+- **Empty portion** remains neutral (`--surface-track`) with no accent tint
+- Use one gradient family per view to reduce cognitive noise and improve scan speed
+- Avoid endpoint marker clutter on progress bars unless a marker communicates a distinct threshold
 
 ### Motion Design
 

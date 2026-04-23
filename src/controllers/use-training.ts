@@ -1,6 +1,6 @@
 'use client';
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { queryKeys, staleTimes } from '@/lib/constants';
 import {
   getPrograms,
@@ -12,9 +12,17 @@ import {
   saveWorkout,
   deleteWorkout,
   getRecentWorkouts,
+  applyWorkoutSetChange,
+  deleteCurrentWeekVolumeRollup,
 } from '@/services';
 import type { Workout } from '@/lib/types';
 import { onMutationError } from './_shared/on-error';
+import { invalidateDashboardBundle } from './_shared/invalidate-dashboard';
+
+function invalidateVolumeAfterWorkoutWrite(queryClient: QueryClient, userId: string) {
+  void deleteCurrentWeekVolumeRollup(userId).catch(() => {});
+  void queryClient.invalidateQueries({ queryKey: queryKeys(userId).volume.all });
+}
 
 // Programs
 export function usePrograms(userId: string) {
@@ -71,6 +79,8 @@ export function useCreateWorkout(userId: string) {
     mutationFn: (workout: Omit<Workout, 'id'>) => createWorkout(userId, workout),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys(userId).training.all });
+      invalidateVolumeAfterWorkoutWrite(queryClient, userId);
+      invalidateDashboardBundle(queryClient, userId);
     },
     onError: onMutationError,
   });
@@ -85,6 +95,8 @@ export function useUpdateWorkout(userId: string) {
     onSuccess: (_, { workoutId }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys(userId).training.workout(workoutId) });
       queryClient.invalidateQueries({ queryKey: queryKeys(userId).training.all });
+      invalidateVolumeAfterWorkoutWrite(queryClient, userId);
+      invalidateDashboardBundle(queryClient, userId);
     },
     onError: onMutationError,
   });
@@ -97,6 +109,8 @@ export function useSaveWorkout(userId: string) {
     mutationFn: (workout: Workout) => saveWorkout(userId, workout),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys(userId).training.all });
+      invalidateVolumeAfterWorkoutWrite(queryClient, userId);
+      invalidateDashboardBundle(queryClient, userId);
     },
     onError: onMutationError,
   });
@@ -109,6 +123,8 @@ export function useDeleteWorkout(userId: string) {
     mutationFn: (workoutId: string) => deleteWorkout(userId, workoutId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys(userId).training.all });
+      invalidateVolumeAfterWorkoutWrite(queryClient, userId);
+      invalidateDashboardBundle(queryClient, userId);
     },
     onError: onMutationError,
   });
@@ -131,9 +147,12 @@ export function useSaveSet(userId: string, workoutId: string) {
       const workout = await getWorkout(userId, workoutId);
       if (!workout) throw new Error('Workout not found');
 
-      workout.exercises[exerciseIndex].sets[setIndex] = set;
-      await saveWorkout(userId, workout);
-      return workout;
+      return applyWorkoutSetChange(userId, workoutId, {
+        exerciseIndex,
+        setIndex,
+        set,
+        baseUpdatedAt: workout.updatedAt,
+      });
     },
     onMutate: async ({ exerciseIndex, setIndex, set }) => {
       const qk = queryKeys(userId).training.workout(workoutId);
@@ -169,6 +188,8 @@ export function useSaveSet(userId: string, workoutId: string) {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys(userId).training.workout(workoutId) });
+      invalidateVolumeAfterWorkoutWrite(queryClient, userId);
+      invalidateDashboardBundle(queryClient, userId);
     },
   });
 }

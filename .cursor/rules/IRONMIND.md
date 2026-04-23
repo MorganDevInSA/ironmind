@@ -53,6 +53,7 @@ Pages/Components  →  Controllers (use-*.ts)  →  Services (*.service.ts)  →
 - Use `color-mix()` for opacity: `color-mix(in srgb, var(--accent) 20%, transparent)`
 - Never hardcode accent hex values (`#DC2626`, etc.)
 - Native `<input type="checkbox">` and `<input type="radio">` are globally themed via `accent-color: var(--accent)` in globals.css
+- Progress visuals (bars/sliders) must use **filled-only accent gradients** and neutral empty tracks
 - NEVER use Tailwind's `text-accent`, `bg-accent`, `border-accent`, `focus:border-accent` utilities — they resolve to hardcoded hex from `tailwind.config.js` and bypass the CSS variable theme system. Use `text-[color:var(--accent)]` etc. instead.
 
 ### Numbers Are Monospace
@@ -69,7 +70,7 @@ Every numeric data value in the UI uses `font-mono tabular-nums`. No exceptions.
 - Phase/milestone badges
 - Key interactive elements (links, toggles, checkmarks)
 - Page h1 titles (branded identity)
-- LED readiness/weight indicators in the top bar
+- Stacked LED readiness/target indicators in the top bar (indicator-specific hover/focus detail panels)
 - Icons (visual markers, not readable text)
 - Micro-labels (step numbers, "Step X of 6" — 10px uppercase metadata)
 
@@ -134,6 +135,8 @@ Verify:
 - [ ] All links point to existing routes
 - [ ] All buttons have handlers
 - [ ] Mobile layout works at 375px
+- [ ] Chart axis ticks are readable and use valid token values (`var(--text-2)`, not invalid CSS strings)
+- [ ] Multi-series charts only render legends/lines for series with actual data
 
 For any infrastructure/deploy change, also verify:
 
