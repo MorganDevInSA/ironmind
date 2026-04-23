@@ -4,7 +4,16 @@ import type { Measurements } from '@/lib/types';
 const CM_BOUNDS: Record<
   keyof Pick<
     Measurements,
-    'waist' | 'chest' | 'hips' | 'leftArm' | 'rightArm' | 'leftThigh' | 'rightThigh' | 'shoulders'
+    | 'waist'
+    | 'chest'
+    | 'hips'
+    | 'leftArm'
+    | 'rightArm'
+    | 'leftThigh'
+    | 'rightThigh'
+    | 'shoulders'
+    | 'leftCalf'
+    | 'rightCalf'
   >,
   { min: number; max: number }
 > = {
@@ -16,6 +25,8 @@ const CM_BOUNDS: Record<
   leftThigh: { min: 34, max: 95 },
   rightThigh: { min: 34, max: 95 },
   shoulders: { min: 70, max: 165 },
+  leftCalf: { min: 20, max: 58 },
+  rightCalf: { min: 20, max: 58 },
 };
 
 function toFiniteNumber(value: unknown): number | undefined {

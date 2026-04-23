@@ -226,10 +226,13 @@ export default function PhysiquePage() {
     waist: '',
     chest: '',
     hips: '',
+    shoulders: '',
     leftArm: '',
     rightArm: '',
     leftThigh: '',
     rightThigh: '',
+    leftCalf: '',
+    rightCalf: '',
     coachNotes: '',
   });
 
@@ -247,10 +250,13 @@ export default function PhysiquePage() {
           waist: form.waist ? parseFloat(form.waist) : undefined,
           chest: form.chest ? parseFloat(form.chest) : undefined,
           hips: form.hips ? parseFloat(form.hips) : undefined,
+          shoulders: form.shoulders ? parseFloat(form.shoulders) : undefined,
           leftArm: form.leftArm ? parseFloat(form.leftArm) : undefined,
           rightArm: form.rightArm ? parseFloat(form.rightArm) : undefined,
           leftThigh: form.leftThigh ? parseFloat(form.leftThigh) : undefined,
           rightThigh: form.rightThigh ? parseFloat(form.rightThigh) : undefined,
+          leftCalf: form.leftCalf ? parseFloat(form.leftCalf) : undefined,
+          rightCalf: form.rightCalf ? parseFloat(form.rightCalf) : undefined,
         }),
         photoUrls: [],
         conditioningScore: 0,
@@ -455,6 +461,24 @@ export default function PhysiquePage() {
                 label="R Thigh"
                 value={form.rightThigh}
                 onChange={(v) => setForm((f) => ({ ...f, rightThigh: v }))}
+                unit="cm"
+              />
+              <Field
+                label="Shoulders"
+                value={form.shoulders}
+                onChange={(v) => setForm((f) => ({ ...f, shoulders: v }))}
+                unit="cm"
+              />
+              <Field
+                label="L Calf"
+                value={form.leftCalf}
+                onChange={(v) => setForm((f) => ({ ...f, leftCalf: v }))}
+                unit="cm"
+              />
+              <Field
+                label="R Calf"
+                value={form.rightCalf}
+                onChange={(v) => setForm((f) => ({ ...f, rightCalf: v }))}
                 unit="cm"
               />
             </div>
