@@ -27,10 +27,10 @@ interface StepQuestionnaireProps {
 // ─── helpers ────────────────────────────────────────────────────────────────
 
 const inputCls = `w-full px-4 py-3 rounded-lg
-  bg-[#131313] border border-[rgba(65,50,50,0.40)]
+  bg-[color:var(--bg-2)] border border-[color:var(--chrome-border)]
   text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)]
-  focus:border-[rgba(220,38,38,0.50)]
-  focus:shadow-[0_0_0_3px_rgba(220,38,38,0.10)]
+  focus:border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]
+  focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--accent)_10%,transparent)]
   focus:outline-none transition-all duration-200 text-sm`;
 
 const labelCls =
@@ -51,7 +51,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
       <h3 className="text-sm font-bold uppercase tracking-[0.25em] text-[color:var(--text-0)]">
         {children}
       </h3>
-      <div className="flex-1 h-px bg-[rgba(220,38,38,0.20)]" />
+      <div className="flex-1 h-px bg-[color:color-mix(in_srgb,var(--accent)_20%,transparent)]" />
     </div>
   );
 }
@@ -906,7 +906,7 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
           onClick={downloadJson}
           className="flex items-center gap-2 px-5 py-3 rounded-lg font-semibold text-white text-sm
             bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-2)] border border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]
-            shadow-[0_8px_20px_rgba(220,38,38,0.22)]
+            shadow-[0_8px_20px_color-mix(in_srgb,var(--accent)_22%,transparent)]
             hover:brightness-110 active:scale-95 transition-all duration-200"
         >
           {copied ? <Check size={16} /> : <Download size={16} />}
@@ -937,7 +937,7 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
           disabled={!downloaded}
           className="flex items-center gap-2 px-6 py-2.5 rounded-lg font-semibold text-sm text-white
             bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-2)] border border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]
-            shadow-[0_8px_20px_rgba(220,38,38,0.22)]
+            shadow-[0_8px_20px_color-mix(in_srgb,var(--accent)_22%,transparent)]
             hover:brightness-110 active:scale-95 transition-all duration-200
             disabled:opacity-40 disabled:cursor-not-allowed"
         >

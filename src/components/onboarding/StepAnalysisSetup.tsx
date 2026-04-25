@@ -38,8 +38,10 @@ export function StepAnalysisSetup({ onNext, onBack }: StepAnalysisSetupProps) {
       </div>
 
       {/* Analysis prompt block */}
-      <div className="rounded-[14px] p-5 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)]
-        shadow-[0_10px_24px_rgba(0,0,0,0.45)]">
+      <div
+        className="rounded-[14px] p-5 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)]
+        shadow-[0_10px_24px_rgba(0,0,0,0.45)]"
+      >
         <PromptBlock
           text={ANALYSIS_PROMPT}
           filename="04-coach-analysis-from-export-or-screenshots.md"
@@ -48,8 +50,10 @@ export function StepAnalysisSetup({ onNext, onBack }: StepAnalysisSetupProps) {
       </div>
 
       {/* How to use */}
-      <div className="rounded-[14px] p-5 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)]
-        shadow-[0_10px_24px_rgba(0,0,0,0.45)] flex flex-col gap-3">
+      <div
+        className="rounded-[14px] p-5 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)]
+        shadow-[0_10px_24px_rgba(0,0,0,0.45)] flex flex-col gap-3"
+      >
         <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[color:var(--text-2)]">
           How to use it
         </p>
@@ -61,9 +65,11 @@ export function StepAnalysisSetup({ onNext, onBack }: StepAnalysisSetupProps) {
             'The AI will analyse your training history, nutrition, physique trends, and recovery — then give you specific coaching actions',
           ].map((text, i) => (
             <li key={i} className="flex items-start gap-4">
-              <span className="mt-0.5 w-6 h-6 shrink-0 rounded-full flex items-center justify-center
+              <span
+                className="mt-0.5 w-6 h-6 shrink-0 rounded-full flex items-center justify-center
                 text-[10px] font-bold bg-[rgba(16,16,16,0.78)] border border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)]
-                text-[color:var(--accent-light)]">
+                text-[color:var(--accent-light)]"
+              >
                 0{i + 1}
               </span>
               <p className="text-sm text-[color:var(--text-0)] leading-relaxed">{text}</p>
@@ -73,15 +79,18 @@ export function StepAnalysisSetup({ onNext, onBack }: StepAnalysisSetupProps) {
       </div>
 
       {/* Context retention panel */}
-      <div className="rounded-[14px] p-5 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)]
-        shadow-[0_10px_24px_rgba(0,0,0,0.45)] flex flex-col gap-4">
+      <div
+        className="rounded-[14px] p-5 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)]
+        shadow-[0_10px_24px_rgba(0,0,0,0.45)] flex flex-col gap-4"
+      >
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[color:var(--text-2)] mb-1">
             Keeping Chat Context
           </p>
           <p className="text-sm text-[color:var(--text-1)]">
             When returning to an existing AI chat thread, use this prompt to restore continuity.
-            Paste your IRONMIND export where indicated so the coach picks up exactly where it left off.
+            Paste your IRONMIND export where indicated so the coach picks up exactly where it left
+            off.
           </p>
         </div>
 
@@ -98,7 +107,7 @@ export function StepAnalysisSetup({ onNext, onBack }: StepAnalysisSetupProps) {
           onClick={handleCopyContext}
           className="self-start flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm text-white
             bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-2)] border border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]
-            shadow-[0_8px_20px_rgba(220,38,38,0.22)]
+            shadow-[0_8px_20px_color-mix(in_srgb,var(--accent)_22%,transparent)]
             hover:brightness-110 active:scale-95 transition-all duration-200"
         >
           {copiedContext ? <Check size={15} /> : <Copy size={15} />}
@@ -123,7 +132,7 @@ export function StepAnalysisSetup({ onNext, onBack }: StepAnalysisSetupProps) {
           onClick={onNext}
           className="flex items-center gap-2 px-6 py-2.5 rounded-lg font-semibold text-sm text-white
             bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-2)] border border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]
-            shadow-[0_8px_20px_rgba(220,38,38,0.22)]
+            shadow-[0_8px_20px_color-mix(in_srgb,var(--accent)_22%,transparent)]
             hover:brightness-110 active:scale-95 transition-all duration-200"
         >
           Ready to Import My Files

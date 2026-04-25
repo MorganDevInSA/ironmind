@@ -141,7 +141,8 @@ function Callout({
       'border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)] bg-[rgba(16,16,16,0.78)] text-[color:var(--accent-light)]',
     crimson:
       'border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)] bg-[rgba(16,16,16,0.78)] text-[color:var(--accent-light)]',
-    green: 'border-[rgba(34,197,94,0.30)] bg-[rgba(16,16,16,0.78)] text-[#22C55E]',
+    green:
+      'border-[color:color-mix(in_srgb,var(--good)_30%,transparent)] bg-[color:var(--surface-track)] text-[color:var(--good)]',
   };
   return (
     <div className={`flex items-start gap-3 p-4 rounded-lg border ${palette[color]}`}>
@@ -584,7 +585,7 @@ export default function GuidePage() {
           href="/dashboard"
           className="flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm text-[color:var(--text-1)]
             bg-[rgba(22,16,16,0.9)] border border-[rgba(65,50,50,0.45)]
-            hover:border-[rgba(220,38,38,0.45)] hover:text-[color:var(--text-0)]
+            hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]
             active:scale-95 transition-all duration-200"
         >
           Back to Dashboard

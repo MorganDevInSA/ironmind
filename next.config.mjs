@@ -11,8 +11,6 @@ const nextConfig = {
       },
     ],
   },
-  // Ensure trailing slashes for Firebase hosting compatibility
-  trailingSlash: true,
 };
 
 export default nextConfig;

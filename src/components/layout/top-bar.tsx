@@ -167,7 +167,7 @@ export function TopBar() {
       <div className="flex items-center gap-3 min-w-0">
         <Link
           href="/dashboard"
-          className="lg:hidden shrink-0 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent)]/55 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d0d0d]"
+          className="lg:hidden shrink-0 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--accent)]/55 focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--bg-1)]"
           aria-label="IRONMIND home"
         >
           <IronmindLogo variant="topbar" priority />
@@ -199,9 +199,9 @@ export function TopBar() {
 
         {/* Offline indicator */}
         {!isOnline && (
-          <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-[rgba(245,158,11,0.12)] border border-[rgba(245,158,11,0.35)]">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#F59E0B] animate-pulse" />
-            <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#F59E0B]">
+          <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-[color:color-mix(in_srgb,var(--warn)_12%,transparent)] border border-[color:color-mix(in_srgb,var(--warn)_35%,transparent)]">
+            <div className="w-1.5 h-1.5 rounded-full bg-[color:var(--warn)] animate-pulse" />
+            <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[color:var(--warn)]">
               Offline
             </span>
           </div>
@@ -350,7 +350,7 @@ export function TopBar() {
             aria-label={`Alerts, ${alertCount} active`}
             aria-expanded={alertsOpen}
             className={cn(
-              'relative p-2 rounded-lg transition-colors duration-200 hover:bg-[rgba(0,0,0,0.35)]',
+              'relative p-2 rounded-lg transition-colors duration-200 hover:bg-[color:var(--surface-track)]',
               alertCount > 0
                 ? 'text-[color:var(--accent)] hover:text-[color:var(--accent-light)]'
                 : 'text-[color:color-mix(in_srgb,var(--accent)_38%,var(--text-2)))] hover:text-[color:color-mix(in_srgb,var(--accent)_48%,var(--text-1)))]',
@@ -376,7 +376,7 @@ export function TopBar() {
 
           {alertsOpen && (
             <div className="absolute right-0 top-full mt-2 w-80 glass-panel z-50 overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-[rgba(65,50,50,0.28)]">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-[color:var(--chrome-border-subtle)]">
                 <span className="text-sm font-semibold text-[color:var(--text-0)]">Alerts</span>
                 <button
                   type="button"
@@ -387,7 +387,7 @@ export function TopBar() {
                   <X size={16} aria-hidden="true" />
                 </button>
               </div>
-              <div className="max-h-64 overflow-y-auto divide-y divide-[rgba(65,50,50,0.18)]">
+              <div className="max-h-64 overflow-y-auto divide-y divide-[color:var(--chrome-border-subtle)]">
                 {visibleAlerts.length === 0 ? (
                   <div className="px-4 py-5 text-center text-xs text-[color:var(--text-2)] leading-relaxed">
                     {serverAlerts.length > 0
@@ -411,7 +411,7 @@ export function TopBar() {
                       ) : alert.severity === 'warning' ? (
                         <AlertTriangle
                           size={16}
-                          className="text-[#F59E0B] shrink-0 mt-0.5"
+                          className="text-[color:var(--warn)] shrink-0 mt-0.5"
                           aria-hidden
                         />
                       ) : (

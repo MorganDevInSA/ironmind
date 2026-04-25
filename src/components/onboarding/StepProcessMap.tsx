@@ -85,8 +85,8 @@ export function StepProcessMap({ onNext }: StepProcessMapProps) {
                     {/* Number badge */}
                     <div
                       className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold
-                      bg-[rgba(220,38,38,0.15)] border border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)] text-[color:var(--accent-light)]
-                      [text-shadow:0_0_8px_rgba(220,38,38,0.4)]"
+                      bg-[color:color-mix(in_srgb,var(--accent)_15%,transparent)] border border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)] text-[color:var(--accent-light)]
+                      [text-shadow:0_0_8px_color-mix(in_srgb,var(--accent)_40%,transparent)]"
                     >
                       {node.number}
                     </div>
@@ -104,7 +104,7 @@ export function StepProcessMap({ onNext }: StepProcessMapProps) {
                     <div className="flex items-center justify-center shrink-0 px-1">
                       <ArrowRight
                         size={16}
-                        className="text-[rgba(220,38,38,0.50)]"
+                        className="text-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]"
                         strokeDasharray="4 3"
                       />
                     </div>

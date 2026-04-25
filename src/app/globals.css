@@ -516,6 +516,10 @@ h4 {
   /* --- Buttons ----------------------------------------------- */
 
   .btn-primary {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
     padding: 0.75rem 1.5rem;
     border-radius: 0.5rem;
     font-weight: 600;
@@ -538,6 +542,10 @@ h4 {
   }
 
   .btn-secondary {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
     padding: 0.75rem 1.5rem;
     border-radius: 0.5rem;
     font-weight: 600;
@@ -558,6 +566,10 @@ h4 {
 
   /* btn-gold is now crimson CTA */
   .btn-gold {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
     padding: 0.75rem 1.5rem;
     border-radius: 0.5rem;
     font-weight: 600;
@@ -580,6 +592,10 @@ h4 {
   }
 
   .btn-ghost {
+    display: inline-flex;
+    min-height: 2.5rem;
+    align-items: center;
+    justify-content: center;
     padding: 0.5rem 1rem;
     border-radius: 0.5rem;
     font-weight: 500;
@@ -646,7 +662,7 @@ h4 {
     font-family: 'Cinzel', serif;
     font-weight: 800;
     letter-spacing: 0.1em;
-    color: #ef4444;
+    color: var(--accent-light);
     text-shadow:
       0 1px 0 color-mix(in srgb, var(--accent-light) 80%, transparent),
       0 2px 0 color-mix(in srgb, var(--accent) 70%, transparent),
@@ -715,6 +731,11 @@ h4 {
     color: var(--crimson-light);
     border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
     text-shadow: 0 0 8px color-mix(in srgb, var(--accent) 40%, transparent);
+  }
+
+  /* Inline metrics (e.g. workout row volume) — use theme accent, not tailwind `warning` / amber */
+  .text-theme-accent {
+    color: var(--accent);
   }
 
   /* --- Accent border-left (alert/coaching cards) ------------ */
@@ -1048,6 +1069,7 @@ h4 {
   /* --- Tab button ------------------------------------------- */
 
   .tab-button {
+    min-height: 2.75rem;
     padding: 0.75rem 1.5rem;
     font-weight: 600;
     border-bottom: 2px solid transparent;
@@ -1082,6 +1104,37 @@ h4 {
     stroke: rgba(239, 68, 68, 0.9) !important;
     stroke-width: 1.8 !important;
     filter: drop-shadow(0 0 4px color-mix(in srgb, var(--accent) 50%, transparent));
+  }
+}
+
+/* Mobile chrome keeps controls above gesture bars while preserving the 64px visual rail. */
+.mobile-nav-bar {
+  min-height: calc(4rem + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.mobile-more-sheet {
+  bottom: calc(4rem + env(safe-area-inset-bottom));
+}
+
+/* Compact segmented/date controls still need forgiving touch geometry on coarse pointers. */
+@media (pointer: coarse) {
+  button,
+  [role='button'],
+  input,
+  select,
+  textarea {
+    min-height: 2.75rem;
+  }
+
+  input[type='checkbox'],
+  input[type='radio'] {
+    min-height: auto;
+  }
+
+  .data-table button,
+  .data-table [role='button'] {
+    min-height: 2.5rem;
   }
 }
 

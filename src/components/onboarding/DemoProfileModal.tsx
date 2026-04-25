@@ -70,7 +70,8 @@ const DEMO_PROFILES: DemoProfile[] = [
     description:
       'Structured reduction phase with adherence-first planning and repeatable meal architecture.',
     tag: 'Foundation cut',
-    tagColor: 'text-[#F59E0B] bg-[rgba(245,158,11,0.12)] border-[rgba(245,158,11,0.35)]',
+    tagColor:
+      'text-[color:var(--warn)] bg-[color:color-mix(in_srgb,var(--warn)_12%,transparent)] border-[color:color-mix(in_srgb,var(--warn)_35%,transparent)]',
     lifestyle:
       'Up at 06:00 in winter (South Africa), office workload 07:00–18:00 with compressed daytime eating windows.',
     trainingHistory:
@@ -91,7 +92,8 @@ const DEMO_PROFILES: DemoProfile[] = [
     description:
       'Intermediate mass-and-strength block with high compliance and measurable progression markers.',
     tag: 'Hypertrophy',
-    tagColor: 'text-[#22C55E] bg-[rgba(34,197,94,0.12)] border-[rgba(34,197,94,0.35)]',
+    tagColor:
+      'text-[color:var(--good)] bg-[color:color-mix(in_srgb,var(--good)_12%,transparent)] border-[color:color-mix(in_srgb,var(--good)_35%,transparent)]',
     lifestyle:
       'Office-based schedule with regular commute and stable sleep routine during weekdays.',
     trainingHistory:
@@ -133,7 +135,8 @@ const DEMO_PROFILES: DemoProfile[] = [
     description:
       'Champion bodyboarder rebuilding size on a fast metabolism: early-morning commercial gym work, high cardio base, surgical shoulder history with hardware.',
     tag: 'Athlete rebuild',
-    tagColor: 'text-[#38BDF8] bg-[rgba(56,189,248,0.10)] border-[rgba(56,189,248,0.38)]',
+    tagColor:
+      'text-[color:var(--accent-light)] bg-[color:color-mix(in_srgb,var(--accent)_10%,transparent)] border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)]',
     lifestyle:
       'Full-time job, trains before work, no alcohol or smoking, sleeps well and prioritises whole-food vegan fueling.',
     trainingHistory:
@@ -154,7 +157,8 @@ const DEMO_PROFILES: DemoProfile[] = [
     description:
       'Home-based mom with pool and hill stairs, no traditional gym; custody schedule drives either three straight training days or short kid-friendly sessions.',
     tag: 'Home + pool',
-    tagColor: 'text-[#A78BFA] bg-[rgba(167,139,250,0.10)] border-[rgba(167,139,250,0.38)]',
+    tagColor:
+      'text-[color:var(--accent-light)] bg-[color:color-mix(in_srgb,var(--accent)_10%,transparent)] border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)]',
     lifestyle:
       'Works from home, medium stress, social drinking and occasional smoking; nutrition stays relaxed but protein-conscious on busy weeks.',
     trainingHistory:
@@ -274,7 +278,7 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
           )}
 
           {error && (
-            <div className="p-3 rounded-lg text-xs border border-[rgba(239,68,68,0.30)] bg-[rgba(239,68,68,0.06)] text-[color:var(--accent-light)]">
+            <div className="p-3 rounded-lg text-xs border border-[color:color-mix(in_srgb,var(--bad)_30%,transparent)] bg-[color:color-mix(in_srgb,var(--bad)_6%,transparent)] text-[color:var(--bad)]">
               {error}
             </div>
           )}

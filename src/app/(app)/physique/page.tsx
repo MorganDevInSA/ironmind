@@ -225,7 +225,7 @@ function Field({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="w-full bg-[rgba(18,14,14,0.6)] border border-[rgba(65,50,50,0.25)] rounded-lg p-3 text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color-mix(in srgb,var(--accent) 40%,transparent0.4)] pr-12"
+          className="w-full bg-[color:var(--surface-track)] border border-[color:var(--chrome-border-subtle)] rounded-lg p-3 text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color:color-mix(in_srgb,var(--accent)_40%,transparent)] pr-12"
         />
         {unit && (
           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[color:var(--text-2)]">
@@ -427,7 +427,7 @@ export default function PhysiquePage() {
           )}
 
           {isError && (
-            <div className="rounded-lg border border-[rgba(239,68,68,0.45)] bg-[rgba(239,68,68,0.08)] px-3 py-2 text-sm text-[#FECACA] flex flex-col gap-2">
+            <div className="rounded-lg border border-[color:color-mix(in_srgb,var(--bad)_45%,transparent)] bg-[color:color-mix(in_srgb,var(--bad)_8%,transparent)] px-3 py-2 text-sm text-[color:color-mix(in_srgb,var(--bad)_42%,white)] flex flex-col gap-2">
               <p>
                 {error instanceof Error ? error.message : 'Could not save check-in. Try again.'}
               </p>
@@ -526,7 +526,7 @@ export default function PhysiquePage() {
               onChange={(e) => setForm((f) => ({ ...f, coachNotes: e.target.value }))}
               placeholder="How do you look? Any visible changes or comments for your coach AI?"
               rows={3}
-              className="w-full bg-[rgba(18,14,14,0.6)] border border-[rgba(65,50,50,0.25)] rounded-lg p-3 text-sm text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color-mix(in srgb,var(--accent) 40%,transparent0.4)] resize-none"
+              className="w-full bg-[color:var(--surface-track)] border border-[color:var(--chrome-border-subtle)] rounded-lg p-3 text-sm text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color:color-mix(in_srgb,var(--accent)_40%,transparent)] resize-none"
             />
           </div>
 
@@ -535,14 +535,14 @@ export default function PhysiquePage() {
               <label className="text-sm font-medium text-[color:var(--text-1)]">
                 Progress photos (optional)
               </label>
-              <label className="flex items-center gap-3 p-3 rounded-lg border border-[rgba(65,50,50,0.25)] bg-[rgba(18,14,14,0.6)] cursor-pointer hover:border-[color:color-mix(in_srgb,var(--accent)_40%,transparent)] transition-colors">
+              <label className="flex items-center gap-3 p-3 rounded-lg border border-[color:var(--chrome-border-subtle)] bg-[color:var(--surface-track)] cursor-pointer hover:border-[color:color-mix(in_srgb,var(--accent)_40%,transparent)] transition-colors">
                 <Camera size={16} className="text-[color:var(--accent)] shrink-0" />
                 <span className="text-sm text-[color:var(--text-1)]">Tap to add a photo</span>
                 <input type="file" accept="image/*" capture="environment" className="sr-only" />
               </label>
             </div>
           ) : (
-            <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg border border-[rgba(65,50,50,0.15)] bg-[rgba(18,14,14,0.4)]">
+            <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg border border-[color:var(--chrome-border-subtle)] bg-[color:var(--surface-well)]">
               <Camera size={14} className="text-[color:var(--text-2)] shrink-0" />
               <span className="text-xs text-[color:var(--text-2)]">
                 Progress photos — coming soon

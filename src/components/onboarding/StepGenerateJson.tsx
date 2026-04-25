@@ -8,19 +8,25 @@ interface StepGenerateJsonProps {
 }
 
 const EXPECTED_FILES = [
-  { name: 'athlete_profile.json',     description: 'Age, weight, goals, injury constraints' },
-  { name: 'training_program.json',    description: '14-day rotating cycle with all exercises' },
-  { name: 'nutrition_plan.json',      description: 'Macro targets by day type + meal schedule' },
+  { name: 'athlete_profile.json', description: 'Age, weight, goals, injury constraints' },
+  { name: 'training_program.json', description: '14-day rotating cycle with all exercises' },
+  { name: 'nutrition_plan.json', description: 'Macro targets by day type + meal schedule' },
   { name: 'supplement_protocol.json', description: 'Supplement windows and timing' },
-  { name: 'phase.json',               description: 'Training phase with targets and strategy' },
-  { name: 'volume_landmarks.json',    description: 'MEV / MAV / MRV per muscle group' },
+  { name: 'phase.json', description: 'Training phase with targets and strategy' },
+  { name: 'volume_landmarks.json', description: 'MEV / MAV / MRV per muscle group' },
 ];
 
 const instructions = [
   { num: '01', text: 'Go back to the same AI chat where you activated the coach persona (Step 2)' },
   { num: '02', text: 'Click Copy to Clipboard below and paste the data-generation prompt' },
-  { num: '03', text: 'Then paste or type your questionnaire JSON from Step 2 at the bottom where instructed' },
-  { num: '04', text: 'The AI will output 6 JSON files — save each with the exact filename shown in the reference panel below' },
+  {
+    num: '03',
+    text: 'Then paste or type your questionnaire JSON from Step 2 at the bottom where instructed',
+  },
+  {
+    num: '04',
+    text: 'The AI will output 6 JSON files — save each with the exact filename shown in the reference panel below',
+  },
 ];
 
 export function StepGenerateJson({ onNext, onBack }: StepGenerateJsonProps) {
@@ -35,22 +41,26 @@ export function StepGenerateJson({ onNext, onBack }: StepGenerateJsonProps) {
           Generate Your Data Pack
         </h2>
         <p className="mt-2 text-sm text-[color:var(--text-1)]">
-          Paste this prompt into the same AI chat as Step 1, then add your questionnaire JSON.
-          The AI will output 6 files that fully populate your IRONMIND app.
+          Paste this prompt into the same AI chat as Step 1, then add your questionnaire JSON. The
+          AI will output 6 files that fully populate your IRONMIND app.
         </p>
       </div>
 
       {/* Instruction steps */}
-      <div className="rounded-[14px] p-5 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)]
-        shadow-[0_10px_24px_rgba(0,0,0,0.45)] flex flex-col gap-4">
+      <div
+        className="rounded-[14px] p-5 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)]
+        shadow-[0_10px_24px_rgba(0,0,0,0.45)] flex flex-col gap-4"
+      >
         <div className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[color:var(--text-2)]">
           Instructions
         </div>
-        {instructions.map(step => (
+        {instructions.map((step) => (
           <div key={step.num} className="flex items-start gap-4">
-            <span className="mt-0.5 w-6 h-6 shrink-0 rounded-full flex items-center justify-center
+            <span
+              className="mt-0.5 w-6 h-6 shrink-0 rounded-full flex items-center justify-center
               text-[10px] font-bold bg-[rgba(16,16,16,0.78)] border border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)]
-              text-[color:var(--accent-light)]">
+              text-[color:var(--accent-light)]"
+            >
               {step.num}
             </span>
             <p className="text-sm text-[color:var(--text-0)] leading-relaxed">{step.text}</p>
@@ -59,8 +69,10 @@ export function StepGenerateJson({ onNext, onBack }: StepGenerateJsonProps) {
       </div>
 
       {/* Prompt block */}
-      <div className="rounded-[14px] p-5 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)]
-        shadow-[0_10px_24px_rgba(0,0,0,0.45)]">
+      <div
+        className="rounded-[14px] p-5 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)]
+        shadow-[0_10px_24px_rgba(0,0,0,0.45)]"
+      >
         <PromptBlock
           text={JSON_GENERATION_PROMPT}
           filename="03-json-pack-generation-prompt.md"
@@ -69,18 +81,25 @@ export function StepGenerateJson({ onNext, onBack }: StepGenerateJsonProps) {
       </div>
 
       {/* Expected file reference panel */}
-      <div className="rounded-[14px] p-5 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)]
-        shadow-[0_10px_24px_rgba(0,0,0,0.45)]">
+      <div
+        className="rounded-[14px] p-5 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)]
+        shadow-[0_10px_24px_rgba(0,0,0,0.45)]"
+      >
         <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[color:var(--text-2)] mb-4">
           6 Files the AI Will Output — Save With These Exact Filenames
         </p>
         <div className="flex flex-col gap-2">
-          {EXPECTED_FILES.map(file => (
-            <div key={file.name} className="flex items-start gap-3 p-3 rounded-lg
-              bg-[rgba(8,8,8,0.7)] border border-[rgba(65,50,50,0.30)]">
+          {EXPECTED_FILES.map((file) => (
+            <div
+              key={file.name}
+              className="flex items-start gap-3 p-3 rounded-lg
+              bg-[rgba(8,8,8,0.7)] border border-[rgba(65,50,50,0.30)]"
+            >
               <FileJson size={16} className="text-[color:var(--accent)] mt-0.5 shrink-0" />
               <div>
-                <p className="text-sm font-mono font-semibold text-[color:var(--text-0)]">{file.name}</p>
+                <p className="text-sm font-mono font-semibold text-[color:var(--text-0)]">
+                  {file.name}
+                </p>
                 <p className="text-xs text-[color:var(--text-2)]">{file.description}</p>
               </div>
             </div>
@@ -105,7 +124,7 @@ export function StepGenerateJson({ onNext, onBack }: StepGenerateJsonProps) {
           onClick={onNext}
           className="flex items-center gap-2 px-6 py-2.5 rounded-lg font-semibold text-sm text-white
             bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-2)] border border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]
-            shadow-[0_8px_20px_rgba(220,38,38,0.22)]
+            shadow-[0_8px_20px_color-mix(in_srgb,var(--accent)_22%,transparent)]
             hover:brightness-110 active:scale-95 transition-all duration-200"
         >
           I Have My 6 JSON Files

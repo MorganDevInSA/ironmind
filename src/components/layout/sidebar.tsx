@@ -20,15 +20,15 @@ import { cn } from '@/lib/utils';
 import { IronmindLogo } from '@/components/brand/ironmind-logo';
 
 const navItems = [
-  { href: '/dashboard',    label: 'Dashboard',   icon: LayoutDashboard },
-  { href: '/training',     label: 'Training',     icon: Dumbbell },
-  { href: '/nutrition',    label: 'Nutrition',    icon: Utensils },
-  { href: '/supplements',  label: 'Supplements',  icon: Pill },
-  { href: '/recovery',     label: 'Recovery',     icon: Activity },
-  { href: '/physique',     label: 'Physique',     icon: User },
-  { href: '/export',       label: 'Export',       icon: Download },
-  { href: '/settings',     label: 'Settings',     icon: Settings },
-  { href: '/guide',        label: 'User Guide',   icon: BookOpen },
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/training', label: 'Training', icon: Dumbbell },
+  { href: '/nutrition', label: 'Nutrition', icon: Utensils },
+  { href: '/supplements', label: 'Supplements', icon: Pill },
+  { href: '/recovery', label: 'Recovery', icon: Activity },
+  { href: '/physique', label: 'Physique', icon: User },
+  { href: '/export', label: 'Export', icon: Download },
+  { href: '/settings', label: 'Settings', icon: Settings },
+  { href: '/guide', label: 'User Guide', icon: BookOpen },
 ];
 
 /** All nav labels/icons use theme accent; active row gets weight + glow via classes */
@@ -44,14 +44,14 @@ export function Sidebar() {
       className={cn(
         'fixed left-0 top-0 h-full z-40 flex flex-col transition-[width] duration-300 ease-out',
         'bg-[color:var(--chrome-bg)]',
-        sidebarOpen ? 'w-60' : 'w-[72px]'
+        sidebarOpen ? 'w-60' : 'w-[72px]',
       )}
     >
       {/* Logo — fixed size and position regardless of sidebar state */}
       <div className="flex w-full shrink-0 h-[5.5rem] items-center justify-center px-2">
         <Link
           href="/guide"
-          className="flex items-center justify-center rounded-lg outline-none ring-offset-2 ring-offset-[#0d0d0d] focus-visible:ring-2 focus-visible:ring-[color:var(--accent)]/55"
+          className="flex items-center justify-center rounded-lg outline-none ring-offset-2 ring-offset-[color:var(--bg-1)] focus-visible:ring-2 focus-visible:ring-[color:var(--accent)]/55"
         >
           <IronmindLogo variant="sidebar-expanded" priority />
           <span className="sr-only">IRONMIND — User Guide</span>
@@ -69,10 +69,14 @@ export function Sidebar() {
           'bg-[color:var(--chrome-bg-toggle)] border border-[color:var(--chrome-border)]',
           'text-[color:var(--text-1)] hover:text-[color:var(--accent)] hover:border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)]',
           'shadow-[0_4px_12px_rgba(0,0,0,0.4)]',
-          'transition-all duration-200 hover:scale-110'
+          'transition-all duration-200 hover:scale-110',
         )}
       >
-        {sidebarOpen ? <ChevronLeft size={12} aria-hidden="true" /> : <ChevronRight size={12} aria-hidden="true" />}
+        {sidebarOpen ? (
+          <ChevronLeft size={12} aria-hidden="true" />
+        ) : (
+          <ChevronRight size={12} aria-hidden="true" />
+        )}
       </button>
 
       {/* Navigation */}
@@ -91,7 +95,7 @@ export function Sidebar() {
               className={cn(
                 'nav-item group',
                 !sidebarOpen && 'justify-center max-w-none px-0',
-                isActive && 'active'
+                isActive && 'active',
               )}
             >
               <Icon
@@ -101,7 +105,7 @@ export function Sidebar() {
                   accentIcon,
                   isActive &&
                     'drop-shadow-[0_0_8px_color-mix(in_srgb,var(--accent)_50%,transparent)]',
-                  !isActive && 'opacity-90 group-hover:opacity-100'
+                  !isActive && 'opacity-90 group-hover:opacity-100',
                 )}
               />
               {sidebarOpen && (
@@ -109,7 +113,7 @@ export function Sidebar() {
                   className={cn(
                     'text-sm tracking-wide transition-colors duration-[220ms] truncate',
                     accentLabel,
-                    isActive ? 'font-semibold' : 'font-medium opacity-90 group-hover:opacity-100'
+                    isActive ? 'font-semibold' : 'font-medium opacity-90 group-hover:opacity-100',
                   )}
                 >
                   {item.label}

@@ -9,10 +9,14 @@ import { IronmindLogo } from '@/components/brand/ironmind-logo';
 // ─── password rules ───────────────────────────────────────────────────────────
 
 const RULES = [
-  { id: 'length',   label: 'At least 8 characters',       test: (p: string) => p.length >= 8 },
-  { id: 'upper',    label: 'One uppercase letter',         test: (p: string) => /[A-Z]/.test(p) },
-  { id: 'number',   label: 'One number',                   test: (p: string) => /[0-9]/.test(p) },
-  { id: 'special',  label: 'One special character (!@#$…)', test: (p: string) => /[^A-Za-z0-9]/.test(p) },
+  { id: 'length', label: 'At least 8 characters', test: (p: string) => p.length >= 8 },
+  { id: 'upper', label: 'One uppercase letter', test: (p: string) => /[A-Z]/.test(p) },
+  { id: 'number', label: 'One number', test: (p: string) => /[0-9]/.test(p) },
+  {
+    id: 'special',
+    label: 'One special character (!@#$…)',
+    test: (p: string) => /[^A-Za-z0-9]/.test(p),
+  },
 ];
 
 // ─── field input with optional eye toggle ─────────────────────────────────────
@@ -35,18 +39,18 @@ function PasswordInput({
         id={id}
         type={visible ? 'text' : 'password'}
         value={value}
-        onChange={e => onChange(e.target.value)}
+        onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         required
         className="w-full px-3 py-2.5 pr-10 rounded-lg text-sm
-          bg-[#131313] border border-[rgba(65,50,50,0.50)]
+          bg-[color:var(--bg-2)] border border-[color:var(--chrome-border)]
           text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)]
           focus:border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)] focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--accent)_10%,transparent)]
           focus:outline-none transition-all duration-200"
       />
       <button
         type="button"
-        onClick={() => setVisible(v => !v)}
+        onClick={() => setVisible((v) => !v)}
         tabIndex={-1}
         className="absolute right-3 top-1/2 -translate-y-1/2 text-[color:var(--text-2)] hover:text-[color:var(--text-1)] transition-colors"
         aria-label={visible ? 'Hide password' : 'Show password'}
@@ -62,13 +66,13 @@ function PasswordInput({
 export default function RegisterPage() {
   const router = useRouter();
   const [displayName, setDisplayName] = useState('');
-  const [email, setEmail]             = useState('');
-  const [password, setPassword]       = useState('');
-  const [confirm, setConfirm]         = useState('');
-  const [error, setError]             = useState('');
-  const [success, setSuccess]         = useState('');
-  const [isLoading, setIsLoading]     = useState(false);
-  const [touched, setTouched]         = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [touched, setTouched] = useState(false);
 
   const handleFacebookRegister = async () => {
     setIsLoading(true);
@@ -98,8 +102,11 @@ export default function RegisterPage() {
     }
   };
 
-  const ruleResults = useMemo(() => RULES.map(r => ({ ...r, pass: r.test(password) })), [password]);
-  const allRulesPass = ruleResults.every(r => r.pass);
+  const ruleResults = useMemo(
+    () => RULES.map((r) => ({ ...r, pass: r.test(password) })),
+    [password],
+  );
+  const allRulesPass = ruleResults.every((r) => r.pass);
   const passwordsMatch = password === confirm && confirm.length > 0;
   const formValid = allRulesPass && passwordsMatch && displayName.trim() && email.trim();
 
@@ -125,50 +132,59 @@ export default function RegisterPage() {
   };
 
   const inputCls = `w-full px-3 py-2.5 rounded-lg text-sm
-    bg-[#131313] border border-[rgba(65,50,50,0.50)]
+    bg-[color:var(--bg-2)] border border-[color:var(--chrome-border)]
     text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)]
     focus:border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)] focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--accent)_10%,transparent)]
     focus:outline-none transition-all duration-200`;
 
-  const labelCls = 'block text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)] mb-1.5';
+  const labelCls =
+    'block text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)] mb-1.5';
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4
-      bg-[radial-gradient(900px_500px_at_50%_-10%,color-mix(in_srgb,var(--accent)_7%,transparent),transparent_60%),linear-gradient(160deg,#080808,#0D0D0D_55%,#131313)]">
+    <div
+      className="min-h-screen flex items-center justify-center p-4
+      bg-[radial-gradient(900px_500px_at_50%_-10%,color-mix(in_srgb,var(--accent)_7%,transparent),transparent_60%),linear-gradient(160deg,var(--bg-0),var(--bg-1)_55%,var(--bg-2))]"
+    >
       <div className="w-full max-w-md">
-
         {/* Logo */}
         <div className="text-center mb-8">
           <IronmindLogo variant="auth" priority className="mb-3" />
-          <p className="text-sm text-[color:var(--text-2)] mt-2 uppercase tracking-[0.2em]">Create your account</p>
+          <p className="text-sm text-[color:var(--text-2)] mt-2 uppercase tracking-[0.2em]">
+            Create your account
+          </p>
         </div>
 
         {/* Card */}
-        <div className="rounded-[14px] p-6 bg-[rgba(18,14,14,0.94)] backdrop-blur-xl
-          border border-[rgba(65,50,50,0.40)] shadow-[0_16px_40px_rgba(0,0,0,0.60)]">
-          <h2 className="text-xl font-bold font-heading tracking-tight text-[color:var(--text-0)] mb-6">Sign Up</h2>
+        <div
+          className="rounded-[14px] p-6 bg-[color:var(--panel-strong)] backdrop-blur-xl
+          border border-[color:var(--chrome-border)] shadow-[var(--shadow-strong)]"
+        >
+          <h2 className="text-xl font-bold font-heading tracking-tight text-[color:var(--text-0)] mb-6">
+            Sign Up
+          </h2>
 
           {error && (
-            <div className="mb-4 p-3 rounded-lg text-sm bg-[rgba(239,68,68,0.10)] border border-[rgba(239,68,68,0.30)] text-[#EF4444]">
+            <div className="mb-4 p-3 rounded-lg text-sm bg-[color:color-mix(in_srgb,var(--bad)_10%,transparent)] border border-[color:color-mix(in_srgb,var(--bad)_30%,transparent)] text-[color:var(--bad)]">
               {error}
             </div>
           )}
           {success && (
-            <div className="mb-4 p-3 rounded-lg text-sm bg-[rgba(34,197,94,0.12)] border border-[rgba(34,197,94,0.30)] text-[#22C55E]">
+            <div className="mb-4 p-3 rounded-lg text-sm bg-[color:color-mix(in_srgb,var(--good)_12%,transparent)] border border-[color:color-mix(in_srgb,var(--good)_30%,transparent)] text-[color:var(--good)]">
               {success}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
-
             {/* Display name */}
             <div>
-              <label htmlFor="displayName" className={labelCls}>Display Name</label>
+              <label htmlFor="displayName" className={labelCls}>
+                Display Name
+              </label>
               <input
                 id="displayName"
                 type="text"
                 value={displayName}
-                onChange={e => setDisplayName(e.target.value)}
+                onChange={(e) => setDisplayName(e.target.value)}
                 className={inputCls}
                 placeholder="Your name"
                 required
@@ -177,12 +193,14 @@ export default function RegisterPage() {
 
             {/* Email */}
             <div>
-              <label htmlFor="email" className={labelCls}>Email</label>
+              <label htmlFor="email" className={labelCls}>
+                Email
+              </label>
               <input
                 id="email"
                 type="email"
                 value={email}
-                onChange={e => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
                 className={inputCls}
                 placeholder="you@example.com"
                 required
@@ -191,23 +209,33 @@ export default function RegisterPage() {
 
             {/* Password */}
             <div>
-              <label htmlFor="password" className={labelCls}>Password</label>
+              <label htmlFor="password" className={labelCls}>
+                Password
+              </label>
               <PasswordInput id="password" value={password} onChange={setPassword} />
 
               {/* Rules checklist — show as soon as user starts typing */}
               {(password.length > 0 || touched) && (
                 <div className="mt-3 flex flex-col gap-1.5">
-                  {ruleResults.map(r => (
+                  {ruleResults.map((r) => (
                     <div key={r.id} className="flex items-center gap-2">
-                      <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 transition-colors duration-200
-                        ${r.pass
-                          ? 'bg-[rgba(34,197,94,0.15)] border border-[rgba(34,197,94,0.45)]'
-                          : 'bg-[rgba(65,50,50,0.40)] border border-[rgba(65,50,50,0.50)]'}`}>
-                        {r.pass
-                          ? <Check size={9} className="text-[#22C55E]" />
-                          : <X size={9} className="text-[color:var(--text-2)]" />}
+                      <div
+                        className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 transition-colors duration-200
+                        ${
+                          r.pass
+                            ? 'bg-[color:color-mix(in_srgb,var(--good)_15%,transparent)] border border-[color:color-mix(in_srgb,var(--good)_45%,transparent)]'
+                            : 'bg-[color:var(--surface-track)] border border-[color:var(--chrome-border)]'
+                        }`}
+                      >
+                        {r.pass ? (
+                          <Check size={9} className="text-[color:var(--good)]" />
+                        ) : (
+                          <X size={9} className="text-[color:var(--text-2)]" />
+                        )}
                       </div>
-                      <span className={`text-xs transition-colors duration-200 ${r.pass ? 'text-[#22C55E]' : 'text-[color:var(--text-2)]'}`}>
+                      <span
+                        className={`text-xs transition-colors duration-200 ${r.pass ? 'text-[color:var(--good)]' : 'text-[color:var(--text-2)]'}`}
+                      >
                         {r.label}
                       </span>
                     </div>
@@ -218,21 +246,36 @@ export default function RegisterPage() {
 
             {/* Confirm password */}
             <div>
-              <label htmlFor="confirm" className={labelCls}>Confirm Password</label>
-              <PasswordInput id="confirm" value={confirm} onChange={setConfirm} placeholder="Re-enter password" />
+              <label htmlFor="confirm" className={labelCls}>
+                Confirm Password
+              </label>
+              <PasswordInput
+                id="confirm"
+                value={confirm}
+                onChange={setConfirm}
+                placeholder="Re-enter password"
+              />
 
               {/* Match indicator */}
               {confirm.length > 0 && (
                 <div className="mt-2 flex items-center gap-2">
-                  <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0
-                    ${passwordsMatch
-                      ? 'bg-[rgba(34,197,94,0.15)] border border-[rgba(34,197,94,0.45)]'
-                      : 'bg-[rgba(239,68,68,0.10)] border border-[rgba(239,68,68,0.35)]'}`}>
-                    {passwordsMatch
-                      ? <Check size={9} className="text-[#22C55E]" />
-                      : <X size={9} className="text-[#EF4444]" />}
+                  <div
+                    className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0
+                    ${
+                      passwordsMatch
+                        ? 'bg-[color:color-mix(in_srgb,var(--good)_15%,transparent)] border border-[color:color-mix(in_srgb,var(--good)_45%,transparent)]'
+                        : 'bg-[color:color-mix(in_srgb,var(--bad)_10%,transparent)] border border-[color:color-mix(in_srgb,var(--bad)_35%,transparent)]'
+                    }`}
+                  >
+                    {passwordsMatch ? (
+                      <Check size={9} className="text-[color:var(--good)]" />
+                    ) : (
+                      <X size={9} className="text-[color:var(--bad)]" />
+                    )}
                   </div>
-                  <span className={`text-xs ${passwordsMatch ? 'text-[#22C55E]' : 'text-[#EF4444]'}`}>
+                  <span
+                    className={`text-xs ${passwordsMatch ? 'text-[color:var(--good)]' : 'text-[color:var(--bad)]'}`}
+                  >
                     {passwordsMatch ? 'Passwords match' : 'Passwords do not match'}
                   </span>
                 </div>
@@ -253,7 +296,9 @@ export default function RegisterPage() {
                   <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   Creating account…
                 </span>
-              ) : 'Create Account'}
+              ) : (
+                'Create Account'
+              )}
             </button>
           </form>
 
@@ -261,9 +306,11 @@ export default function RegisterPage() {
           {false && (
             <>
               <div className="my-6 flex items-center gap-4">
-                <div className="flex-1 h-px bg-[rgba(65,50,50,0.40)]" />
-                <span className="text-xs text-[color:var(--text-2)] uppercase tracking-[0.15em]">or continue with</span>
-                <div className="flex-1 h-px bg-[rgba(65,50,50,0.40)]" />
+                <div className="flex-1 h-px bg-[color:var(--chrome-border)]" />
+                <span className="text-xs text-[color:var(--text-2)] uppercase tracking-[0.15em]">
+                  or continue with
+                </span>
+                <div className="flex-1 h-px bg-[color:var(--chrome-border)]" />
               </div>
 
               <div className="flex flex-col gap-3">
@@ -272,8 +319,8 @@ export default function RegisterPage() {
                   onClick={handleFacebookRegister}
                   disabled={isLoading}
                   className="w-full py-2.5 rounded-lg text-sm font-medium
-                    bg-[#131313] border border-[rgba(65,50,50,0.50)] text-[color:var(--text-0)]
-                    hover:bg-[rgba(65,50,50,0.30)] transition-colors disabled:opacity-50
+                    bg-[color:var(--bg-2)] border border-[color:var(--chrome-border)] text-[color:var(--text-0)]
+                    hover:bg-[color:var(--surface-track)] transition-colors disabled:opacity-50
                     flex items-center justify-center gap-2"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -287,8 +334,8 @@ export default function RegisterPage() {
                   onClick={handleMicrosoftRegister}
                   disabled={isLoading}
                   className="w-full py-2.5 rounded-lg text-sm font-medium
-                    bg-[#131313] border border-[rgba(65,50,50,0.50)] text-[color:var(--text-0)]
-                    hover:bg-[rgba(65,50,50,0.30)] transition-colors disabled:opacity-50
+                    bg-[color:var(--bg-2)] border border-[color:var(--chrome-border)] text-[color:var(--text-0)]
+                    hover:bg-[color:var(--surface-track)] transition-colors disabled:opacity-50
                     flex items-center justify-center gap-2"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 21 21">
@@ -306,7 +353,10 @@ export default function RegisterPage() {
 
         <p className="text-center text-sm text-[color:var(--text-2)] mt-6">
           Already have an account?{' '}
-          <a href="/login" className="text-[color:var(--accent)] hover:text-[color:var(--accent-light)] underline underline-offset-2 transition-colors">
+          <a
+            href="/login"
+            className="text-[color:var(--accent)] hover:text-[color:var(--accent-light)] underline underline-offset-2 transition-colors"
+          >
             Sign in
           </a>
         </p>

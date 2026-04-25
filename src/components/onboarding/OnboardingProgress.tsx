@@ -46,7 +46,7 @@ export function OnboardingProgress({ steps, current }: OnboardingProgressProps) 
             className={`absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full border-2 transition-all duration-300 ${
               i <= current
                 ? 'bg-[color:var(--accent)] border-[color:var(--accent-light)] shadow-[0_0_8px_color-mix(in srgb, var(--accent) 50%, transparent)]'
-                : 'bg-[#1a1a1a] border-[rgba(65,50,50,0.60)]'
+                : 'bg-[color:var(--bg-2)] border-[color:var(--chrome-border)]'
             }`}
             style={{ left: `calc(${(i / (steps.length - 1)) * 100}% - 5px)` }}
           />

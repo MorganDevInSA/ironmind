@@ -126,11 +126,11 @@ export default function LoginPage() {
             sizes="(max-width: 640px) 85vw, 384px"
             className="mx-auto mb-3 h-auto max-h-[min(28vh,240px)] w-auto max-w-[min(100%,384px)] object-contain object-center drop-shadow-[0_12px_40px_rgba(0,0,0,0.45)]"
           />
-          <p className="text-text-secondary mt-2">Elite Bodybuilding Performance</p>
+          <p className="text-[color:var(--text-1)] mt-2">Elite Bodybuilding Performance</p>
         </div>
 
         {/* Login Card */}
-        <div className="bg-surface border border-border rounded-xl p-6">
+        <div className="bg-[color:var(--panel-strong)] border border-[color:var(--chrome-border)] rounded-xl p-6">
           <h2 className="text-xl font-semibold text-foreground mb-6">Sign In</h2>
 
           {error && (
@@ -139,31 +139,35 @@ export default function LoginPage() {
             </div>
           )}
           {info && (
-            <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-400 text-sm">
+            <div className="mb-4 p-3 bg-[color:color-mix(in_srgb,var(--good)_10%,transparent)] border border-[color:color-mix(in_srgb,var(--good)_20%,transparent)] rounded-lg text-[color:var(--good)] text-sm">
               {info}
             </div>
           )}
 
           <form onSubmit={handleEmailLogin} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-1">Email</label>
+              <label className="block text-sm font-medium text-[color:var(--text-1)] mb-1">
+                Email
+              </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2 bg-surface-elevated border border-border rounded-lg text-foreground focus:outline-none focus:border-[color:var(--accent)]"
+                className="w-full px-3 py-2 bg-[color:var(--bg-2)] border border-[color:var(--chrome-border)] rounded-lg text-[color:var(--text-0)] focus:outline-none focus:border-[color:var(--accent)]"
                 placeholder="you@example.com"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-text-secondary mb-1">Password</label>
+              <label className="block text-sm font-medium text-[color:var(--text-1)] mb-1">
+                Password
+              </label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2 bg-surface-elevated border border-border rounded-lg text-foreground focus:outline-none focus:border-[color:var(--accent)]"
+                className="w-full px-3 py-2 bg-[color:var(--bg-2)] border border-[color:var(--chrome-border)] rounded-lg text-[color:var(--text-0)] focus:outline-none focus:border-[color:var(--accent)]"
                 placeholder="••••••••"
                 required
               />
@@ -180,14 +184,14 @@ export default function LoginPage() {
 
           <div className="my-6 flex items-center gap-4">
             <div className="flex-1 h-px bg-border" />
-            <span className="text-sm text-text-muted">or</span>
+            <span className="text-sm text-[color:var(--text-2)]">or</span>
             <div className="flex-1 h-px bg-border" />
           </div>
 
           <button
             onClick={handleGoogleLogin}
             disabled={isLoading}
-            className="w-full py-2.5 bg-surface-elevated border border-border text-foreground font-medium rounded-lg hover:bg-border transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full py-2.5 bg-[color:var(--bg-2)] border border-[color:var(--chrome-border)] text-[color:var(--text-0)] font-medium rounded-lg hover:bg-[color:var(--surface-track)] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
@@ -216,7 +220,7 @@ export default function LoginPage() {
               <button
                 onClick={handleFacebookLogin}
                 disabled={isLoading}
-                className="w-full py-2.5 bg-surface-elevated border border-border text-foreground font-medium rounded-lg hover:bg-border transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full py-2.5 bg-[color:var(--bg-2)] border border-[color:var(--chrome-border)] text-[color:var(--text-0)] font-medium rounded-lg hover:bg-[color:var(--surface-track)] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
@@ -227,7 +231,7 @@ export default function LoginPage() {
               <button
                 onClick={handleMicrosoftLogin}
                 disabled={isLoading}
-                className="w-full py-2.5 bg-surface-elevated border border-border text-foreground font-medium rounded-lg hover:bg-border transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full py-2.5 bg-[color:var(--bg-2)] border border-[color:var(--chrome-border)] text-[color:var(--text-0)] font-medium rounded-lg hover:bg-[color:var(--surface-track)] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 <svg className="w-5 h-5" viewBox="0 0 21 21">
                   <rect x="1" y="1" width="9" height="9" fill="#f25022" />
@@ -245,14 +249,14 @@ export default function LoginPage() {
               type="button"
               onClick={handleResendVerification}
               disabled={isLoading}
-              className="w-full mt-3 py-2.5 bg-surface-elevated border border-border text-foreground font-medium rounded-lg hover:bg-border transition-colors disabled:opacity-50"
+              className="w-full mt-3 py-2.5 bg-[color:var(--bg-2)] border border-[color:var(--chrome-border)] text-[color:var(--text-0)] font-medium rounded-lg hover:bg-[color:var(--surface-track)] transition-colors disabled:opacity-50"
             >
               Resend verification email
             </button>
           )}
         </div>
 
-        <p className="text-center text-sm text-text-muted mt-6">
+        <p className="text-center text-sm text-[color:var(--text-2)] mt-6">
           Don&apos;t have an account?{' '}
           <a href="/register" className="text-[color:var(--accent)] hover:underline">
             Sign up

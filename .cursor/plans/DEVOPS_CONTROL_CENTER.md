@@ -69,7 +69,9 @@ Checkbox legend: `[ ]` todo · `[x]` done · `[~]` in progress · `[!]` blocked.
 
 ## 1 — Fix Critical Misconfigurations (do these first)
 
-### [ ] 1.1 — Fix `.firebaserc` project ID
+### [x] 1.1 — Fix `.firebaserc` project ID
+
+_Done 2026-04-24 — `.firebaserc` now points at `ironmindmp`._
 
 **Why:** Placeholder `YOUR_PROJECT_ID_HERE` will break every Firebase deploy. Real project is `ironmindmp`.
 **File:** `.firebaserc`
@@ -84,16 +86,20 @@ Checkbox legend: `[ ]` todo · `[x]` done · `[~]` in progress · `[!]` blocked.
 
 **Verify:** `cat .firebaserc` shows `ironmindmp`.
 
-### [ ] 1.2 — Remove duplicate PostCSS config
+### [x] 1.2 — Remove duplicate PostCSS config
+
+_Done 2026-04-24 — removed `postcss.config.mjs`. Kept `postcss.config.js` because this repo uses Tailwind CSS 3.x and the `.mjs` file referenced the Tailwind 4 `@tailwindcss/postcss` plugin, which is not installed._
 
 **Why:** Two configs (`postcss.config.js` + `postcss.config.mjs`) is ambiguous; Next picks one and silently ignores the other.
-**Action:** Keep `postcss.config.mjs` (ESM matches `next.config.mjs`); delete `postcss.config.js`.
+**Action:** Keep `postcss.config.js` (CommonJS config using `tailwindcss` + `autoprefixer` for Tailwind CSS 3.x); delete `postcss.config.mjs`.
 
 ```bash
-rm postcss.config.js
+rm postcss.config.mjs
 ```
 
-### [ ] 1.3 — Re-evaluate `trailingSlash: true` for Vercel
+### [x] 1.3 — Re-evaluate `trailingSlash: true` for Vercel
+
+_Done 2026-04-24 — removed `trailingSlash: true`. Vercel hosts the Next.js app; Firebase is used alongside it for Auth / Firestore / Storage, not as the frontend hosting target. Official Next.js docs confirm `trailingSlash` only changes slash redirect behavior and static export output shape._
 
 **Why:** `trailingSlash: true` was added for "Firebase hosting compatibility". If the target host is **Vercel**, this is unnecessary and causes SEO duplication + extra redirects. Remove unless you are also deploying to Firebase Hosting.
 **File:** `next.config.mjs` — delete line:

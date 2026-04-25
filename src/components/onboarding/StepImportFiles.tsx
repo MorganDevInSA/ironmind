@@ -225,8 +225,8 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
           bg-[rgba(18,14,14,0.94)] border border-[rgba(65,50,50,0.40)]
           shadow-[0_16px_40px_rgba(0,0,0,0.60)]"
         >
-          <div className="w-16 h-16 rounded-full bg-[rgba(16,185,129,0.15)] border border-[rgba(16,185,129,0.35)] flex items-center justify-center mx-auto">
-            <CheckCircle2 size={32} className="text-[#10B981]" />
+          <div className="w-16 h-16 rounded-full bg-[color:color-mix(in_srgb,var(--good)_15%,transparent)] border border-[color:color-mix(in_srgb,var(--good)_35%,transparent)] flex items-center justify-center mx-auto">
+            <CheckCircle2 size={32} className="text-[color:var(--good)]" />
           </div>
           <div>
             <h2 className="text-2xl font-bold text-[color:var(--text-0)] mb-2">
@@ -293,8 +293,8 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
 
         {accountAlreadySeeded && (
           <label
-            className="flex items-start gap-3 p-4 rounded-xl border border-[rgba(245,158,11,0.35)]
-            bg-[rgba(245,158,11,0.08)] cursor-pointer"
+            className="flex items-start gap-3 p-4 rounded-xl border border-[color:color-mix(in_srgb,var(--warn)_35%,transparent)]
+            bg-[color:color-mix(in_srgb,var(--warn)_8%,transparent)] cursor-pointer"
           >
             <input
               type="checkbox"
@@ -304,7 +304,9 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
               style={{ accentColor: 'var(--accent)' }}
             />
             <span className="text-sm text-[color:var(--text-0)]">
-              <span className="font-semibold text-[#F59E0B]">Replace existing IronMind data</span>
+              <span className="font-semibold text-[color:var(--warn)]">
+                Replace existing IronMind data
+              </span>
               {' — '}
               Your account already has a saved plan. Check this to import this coach pack and set it
               as your active program (profile, supplements, phase, landmarks, and today&apos;s
@@ -335,7 +337,7 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
             }
             className="flex-1 flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg font-semibold text-sm text-white
               bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-2)] border border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]
-              shadow-[0_8px_20px_rgba(220,38,38,0.22)]
+              shadow-[0_8px_20px_color-mix(in_srgb,var(--accent)_22%,transparent)]
               hover:brightness-110 active:scale-95 transition-all duration-200
               disabled:opacity-40 disabled:cursor-not-allowed"
           >
@@ -378,7 +380,7 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
       {/* Icon header */}
       <div className="flex justify-center">
         <div
-          className="w-14 h-14 rounded-2xl bg-[rgba(16,16,16,0.78)] border border-[rgba(220,38,38,0.30)]
+          className="w-14 h-14 rounded-2xl bg-[color:var(--surface-track)] border border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)]
           flex items-center justify-center"
         >
           <Dumbbell size={28} className="text-[color:var(--accent)]" />
@@ -397,8 +399,8 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
         className={cn(
           'rounded-2xl border-2 border-dashed p-6 text-center transition-all',
           isDragging
-            ? 'border-[color:var(--accent)] bg-[rgba(16,16,16,0.78)]'
-            : 'border-[rgba(65,50,50,0.40)] bg-[rgba(16,14,14,0.4)]',
+            ? 'border-[color:var(--accent)] bg-[color:var(--surface-track)]'
+            : 'border-[color:var(--chrome-border)] bg-[color:var(--surface-well)]',
         )}
       >
         <label htmlFor="bulk-upload" className="cursor-pointer block space-y-2">
@@ -434,10 +436,10 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
               className={cn(
                 'flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all select-none',
                 state.status === 'loaded'
-                  ? 'border-[rgba(16,185,129,0.35)] bg-[rgba(16,185,129,0.06)]'
+                  ? 'border-[color:color-mix(in_srgb,var(--good)_35%,transparent)] bg-[color:color-mix(in_srgb,var(--good)_6%,transparent)]'
                   : state.status === 'error'
-                    ? 'border-[rgba(239,68,68,0.35)] bg-[rgba(239,68,68,0.06)]'
-                    : 'border-[rgba(65,50,50,0.30)] bg-[rgba(18,14,14,0.5)] hover:border-[rgba(220,38,38,0.30)] active:scale-[0.99]',
+                    ? 'border-[color:color-mix(in_srgb,var(--bad)_35%,transparent)] bg-[color:color-mix(in_srgb,var(--bad)_6%,transparent)]'
+                    : 'border-[color:var(--chrome-border)] bg-[color:var(--surface-well)] hover:border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)] active:scale-[0.99]',
               )}
             >
               <input
@@ -449,7 +451,7 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
               />
               <div className="shrink-0">
                 {state.status === 'loaded' ? (
-                  <CheckCircle2 size={22} className="text-[#10B981]" />
+                  <CheckCircle2 size={22} className="text-[color:var(--good)]" />
                 ) : state.status === 'error' ? (
                   <XCircle size={22} className="text-[color:var(--accent-light)]" />
                 ) : (
@@ -466,7 +468,7 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
                 className={cn(
                   'shrink-0 text-xs font-bold uppercase tracking-wider',
                   state.status === 'loaded'
-                    ? 'text-[#10B981]'
+                    ? 'text-[color:var(--good)]'
                     : state.status === 'error'
                       ? 'text-[color:var(--accent-light)]'
                       : 'text-[color:var(--text-2)]',

@@ -118,8 +118,8 @@ export default function SettingsPage() {
                 onClick={() => setTheme(option.value)}
                 className={`w-full p-3 rounded-lg border text-left transition-colors ${
                   active
-                    ? 'border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)] bg-[rgba(16,16,16,0.78)]'
-                    : 'border-[rgba(65,50,50,0.38)] bg-[rgba(16,16,16,0.78)] hover:border-[rgba(120,120,120,0.45)]'
+                    ? 'border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)] bg-[color:var(--surface-track)]'
+                    : 'border-[color:var(--chrome-border)] bg-[color:var(--surface-track)] hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)]'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -142,8 +142,8 @@ export default function SettingsPage() {
             onClick={() => setTheme('custom')}
             className={`w-full p-3 rounded-lg border text-left transition-colors ${
               theme === 'custom'
-                ? 'border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)] bg-[rgba(16,16,16,0.78)]'
-                : 'border-[rgba(65,50,50,0.38)] bg-[rgba(16,16,16,0.78)] hover:border-[rgba(120,120,120,0.45)]'
+                ? 'border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)] bg-[color:var(--surface-track)]'
+                : 'border-[color:var(--chrome-border)] bg-[color:var(--surface-track)] hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)]'
             }`}
             aria-pressed={theme === 'custom'}
           >
@@ -225,7 +225,7 @@ export default function SettingsPage() {
               value={currentWeight}
               onChange={(e) => setCurrentWeight(e.target.value)}
               placeholder={profile?.currentWeight?.toString() ?? ''}
-              className="w-full bg-[rgba(18,14,14,0.6)] border border-[rgba(65,50,50,0.25)] rounded-lg p-3 text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color:color-mix(in_srgb,var(--accent)_40%,transparent)]"
+              className="w-full bg-[color:var(--surface-track)] border border-[color:var(--chrome-border-subtle)] rounded-lg p-3 text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color:color-mix(in_srgb,var(--accent)_40%,transparent)]"
             />
           </div>
           <div className="space-y-1">
@@ -236,7 +236,7 @@ export default function SettingsPage() {
               value={targetWeight}
               onChange={(e) => setTargetWeight(e.target.value)}
               placeholder={profile?.targetWeight?.toString() ?? ''}
-              className="w-full bg-[rgba(18,14,14,0.6)] border border-[rgba(65,50,50,0.25)] rounded-lg p-3 text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color:color-mix(in_srgb,var(--accent)_40%,transparent)]"
+              className="w-full bg-[color:var(--surface-track)] border border-[color:var(--chrome-border-subtle)] rounded-lg p-3 text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color:color-mix(in_srgb,var(--accent)_40%,transparent)]"
             />
           </div>
         </div>
