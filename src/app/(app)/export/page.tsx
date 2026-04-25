@@ -5,7 +5,7 @@ import { useAuthStore } from '@/stores';
 import { useCreateJournalEntry, useJournalEntries } from '@/controllers';
 import { generateSummary } from '@/lib/export';
 import type { ExportOptions } from '@/lib/types';
-import { formatDisplayDate, today } from '@/lib/utils';
+import { cn, formatDisplayDate, today } from '@/lib/utils';
 import { Download, Copy, Check } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -79,7 +79,7 @@ export default function ExportPage() {
   };
 
   const toggleOption = (key: keyof ExportOptions) => {
-    setOptions(prev => ({ ...prev, [key]: !prev[key] }));
+    setOptions((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   const handleSaveNote = () => {
@@ -105,9 +105,11 @@ export default function ExportPage() {
           toast.success('Export note saved.');
         },
         onError: (error: unknown) => {
-          toast.error(`Failed to save note: ${error instanceof Error ? error.message : String(error)}`);
+          toast.error(
+            `Failed to save note: ${error instanceof Error ? error.message : String(error)}`,
+          );
         },
-      }
+      },
     );
   };
 
@@ -116,9 +118,13 @@ export default function ExportPage() {
       <div>
         <h1 className="text-2xl font-heading font-bold text-[color:var(--accent)]">Export Data</h1>
         <p className="text-text-secondary">
-          Generate an <strong>Athlete Status Report</strong> (markdown) for coach-style analysis. Pair the export with{' '}
-          <code className="rounded bg-surface-elevated px-1 py-0.5 text-xs">prompts/04-coach-analysis-from-export-or-screenshots.md</code>{' '}
-          and your coach persona—full history, set-level training detail, volume landmarks, supplements protocol, alerts, and journal notes when enabled below.
+          Generate an <strong>Athlete Status Report</strong> (markdown) for coach-style analysis.
+          Pair the export with{' '}
+          <code className="rounded bg-surface-elevated px-1 py-0.5 text-xs">
+            prompts/04-coach-analysis-from-export-or-screenshots.md
+          </code>{' '}
+          and your coach persona—full history, set-level training detail, volume landmarks,
+          supplements protocol, alerts, and journal notes when enabled below.
         </p>
       </div>
 
@@ -164,10 +170,15 @@ export default function ExportPage() {
           {recentNotes && recentNotes.length > 0 ? (
             <div className="space-y-2">
               {recentNotes.map((note) => (
-                <div key={note.id} className="rounded-lg border border-[color:var(--chrome-border)] bg-[rgba(0,0,0,0.2)] p-3">
+                <div
+                  key={note.id}
+                  className="rounded-lg border border-[color:var(--chrome-border)] bg-[rgba(0,0,0,0.2)] p-3"
+                >
                   <p className="text-sm font-medium text-foreground">{note.title}</p>
                   <p className="text-xs text-text-secondary line-clamp-2 mt-1">{note.content}</p>
-                  <p className="text-[11px] text-[color:var(--text-2)] mt-1">{formatDisplayDate(note.date)}</p>
+                  <p className="text-[11px] text-[color:var(--text-2)] mt-1">
+                    {formatDisplayDate(note.date)}
+                  </p>
                 </div>
               ))}
             </div>
@@ -194,7 +205,10 @@ export default function ExportPage() {
                   style={{ accentColor: 'var(--accent)' }}
                 />
                 <span className="text-sm text-foreground capitalize">
-                  {key.replace('include', '').replace(/([A-Z])/g, ' $1').trim()}
+                  {key
+                    .replace('include', '')
+                    .replace(/([A-Z])/g, ' $1')
+                    .trim()}
                 </span>
               </label>
             ))}
@@ -205,9 +219,18 @@ export default function ExportPage() {
           <select
             value={options.historyDays}
             onChange={(e) =>
-              setOptions(prev => ({ ...prev, historyDays: Number(e.target.value) }))
+              setOptions((prev) => ({ ...prev, historyDays: Number(e.target.value) }))
             }
-            className="bg-surface-elevated border border-border rounded-lg px-3 py-1.5 text-sm text-foreground"
+            className={cn(
+              'theme-native-select min-w-[10rem] rounded-lg border border-[color:var(--chrome-border)]',
+              'bg-[color:var(--surface-well)] px-3 py-2 text-sm text-foreground',
+              'shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]',
+              'transition-[border-color,box-shadow,background-color] duration-150',
+              'hover:border-[color:color-mix(in_srgb,var(--accent)_42%,transparent)]',
+              'hover:bg-[color:color-mix(in_srgb,var(--accent)_10%,transparent)]',
+              'focus:outline-none focus:border-[color:color-mix(in_srgb,var(--accent)_55%,transparent)]',
+              'focus:shadow-[0_0_0_2px_color-mix(in_srgb,var(--accent)_24%,transparent),inset_0_1px_0_rgba(255,255,255,0.04)]',
+            )}
           >
             <option value={7}>7 days</option>
             <option value={14}>14 days</option>

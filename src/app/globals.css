@@ -1276,14 +1276,32 @@ h4 {
   box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 45%, transparent);
 }
 
-/* Nutrition meal plan-line picker — dark native chrome + theme focus (OS list UI may still vary) */
+/*
+ * Themed native `<select>` — dark scheme + accent (list highlight where supported).
+ * `.nutrition-meal-select` is an alias for backwards compatibility.
+ * Option row colors apply in Firefox / some WebKit builds; Chromium’s popup
+ * may still use OS defaults on some platforms.
+ */
+.theme-native-select,
 .nutrition-meal-select {
   color-scheme: dark;
   accent-color: var(--accent);
 }
 
+.theme-native-select option,
 .nutrition-meal-select option {
-  background-color: var(--bg-1);
+  background-color: var(--panel-strong);
+  color: var(--text-0);
+  font-weight: 500;
+}
+
+.theme-native-select option:checked,
+.theme-native-select option:hover,
+.theme-native-select option:focus,
+.nutrition-meal-select option:checked,
+.nutrition-meal-select option:hover,
+.nutrition-meal-select option:focus {
+  background-color: color-mix(in srgb, var(--accent) 36%, var(--bg-0));
   color: var(--text-0);
 }
 

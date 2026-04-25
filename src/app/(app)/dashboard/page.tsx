@@ -54,6 +54,7 @@ import {
   ReferenceLine,
 } from 'recharts';
 import { cn } from '@/lib/utils';
+import { consumeDashboardTrendWindowFourWeeksBootstrap } from '@/lib/dashboard-trend-session';
 import { bodyweightForChartKg, measurementForChart } from '@/lib/utils/measurement-bounds';
 import { MEASUREMENT_CHART_SERIES } from '@/lib/constants/measurement-chart-series';
 import type { Workout, NutritionDay, SupplementLog, ProgramSession, CheckIn } from '@/lib/types';
@@ -1773,6 +1774,16 @@ export default function DashboardPage() {
   });
   const [customApplied, setCustomApplied] = useState<{ from: string; to: string } | null>(null);
   const [customError, setCustomError] = useState('');
+
+  useEffect(() => {
+    if (consumeDashboardTrendWindowFourWeeksBootstrap()) {
+      setTrendKind('preset');
+      setTrendPresetDays(28);
+      setCustomApplied(null);
+      setCustomDraft({ from: '', to: '' });
+      setCustomError('');
+    }
+  }, []);
 
   const trendBounds = useMemo(() => {
     if (trendKind === 'preset') {

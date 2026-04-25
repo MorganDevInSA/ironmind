@@ -7,6 +7,7 @@ import {
   type ImportResult,
 } from '@/services/import.service';
 import { seedUserData, type SeedUserDataResult } from '@/lib/seed';
+import { markDashboardTrendWindowFourWeeksAfterDemo } from '@/lib/dashboard-trend-session';
 import { onMutationError } from './_shared/on-error';
 import { invalidatePostImportDomains } from './_shared/invalidate-user-domains';
 
@@ -27,8 +28,11 @@ export function useSeedDemoData(userId: string) {
 
   return useMutation<SeedUserDataResult, Error>({
     mutationFn: () => seedUserData(userId),
-    onSuccess: () => {
+    onSuccess: (data) => {
       void invalidatePostImportDomains(queryClient, userId);
+      if (data.seeded) {
+        markDashboardTrendWindowFourWeeksAfterDemo();
+      }
     },
     onError: onMutationError,
   });

@@ -33,6 +33,8 @@ const inputCls = `w-full px-4 py-3 rounded-lg
   focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--accent)_10%,transparent)]
   focus:outline-none transition-all duration-200 text-sm`;
 
+const selectCls = `${inputCls} theme-native-select`;
+
 const labelCls =
   'block text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)] mb-1.5';
 
@@ -223,7 +225,7 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
           </Field>
           <Field label="Gender">
             <select
-              className={inputCls}
+              className={selectCls}
               value={answers.gender}
               onChange={(e) => set('gender', e.target.value)}
             >
@@ -253,7 +255,7 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
           </Field>
           <Field label="Weight Unit">
             <select
-              className={inputCls}
+              className={selectCls}
               value={answers.weightUnit}
               onChange={(e) => set('weightUnit', e.target.value)}
             >
@@ -289,7 +291,7 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
           </Field>
           <Field label="Training Level">
             <select
-              className={inputCls}
+              className={selectCls}
               value={answers.trainingLevel}
               onChange={(e) => set('trainingLevel', e.target.value)}
             >
@@ -325,7 +327,7 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field label="Goal Type">
             <select
-              className={inputCls}
+              className={selectCls}
               value={answers.goalType}
               onChange={(e) => set('goalType', e.target.value)}
             >
@@ -491,7 +493,7 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
           </Field>
           <Field label="Priority: Lose Fat vs Add Muscle">
             <select
-              className={inputCls}
+              className={selectCls}
               value={answers.bodyFatVsMusclePriority}
               onChange={(e) => set('bodyFatVsMusclePriority', e.target.value)}
             >
@@ -509,7 +511,7 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field label="Gym Access">
             <select
-              className={inputCls}
+              className={selectCls}
               value={answers.gymAccess}
               onChange={(e) => set('gymAccess', e.target.value)}
             >
@@ -618,7 +620,7 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
           </Field>
           <Field label="Cardio Capacity">
             <select
-              className={inputCls}
+              className={selectCls}
               value={answers.cardioCapacity}
               onChange={(e) => set('cardioCapacity', e.target.value)}
             >
@@ -664,7 +666,7 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
           ))}
           <Field label="Nutrition Style">
             <select
-              className={inputCls}
+              className={selectCls}
               value={answers.nutritionStyle}
               onChange={(e) => set('nutritionStyle', e.target.value)}
             >
@@ -839,7 +841,7 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field label="Preferred Coaching Style">
             <select
-              className={inputCls}
+              className={selectCls}
               value={answers.coachingStyle}
               onChange={(e) => set('coachingStyle', e.target.value)}
             >
@@ -853,7 +855,7 @@ export function StepQuestionnaire({ onNext, onBack }: StepQuestionnaireProps) {
           </Field>
           <Field label="Check-in Frequency">
             <select
-              className={inputCls}
+              className={selectCls}
               value={answers.checkInFrequency}
               onChange={(e) => set('checkInFrequency', e.target.value)}
             >

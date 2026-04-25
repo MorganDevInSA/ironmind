@@ -429,19 +429,21 @@ export default function NutritionPage() {
                             disabled={isSaving}
                             aria-label={`Meal option for ${meal.slot.replace('-', ' ')}`}
                             className={cn(
-                              'nutrition-meal-select w-full text-xs sm:text-sm rounded-lg border px-2 py-2',
-                              'border-[color:color-mix(in_srgb,var(--chrome-border)_55%,transparent)]',
-                              'bg-[color:var(--bg-2)] text-[color:var(--text-0)]',
-                              'focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--bg-1)]',
-                              'disabled:opacity-50',
+                              'theme-native-select w-full min-w-0 text-xs sm:text-sm rounded-lg border px-2 py-2.5',
+                              'border-[color:color-mix(in_srgb,var(--chrome-border)_60%,transparent)]',
+                              'bg-[color:color-mix(in_srgb,var(--surface-well)_94%,transparent)]',
+                              'text-[color:var(--text-0)] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]',
+                              'transition-[border-color,box-shadow,background-color] duration-150',
+                              'hover:border-[color:color-mix(in_srgb,var(--accent)_42%,transparent)]',
+                              'hover:bg-[color:color-mix(in_srgb,var(--accent)_10%,transparent)]',
+                              'focus:outline-none focus:border-[color:color-mix(in_srgb,var(--accent)_55%,transparent)]',
+                              'focus:shadow-[0_0_0_2px_color-mix(in_srgb,var(--accent)_24%,transparent),inset_0_1px_0_rgba(255,255,255,0.04)]',
+                              'focus-visible:outline-none',
+                              'disabled:cursor-not-allowed disabled:opacity-50',
                             )}
                           >
                             {optionList.map((opt) => (
-                              <option
-                                key={opt}
-                                value={opt}
-                                className="bg-[color:var(--bg-1)] text-[color:var(--text-0)]"
-                              >
+                              <option key={opt} value={opt}>
                                 {opt.length > 90 ? `${opt.slice(0, 87)}…` : opt}
                               </option>
                             ))}

@@ -6,7 +6,18 @@ import { isValid, parseISO } from 'date-fns';
 import { useAuthStore } from '@/stores';
 import { useSaveRecoveryEntry, useRecentRecoveryEntries } from '@/controllers';
 import { today, formatDisplayDate } from '@/lib/utils';
-import { Activity, CheckCircle2, TrendingUp, Brain } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import {
+  Activity,
+  Brain,
+  CheckCircle2,
+  Circle,
+  CloudRain,
+  Flame,
+  Frown,
+  Smile,
+  TrendingUp,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   ResponsiveContainer,
@@ -54,7 +65,13 @@ function ChartTooltip({
   );
 }
 
-const MOODS = ['😫', '😔', '😐', '😊', '🔥'] as const;
+const MOOD_OPTIONS: readonly { Icon: LucideIcon; label: string }[] = [
+  { Icon: CloudRain, label: 'Very rough day' },
+  { Icon: Frown, label: 'Low mood' },
+  { Icon: Circle, label: 'Neutral mood' },
+  { Icon: Smile, label: 'Good mood' },
+  { Icon: Flame, label: 'Great mood' },
+];
 const chartGridStroke = 'color-mix(in srgb, var(--chrome-border) 35%, transparent)';
 const polarGridStroke = 'color-mix(in srgb, var(--chrome-border) 55%, transparent)';
 const sliderFillGradient =
@@ -359,20 +376,31 @@ export default function RecoveryPage() {
             <div className="space-y-2">
               <label className="text-sm font-medium text-[color:var(--text-1)]">Mood</label>
               <div className="flex gap-2">
-                {MOODS.map((emoji, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setForm((f) => ({ ...f, mood: i + 1 }))}
-                    className={cn(
-                      'flex-1 py-2 rounded-lg text-xl border transition-all',
-                      form.mood === i + 1
-                        ? 'border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)] bg-[rgba(16,16,16,0.78)]'
-                        : 'border-[rgba(65,50,50,0.25)]',
-                    )}
-                  >
-                    {emoji}
-                  </button>
-                ))}
+                {MOOD_OPTIONS.map(({ Icon, label }, i) => {
+                  const selected = form.mood === i + 1;
+                  return (
+                    <button
+                      key={label}
+                      type="button"
+                      aria-label={label}
+                      aria-pressed={selected}
+                      onClick={() => setForm((f) => ({ ...f, mood: i + 1 }))}
+                      className={cn(
+                        'flex flex-1 items-center justify-center rounded-lg border py-2.5 transition-all',
+                        selected
+                          ? 'border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_10%,transparent)] text-[color:var(--accent-light)]'
+                          : 'border-[color:var(--chrome-border-subtle)] bg-[color:var(--surface-well)] text-[color:var(--text-2)] hover:border-[color:color-mix(in_srgb,var(--accent)_28%,transparent)] hover:text-[color:var(--text-1)]',
+                      )}
+                    >
+                      <Icon
+                        size={22}
+                        className="shrink-0"
+                        strokeWidth={selected ? 2.5 : 2}
+                        aria-hidden
+                      />
+                    </button>
+                  );
+                })}
               </div>
             </div>
 

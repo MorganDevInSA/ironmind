@@ -1,11 +1,15 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Brain, ClipboardList, FileJson, Upload, TrendingUp, ArrowRight, Zap } from 'lucide-react';
 import { DemoProfileModal } from '@/components/onboarding/DemoProfileModal';
+import { useAuthStore } from '@/stores';
 
 interface StepProcessMapProps {
   onNext: () => void;
+  /** Jump to the matching onboarding wizard step (indices align with `/onboarding` STEPS). */
+  onGoToStep?: (stepIndex: number) => void;
 }
 
 const nodes = [
@@ -14,35 +18,50 @@ const nodes = [
     number: '01',
     label: 'Activate Coach',
     description: 'Paste the coach persona prompt into ChatGPT, Claude, or Gemini',
+    onboardingStep: 2,
   },
   {
     icon: ClipboardList,
     number: '02',
     label: 'Questionnaire',
     description: 'Complete your athlete intake — every detail sharpens the AI output',
+    onboardingStep: 3,
   },
   {
     icon: FileJson,
     number: '03',
     label: 'Generate JSON Pack',
     description: 'Paste the data-gen prompt + your questionnaire — AI outputs 6 files',
+    onboardingStep: 4,
   },
   {
     icon: Upload,
     number: '04',
     label: 'Import to IRONMIND',
     description: 'Upload the 6 JSON files to fully personalise your app',
+    onboardingStep: 6,
   },
   {
     icon: TrendingUp,
     number: '05',
     label: 'Ongoing Analysis',
     description: 'Export your data anytime and paste into AI for elite coaching advice',
+    onboardingStep: 5,
   },
-];
+] as const;
 
-export function StepProcessMap({ onNext }: StepProcessMapProps) {
+/** Title block — enough for two wrapped lines at 10px uppercase. */
+const TIMELINE_TITLE_MIN = 'min-h-[2.25rem]';
+
+/** Body copy — minimal shared floor for step 03 at narrow card width (~4 lines @ 9px). */
+const TIMELINE_BODY_MIN = 'min-h-[3.375rem]';
+
+const ctaPrimaryCls =
+  'btn-primary inline-flex items-center justify-center gap-2 min-w-[172px] px-6 py-2.5 text-sm';
+
+export function StepProcessMap({ onNext, onGoToStep }: StepProcessMapProps) {
   const [demoOpen, setDemoOpen] = useState(false);
+  const { user } = useAuthStore();
 
   return (
     <div className="flex flex-col gap-8 py-4">
@@ -71,46 +90,67 @@ export function StepProcessMap({ onNext }: StepProcessMapProps) {
         </p>
 
         <div className="overflow-x-auto pb-3 px-4 sm:px-0">
-          <div className="flex flex-row items-stretch gap-0 min-w-max sm:min-w-0 sm:grid sm:grid-cols-5">
-            {nodes.map((node, i) => {
+          <div className="flex flex-row items-stretch gap-0 min-w-max sm:min-w-0 sm:w-full">
+            {nodes.flatMap((node, i) => {
               const Icon = node.icon;
-              return (
-                <div key={node.number} className="flex flex-row items-center">
-                  {/* Node card */}
-                  <div
-                    className="flex flex-col items-center gap-3 p-4 rounded-[14px] w-[148px] sm:w-auto
-                    bg-[rgba(18,14,14,0.78)] backdrop-blur-xl border border-[rgba(65,50,50,0.40)]
-                    shadow-[0_10px_24px_rgba(0,0,0,0.45)]"
+              const card = (
+                <div
+                  key={node.number}
+                  className="flex min-h-0 shrink-0 flex-col self-stretch sm:flex-1 sm:min-w-0 w-[156px] sm:w-auto"
+                >
+                  <button
+                    type="button"
+                    onClick={() => onGoToStep?.(node.onboardingStep)}
+                    aria-label={`Open ${node.label} — step ${node.number}`}
+                    className="group flex h-full min-h-0 w-full cursor-pointer flex-col items-center gap-2.5 rounded-[14px] border border-[rgba(65,50,50,0.40)]
+                    bg-[rgba(18,14,14,0.78)] p-4 text-center shadow-[0_10px_24px_rgba(0,0,0,0.45)] backdrop-blur-xl transition-[border-color,box-shadow,background-color] duration-200
+                    hover:border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)] hover:bg-[rgba(22,16,16,0.88)]
+                    hover:shadow-[0_12px_28px_rgba(0,0,0,0.5)]
+                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:color-mix(in_srgb,var(--accent)_50%,transparent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--bg-0)]"
                   >
-                    {/* Number badge */}
                     <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold
+                      className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center text-xs font-bold
                       bg-[color:color-mix(in_srgb,var(--accent)_15%,transparent)] border border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)] text-[color:var(--accent-light)]
                       [text-shadow:0_0_8px_color-mix(in_srgb,var(--accent)_40%,transparent)]"
                     >
                       {node.number}
                     </div>
-                    <Icon size={20} className="text-[color:var(--accent)]" />
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[color:var(--text-0)] text-center leading-tight">
+                    <Icon
+                      size={20}
+                      className="shrink-0 text-[color:var(--accent)] transition-transform duration-200 group-hover:scale-105"
+                    />
+                    <span
+                      className={`text-[10px] font-bold uppercase tracking-wider text-[color:var(--text-0)] text-center leading-tight w-full ${TIMELINE_TITLE_MIN} flex items-center justify-center`}
+                    >
                       {node.label}
                     </span>
-                    <p className="text-[9px] text-[color:var(--text-2)] text-center leading-snug">
-                      {node.description}
-                    </p>
-                  </div>
-
-                  {/* Connector arrow — between nodes */}
-                  {i < nodes.length - 1 && (
-                    <div className="flex items-center justify-center shrink-0 px-1">
-                      <ArrowRight
-                        size={16}
-                        className="text-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]"
-                        strokeDasharray="4 3"
-                      />
+                    <div
+                      className={`flex w-full min-h-0 flex-1 flex-col items-start justify-start ${TIMELINE_BODY_MIN}`}
+                    >
+                      <p className="text-[9px] text-[color:var(--text-2)] text-center leading-snug max-w-full">
+                        {node.description}
+                      </p>
                     </div>
-                  )}
+                  </button>
                 </div>
               );
+
+              if (i >= nodes.length - 1) return [card];
+
+              const arrow = (
+                <div
+                  key={`${node.number}-arrow`}
+                  className="flex items-center justify-center shrink-0 self-center px-0.5 sm:px-1"
+                >
+                  <ArrowRight
+                    size={16}
+                    className="text-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]"
+                    strokeDasharray="4 3"
+                  />
+                </div>
+              );
+
+              return [card, arrow];
             })}
           </div>
         </div>
@@ -128,21 +168,21 @@ export function StepProcessMap({ onNext }: StepProcessMapProps) {
 
       {/* CTA */}
       <div className="flex flex-col items-center gap-3">
-        <button
-          onClick={onNext}
-          className="btn-primary inline-flex items-center justify-center gap-2 min-w-[172px] px-6 py-2.5 text-sm"
-        >
+        <button type="button" onClick={onNext} className={ctaPrimaryCls}>
           Let&apos;s Start
           <ArrowRight size={18} />
         </button>
 
-        <button
-          onClick={() => setDemoOpen(true)}
-          className="btn-primary inline-flex items-center justify-center gap-2 min-w-[172px] px-6 py-2.5 text-sm"
-        >
+        <button type="button" onClick={() => setDemoOpen(true)} className={ctaPrimaryCls}>
           <Zap size={15} />
           Load Demo
         </button>
+
+        {user ? (
+          <Link href="/dashboard" className={ctaPrimaryCls}>
+            Dashboard
+          </Link>
+        ) : null}
       </div>
 
       <DemoProfileModal open={demoOpen} onClose={() => setDemoOpen(false)} />

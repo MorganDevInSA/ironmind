@@ -15,6 +15,7 @@ import {
   seedMariaData,
   getDemoThemeForProfileId,
 } from '@/lib/seed';
+import { markDashboardTrendWindowFourWeeksAfterDemo } from '@/lib/dashboard-trend-session';
 import { cn } from '@/lib/utils';
 
 // ─── demo profiles ────────────────────────────────────────────────────────────
@@ -218,6 +219,7 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
       await queryClient.invalidateQueries({ queryKey: qk.volume.all });
       await queryClient.invalidateQueries({ queryKey: qk.dashboard.all });
       await queryClient.invalidateQueries({ queryKey: qk.physique.all });
+      markDashboardTrendWindowFourWeeksAfterDemo();
       setDone(true);
       setTimeout(() => {
         onClose();
