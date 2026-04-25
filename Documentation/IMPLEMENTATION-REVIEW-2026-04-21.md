@@ -28,16 +28,16 @@ This document records the full request set, accepted decisions, and shipped impl
 
 ## 2) Request-to-implementation matrix
 
-| Request | Status | Implementation |
-|--------|--------|----------------|
-| Coaching notes does not work; maybe delete | Completed | Deleted `src/app/(app)/coaching/page.tsx`, removed sidebar `/coaching` link, removed dashboard coaching note card/modal. |
-| Keep option to enter notes for export | Completed | Added persisted note composer to `src/app/(app)/export/page.tsx` using `useCreateJournalEntry` + recent list via `useJournalEntries`. |
-| Dashboard selected day + selected panel synchronized glow/border/button glow | Completed | Added shared `.is-selected` utility in `src/app/globals.css`; applied to cycle-day tabs and selected session panel in `src/app/(app)/dashboard/page.tsx`. |
-| Nutrition day type styling mismatch | Completed | Updated day-type selected/unselected styling in `src/app/(app)/nutrition/page.tsx` to theme-token + `.is-selected` treatment. |
-| Recovery header needs same styling language | Completed | Tokenized header/tabs in `src/app/(app)/recovery/page.tsx`, applied `.is-selected` for active tab. |
-| Coaching training journal text formatting | Superseded by accepted deletion decision | Coaching journal UI removed with `/coaching`; note functionality retained in export workflow. |
-| Onboard theme option (crimson/hot pink/custom) | Completed | Added `src/components/onboarding/StepTheme.tsx`; wired into `src/app/(onboarding)/onboarding/page.tsx`; updated step indices. |
-| Expand demo profiles with professional coach form details | Completed | Extended `src/components/onboarding/DemoProfileModal.tsx` profile model and card UI with lifestyle, history, genetics, equipment, coach summary for Morton, Sheri, Alex, Jordan. |
+| Request                                                                      | Status                                   | Implementation                                                                                                                                                                   |
+| ---------------------------------------------------------------------------- | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Coaching notes does not work; maybe delete                                   | Completed                                | Deleted `src/app/(app)/coaching/page.tsx`, removed sidebar `/coaching` link, removed dashboard coaching note card/modal.                                                         |
+| Keep option to enter notes for export                                        | Completed                                | Added persisted note composer to `src/app/(app)/export/page.tsx` using `useCreateJournalEntry` + recent list via `useJournalEntries`.                                            |
+| Dashboard selected day + selected panel synchronized glow/border/button glow | Completed                                | Added shared `.is-selected` utility in `src/app/globals.css`; applied to cycle-day tabs and selected session panel in `src/app/(app)/dashboard/page.tsx`.                        |
+| Nutrition day type styling mismatch                                          | Completed                                | Updated day-type selected/unselected styling in `src/app/(app)/nutrition/page.tsx` to theme-token + `.is-selected` treatment.                                                    |
+| Recovery header needs same styling language                                  | Completed                                | Tokenized header/tabs in `src/app/(app)/recovery/page.tsx`, applied `.is-selected` for active tab.                                                                               |
+| Coaching training journal text formatting                                    | Superseded by accepted deletion decision | Coaching journal UI removed with `/coaching`; note functionality retained in export workflow.                                                                                    |
+| Onboard theme option (crimson/hot pink/custom)                               | Completed                                | Added `src/components/onboarding/StepTheme.tsx`; wired into `src/app/(onboarding)/onboarding/page.tsx`; updated step indices.                                                    |
+| Expand demo profiles with professional coach form details                    | Completed                                | Extended `src/components/onboarding/DemoProfileModal.tsx` profile model and card UI with lifestyle, history, genetics, equipment, coach summary for Morton, Cheri, Alex, Jordan. |
 
 ---
 
@@ -104,7 +104,6 @@ These are now updated in:
 If product copy should match stakeholder naming exactly, update visible profile labels from:
 
 - `Morton` -> `Morgan`
-- `Sheri` -> `Keri`
+- `Cheri` -> `Keri`
 
 Current implementation keeps codebase seed names as-is and maps requested detail to those existing demo personas.
-

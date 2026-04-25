@@ -8,7 +8,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/constants/query-keys';
 import {
   seedMortonData,
-  seedSheriData,
+  seedCheriData,
   seedAlexData,
   seedJordanData,
   seedFezData,
@@ -61,8 +61,8 @@ const DEMO_PROFILES: DemoProfile[] = [
       'Primary coaching focus is intelligent load progression around pelvic constraints, not motivation or access.',
   },
   {
-    id: 'sheri',
-    name: 'Sheri',
+    id: 'cheri',
+    name: 'Cheri',
     age: 45,
     sex: 'Female',
     level: 'Beginner',
@@ -193,8 +193,8 @@ export function DemoProfileModal({ open, onClose, alreadySeeded = false }: DemoP
     setLoading(true);
     setError('');
     try {
-      if (selected === 'sheri') {
-        await seedSheriData(user.uid);
+      if (selected === 'cheri') {
+        await seedCheriData(user.uid);
       } else if (selected === 'alex') {
         await seedAlexData(user.uid);
       } else if (selected === 'jordan') {

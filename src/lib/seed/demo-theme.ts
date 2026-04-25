@@ -3,7 +3,7 @@ import type { AppTheme } from '@/stores/ui-store';
 /** Demo profile picker `id` → accent preset (IRONMIND curated). */
 export const DEMO_THEME_BY_PROFILE_ID: Record<string, AppTheme> = {
   morton: 'crimson',
-  sheri: 'hot-pink',
+  cheri: 'hot-pink',
   alex: 'emerald',
   jordan: 'forge',
   fez: 'cobalt',
@@ -12,7 +12,7 @@ export const DEMO_THEME_BY_PROFILE_ID: Record<string, AppTheme> = {
 
 const DEMO_THEME_BY_CLIENT_NAME_LOWER: Record<string, AppTheme> = {
   morton: 'crimson',
-  sheri: 'hot-pink',
+  cheri: 'hot-pink',
   alex: 'emerald',
   jordan: 'forge',
   fez: 'cobalt',

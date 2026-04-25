@@ -1,12 +1,12 @@
 /**
- * **Sheri** — foundation fat-loss: scale drifts down from a heavier start toward `sheriProfile` (95 kg).
+ * **Cheri** — foundation fat-loss: scale drifts down from a heavier start toward `cheriProfile` (95 kg).
  * Waist/hips contract; arms hold; last row matches current profile weight for dashboard parity.
  *
- * Demo-only — consumed exclusively when `seedSheriData` → `seedDemoHistoricalData` runs.
+ * Demo-only — consumed exclusively when `seedCheriData` → `seedDemoHistoricalData` runs.
  */
 import type { DemoPhysiqueWeek } from './types';
 
-export const sheriDemoPhysiqueWeeks: readonly DemoPhysiqueWeek[] = [
+export const cheriDemoPhysiqueWeeks: readonly DemoPhysiqueWeek[] = [
   {
     bodyweight: 96.8,
     measurements: {

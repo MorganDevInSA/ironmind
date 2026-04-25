@@ -309,7 +309,7 @@ export default function WorkoutPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-4 pb-8 font-sans">
       {/* Sticky header */}
-      <div className="sticky top-14 z-20 glass-panel px-4 py-3 flex items-center gap-3">
+      <div className="sticky top-14 z-20 flex items-center gap-3 border-b border-[color:var(--chrome-border-subtle)] bg-[color:color-mix(in_srgb,var(--chrome-bg)_88%,transparent)] px-4 py-3 shadow-[var(--chrome-header-shadow)] backdrop-blur-md">
         <button
           type="button"
           onClick={() => router.back()}
@@ -350,9 +350,9 @@ export default function WorkoutPage() {
         />
       </div>
 
-      {/* Session note — accent border/text (never legacy amber warn gold) */}
+      {/* Session coaching / RIR — full accent frame (theme token, not edge-only) */}
       {session.notes && (
-        <div className="glass-panel border-l-4 border-[color:var(--accent)] bg-[color-mix(in_srgb,var(--accent)_8%,transparent)] p-3">
+        <div className="glass-panel border border-[color:color-mix(in_srgb,var(--accent)_36%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_8%,transparent)] p-3 sm:p-4">
           <p className="font-sans text-sm leading-relaxed text-[color:var(--text-0)]">
             {session.notes}
           </p>
@@ -375,7 +375,11 @@ export default function WorkoutPage() {
           return (
             <div
               key={exercise.exerciseId}
-              className={cn('glass-panel overflow-hidden', allDone && 'opacity-80')}
+              className={cn(
+                'glass-panel overflow-hidden transition-[border-color,box-shadow] duration-200',
+                allDone && 'opacity-80',
+                isOpen && 'is-selected',
+              )}
             >
               <button
                 type="button"
@@ -399,11 +403,7 @@ export default function WorkoutPage() {
                     <span className="font-semibold text-[color:var(--text-0)]">
                       {exercise.name}
                     </span>
-                    {exercise.isKPI && (
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-[rgba(16,16,16,0.78)] text-[color:var(--accent)] border border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)]">
-                        KPI
-                      </span>
-                    )}
+                    {exercise.isKPI && <span className="workout-kpi-badge">KPI</span>}
                   </div>
                   <p className="text-xs text-[color:var(--text-2)]">
                     {exercise.sets} × {exercise.reps} · {exercise.rest}s rest
@@ -412,7 +412,7 @@ export default function WorkoutPage() {
 
                 <div className="flex items-center gap-3 shrink-0">
                   {exVolume > 0 && (
-                    <span className="text-xs font-mono tabular-nums text-theme-accent">
+                    <span className="font-mono tabular-nums workout-volume-metric">
                       {Math.round(exVolume).toLocaleString()} kg
                     </span>
                   )}
@@ -449,10 +449,10 @@ export default function WorkoutPage() {
                       <div
                         key={i}
                         className={cn(
-                          'grid grid-cols-[2.5rem_1fr_1fr_5rem] items-center gap-2 rounded-lg border p-2 transition-all',
+                          'grid grid-cols-[2.5rem_1fr_1fr_5rem] items-center gap-2 rounded-lg border p-2 transition-[border-color,box-shadow,background-color]',
                           log.timeStamped
                             ? 'border-[color:color-mix(in_srgb,var(--good)_38%,transparent)] bg-[color:color-mix(in_srgb,var(--good)_8%,transparent)]'
-                            : 'border-[color:var(--chrome-border-subtle)] bg-[color:var(--surface-well)]',
+                            : 'border-[color:var(--chrome-border-subtle)] bg-[color:var(--surface-well)] focus-within:border-[color:color-mix(in_srgb,var(--accent)_48%,transparent)] focus-within:shadow-[0_0_0_1px_color-mix(in_srgb,var(--accent)_22%,transparent)]',
                         )}
                       >
                         <span className="text-xs font-mono text-[color:var(--text-2)] text-center">

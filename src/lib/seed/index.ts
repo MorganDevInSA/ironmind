@@ -28,12 +28,12 @@ import { mortonInitialPhase } from './phase';
 import { mortonVolumeLandmarks } from './volume-landmarks';
 import { mortonInitialNotes } from './coaching-notes';
 
-import { sheriProfile } from './sheri-profile';
-import { sheriProgram } from './sheri-program';
-import { sheriNutritionPlan } from './sheri-nutrition';
-import { sheriSupplementProtocol } from './sheri-supplements';
-import { sheriInitialPhase } from './sheri-phase';
-import { sheriVolumeLandmarks } from './sheri-volume-landmarks';
+import { cheriProfile } from './cheri-profile';
+import { cheriProgram } from './cheri-program';
+import { cheriNutritionPlan } from './cheri-nutrition';
+import { cheriSupplementProtocol } from './cheri-supplements';
+import { cheriInitialPhase } from './cheri-phase';
+import { cheriVolumeLandmarks } from './cheri-volume-landmarks';
 
 import { alexProfile } from './alex-profile';
 import { alexProgram } from './alex-program';
@@ -227,42 +227,42 @@ export async function seedMortonData(userId: string): Promise<void> {
 }
 
 /**
- * Seed Sheri's data — overwrites any existing data for userId
+ * Seed Cheri's data — overwrites any existing data for userId
  */
-export async function seedSheriData(userId: string): Promise<void> {
-  await updateProfile(userId, sheriProfile);
+export async function seedCheriData(userId: string): Promise<void> {
+  await updateProfile(userId, cheriProfile);
   const historyStartStr = getDemoHistoryStartDateString();
   const programId = await createProgram(userId, {
-    ...sheriProgram,
+    ...cheriProgram,
     startDate: historyStartStr,
   });
   await setActiveProgram(userId, programId);
-  await saveProtocol(userId, sheriSupplementProtocol);
-  const phaseId = await createPhase(userId, sheriInitialPhase);
+  await saveProtocol(userId, cheriSupplementProtocol);
+  const phaseId = await createPhase(userId, cheriInitialPhase);
   await setActivePhase(userId, phaseId);
-  await updateVolumeLandmarks(userId, sheriVolumeLandmarks);
+  await updateVolumeLandmarks(userId, cheriVolumeLandmarks);
 
-  await saveNutritionPlan(userId, sheriNutritionPlan);
+  await saveNutritionPlan(userId, cheriNutritionPlan);
   const todayStr = today();
   await saveNutritionDay(userId, todayStr, {
     date: todayStr,
     dayType: 'moderate',
     meals: [],
-    macroTargets: sheriNutritionPlan.macroTargetsByDayType.moderate,
+    macroTargets: cheriNutritionPlan.macroTargetsByDayType.moderate,
     macroActuals: { calories: 0, protein: 0, carbs: 0, fat: 0 },
     complianceScore: 0,
   });
   await seedDemoHistoricalData({
-    personaId: 'sheri',
+    personaId: 'cheri',
     userId,
-    profile: sheriProfile,
+    profile: cheriProfile,
     programId,
     program: {
-      ...sheriProgram,
+      ...cheriProgram,
       startDate: historyStartStr,
     },
-    nutritionPlan: sheriNutritionPlan,
-    supplementProtocol: sheriSupplementProtocol,
+    nutritionPlan: cheriNutritionPlan,
+    supplementProtocol: cheriSupplementProtocol,
     days: DEMO_HISTORY_DAYS,
     historyStartDate: historyStartStr,
   });

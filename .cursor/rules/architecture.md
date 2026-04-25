@@ -153,11 +153,11 @@ All date/time fields in TypeScript types must be `string`, not `Date`.
 When creating or modifying `src/lib/seed/*.ts`:
 
 1. Modules MUST be imported into [`src/lib/seed/index.ts`](../../src/lib/seed/index.ts).
-2. **First-login baseline (Morton)** MUST be invoked from `seedUserData()` in that same file. **Alternate demo personas** (Sheri, Alex, Jordan, Fez, Maria, …) MUST be wired through **`seed*Data` overwrite helpers** and the **Demo profile modal** — never orphan modules that are not imported/called.
+2. **First-login baseline (Morton)** MUST be invoked from `seedUserData()` in that same file. **Alternate demo personas** (Cheri, Alex, Jordan, Fez, Maria, …) MUST be wired through **`seed*Data` overwrite helpers** and the **Demo profile modal** — never orphan modules that are not imported/called.
 3. Success paths SHOULD log with `✓` prefix where the file already uses that pattern.
 
 ```ts
-// Pattern: baseline in seedUserData(); demos in seedSheriData(), seedFezData(), etc.
+// Pattern: baseline in seedUserData(); demos in seedCheriData(), seedFezData(), etc.
 // Demo historical: demo-historical.ts + demo-data/physique/ (weekly literals) + demo-theme.ts
 // See Documentation/EXPERT-DEMO-DATA-AND-STORAGE-GUIDE.md §3–§4, §13.
 ```

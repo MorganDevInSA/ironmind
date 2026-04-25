@@ -17,6 +17,19 @@ export function today(): string {
   return formatDate(new Date());
 }
 
+/**
+ * Calendar key for comparisons and charts. Firestore converters may surface
+ * `date` as full ISO (`2026-04-19T00:00:00.000Z`); those strings sort *after*
+ * plain `yyyy-MM-dd` bounds and fail `<= trendTo` filters even when the day is in range.
+ */
+export function toDateOnlyKey(raw: string | undefined | null): string {
+  if (raw == null) return '';
+  const s = String(raw).trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  const m = s.match(/^(\d{4}-\d{2}-\d{2})/);
+  return m ? m[1] : s;
+}
+
 export function parseDate(dateString: string): Date {
   return parseISO(dateString);
 }
@@ -72,4 +85,3 @@ export function getDayName(date: Date | string, short = false): string {
   const d = typeof date === 'string' ? parseISO(date) : date;
   return format(d, short ? 'EEE' : 'EEEE');
 }
-

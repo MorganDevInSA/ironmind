@@ -84,7 +84,7 @@ const personaTuning: Record<DemoPersonaId, PersonaTuning> = {
     avgDomsOnLift: 5.5,
     mealPortionMultiplier: 1.05,
   },
-  sheri: {
+  cheri: {
     workoutAdherence: 0.78,
     nutritionAdherence: 0.74,
     supplementAdherence: 0.68,
@@ -219,7 +219,7 @@ export async function seedDemoHistoricalData(ctx: HistoricalSeedContext): Promis
     const isLift = session?.type === 'lift';
     const weekNum = Math.floor(i / 7);
     const isDeloadWeek = weekNum === midDeloadWeek;
-    const isStressWeekSheri = ctx.personaId === 'sheri' && weekNum === 3;
+    const isStressWeekCheri = ctx.personaId === 'cheri' && weekNum === 3;
     const isStressWeekMaria = ctx.personaId === 'maria' && weekNum === 5;
 
     let workoutP = tuning.workoutAdherence;
@@ -228,12 +228,12 @@ export async function seedDemoHistoricalData(ctx: HistoricalSeedContext): Promis
         ctx.personaId === 'morton' || ctx.personaId === 'alex' || ctx.personaId === 'fez'
           ? 0.86
           : 0.78;
-    if (isStressWeekSheri) workoutP *= 0.88;
+    if (isStressWeekCheri) workoutP *= 0.88;
     if (isStressWeekMaria) workoutP *= 0.85;
 
     let nutritionP = tuning.nutritionAdherence;
     if (isDeloadWeek) nutritionP *= 0.93;
-    if (isStressWeekSheri) nutritionP *= 0.89;
+    if (isStressWeekCheri) nutritionP *= 0.89;
     if (isStressWeekMaria) nutritionP *= 0.9;
 
     const didWorkout = Boolean(isLift && chance(workoutP, i, 11));
@@ -279,7 +279,7 @@ export async function seedDemoHistoricalData(ctx: HistoricalSeedContext): Promis
       tuning,
       dayIndex: i,
       personaId: ctx.personaId,
-      stressBump: isStressWeekSheri ? 1.4 : isStressWeekMaria ? 1.1 : isDeloadWeek ? -0.35 : 0,
+      stressBump: isStressWeekCheri ? 1.4 : isStressWeekMaria ? 1.1 : isDeloadWeek ? -0.35 : 0,
     });
     await saveRecoveryEntry(ctx.userId, date, recovery);
 
@@ -570,7 +570,7 @@ function buildStaticDemoCheckIn(args: {
   const conditioningByPersona: Record<DemoPersonaId, number> = {
     morton: 7,
     alex: 7,
-    sheri: 5,
+    cheri: 5,
     jordan: 6,
     fez: 8,
     maria: 5,
@@ -637,7 +637,7 @@ function buildJournalNotes(
         tags: ['summary', 'progress'],
       },
     ],
-    sheri: [
+    cheri: [
       {
         date: d1,
         title: 'Routine Kickoff',
@@ -803,7 +803,7 @@ function workoutSessionNotes(
   if (personaId === 'morton' && weekIndex >= 9) {
     return 'Late block: effort high but controlled; monitoring shoulder and pelvic response.';
   }
-  if (personaId === 'sheri' && weekIndex === 3) {
+  if (personaId === 'cheri' && weekIndex === 3) {
     return 'Stress week — reduced accessories, protected main lifts.';
   }
   if (personaId === 'alex' && weekIndex >= 8) {
@@ -837,7 +837,7 @@ const DEMO_CHECK_IN_COACH_NOTES: Record<DemoPersonaId, readonly string[]> = {
     'Late-block tissue check: dull fatigue ok — flag anything sharp or nerve-like early.',
     'Twelve-week close: strength retained, waist tighter vs week 0 — easy week before next bias.',
   ],
-  sheri: [
+  cheri: [
     'Foundation: repeatable week template beats one heroic week you cannot repeat.',
     'Steps creeping up; keep protein anchored on the busiest workdays first.',
     'Weekend structure is still the lever — pre-portion Sat/Sun when you can.',
@@ -1007,7 +1007,7 @@ function inferBaseWeight(personaId: DemoPersonaId, exerciseName: string): number
   const n = exerciseName.toLowerCase();
   const baseByPersona: Record<DemoPersonaId, number> = {
     morton: 30,
-    sheri: 14,
+    cheri: 14,
     alex: 42,
     jordan: 16,
     fez: 38,
@@ -1025,7 +1025,7 @@ function inferBaseWeight(personaId: DemoPersonaId, exerciseName: string): number
 
 function progressionStep(personaId: DemoPersonaId, exerciseName: string): number {
   const n = exerciseName.toLowerCase();
-  const base = personaId === 'sheri' || personaId === 'jordan' || personaId === 'maria' ? 0.5 : 1;
+  const base = personaId === 'cheri' || personaId === 'jordan' || personaId === 'maria' ? 0.5 : 1;
   if (n.includes('deadlift') || n.includes('squat')) return base + 0.7;
   if (n.includes('bench') || n.includes('row') || n.includes('pull')) return base + 0.4;
   return base;

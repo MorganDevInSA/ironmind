@@ -22,6 +22,7 @@ const INLINE_THEME_VARS = [
   '--text-detail',
   '--shadow-accent',
   '--shadow-gold',
+  /* Cleared when leaving custom; border now follows --accent via stylesheet color-mix. */
   '--exercise-index-border',
   '--chrome-border',
   '--chrome-border-subtle',
@@ -78,17 +79,19 @@ export function ThemeSync() {
       root.style.setProperty('--text-1', `rgb(${t1R},${t1G},${t1B})`);
       root.style.setProperty('--text-2', `rgb(${t2R},${t2G},${t2B})`);
       const dR = Math.round(lr.r * 0.45 + 216 * 0.55);
-      const dG = Math.round(lr.g * 0.40 + 152 * 0.60);
-      const dB = Math.round(lr.b * 0.40 + 152 * 0.60);
+      const dG = Math.round(lr.g * 0.4 + 152 * 0.6);
+      const dB = Math.round(lr.b * 0.4 + 152 * 0.6);
       root.style.setProperty('--text-detail', `rgb(${dR},${dG},${dB})`);
       root.style.setProperty('--shadow-accent', `0 8px 32px rgba(${r},${g},${b},0.20)`);
       root.style.setProperty('--shadow-gold', `0 8px 32px rgba(${r},${g},${b},0.20)`);
-      root.style.setProperty('--exercise-index-border', `rgba(${r},${g},${b},0.42)`);
       const warmR = Math.round(r * 0.3 + 65 * 0.7);
       const warmG = Math.round(g * 0.25 + 50 * 0.75);
       const warmB = Math.round(b * 0.25 + 50 * 0.75);
       root.style.setProperty('--chrome-border', `rgba(${warmR},${warmG},${warmB},0.38)`);
-      root.style.setProperty('--chrome-border-subtle', `rgba(${Math.round(warmR*0.65)},${Math.round(warmG*0.72)},${Math.round(warmB*0.72)},0.72)`);
+      root.style.setProperty(
+        '--chrome-border-subtle',
+        `rgba(${Math.round(warmR * 0.65)},${Math.round(warmG * 0.72)},${Math.round(warmB * 0.72)},0.72)`,
+      );
       root.style.setProperty('--body-glow-1', `rgba(${r},${g},${b},0.06)`);
       root.style.setProperty('--body-glow-2', `rgba(${r},${g},${b},0.04)`);
       root.style.setProperty('--body-glow-3', `rgba(${r},${g},${b},0.03)`);

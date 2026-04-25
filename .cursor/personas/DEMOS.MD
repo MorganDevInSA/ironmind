@@ -155,7 +155,7 @@ Examples:
 
 Alternate persona modules may use patterns such as:
 
-* `sheri-*`
+* `cheri-*`
 * `alex-*`
 * `jordan-*`
 * `fez-*` — vegan lean-bulk bodyboarder, shoulder hardware, commercial gym + cardio (`seedFezData`, theme **cobalt**)
@@ -167,7 +167,7 @@ Any new seed module must be imported and invoked through:
 
 Never create orphan seed files.
 
-**Synced product behaviour (repo):** Six demo profiles in `DemoProfileModal`; theme presets live in **`src/lib/seed/demo-theme.ts`** (**morton → crimson**, **sheri → hot-pink**, **alex → emerald**, **jordan → forge**, **fez → cobalt**, **maria → violet**) and apply after seed from the modal plus on navigation/refresh via **`DemoThemeSync`**. **`seedDemoHistoricalData`** calls **`deleteAllCheckIns`**, then maps **twelve** hand-authored weekly rows per persona from **`src/lib/seed/demo-data/physique/`** onto the anchored history window (daily workouts/nutrition/recovery still generated in **`demo-historical.ts`** via **`personaTuning`**). `saveCheckIn` merges measurements; **`sanitizeMeasurementsInput`** / **`measurementForChart`** reject or hide impossible circumferences; charts sort by date and use **`dateKey`**. **Physique → History** renders a **scrollable table** (newest first; first **10** rows): each tape column and scale shows **absolute** values plus **Δ vs the next older** logged row — deterministic jitter on intermediate demo weeks keeps the narrative believable. See `Documentation/EXPERT-DEMO-DATA-AND-STORAGE-GUIDE.md` §3–§4, §13.
+**Synced product behaviour (repo):** Six demo profiles in `DemoProfileModal`; theme presets live in **`src/lib/seed/demo-theme.ts`** (**morton → crimson**, **cheri → hot-pink**, **alex → emerald**, **jordan → forge**, **fez → cobalt**, **maria → violet**) and apply after seed from the modal plus on navigation/refresh via **`DemoThemeSync`**. **`seedDemoHistoricalData`** calls **`deleteAllCheckIns`**, then maps **twelve** hand-authored weekly rows per persona from **`src/lib/seed/demo-data/physique/`** onto the anchored history window (daily workouts/nutrition/recovery still generated in **`demo-historical.ts`** via **`personaTuning`**). `saveCheckIn` merges measurements; **`sanitizeMeasurementsInput`** / **`measurementForChart`** reject or hide impossible circumferences; charts sort by date and use **`dateKey`**. **Physique → History** renders a **scrollable table** (newest first; first **10** rows): each tape column and scale shows **absolute** values plus **Δ vs the next older** logged row — deterministic jitter on intermediate demo weeks keeps the narrative believable. See `Documentation/EXPERT-DEMO-DATA-AND-STORAGE-GUIDE.md` §3–§4, §13.
 
 ---
 

@@ -9,8 +9,13 @@ import {
   formatDisplayDate,
   formatShortDate,
   sortCheckInsChronologicalAsc,
+  toDateOnlyKey,
 } from '@/lib/utils';
-import { measurementForChart, sanitizeMeasurementsInput } from '@/lib/utils/measurement-bounds';
+import {
+  bodyweightForChartKg,
+  measurementForChart,
+  sanitizeMeasurementsInput,
+} from '@/lib/utils/measurement-bounds';
 import { MEASUREMENT_CHART_SERIES } from '@/lib/constants/measurement-chart-series';
 import {
   Scale,
@@ -316,14 +321,14 @@ export default function PhysiquePage() {
   /* ── Chart data ─────────────────────────────────────────────── */
   const chron = sortCheckInsChronologicalAsc(checkIns ?? []);
   const weightData = chron.map((c: CheckIn) => ({
-    dateKey: c.date,
-    weight: c.bodyweight,
+    dateKey: toDateOnlyKey(c.date) || c.date,
+    weight: bodyweightForChartKg(c.bodyweight),
   }));
 
   const measurementData = chron.map((c: CheckIn) => {
     const m = c.measurements ?? {};
     return {
-      dateKey: c.date,
+      dateKey: toDateOnlyKey(c.date) || c.date,
       waist: measurementForChart('waist', m.waist),
       chest: measurementForChart('chest', m.chest),
       hips: measurementForChart('hips', m.hips),

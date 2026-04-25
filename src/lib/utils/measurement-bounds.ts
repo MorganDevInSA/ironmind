@@ -72,3 +72,12 @@ export function measurementForChart(key: keyof Measurements, value: unknown): nu
   if (!inBounds(key as keyof typeof CM_BOUNDS, n)) return undefined;
   return Math.round(n * 10) / 10;
 }
+
+/** Bodyweight safe for charts (Firestore may store strings; strip junk / impossible kg). */
+export function bodyweightForChartKg(value: unknown): number | undefined {
+  const n = toFiniteNumber(value);
+  if (n === undefined || !Number.isFinite(n)) return undefined;
+  /* Keep permissive for chart display — tight bounds belong on save (sanitize), not plot. */
+  if (n <= 0 || n > 600) return undefined;
+  return Math.round(n * 10) / 10;
+}

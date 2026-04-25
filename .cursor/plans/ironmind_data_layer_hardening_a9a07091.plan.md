@@ -1,66 +1,66 @@
 ---
 name: IronMind Data Layer Hardening
-overview: "Comprehensive, execution-ready remediation of all 15 findings from the senior data-layer audit: centralize Firestore write safety, introduce typed service errors, fix cache key collisions, deploy security rules, eliminate alert double-fetch, close architecture boundary violations, and resolve tech-debt gaps — all without harming the polished UI/UX."
+overview: 'Comprehensive, execution-ready remediation of all 15 findings from the senior data-layer audit: centralize Firestore write safety, introduce typed service errors, fix cache key collisions, deploy security rules, eliminate alert double-fetch, close architecture boundary violations, and resolve tech-debt gaps — all without harming the polished UI/UX.'
 todos:
   - id: fix-2
-    content: "FIX 2: Centralize stripUndefinedDeep in src/lib/firebase/firestore.ts (setDocument/updateDocument/addDocument); retire local copy in physique.service.ts"
+    content: 'FIX 2: Centralize stripUndefinedDeep in src/lib/firebase/firestore.ts (setDocument/updateDocument/addDocument); retire local copy in physique.service.ts'
     status: completed
   - id: fix-5
-    content: "FIX 5: Add training.recentWorkouts(days) to query-keys.ts; update useRecentWorkouts in use-training.ts to use it"
+    content: 'FIX 5: Add training.recentWorkouts(days) to query-keys.ts; update useRecentWorkouts in use-training.ts to use it'
     status: completed
   - id: fix-6
-    content: "FIX 6: Wire staleTimes to all queries in use-dashboard.ts; fix useNutritionPlan to use staleTimes.macroTargets"
+    content: 'FIX 6: Wire staleTimes to all queries in use-dashboard.ts; fix useNutritionPlan to use staleTimes.macroTargets'
     status: completed
   - id: fix-4
-    content: "FIX 4: Refactor alerts.service.ts to export summarizeAlerts (sync); update use-alerts.ts useAlertSummary to derive from cache; remove checkShoulderSpillover stub and unused imports; delete nutrition.service checkCalorieEmergency"
+    content: 'FIX 4: Refactor alerts.service.ts to export summarizeAlerts (sync); update use-alerts.ts useAlertSummary to derive from cache; remove checkShoulderSpillover stub and unused imports; delete nutrition.service checkCalorieEmergency'
     status: completed
   - id: fix-1a
-    content: "FIX 1a: Create src/lib/errors/service-error.ts with ServiceError class, toServiceError, withService; add src/lib/errors/index.ts"
+    content: 'FIX 1a: Create src/lib/errors/service-error.ts with ServiceError class, toServiceError, withService; add src/lib/errors/index.ts'
     status: completed
   - id: fix-1b
-    content: "FIX 1b: Wrap every exported function in all src/services/*.service.ts (except storage) with withService(domain, op, ...)"
+    content: 'FIX 1b: Wrap every exported function in all src/services/*.service.ts (except storage) with withService(domain, op, ...)'
     status: completed
   - id: fix-1c
-    content: "FIX 1c: Create src/controllers/_shared/on-error.ts; add onError: onMutationError to every useMutation across controllers"
+    content: 'FIX 1c: Create src/controllers/_shared/on-error.ts; add onError: onMutationError to every useMutation across controllers'
     status: completed
   - id: fix-3a
-    content: "FIX 3a: Refactor src/components/auth/auth-guard.tsx to use queryClient.fetchQuery instead of direct isUserSeeded import"
+    content: 'FIX 3a: Refactor src/components/auth/auth-guard.tsx to use queryClient.fetchQuery instead of direct isUserSeeded import'
     status: completed
   - id: fix-3b
-    content: "FIX 3b: Create src/controllers/use-import.ts (useImportCoachData, useSeedDemoData); refactor StepImportFiles.tsx to use it"
+    content: 'FIX 3b: Create src/controllers/use-import.ts (useImportCoachData, useSeedDemoData); refactor StepImportFiles.tsx to use it'
     status: completed
   - id: fix-3c
-    content: "FIX 3c: Document allowed firebase-import exceptions in .cursor/rules/architecture.md"
+    content: 'FIX 3c: Document allowed firebase-import exceptions in .cursor/rules/architecture.md'
     status: completed
   - id: fix-7
-    content: "FIX 7: Create firestore.rules, storage.rules, firebase.json, firestore.indexes.json, .firebaserc placeholder; append deploy instructions to README.md"
+    content: 'FIX 7: Create firestore.rules, storage.rules, firebase.json, firestore.indexes.json, .firebaserc placeholder; append deploy instructions to README.md'
     status: completed
   - id: fix-8
-    content: "FIX 8: Add saveNutritionPlan call inside importCoachData nutrition block in src/services/import.service.ts"
+    content: 'FIX 8: Add saveNutritionPlan call inside importCoachData nutrition block in src/services/import.service.ts'
     status: completed
   - id: fix-9
     content: "FIX 9: Add export * from './import.service' to src/services/index.ts"
     status: completed
   - id: fix-10
-    content: "FIX 10: Pin eslint-config-next to ^14.2.35 in package.json; run npm install; npm run lint"
+    content: 'FIX 10: Pin eslint-config-next to ^14.2.35 in package.json; run npm install; npm run lint'
     status: completed
   - id: fix-11
-    content: "FIX 11: Replace images.domains with images.remotePatterns in next.config.mjs"
+    content: 'FIX 11: Replace images.domains with images.remotePatterns in next.config.mjs'
     status: completed
   - id: fix-12
-    content: "FIX 12: Remove hardcoded accent/crimson/gold color entries from tailwind.config.js; add guard comment; convert any stray text-accent/bg-accent usage to var(--accent)"
+    content: 'FIX 12: Remove hardcoded accent/crimson/gold color entries from tailwind.config.js; add guard comment; convert any stray text-accent/bg-accent usage to var(--accent)'
     status: completed
   - id: fix-13
-    content: "FIX 13: Replace stray hardcoded crimson hex in src/app/globals.css with var(--accent)/color-mix (outside :root and [data-theme] blocks)"
+    content: 'FIX 13: Replace stray hardcoded crimson hex in src/app/globals.css with var(--accent)/color-mix (outside :root and [data-theme] blocks)'
     status: completed
   - id: fix-14
-    content: "FIX 14: Add queryClient passthrough + readCached helper to src/lib/export/generate-summary.ts; update use-export.ts to inject queryClient"
+    content: 'FIX 14: Add queryClient passthrough + readCached helper to src/lib/export/generate-summary.ts; update use-export.ts to inject queryClient'
     status: completed
   - id: fix-15
-    content: "FIX 15: Create src/stores/online-store.ts, src/components/providers/online-listener.tsx; mount in root layout; add Offline pill to top-bar.tsx"
+    content: 'FIX 15: Create src/stores/online-store.ts, src/components/providers/online-listener.tsx; mount in root layout; add Offline pill to top-bar.tsx'
     status: completed
   - id: final-verify
-    content: "Final verification: tsc --noEmit, npm run lint, npm run build, architecture rg audit, query key audit, manual smoke tests (desktop + 375px mobile, theme switch, offline mode)"
+    content: 'Final verification: tsc --noEmit, npm run lint, npm run build, architecture rg audit, query key audit, manual smoke tests (desktop + 375px mobile, theme switch, offline mode)'
     status: completed
 isProject: false
 ---
@@ -106,6 +106,7 @@ flowchart TD
 ## FIX 1 — ServiceError class + wrap services (CRITICAL)
 
 ### Problem
+
 Every service file except `import.service.ts` has zero try/catch. Firestore errors propagate raw to controllers → TanStack Query → blank UI. A permission/offline error on one collection crashes composite hooks like [src/controllers/use-dashboard.ts](src/controllers/use-dashboard.ts).
 
 ### Solution — Step 1a: Create `ServiceError`
@@ -128,7 +129,7 @@ export class ServiceError extends Error {
     message: string,
     public readonly code: ServiceErrorCode,
     public readonly domain: string,
-    public readonly cause?: unknown
+    public readonly cause?: unknown,
   ) {
     super(message);
     this.name = 'ServiceError';
@@ -136,30 +137,32 @@ export class ServiceError extends Error {
 }
 
 /** Map a raw Firestore/Firebase error to a typed ServiceError. */
-export function toServiceError(
-  domain: string,
-  operation: string,
-  cause: unknown
-): ServiceError {
+export function toServiceError(domain: string, operation: string, cause: unknown): ServiceError {
   const raw = cause as { code?: string; message?: string } | undefined;
   const rawCode = raw?.code ?? '';
 
   if (rawCode === 'permission-denied') {
     return new ServiceError(
       `You do not have permission to perform this ${operation}.`,
-      'PERMISSION_DENIED', domain, cause
+      'PERMISSION_DENIED',
+      domain,
+      cause,
     );
   }
   if (rawCode === 'unavailable' || /offline/i.test(String(cause))) {
     return new ServiceError(
       `Cannot ${operation} while offline. Changes will sync when you reconnect.`,
-      'OFFLINE', domain, cause
+      'OFFLINE',
+      domain,
+      cause,
     );
   }
   if (rawCode === 'unauthenticated') {
     return new ServiceError(
       `Please sign in again to ${operation}.`,
-      'UNAUTHENTICATED', domain, cause
+      'UNAUTHENTICATED',
+      domain,
+      cause,
     );
   }
   if (rawCode === 'not-found') {
@@ -168,19 +171,22 @@ export function toServiceError(
   if (/invalid data|unsupported field/i.test(String(raw?.message ?? ''))) {
     return new ServiceError(
       `Invalid data for ${domain} ${operation}.`,
-      'VALIDATION', domain, cause
+      'VALIDATION',
+      domain,
+      cause,
     );
   }
   return new ServiceError(
     `Failed to ${operation} ${domain}.`,
     operation.startsWith('read') ? 'READ_FAILED' : 'WRITE_FAILED',
     domain,
-    cause
+    cause,
   );
 }
 ```
 
 **New file:** `src/lib/errors/index.ts`
+
 ```ts
 export * from './service-error';
 ```
@@ -195,7 +201,7 @@ Introduce a `withService` helper and apply it consistently. No hand-rolled try/c
 export async function withService<T>(
   domain: string,
   operation: string,
-  fn: () => Promise<T>
+  fn: () => Promise<T>,
 ): Promise<T> {
   try {
     return await fn();
@@ -219,23 +225,27 @@ import { withService } from '@/lib/errors';
 
 export async function getProfile(userId: string): Promise<AthleteProfile | null> {
   return withService('profile', 'read profile', () =>
-    getDocument<AthleteProfile>(collections.profiles(userId), 'data', converter)
+    getDocument<AthleteProfile>(collections.profiles(userId), 'data', converter),
   );
 }
 
 export async function updateProfile(
   userId: string,
-  profile: Partial<AthleteProfile>
+  profile: Partial<AthleteProfile>,
 ): Promise<void> {
   return withService('profile', 'update profile', () =>
     setDocument<AthleteProfile>(
-      collections.profiles(userId), 'data', profile as AthleteProfile, converter
-    )
+      collections.profiles(userId),
+      'data',
+      profile as AthleteProfile,
+      converter,
+    ),
   );
 }
 ```
 
 **Apply identically to:**
+
 - `profile.service.ts` — all 6 functions
 - `training.service.ts` — all program + workout functions (17 total)
 - `nutrition.service.ts` — all Firestore-touching functions (skip pure calcs)
@@ -251,6 +261,7 @@ export async function updateProfile(
 Add a shared error toast helper, so every mutation surfaces `ServiceError.message` consistently.
 
 **New file:** `src/controllers/_shared/on-error.ts`
+
 ```ts
 import { toast } from 'sonner';
 import { ServiceError } from '@/lib/errors';
@@ -285,6 +296,7 @@ export function useUpdateProfile(userId: string) {
 **Controllers to update (all `useMutation` instances):** `use-profile`, `use-training`, `use-nutrition`, `use-recovery`, `use-physique`, `use-supplements`, `use-coaching`, `use-volume`.
 
 ### Verification
+
 - `npx tsc --noEmit` → 0 errors
 - Force an error: disable network, save profile → toast shows "Cannot update profile while offline."
 - UX unchanged: loading spinner still appears during mutation.
@@ -294,6 +306,7 @@ export function useUpdateProfile(userId: string) {
 ## FIX 2 — Centralize `stripUndefined` in Firebase helpers (CRITICAL)
 
 ### Problem
+
 Only [src/services/physique.service.ts](src/services/physique.service.ts) (lines 17–27, 70–74) strips `undefined`. Every other `setDocument`/`updateDocument` call is one `undefined` field away from a silent write rejection.
 
 ### Solution — Step 2a: Hoist `stripUndefinedDeep` into the firebase layer
@@ -313,9 +326,7 @@ export function stripUndefinedDeep<T>(value: T): T {
   if (value === null || typeof value !== 'object') return value;
   if (value instanceof Date) return value;
   if (Array.isArray(value)) {
-    return value
-      .map(stripUndefinedDeep)
-      .filter((v) => v !== undefined) as unknown as T;
+    return value.map(stripUndefinedDeep).filter((v) => v !== undefined) as unknown as T;
   }
   const out: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
@@ -333,20 +344,22 @@ export async function setDocument<T>(
   collectionPath: string,
   docId: string,
   data: WithFieldValue<T>,
-  converter?: FirestoreDataConverter<T>
+  converter?: FirestoreDataConverter<T>,
 ): Promise<void> {
   if (!db) throw new Error('Firestore not initialized');
   const safe = stripUndefinedDeep(data) as WithFieldValue<T>;
-  const docRef = (converter
-    ? doc(db, collectionPath, docId).withConverter(converter)
-    : doc(db, collectionPath, docId)) as DocumentReference<T>;
+  const docRef = (
+    converter
+      ? doc(db, collectionPath, docId).withConverter(converter)
+      : doc(db, collectionPath, docId)
+  ) as DocumentReference<T>;
   await setDoc(docRef, safe, { merge: true });
 }
 
 export async function updateDocument<T>(
   collectionPath: string,
   docId: string,
-  data: Partial<T>
+  data: Partial<T>,
 ): Promise<void> {
   if (!db) throw new Error('Firestore not initialized');
   const safe = stripUndefinedDeep(data) as DocumentData;
@@ -357,13 +370,15 @@ export async function updateDocument<T>(
 export async function addDocument<T>(
   collectionPath: string,
   data: WithFieldValue<T>,
-  converter?: FirestoreDataConverter<T>
+  converter?: FirestoreDataConverter<T>,
 ): Promise<string> {
   if (!db) throw new Error('Firestore not initialized');
   const safe = stripUndefinedDeep(data) as WithFieldValue<T>;
-  const colRef = (converter
-    ? collection(db, collectionPath).withConverter(converter)
-    : collection(db, collectionPath)) as CollectionReference<T>;
+  const colRef = (
+    converter
+      ? collection(db, collectionPath).withConverter(converter)
+      : collection(db, collectionPath)
+  ) as CollectionReference<T>;
   const docRef = await addDoc(colRef, safe);
   return docRef.id;
 }
@@ -372,11 +387,13 @@ export async function addDocument<T>(
 ### Solution — Step 2b: Retire per-service duplication
 
 **Edit** [src/services/physique.service.ts](src/services/physique.service.ts):
+
 - Delete local `stripUndefinedDeep` function (lines 16–27).
 - Import from firebase: `import { stripUndefinedDeep } from '@/lib/firebase/firestore';`
 - Or simpler: remove the local strip call in `saveCheckIn` entirely — the helper now strips automatically. Keep the `measurements: checkIn.measurements ?? {}` default coalesce (lines 73).
 
 ### Verification
+
 - `npx tsc --noEmit` → 0 errors
 - Manual: pass `updateProfile(uid, { currentWeight: 80, fullName: undefined })` — write succeeds, `fullName` untouched in Firestore.
 - No regressions in check-in save (physique page still works with measurement dict).
@@ -386,6 +403,7 @@ export async function addDocument<T>(
 ## FIX 3 — Close architecture boundary violations (HIGH)
 
 ### Problem
+
 Six UI/component files bypass controllers, importing services or firebase directly. [Auth pages are a documented exception]; the rest are tech debt.
 
 ### Solution — Step 3a: `AuthGuard` uses controller only for seed check
@@ -483,7 +501,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Note: `getUserData` is imported as the *service function* but used **as a `queryFn` inside `queryClient.fetchQuery`**. This keeps the seed check inside TanStack's cache layer — the controller pattern in spirit. If the strict rule ("no `@/services` import in components") must be enforced, factor a `src/controllers/_shared/seed-check.ts` that exports `fetchSeedStatus(userId, queryClient)` and import that instead.
+Note: `getUserData` is imported as the _service function_ but used **as a `queryFn` inside `queryClient.fetchQuery`**. This keeps the seed check inside TanStack's cache layer — the controller pattern in spirit. If the strict rule ("no `@/services` import in components") must be enforced, factor a `src/controllers/_shared/seed-check.ts` that exports `fetchSeedStatus(userId, queryClient)` and import that instead.
 
 ### Solution — Step 3b: `StepImportFiles` uses a controller
 
@@ -557,10 +575,13 @@ const handleImport = async () => {
   const force = accountAlreadySeeded && overwriteExistingData;
   const result = await importMutation.mutateAsync({ data: parsedData, force });
   if (result.success) {
-    setImportResult({ success: true, message: `${result.filesImported.length} files imported successfully.` });
+    setImportResult({
+      success: true,
+      message: `${result.filesImported.length} files imported successfully.`,
+    });
     setSubStep('done');
   } else {
-    const msg = result.errors.map(e => `${e.filename}: ${e.error}`).join(' · ');
+    const msg = result.errors.map((e) => `${e.filename}: ${e.error}`).join(' · ');
     setImportResult({ success: false, message: msg });
   }
 };
@@ -598,6 +619,7 @@ All other direct imports from `@/lib/firebase` or `@/services/*` inside `src/app
 ```
 
 ### Verification
+
 - `npx tsc --noEmit` → 0 errors
 - Onboarding file-import flow still completes end-to-end and lands on `/dashboard`.
 - Demo-profile seed still works from `StepImportFiles`.
@@ -607,6 +629,7 @@ All other direct imports from `@/lib/firebase` or `@/services/*` inside `src/app
 ## FIX 4 — Alerts: eliminate double-fetch, wire orphans (HIGH)
 
 ### Problem
+
 - [src/services/alerts.service.ts](src/services/alerts.service.ts) line 228: `getAlertSummary` calls `getActiveAlerts` — duplicates work when both hooks mount.
 - `checkCalorieEmergency` in [src/services/nutrition.service.ts](src/services/nutrition.service.ts) lines 125–155 is dead code.
 - `checkShoulderSpillover` (alerts service line 102) is a stub.
@@ -617,6 +640,7 @@ All other direct imports from `@/lib/firebase` or `@/services/*` inside `src/app
 **Edit** [src/services/alerts.service.ts](src/services/alerts.service.ts):
 
 1. Fix line 1 imports — remove unused types:
+
    ```ts
    import type { SmartAlert } from '@/lib/types';
    import { getRecentWorkouts, getActiveProgram } from './training.service';
@@ -626,15 +650,19 @@ All other direct imports from `@/lib/firebase` or `@/services/*` inside `src/app
    ```
 
 2. Replace `getAlertSummary` (lines 222–236):
+
    ```ts
    export function summarizeAlerts(alerts: SmartAlert[]): {
-     total: number; critical: number; warning: number; info: number;
+     total: number;
+     critical: number;
+     warning: number;
+     info: number;
    } {
      return {
        total: alerts.length,
-       critical: alerts.filter(a => a.severity === 'critical').length,
-       warning: alerts.filter(a => a.severity === 'warning').length,
-       info: alerts.filter(a => a.severity === 'info').length,
+       critical: alerts.filter((a) => a.severity === 'critical').length,
+       warning: alerts.filter((a) => a.severity === 'warning').length,
+       info: alerts.filter((a) => a.severity === 'info').length,
      };
    }
    ```
@@ -688,6 +716,7 @@ Pick ONE of these paths:
 **Default plan action:** Path A. Delete `checkCalorieEmergency` and remove its now-unused `getRecentNutritionDays` internal dependency if nothing else uses it.
 
 ### Verification
+
 - `npx tsc --noEmit` → 0 errors
 - Dashboard renders alerts as before; network tab shows ONE `getActiveAlerts` fetch (not two) when both `useActiveAlerts` and `useAlertSummary` mount.
 
@@ -696,6 +725,7 @@ Pick ONE of these paths:
 ## FIX 5 — Workout query key collision (HIGH)
 
 ### Problem
+
 [src/controllers/use-training.ts](src/controllers/use-training.ts) line 49: `useRecentWorkouts` uses key `training.workouts({ from: '', to: '' })` — identical regardless of `days` parameter. 7-day and 30-day callers collide in the cache.
 
 ### Solution
@@ -732,6 +762,7 @@ export function useRecentWorkouts(userId: string, days: number = 14) {
 All existing invalidations use `queryKeys(userId).training.all` — they still cover the new key (prefix match). No further changes needed.
 
 ### Verification
+
 - `npx tsc --noEmit` → 0 errors
 - Mount `useRecentWorkouts(uid, 7)` and `useRecentWorkouts(uid, 30)` simultaneously; both receive correct independent data.
 
@@ -740,6 +771,7 @@ All existing invalidations use `queryKeys(userId).training.all` — they still c
 ## FIX 6 — Dashboard stale times (HIGH)
 
 ### Problem
+
 [src/controllers/use-dashboard.ts](src/controllers/use-dashboard.ts) only sets `staleTime` on `latestRecovery` (line 51). Seven other queries use default `staleTime: 0` — refetch on every mount. Likewise `useNutritionPlan` in `use-nutrition.ts` uses the wrong stale time (should be `macroTargets: Infinity`).
 
 ### Solution — Step 6a: Wire stale times into all dashboard sub-queries
@@ -752,8 +784,14 @@ All existing invalidations use `queryKeys(userId).training.all` — they still c
 import { useQuery } from '@tanstack/react-query';
 import { queryKeys, staleTimes } from '@/lib/constants';
 import {
-  getProfile, getActiveProgram, getNutritionDay, getRecoveryEntry,
-  getLatestRecoveryEntry, getSupplementLog, getWeeklyVolumeSummary, getActiveAlerts,
+  getProfile,
+  getActiveProgram,
+  getNutritionDay,
+  getRecoveryEntry,
+  getLatestRecoveryEntry,
+  getSupplementLog,
+  getWeeklyVolumeSummary,
+  getActiveAlerts,
 } from '@/services';
 import { today } from '@/lib/utils';
 
@@ -819,21 +857,34 @@ export function useDashboardData(userId: string) {
 
   /* rest unchanged */
   const isLoading =
-    profile.isLoading || activeProgram.isLoading || todayNutrition.isLoading ||
-    todayRecovery.isLoading || latestRecovery.isLoading || todaySupplements.isLoading ||
-    weeklyVolume.isLoading || alerts.isLoading;
+    profile.isLoading ||
+    activeProgram.isLoading ||
+    todayNutrition.isLoading ||
+    todayRecovery.isLoading ||
+    latestRecovery.isLoading ||
+    todaySupplements.isLoading ||
+    weeklyVolume.isLoading ||
+    alerts.isLoading;
 
   return {
-    profile: profile.data, activeProgram: activeProgram.data,
-    todayNutrition: todayNutrition.data, todayRecovery: todayRecovery.data,
-    latestRecovery: latestRecovery.data, todaySupplements: todaySupplements.data,
-    weeklyVolume: weeklyVolume.data, alerts: alerts.data,
+    profile: profile.data,
+    activeProgram: activeProgram.data,
+    todayNutrition: todayNutrition.data,
+    todayRecovery: todayRecovery.data,
+    latestRecovery: latestRecovery.data,
+    todaySupplements: todaySupplements.data,
+    weeklyVolume: weeklyVolume.data,
+    alerts: alerts.data,
     isLoading,
     errors: {
-      profile: profile.error, activeProgram: activeProgram.error,
-      todayNutrition: todayNutrition.error, todayRecovery: todayRecovery.error,
-      latestRecovery: latestRecovery.error, todaySupplements: todaySupplements.error,
-      weeklyVolume: weeklyVolume.error, alerts: alerts.error,
+      profile: profile.error,
+      activeProgram: activeProgram.error,
+      todayNutrition: todayNutrition.error,
+      todayRecovery: todayRecovery.error,
+      latestRecovery: latestRecovery.error,
+      todaySupplements: todaySupplements.error,
+      weeklyVolume: weeklyVolume.error,
+      alerts: alerts.error,
     },
   };
 }
@@ -844,6 +895,7 @@ export function useDashboardData(userId: string) {
 **Edit** `src/controllers/use-nutrition.ts` — find the `useNutritionPlan` hook and change its `staleTime` from `staleTimes.nutritionHistory` to `staleTimes.macroTargets`.
 
 ### Verification
+
 - `npx tsc --noEmit` → 0 errors
 - Navigate: Dashboard → Training → back to Dashboard. Network tab shows zero Firestore calls on the second dashboard mount (cache hit).
 
@@ -852,6 +904,7 @@ export function useDashboardData(userId: string) {
 ## FIX 7 — Firestore Security Rules (HIGH)
 
 ### Problem
+
 No `firestore.rules` file exists. Multi-user data isolation currently depends on client-side `userId` scoping — any authenticated user can bypass by crafting URLs.
 
 ### Solution — Step 7a: Create rules
@@ -900,11 +953,13 @@ service cloud.firestore {
 ```
 
 **New file:** `firestore.indexes.json`
+
 ```json
 { "indexes": [], "fieldOverrides": [] }
 ```
 
 **New file:** `storage.rules`
+
 ```
 rules_version = '2';
 service firebase.storage {
@@ -919,6 +974,7 @@ service firebase.storage {
 ```
 
 **New file:** `.firebaserc` — use placeholder; user replaces with their project:
+
 ```json
 {
   "projects": {
@@ -931,21 +987,24 @@ service firebase.storage {
 
 **Edit** [README.md](README.md) — append under "Deploy To Vercel":
 
-```md
+````md
 ## Deploy Firestore Security Rules
 
 Rules live in `firestore.rules` and must be deployed to Firebase separately from Vercel.
 
 One-time setup:
+
 ```bash
 npm i -g firebase-tools
 firebase login
 firebase use <your-project-id>
 firebase deploy --only firestore:rules,storage:rules
 ```
+````
 
 After any rule change, re-run the deploy command.
-```
+
+````
 
 ### Verification
 - `firebase deploy --only firestore:rules` succeeds (manual — agent surfaces instructions).
@@ -965,7 +1024,7 @@ After any rule change, re-run the deploy command.
 Add import at top:
 ```ts
 import { saveNutritionDay, saveNutritionPlan } from './nutrition.service';
-```
+````
 
 Inside the `if (data.nutritionPlan) { try { ... } }` block (lines 185–217), before the `saveNutritionDay` call add:
 
@@ -1006,6 +1065,7 @@ if (data.nutritionPlan) {
 **Check:** `saveNutritionPlan` must exist in `nutrition.service.ts` and accept `NutritionPlanSeed`. If its current signature differs, align the import to pass the right shape (verify by reading the function before editing).
 
 ### Verification
+
 - `npx tsc --noEmit` → 0 errors
 - Fresh user imports coach pack → `/nutrition` page shows macro targets, not empty state.
 
@@ -1014,11 +1074,13 @@ if (data.nutritionPlan) {
 ## FIX 9 — `import.service` in services barrel (MEDIUM)
 
 ### Problem
+
 [src/services/index.ts](src/services/index.ts) excludes `import.service`. Discoverability gap.
 
 ### Solution
 
 **Edit** [src/services/index.ts](src/services/index.ts), append:
+
 ```ts
 export * from './import.service';
 ```
@@ -1026,6 +1088,7 @@ export * from './import.service';
 **Check:** Ensure no name collision exists. `parseAndValidateFiles`, `importCoachData`, `ImportFile`, `ImportResult`, `ParsedCoachData` are unique across the other services — safe to re-export.
 
 ### Verification
+
 - `npx tsc --noEmit` → 0 errors.
 - `import { importCoachData } from '@/services'` now resolves.
 
@@ -1034,6 +1097,7 @@ export * from './import.service';
 ## FIX 10 — Next/ESLint version alignment (MEDIUM)
 
 ### Problem
+
 [package.json](package.json) line 20: `next: ^14.2.35`; line 38: `eslint-config-next: 16.2.4`. Incompatible combination.
 
 ### Solution
@@ -1041,11 +1105,13 @@ export * from './import.service';
 **Option A (recommended):** Downgrade ESLint config to match Next 14 line.
 
 Edit [package.json](package.json) line 38:
+
 ```json
 "eslint-config-next": "^14.2.35",
 ```
 
 Then:
+
 ```bash
 npm install
 npm run lint
@@ -1056,6 +1122,7 @@ npm run lint
 **Default plan action:** Option A. Stay on Next 14, align ESLint.
 
 ### Verification
+
 - `npm install` completes without peer-dep warnings about `eslint-config-next`.
 - `npm run lint` runs; no "Next.js 16" rule references in output.
 
@@ -1064,6 +1131,7 @@ npm run lint
 ## FIX 11 — `images.remotePatterns` (LOW)
 
 ### Problem
+
 [next.config.mjs](next.config.mjs) lines 5–7 use deprecated `images.domains`.
 
 ### Solution
@@ -1091,6 +1159,7 @@ export default nextConfig;
 ```
 
 ### Verification
+
 - `npm run build` succeeds, no deprecation warning for `images.domains`.
 - Any existing `<Image>` tag pulling from Firebase Storage still renders.
 
@@ -1099,6 +1168,7 @@ export default nextConfig;
 ## FIX 12 — Tailwind hardcoded accent removal (LOW)
 
 ### Problem
+
 `tailwind.config.js` defines `accent`, `crimson`, `gold` hex colors that tempt contributors to use `bg-accent` / `text-accent` which bypass theme CSS variables — forbidden by [.cursor/rules/IRONMIND.md](.cursor/rules/IRONMIND.md) line 54.
 
 ### Solution
@@ -1108,6 +1178,7 @@ export default nextConfig;
 Retain only the theme-agnostic colors (`bg-0`/`bg-1`/`bg-2`, `text-0`/`text-1`/`text-2`, `good`/`warn`/`bad`, chrome tokens if they exist as fixed hex).
 
 Before deletion, verify no component references them:
+
 ```
 rg "bg-accent|text-accent|border-accent|bg-crimson|text-crimson|bg-gold|text-gold" src/
 ```
@@ -1115,6 +1186,7 @@ rg "bg-accent|text-accent|border-accent|bg-crimson|text-crimson|bg-gold|text-gol
 If any results: convert them to `bg-[color:var(--accent)]` etc. first (the rule already says this is the correct form).
 
 After removal, add a top-of-file comment:
+
 ```js
 // IRONMIND: Accent colors live in CSS variables (--accent, --accent-light, --accent-2)
 // in src/app/globals.css. Do NOT re-add hardcoded accent hex here — they bypass
@@ -1124,6 +1196,7 @@ After removal, add a top-of-file comment:
 ```
 
 ### Verification
+
 - `npx tsc --noEmit` → 0 errors
 - `npm run build` succeeds
 - `rg "bg-accent|text-accent"` in `src/` → zero matches
@@ -1134,6 +1207,7 @@ After removal, add a top-of-file comment:
 ## FIX 13 — `globals.css` hardcoded crimson cleanup (LOW)
 
 ### Problem
+
 Some CSS in `src/app/globals.css` still uses raw crimson hex (modal scrollbar, `.brand-text`, some table borders) — won't respond to theme.
 
 ### Solution
@@ -1148,6 +1222,7 @@ Some CSS in `src/app/globals.css` still uses raw crimson hex (modal scrollbar, `
 4. Keep original hex values only inside `:root` and `html[data-theme='hot-pink']` (those are the definitions themselves).
 
 ### Verification
+
 - `rg -n "#DC2626|#EF4444|#991B1B" src/app/globals.css` → matches only in `:root`, `[data-theme]`, or comments.
 - Theme smoke test: switch to hot-pink — no lingering red elements (scrollbar, brand text) remain.
 
@@ -1156,6 +1231,7 @@ Some CSS in `src/app/globals.css` still uses raw crimson hex (modal scrollbar, `
 ## FIX 14 — Export cache passthrough (LOW)
 
 ### Problem
+
 `src/lib/export/generate-summary.ts` always re-fetches via services, ignoring TanStack cache.
 
 ### Solution — Step 14a: Accept prefetched data
@@ -1172,7 +1248,7 @@ export interface GenerateSummaryContext {
 export async function generateSummary(
   userId: string,
   options: ExportOptions,
-  ctx: GenerateSummaryContext = {}
+  ctx: GenerateSummaryContext = {},
 ): Promise<string> {
   const { queryClient } = ctx;
 
@@ -1195,11 +1271,12 @@ export async function generateSummary(
 ```
 
 Map every internal service call to its corresponding query key from `queryKeys(userId).*`. Keys to use:
+
 - `getProfile` → `profile.detail()`
 - `getActiveProgram` → `training.activeProgram()`
 - `getRecentWorkouts(uid, n)` → `training.recentWorkouts(n)` (from Fix 5)
 - `getRecentNutritionDays(uid, n)` → `nutrition.recentDays(n)`
-- `getRecentRecoveryEntries(uid, n)` → `recovery.trend(n)` *(if that's the key used)* — verify
+- `getRecentRecoveryEntries(uid, n)` → `recovery.trend(n)` _(if that's the key used)_ — verify
 - `getWeightTrend(uid, n)` → `physique.weightTrend(n)`
 - `getRecentCheckIns(uid, n)` → `physique.recentCheckIns(n)`
 - `getSupplementCompliance(uid, n)` → `supplements.compliance(n)`
@@ -1233,6 +1310,7 @@ export function useExportSummary(userId: string, options: ExportOptions) {
 ```
 
 ### Verification
+
 - `npx tsc --noEmit` → 0 errors
 - Visit `/dashboard`, then `/export` → network tab shows the export re-uses cached profile/program instead of refetching.
 - Export content identical to before.
@@ -1242,6 +1320,7 @@ export function useExportSummary(userId: string, options: ExportOptions) {
 ## FIX 15 — Offline UX indicator (LOW)
 
 ### Problem
+
 Firebase queues writes offline but user gets no UI feedback.
 
 ### Solution — Step 15a: Online status hook
@@ -1304,24 +1383,27 @@ import { WifiOff } from 'lucide-react';
 /* inside the component, near the LED indicators: */
 const isOnline = useOnlineStore((s) => s.isOnline);
 
-{!isOnline && (
-  <div
-    role="status"
-    aria-live="polite"
-    className="flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-semibold uppercase tracking-[0.15em]
+{
+  !isOnline && (
+    <div
+      role="status"
+      aria-live="polite"
+      className="flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-semibold uppercase tracking-[0.15em]
                border border-[color:color-mix(in_srgb,var(--warn)_40%,transparent)]
                bg-[color:color-mix(in_srgb,var(--warn)_10%,transparent)]
                text-[color:var(--warn)]"
-  >
-    <WifiOff size={10} aria-hidden />
-    Offline
-  </div>
-)}
+    >
+      <WifiOff size={10} aria-hidden />
+      Offline
+    </div>
+  );
+}
 ```
 
 Place it so it does not disrupt the Knight Rider LED bars or break mobile layout at 375px — test.
 
 ### Verification
+
 - DevTools → Network → Offline. Top bar shows "Offline" pill. LED bars unchanged. Mobile at 375px still fits.
 - Re-enable network — pill disappears; queued writes flush.
 
@@ -1370,7 +1452,7 @@ If Fix 2 (centralized strip) causes mass unexpected behavior, immediately revert
 - Next.js version upgrade (14 → 16) — separate project.
 - Migration to server components, middleware-based auth, edge runtime — separate project.
 - New features, new pages, new domains — this is a hardening plan.
-- Deleting legacy themes, renaming demo personas (Morton/Sheri) — separate follow-up.
+- Deleting legacy themes, renaming demo personas (Morton/Cheri) — separate follow-up.
 
 ---
 

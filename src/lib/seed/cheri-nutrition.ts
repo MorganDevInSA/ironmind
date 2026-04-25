@@ -1,6 +1,6 @@
 import type { NutritionPlanSeed } from './nutrition';
 
-export const sheriNutritionPlan: NutritionPlanSeed = {
+export const cheriNutritionPlan: NutritionPlanSeed = {
   proteinTarget: 120,
   coreProteinRotation: [
     'chicken thighs',
@@ -47,10 +47,11 @@ export const sheriNutritionPlan: NutritionPlanSeed = {
     },
   ],
   macroTargetsByDayType: {
-    recovery: { calories: [1600, 1750], protein: 120, carbs: [90,  130], fat: null },
+    recovery: { calories: [1600, 1750], protein: 120, carbs: [90, 130], fat: null },
     moderate: { calories: [1600, 1800], protein: 120, carbs: [110, 150], fat: null },
-    high:     { calories: [1700, 1900], protein: 120, carbs: [130, 170], fat: null },
-    highest:  { calories: [1700, 1900], protein: 120, carbs: [140, 180], fat: null },
+    high: { calories: [1700, 1900], protein: 120, carbs: [130, 170], fat: null },
+    highest: { calories: [1700, 1900], protein: 120, carbs: [140, 180], fat: null },
   },
-  emergencyRule: 'If schedule breaks: eat 1 tin tuna or 200g yogurt plus fruit immediately, then normal dinner later. Do not write off the day.',
+  emergencyRule:
+    'If schedule breaks: eat 1 tin tuna or 200g yogurt plus fruit immediately, then normal dinner later. Do not write off the day.',
 };

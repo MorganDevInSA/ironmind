@@ -1,10 +1,10 @@
 import type { AthleteProfile } from '@/lib/types';
 
-export const sheriProfile: AthleteProfile = {
-  clientName: 'Sheri',
+export const cheriProfile: AthleteProfile = {
+  clientName: 'Cheri',
   sex: 'female',
   age: 45,
-  height: "5'6\" (167.6 cm)",
+  height: '5\'6" (167.6 cm)',
   currentWeight: 95,
   targetWeight: 83,
   weightUnit: 'kg',
@@ -31,6 +31,7 @@ export const sheriProfile: AthleteProfile = {
   ],
   strengthBodyparts: ['lower body', 'general strength potential', 'coordination'],
   weakpointBodyparts: ['conditioning', 'upper body endurance', 'body-fat reduction'],
-  nutritionStyle: 'Structured simple meals with repeatable high-protein options and calorie control.',
+  nutritionStyle:
+    'Structured simple meals with repeatable high-protein options and calorie control.',
   metabolismNote: 'Normal to slow; easier fat gain tendency inferred.',
 };

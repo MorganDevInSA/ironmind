@@ -187,15 +187,15 @@ All raster logos live under **`public/brand/`**. Runtime URLs are centralized in
 
 ### Inventory
 
-| File (`public/brand/…`) | `brandAssets` key | Typical use |
-|-------------------------|-------------------|-------------|
-| `ironmind_logo_male.png` | `logoMale` | **`IronmindLogo`** when theme ≠ hot-pink (sidebar, top bar, register). |
-| `ironmind_logo_female.png` | `logoFemale` | **`IronmindLogo`** when theme is hot-pink (e.g. Sheri demo profile). |
-| `ironmind_logo_combined.png` | `logoCombined` | **`/login`** page hero (`next/image`), layered male + female mark. |
-| `ironmind_transparent_1_reverted.png` | `appleTouchIcon` | Root layout **`metadata.icons.apple`** (iOS home screen / PWA). |
-| `ironmind_logo_2_top_right.png` | `alternateTopRight` | Marketing / optional UI — not wired by default. |
-| `ironmind_logo_3_bottom_left.png` | `alternateBottomLeft` | Same. |
-| `ironmind_logo_4_bottom_right.png` | `alternateBottomRight` | Canonical title-style crop reference (768 × 512 px). |
+| File (`public/brand/…`)               | `brandAssets` key      | Typical use                                                            |
+| ------------------------------------- | ---------------------- | ---------------------------------------------------------------------- |
+| `ironmind_logo_male.png`              | `logoMale`             | **`IronmindLogo`** when theme ≠ hot-pink (sidebar, top bar, register). |
+| `ironmind_logo_female.png`            | `logoFemale`           | **`IronmindLogo`** when theme is hot-pink (e.g. Cheri demo profile).   |
+| `ironmind_logo_combined.png`          | `logoCombined`         | **`/login`** page hero (`next/image`), layered male + female mark.     |
+| `ironmind_transparent_1_reverted.png` | `appleTouchIcon`       | Root layout **`metadata.icons.apple`** (iOS home screen / PWA).        |
+| `ironmind_logo_2_top_right.png`       | `alternateTopRight`    | Marketing / optional UI — not wired by default.                        |
+| `ironmind_logo_3_bottom_left.png`     | `alternateBottomLeft`  | Same.                                                                  |
+| `ironmind_logo_4_bottom_right.png`    | `alternateBottomRight` | Canonical title-style crop reference (768 × 512 px).                   |
 
 ### UI wiring notes
 

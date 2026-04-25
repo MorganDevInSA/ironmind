@@ -88,7 +88,8 @@
 
   /* Exercise row index — dark tile + primary text (never mid-grey on crimson fill) */
   --exercise-index-bg: rgba(22, 18, 18, 0.96);
-  --exercise-index-border: rgba(220, 38, 38, 0.42);
+  /* Tracks data-theme / custom --accent (avoid fixed crimson when accent is hot-pink, cobalt, etc.) */
+  --exercise-index-border: color-mix(in srgb, var(--accent) 42%, transparent);
 
   /*
    * App chrome — header, sidebar, mobile nav.
@@ -738,6 +739,41 @@ h4 {
     color: var(--accent);
   }
 
+  /*
+   * Lift workout runner — KPI + coaching strip (no flat rgba(16,16,16) chips;
+   * reads correctly on hot-pink / cobalt / emerald themes).
+   */
+  .workout-kpi-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: 1;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    color: var(--text-0);
+    border: 1px solid color-mix(in srgb, var(--accent) 38%, transparent);
+  }
+
+  .workout-volume-metric {
+    font-size: 0.75rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent-light);
+  }
+
+  /*
+   * Dashboard “Plan” table + schedule modal — logged/completed row tick.
+   * Uses accent (not --good) so hot-pink / cobalt / violet themes stay coherent;
+   * reserve --good for health/success (e.g. workout finished, supplement taken).
+   */
+  .dashboard-plan-done-icon {
+    color: var(--accent-light);
+  }
+
   /* --- Accent border-left (alert/coaching cards) ------------ */
 
   .accent-border {
@@ -818,6 +854,17 @@ h4 {
     );
     box-shadow:
       0 0 14px color-mix(in srgb, var(--accent) 9%, transparent),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.58);
+  }
+
+  /* Keep workout / tab “selected” chrome over .glass-panel:hover (higher specificity). */
+  .glass-panel.is-selected:hover,
+  .glass-panel.is-selected:focus-within {
+    border-color: color-mix(in srgb, var(--accent) 62%, transparent);
+    box-shadow:
+      var(--panel-glow),
+      0 4px 16px rgba(0, 0, 0, 0.3),
       inset 0 1px 0 rgba(255, 255, 255, 0.04),
       inset 0 -1px 0 rgba(0, 0, 0, 0.58);
   }

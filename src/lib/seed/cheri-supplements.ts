@@ -1,6 +1,6 @@
 import type { SupplementProtocol } from '@/lib/types';
 
-export const sheriSupplementProtocol: SupplementProtocol = {
+export const cheriSupplementProtocol: SupplementProtocol = {
   windows: [
     {
       timing: 'morning',

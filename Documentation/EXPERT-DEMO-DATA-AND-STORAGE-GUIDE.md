@@ -53,13 +53,13 @@ All collection path strings must come from **`src/lib/firebase/config.ts`** → 
 | File pattern                                                                                                         | Role                                                                     |
 | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
 | `profile.ts`, `program.ts`, `nutrition.ts`, `supplements.ts`, `phase.ts`, `volume-landmarks.ts`, `coaching-notes.ts` | **Morton** (default first-login seed)                                    |
-| `sheri-*.ts`, `alex-*.ts`, `jordan-*.ts`, `fez-*.ts`, `maria-*.ts`                                                   | Alternate **demo personas** (Sheri, Alex, Jordan, Fez, Maria)            |
+| `cheri-*.ts`, `alex-*.ts`, `jordan-*.ts`, `fez-*.ts`, `maria-*.ts`                                                   | Alternate **demo personas** (Cheri, Alex, Jordan, Fez, Maria)            |
 | `nutrition.ts`                                                                                                       | Exports **`NutritionPlanSeed`** used by seed + demo historical generator |
 
 **Orchestration:**
 
 - **First login (production path):** `seedUserData` in **`src/lib/seed/index.ts`** — runs **once** when the user is not seeded; uses **Morton** constants; creates **`seedJobs`** and uses compensating rollback on failure (same artifact idea as import).
-- **Demo / dev personas (overwrite):** `seedMortonData`, `seedSheriData`, `seedAlexData`, `seedJordanData`, `seedFezData`, `seedMariaData` in **`index.ts`** — **overwrite** existing domain data for that `userId`, then call **`seedDemoHistoricalData`** (see below). Wired from **`src/components/onboarding/DemoProfileModal.tsx`**.
+- **Demo / dev personas (overwrite):** `seedMortonData`, `seedCheriData`, `seedAlexData`, `seedJordanData`, `seedFezData`, `seedMariaData` in **`index.ts`** — **overwrite** existing domain data for that `userId`, then call **`seedDemoHistoricalData`** (see below). Wired from **`src/components/onboarding/DemoProfileModal.tsx`**.
 
 **Project rule (from IRONMIND):** Any new `src/lib/seed/*.ts` module must be **imported and invoked** from `seed/index.ts` (and follow existing logging patterns where applicable).
 
@@ -82,7 +82,7 @@ All collection path strings must come from **`src/lib/firebase/config.ts`** → 
 | Location                                                                  | Role                                                                                                                                                                                                                   |
 | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `src/lib/seed/demo-data/physique/types.ts`                                | `DemoPhysiqueWeek` (bodyweight + `Measurements`), `DemoPersonaId`                                                                                                                                                      |
-| `src/lib/seed/demo-data/physique/{morton,sheri,alex,jordan,fez,maria}.ts` | **Twelve** rows each, oldest → newest; file header describes that persona’s coaching arc; last row **bodyweight** matches that seed profile’s **`currentWeight`**; tape includes **`rightThigh`** and **`shoulders`**. |
+| `src/lib/seed/demo-data/physique/{morton,cheri,alex,jordan,fez,maria}.ts` | **Twelve** rows each, oldest → newest; file header describes that persona’s coaching arc; last row **bodyweight** matches that seed profile’s **`currentWeight`**; tape includes **`rightThigh`** and **`shoulders`**. |
 | `src/lib/seed/demo-data/physique/index.ts`                                | **`DEMO_PHYSIQUE_WEEKLY_BY_PERSONA`**, **`getDemoPhysiqueWeeks(personaId)`** — module doc states **only** `seedDemoHistoricalData` may consume this for production-shaped demos.                                       |
 
 **Mapping:** `seedDemoHistoricalData` collects **weekly** calendar dates (`i % 7 === 0` over the window), then for each week index `i` takes row `min(i, 11)` from that persona’s array and **`saveCheckIn(userId, date, buildStaticDemoCheckIn(...))`**. No runtime generator for scale/tape — edit the literals and re-load a demo profile.
@@ -184,11 +184,11 @@ Use these defaults unless product explicitly requests otherwise:
 
 | Decision        | Default                                                                                                                                                                                                          |
 | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Demo user count | **Six** roster personas: **Morton**, **Sheri**, **Alex**, **Jordan**, **Fez**, **Maria** (wired in **`DemoProfileModal.tsx`** and **`seed/index.ts`**)                                                           |
+| Demo user count | **Six** roster personas: **Morton**, **Cheri**, **Alex**, **Jordan**, **Fez**, **Maria** (wired in **`DemoProfileModal.tsx`** and **`seed/index.ts`**)                                                           |
 | Time depth      | **`DEMO_HISTORY_DAYS` (84)** — twelve weeks of daily nutrition, recovery, supplements; **twelve** weekly physique points from **`DEMO_PHYSIQUE_WEEKLY_BY_PERSONA`**; persona-specific journal milestones         |
 | Delivery        | **`seedDemoHistoricalData`** + static **`demo-data/physique/`** + **`personaTuning`** generator — not ad-hoc Firestore scripts; **data only** (no Storage photo fixtures unless you add an explicit upload path) |
 | Roster mix      | **Mixed**: masters gain, fat-loss beginner, intermediate hypertrophy, home beginner, vegan athlete bulk, home/pool mom recomp                                                                                    |
-| Realism         | **Physique:** hand-authored weekly trends per persona file; **daily logs:** serious amateur variance — deload week, Sheri/Maria stress bumps, imperfect adherence in **`personaTuning`**                         |
+| Realism         | **Physique:** hand-authored weekly trends per persona file; **daily logs:** serious amateur variance — deload week, Cheri/Maria stress bumps, imperfect adherence in **`personaTuning`**                         |
 | Schema          | **Preserve** existing types and validators; new fields require **`src/lib/types/index.ts`** + serializers + any import validators                                                                                |
 
 **Operational note:** Doubling history length **doubles** per-demo Firestore writes on overwrite; keep `DEMO_HISTORY_DAYS` bounded and adjust only with performance awareness.
@@ -206,7 +206,7 @@ Presets are defined on **`html[data-theme='…']`** in **`src/app/globals.css`**
 | Profile id | `AppTheme` | Rationale (short)                                      |
 | ---------- | ---------- | ------------------------------------------------------ |
 | `morton`   | `crimson`  | Default IRONMIND iron / masters intensity              |
-| `sheri`    | `hot-pink` | Distinct feminine energy for the cut-phase narrative   |
+| `cheri`    | `hot-pink` | Distinct feminine energy for the cut-phase narrative   |
 | `alex`     | `emerald`  | Hypertrophy / KPI “progress in the green”              |
 | `jordan`   | `forge`    | Warm orange — beginner momentum, home-gym grit         |
 | `fez`      | `cobalt`   | Cool blue — ocean / cardio athlete, early AM gym focus |

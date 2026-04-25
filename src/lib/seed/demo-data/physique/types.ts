@@ -11,4 +11,4 @@ export type DemoPhysiqueWeek = {
 };
 
 /** Keys aligned with `seedMortonData` … `seedMariaData` and `DemoProfileModal` ids. */
-export type DemoPersonaId = 'morton' | 'sheri' | 'alex' | 'jordan' | 'fez' | 'maria';
+export type DemoPersonaId = 'morton' | 'cheri' | 'alex' | 'jordan' | 'fez' | 'maria';

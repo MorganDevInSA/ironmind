@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useId } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores';
 import {
   useDashboardData,
   useRecentWorkouts,
   useWorkouts,
-  useRecentCheckIns,
+  useCheckIns,
   useNutritionPlan,
   useNutritionDay,
   useProtocol,
@@ -24,6 +25,7 @@ import {
   formatShortDate,
   getDaysInRange,
   sortCheckInsChronologicalAsc,
+  toDateOnlyKey,
 } from '@/lib/utils';
 import { differenceInCalendarDays, format, parseISO, subDays } from 'date-fns';
 import {
@@ -52,7 +54,7 @@ import {
   ReferenceLine,
 } from 'recharts';
 import { cn } from '@/lib/utils';
-import { measurementForChart } from '@/lib/utils/measurement-bounds';
+import { bodyweightForChartKg, measurementForChart } from '@/lib/utils/measurement-bounds';
 import { MEASUREMENT_CHART_SERIES } from '@/lib/constants/measurement-chart-series';
 import type { Workout, NutritionDay, SupplementLog, ProgramSession, CheckIn } from '@/lib/types';
 import {
@@ -163,22 +165,10 @@ function capitalize(s: string) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-const DASHBOARD_MEASUREMENT_LINE_COLORS = [
-  'color-mix(in srgb, var(--accent-light) 92%, white 8%)',
-  'var(--accent)',
-  'color-mix(in srgb, var(--accent) 86%, white 14%)',
-  'color-mix(in srgb, var(--accent) 78%, black 22%)',
-  'color-mix(in srgb, var(--accent) 72%, black 28%)',
-  'color-mix(in srgb, var(--accent-light) 80%, white 20%)',
-  'color-mix(in srgb, var(--accent) 68%, black 32%)',
-] as const;
+/** Match `physique/page.tsx` `chartGridStroke` — safe on Recharts grid paths. */
+const DASHBOARD_PHYSIQUE_CHART_GRID = 'color-mix(in srgb, var(--chrome-border) 35%, transparent)';
 
-const MEASUREMENT_SERIES_MINI = MEASUREMENT_CHART_SERIES.map((s, i) => ({
-  ...s,
-  color: DASHBOARD_MEASUREMENT_LINE_COLORS[i] ?? 'var(--accent)',
-}));
-
-function MiniMeasurementLegendSwatch({ dash, stroke }: { dash: string; stroke: string }) {
+function MiniMeasurementLegendSwatch({ dash }: { dash: string }) {
   return (
     <svg width={22} height={8} viewBox="0 0 22 8" aria-hidden className="shrink-0">
       <line
@@ -186,7 +176,7 @@ function MiniMeasurementLegendSwatch({ dash, stroke }: { dash: string; stroke: s
         y1="4"
         x2="21"
         y2="4"
-        stroke={stroke}
+        stroke="var(--accent)"
         strokeWidth={1.5}
         strokeLinecap="round"
         strokeDasharray={dash === '0' ? '0' : dash}
@@ -196,7 +186,6 @@ function MiniMeasurementLegendSwatch({ dash, stroke }: { dash: string; stroke: s
 }
 const THEME_FILL_GRADIENT =
   'linear-gradient(90deg, color-mix(in srgb, var(--accent-light) 85%, white 15%) 0%, color-mix(in srgb, var(--accent) 72%, black 28%) 100%)';
-const CHART_TICK = { fontSize: 9, fill: 'var(--text-detail)' };
 const CHART_TOOLTIP_STYLE = {
   background: 'var(--panel-strong)',
   border: '1px solid var(--chrome-border)',
@@ -216,28 +205,37 @@ function PhysiqueMiniCharts({
   /** When set, shown instead of the default copy when there are no points in-range. */
   emptyHint?: string | null;
 }) {
+  const chartUid = useId().replace(/:/g, '');
   const [mode, setMode] = useState<'weight' | 'measurements'>('weight');
   const chron = sortCheckInsChronologicalAsc(checkIns ?? []);
 
   const weightRows = chron.map((c) => ({
-    dateKey: c.date,
-    weight: c.bodyweight,
+    dateKey: toDateOnlyKey(c.date) || c.date,
+    weight: bodyweightForChartKg(c.bodyweight),
   }));
+  const hasWeightPts = weightRows.some(
+    (r) => typeof r.weight === 'number' && Number.isFinite(r.weight),
+  );
 
+  /* Same row shape as `physique/page.tsx` measurementData (explicit keys). */
   const measRows = chron.map((c) => {
-    const row: Record<string, string | number | undefined> = {
-      dateKey: c.date,
-    };
     const m = c.measurements ?? {};
-    for (const { key } of MEASUREMENT_CHART_SERIES) {
-      const v = measurementForChart(key, m[key]);
-      if (typeof v === 'number') row[key as string] = v;
-    }
-    return row;
+    return {
+      dateKey: toDateOnlyKey(c.date) || c.date,
+      waist: measurementForChart('waist', m.waist),
+      chest: measurementForChart('chest', m.chest),
+      hips: measurementForChart('hips', m.hips),
+      leftArm: measurementForChart('leftArm', m.leftArm),
+      rightArm: measurementForChart('rightArm', m.rightArm),
+      leftThigh: measurementForChart('leftThigh', m.leftThigh),
+      rightThigh: measurementForChart('rightThigh', m.rightThigh),
+    };
   });
 
   const hasMeas = measRows.some((row) =>
-    MEASUREMENT_CHART_SERIES.some(({ key }) => typeof row[key as string] === 'number'),
+    MEASUREMENT_CHART_SERIES.some(
+      ({ key }) => typeof (row as Record<string, string | number | undefined>)[key] === 'number',
+    ),
   );
 
   if (!chron.length) {
@@ -293,50 +291,49 @@ function PhysiqueMiniCharts({
         </span>
       </div>
 
-      <div className="h-[132px] w-full">
-        {mode === 'weight' && weightRows.length >= 1 ? (
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={weightRows} margin={{ top: 4, right: 4, bottom: 0, left: -16 }}>
+      <div className="h-[132px] w-full min-w-0">
+        {mode === 'weight' && hasWeightPts ? (
+          <ResponsiveContainer width="100%" height={132}>
+            <AreaChart data={weightRows} margin={{ top: 8, right: 4, bottom: 0, left: -20 }}>
               <defs>
-                <linearGradient id="dashPhysWeight" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.3} />
+                <linearGradient id={`dashPhysWeight-${chartUid}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.25} />
                   <stop offset="95%" stopColor="var(--accent)" stopOpacity={0.02} />
                 </linearGradient>
               </defs>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="color-mix(in srgb, var(--chrome-border) 45%, transparent)"
-              />
+              <CartesianGrid strokeDasharray="3 3" stroke={DASHBOARD_PHYSIQUE_CHART_GRID} />
               <XAxis
                 dataKey="dateKey"
                 tickFormatter={(v) => (typeof v === 'string' ? formatShortDate(v) : String(v))}
-                tick={CHART_TICK}
+                tick={{ fontSize: 10, fill: 'var(--text-2)' }}
                 tickLine={false}
                 axisLine={false}
               />
               <YAxis
                 domain={[
-                  (min: number) => Math.floor(min - 0.5),
-                  (max: number) => Math.ceil(max + 0.5),
+                  (dataMin: number) => Math.floor(dataMin - 1),
+                  (dataMax: number) => Math.ceil(dataMax + 1),
                 ]}
-                tick={CHART_TICK}
+                tick={{ fontSize: 10, fill: 'var(--text-2)' }}
                 tickLine={false}
                 axisLine={false}
               />
               <Tooltip
                 contentStyle={CHART_TOOLTIP_STYLE}
                 labelStyle={CHART_TOOLTIP_LABEL_STYLE}
-                labelFormatter={(label) =>
-                  typeof label === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(label)
-                    ? formatDisplayDate(label)
-                    : String(label)
-                }
+                labelFormatter={(label) => {
+                  const key =
+                    typeof label === 'string'
+                      ? toDateOnlyKey(label) || String(label)
+                      : String(label);
+                  return /^\d{4}-\d{2}-\d{2}$/.test(key) ? formatDisplayDate(key) : String(label);
+                }}
                 formatter={(v) => [`${typeof v === 'number' ? v : '—'} kg`, 'Weight']}
               />
               {targetWeight != null && (
                 <ReferenceLine
                   y={targetWeight}
-                  stroke="color-mix(in srgb, var(--accent) 58%, transparent)"
+                  stroke="color-mix(in srgb, var(--accent) 65%, transparent)"
                   strokeDasharray="6 4"
                 />
               )}
@@ -344,52 +341,57 @@ function PhysiqueMiniCharts({
                 type="monotone"
                 dataKey="weight"
                 stroke="var(--accent)"
-                fill="url(#dashPhysWeight)"
-                strokeWidth={2}
-                dot={{ r: 3, fill: 'var(--accent)' }}
+                fill={`url(#dashPhysWeight-${chartUid})`}
+                strokeWidth={2.5}
+                dot={{ r: 4, fill: 'var(--accent)', strokeWidth: 0 }}
+                activeDot={{ r: 6, fill: 'var(--accent)' }}
               />
             </AreaChart>
           </ResponsiveContainer>
         ) : mode === 'measurements' && hasMeas ? (
-          <div className="flex min-h-0 flex-1 flex-col gap-1">
-            <ResponsiveContainer width="100%" height="100%" minHeight={110}>
-              <LineChart data={measRows} margin={{ top: 4, right: 4, bottom: 0, left: -16 }}>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="color-mix(in srgb, var(--chrome-border) 45%, transparent)"
-                />
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-1">
+            <ResponsiveContainer width="100%" height={132}>
+              <LineChart data={measRows} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke={DASHBOARD_PHYSIQUE_CHART_GRID} />
                 <XAxis
                   dataKey="dateKey"
                   tickFormatter={(v) => (typeof v === 'string' ? formatShortDate(v) : String(v))}
-                  tick={CHART_TICK}
+                  tick={{ fontSize: 10, fill: 'var(--text-2)' }}
                   tickLine={false}
                   axisLine={false}
                 />
-                <YAxis tick={CHART_TICK} tickLine={false} axisLine={false} />
+                <YAxis
+                  tick={{ fontSize: 10, fill: 'var(--text-2)' }}
+                  tickLine={false}
+                  axisLine={false}
+                />
                 <Tooltip
                   contentStyle={CHART_TOOLTIP_STYLE}
                   labelStyle={CHART_TOOLTIP_LABEL_STYLE}
-                  labelFormatter={(label) =>
-                    typeof label === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(label)
-                      ? formatDisplayDate(label)
-                      : String(label)
-                  }
+                  labelFormatter={(label) => {
+                    const key =
+                      typeof label === 'string'
+                        ? toDateOnlyKey(label) || String(label)
+                        : String(label);
+                    return /^\d{4}-\d{2}-\d{2}$/.test(key) ? formatDisplayDate(key) : String(label);
+                  }}
                   formatter={(value, name) => [
                     typeof value === 'number' ? `${value} cm` : '—',
                     String(name),
                   ]}
                 />
-                {MEASUREMENT_SERIES_MINI.map(({ key, color, label, dash }) => (
+                {MEASUREMENT_CHART_SERIES.map(({ key, label, dash }) => (
                   <Line
                     key={key}
                     type="monotone"
                     name={label}
-                    dataKey={key as string}
-                    stroke={color}
-                    strokeWidth={1.5}
+                    dataKey={key}
+                    stroke="var(--accent)"
+                    strokeWidth={2}
                     strokeDasharray={dash === '0' ? undefined : dash}
-                    dot={{ r: 2, fill: color }}
+                    dot={{ r: 3, fill: 'var(--accent)', strokeWidth: 0 }}
                     connectNulls={false}
+                    activeDot={{ r: 5, fill: 'var(--accent)' }}
                     isAnimationActive={false}
                   />
                 ))}
@@ -399,20 +401,32 @@ function PhysiqueMiniCharts({
               className="flex flex-wrap gap-x-2.5 gap-y-0.5 px-0.5 text-[9px] leading-tight text-[color:var(--text-2)]"
               aria-label="Measurement series"
             >
-              {MEASUREMENT_SERIES_MINI.map(({ key, label, dash, color }) => (
+              {MEASUREMENT_CHART_SERIES.map(({ key, label, dash }) => (
                 <div key={key} className="flex items-center gap-1">
-                  <MiniMeasurementLegendSwatch dash={dash} stroke={color} />
+                  <MiniMeasurementLegendSwatch dash={dash} />
                   <span>{label}</span>
                 </div>
               ))}
             </div>
           </div>
         ) : (
-          <div className="h-full flex items-center justify-center text-xs text-[color:var(--text-detail)]">
-            Add a second check-in to see the weight line.
+          <div className="h-full flex flex-col items-center justify-center gap-1 px-2 text-center text-xs text-[color:var(--text-detail)]">
+            {mode === 'weight' && !hasWeightPts ? (
+              <p>No bodyweight logged on check-ins in this trend window.</p>
+            ) : mode === 'measurements' && !hasMeas ? (
+              <p>No measurements in this window — log circumferences on Physique.</p>
+            ) : (
+              <p>Switch tabs or widen the trend window to see chart data.</p>
+            )}
           </div>
         )}
       </div>
+      {chron.length === 1 && (mode === 'measurements' ? hasMeas : hasWeightPts) ? (
+        <p className="text-[10px] leading-snug text-[color:var(--text-2)]">
+          One check-in in this range — lines connect across days; add another check-in to see
+          trends.
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -590,11 +604,7 @@ function SessionProgramPreview({ session }: { session: ProgramSession }) {
                       >
                         {ex.name}
                       </span>
-                      {ex.isKPI && (
-                        <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-[color:color-mix(in_srgb,var(--accent)_14%,transparent)] text-[color:var(--text-0)] border border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)] shrink-0">
-                          KPI
-                        </span>
-                      )}
+                      {ex.isKPI && <span className="workout-kpi-badge shrink-0">KPI</span>}
                     </div>
                     {ex.notes ? (
                       <p className="text-xs text-[color:var(--text-detail)] mt-1 whitespace-pre-wrap">
@@ -757,11 +767,7 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
                     <td className={cn(sessionTableTd, 'text-[color:var(--text-0)]')}>
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="font-medium">{ex.name}</span>
-                        {ex.isKPI ? (
-                          <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-[color:color-mix(in_srgb,var(--accent)_14%,transparent)] text-[color:var(--text-0)] border border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)]">
-                            KPI
-                          </span>
-                        ) : null}
+                        {ex.isKPI ? <span className="workout-kpi-badge">KPI</span> : null}
                       </div>
                       {ex.notes ? (
                         <p className="text-xs text-[color:var(--text-detail)] mt-1.5 whitespace-pre-wrap leading-snug">
@@ -984,8 +990,8 @@ function SessionDetailModal({
       >
         <div className="flex items-start justify-between gap-3 p-4 border-b border-[color:var(--chrome-border-subtle)] shrink-0">
           <div className="flex items-start gap-3 min-w-0">
-            <span className="text-[color:var(--accent)] shrink-0 mt-0.5">
-              <Dumbbell size={22} />
+            <span className="text-[color:var(--accent-light)] shrink-0 mt-0.5">
+              <Dumbbell size={22} className="text-current" aria-hidden />
             </span>
             <div className="min-w-0">
               <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[color:var(--text-2)]">
@@ -1000,10 +1006,10 @@ function SessionDetailModal({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-lg text-[color:var(--text-1)] hover:text-[color:var(--text-0)] hover:bg-[color:var(--surface-track)] shrink-0"
+            className="p-2 rounded-lg text-[color:var(--text-1)] hover:text-[color:var(--accent-light)] hover:bg-[color:var(--surface-track)] shrink-0"
             aria-label="Close"
           >
-            <X size={18} />
+            <X size={18} className="text-current" aria-hidden />
           </button>
         </div>
         <div className="flex-1 overflow-y-auto p-4 sm:p-5">
@@ -1025,17 +1031,17 @@ function SessionDetailModal({
             >
               {session.type === 'lift' ? (
                 <>
-                  <Dumbbell size={16} />
+                  <Dumbbell size={16} className="shrink-0 text-white" aria-hidden />
                   {hasLoggedWorkoutToday ? 'Open workout' : 'Start workout'}
                 </>
               ) : session.type === 'recovery' ? (
                 <>
-                  <Activity size={16} />
+                  <Activity size={16} className="shrink-0 text-white" aria-hidden />
                   Log recovery
                 </>
               ) : (
                 <>
-                  <Dumbbell size={16} />
+                  <Dumbbell size={16} className="shrink-0 text-white" aria-hidden />
                   View training
                 </>
               )}
@@ -1072,7 +1078,7 @@ function ActivityContent({
       <SessionProgramPreview session={session} />
       {done ? (
         <div className="flex items-center justify-center gap-2 py-3 text-[color:var(--good)]">
-          <CheckCircle2 size={18} />
+          <CheckCircle2 size={18} className="shrink-0 text-[color:var(--good)]" aria-hidden />
           <span className="font-semibold">Workout Complete</span>
         </div>
       ) : canStart === false ? (
@@ -1086,17 +1092,17 @@ function ActivityContent({
         >
           {session.type === 'lift' ? (
             <>
-              <Dumbbell size={18} />
+              <Dumbbell size={18} className="shrink-0 text-white" aria-hidden />
               Start Workout
             </>
           ) : session.type === 'recovery' ? (
             <>
-              <Activity size={18} />
+              <Activity size={18} className="shrink-0 text-white" aria-hidden />
               Log recovery
             </>
           ) : (
             <>
-              <Dumbbell size={18} />
+              <Dumbbell size={18} className="shrink-0 text-white" aria-hidden />
               View training
             </>
           )}
@@ -1129,37 +1135,50 @@ function ScheduleModal({
 }) {
   const meta = KIND_META[item.kind];
   const p = item.payload;
-  return (
+  /* Portal: .dashboard-overview uses backdrop-filter, which creates a fixed-position
+   * containing block — without a portal the overlay only covers that panel. */
+  const modal = (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+      className="fixed inset-0 z-[72] flex min-h-[100dvh] items-center justify-center p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:p-5"
       onClick={onClose}
+      role="presentation"
     >
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" aria-hidden />
       <div
-        className="relative w-full sm:max-w-md mx-0 sm:mx-4 glass-panel dashboard-card-surface rounded-t-2xl sm:rounded-2xl overflow-hidden max-h-[85vh] flex flex-col"
+        className="relative flex w-full min-h-0 max-w-2xl flex-col overflow-hidden rounded-2xl glass-panel dashboard-card-surface shadow-2xl max-h-[min(92dvh,52rem)]"
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="schedule-modal-title"
       >
         {/* Header */}
-        <div className="flex items-center gap-3 p-4 border-b border-[color:var(--chrome-border-subtle)] shrink-0">
-          <span className="inline-flex items-center justify-center w-7 h-7 rounded-md border border-[color:color-mix(in_srgb,var(--accent)_26%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_10%,transparent)] shrink-0">
-            <meta.icon size={14} className="text-[color:var(--accent-light)]" />
+        <div className="flex shrink-0 items-center gap-3 border-b border-[color:var(--chrome-border-subtle)] p-4 sm:p-5">
+          <span className="inline-flex shrink-0 items-center justify-center rounded-md border border-[color:color-mix(in_srgb,var(--accent)_26%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_10%,transparent)] p-1.5">
+            <meta.icon size={14} className="text-[color:var(--accent-light)]" aria-hidden />
           </span>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-[color:var(--text-0)] truncate">{item.label}</h3>
+          <div className="min-w-0 flex-1">
+            <h3
+              id="schedule-modal-title"
+              className="truncate font-semibold text-[color:var(--text-0)]"
+            >
+              {item.label}
+            </h3>
             <p className="text-xs text-[color:var(--text-detail)]">{item.time}</p>
           </div>
           {item.done === true && (
-            <CheckCircle2 size={15} className="text-[color:var(--good)] shrink-0" />
+            <CheckCircle2 size={15} className="dashboard-plan-done-icon shrink-0" aria-hidden />
           )}
           <button
+            type="button"
             onClick={onClose}
-            className="p-1.5 text-[color:var(--text-detail)] hover:text-[color:var(--text-0)] shrink-0 transition-colors"
+            className="shrink-0 p-1.5 text-[color:var(--text-detail)] transition-colors hover:text-[color:var(--accent-light)]"
+            aria-label="Close"
           >
-            <X size={16} />
+            <X size={16} className="text-current" aria-hidden />
           </button>
         </div>
-        {/* Body */}
-        <div className="flex-1 overflow-y-auto p-4">
+        {/* Body — min-h-0 so flex child can shrink; overflow only when content exceeds viewport */}
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-5">
           {p.kind === 'meal' && (
             <MealContent
               slotKey={p.slotKey}
@@ -1183,6 +1202,8 @@ function ScheduleModal({
       </div>
     </div>
   );
+  if (typeof document === 'undefined') return null;
+  return createPortal(modal, document.body);
 }
 
 /* ─────────────────────────────────────────────────────────────────────
@@ -1330,7 +1351,11 @@ function TodaySchedule({
                     </td>
                     <td className="py-2.5 pr-4 align-top">
                       <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-[color:color-mix(in_srgb,var(--accent)_24%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_8%,transparent)] text-[color:var(--text-detail)]">
-                        <meta.icon size={11} className="text-[color:var(--accent-light)]" />
+                        <meta.icon
+                          size={11}
+                          className="text-[color:var(--accent-light)]"
+                          aria-hidden
+                        />
                         {meta.label}
                       </span>
                     </td>
@@ -1373,7 +1398,7 @@ function TodaySchedule({
                       {item.done === true ? (
                         <CheckCircle2
                           size={15}
-                          className="text-[color:var(--good)] inline-block mt-0.5"
+                          className="dashboard-plan-done-icon inline-block mt-0.5"
                           aria-hidden
                         />
                       ) : item.done === false ? (
@@ -1759,15 +1784,6 @@ export default function DashboardPage() {
     return { from: todayStr, to: todayStr };
   }, [trendKind, trendPresetDays, customApplied, todayStr]);
 
-  const checkInQueryLimit = useMemo(() => {
-    if (trendKind === 'custom' && customApplied) {
-      const span =
-        differenceInCalendarDays(parseISO(customApplied.to), parseISO(customApplied.from)) + 1;
-      return Math.min(500, Math.max(40, span + 40));
-    }
-    return Math.max(50, trendPresetDays + 30);
-  }, [trendKind, customApplied, trendPresetDays]);
-
   const trendSummary = useMemo(
     () => `${formatDisplayDate(trendBounds.from)} – ${formatDisplayDate(trendBounds.to)}`,
     [trendBounds.from, trendBounds.to],
@@ -1806,11 +1822,17 @@ export default function DashboardPage() {
   );
   const recentWorkouts = trendKind === 'preset' ? presetWorkouts : customWorkouts;
 
-  const { data: physiqueCheckIns } = useRecentCheckIns(userId, checkInQueryLimit);
+  /* Same source as Physique tab (`useCheckIns`) so demo seeds + cache keys stay aligned. */
+  const { data: physiqueCheckIns } = useCheckIns(userId);
   const physiqueCheckInsForTrend = useMemo(() => {
     const list = physiqueCheckIns ?? [];
     const { from, to } = trendBounds;
-    return list.filter((c) => c.date >= from && c.date <= to);
+    return list
+      .map((c) => {
+        const d = toDateOnlyKey(c.date);
+        return { ...c, date: d || c.date };
+      })
+      .filter((c) => c.date >= from && c.date <= to);
   }, [physiqueCheckIns, trendBounds]);
 
   const { data: nutritionPlanData } = useNutritionPlan(userId);
