@@ -95,7 +95,7 @@ export const TRAINING_YOUTUBE_PRESETS: readonly TrainingYouTubePreset[] = [
     playlistName: 'Classics',
     summary:
       'Familiar anthems and timeless hooks—predictable builds and sing-along peaks that carry long sessions, leg days, or anytime you want reliable energy.',
-    url: 'https://www.youtube.com/playlist?list=PL3ESu9Aq2zWK0stiENbI7J4TAuqUmEZdW',
+    url: 'https://www.youtube.com/playlist?list=PL3ESu9Aq2zWK0stiENbI7j4TAuqUmEZdV',
   },
   {
     id: 'iv-shared-breakup',
@@ -189,11 +189,11 @@ export const TRAINING_YOUTUBE_PRESETS: readonly TrainingYouTubePreset[] = [
     url: 'https://www.youtube.com/playlist?list=PL3ESu9Aq2zWIOXd0SiFvZkkN7haU8OUgx',
   },
   {
-    id: 'iv-morgan-mix-ipns',
-    playlistName: 'Training Mix',
+    id: 'iv-80s',
+    playlistName: '80s',
     summary:
-      'Curated lifting energy—use for main work when you want a single long mix without hunting tracks between sets.',
-    url: 'https://www.youtube.com/playlist?list=PL3ESu9Aq2zWIPNSxBDL-9UUQ3Y6YycmRK',
+      'Eighties cuts and synth-forward energy—steady drive for accessories, machine work, or longer blocks when you want nostalgic hooks without losing tempo.',
+    url: 'https://www.youtube.com/playlist?list=PL3ESu9Aq2zWIPNSxBDL-9UUQ3Y6YycmR',
   },
   {
     id: 'iv-morgan-rock-anthems',
@@ -235,7 +235,7 @@ export const TRAINING_YOUTUBE_PRESETS: readonly TrainingYouTubePreset[] = [
     playlistName: 'Hip Hop',
     summary:
       'Hip-hop driven grooves and pocket—anchors tempo work, machine stacks, or any session where bar placement matters as much as BPM.',
-    url: 'https://www.youtube.com/playlist?list=PL3ESu9Aq2zWK3Og_381sIz-Pi8g5WoXBO',
+    url: 'https://www.youtube.com/playlist?list=PL3ESu9Aq2zWK3Og_381sIz-Pi8g5WoXBQ',
   },
 ] as const;
 
