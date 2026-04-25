@@ -17,6 +17,8 @@ export function queryKeys(userId: string) {
         [userId, 'training', 'workouts', dateRange] as const,
       recentWorkouts: (days: number) => [userId, 'training', 'recent-workouts', days] as const,
       workout: (id: string) => [userId, 'training', 'workout', id] as const,
+      /** Persisted YouTube URL or skip (`null`) from `users/{uid}`. */
+      workoutMediaPreference: () => [userId, 'training', 'workout-media-preference'] as const,
       exercises: () => [userId, 'training', 'exercises'] as const,
     },
     nutrition: {

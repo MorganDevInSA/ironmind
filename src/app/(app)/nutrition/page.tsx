@@ -8,7 +8,7 @@ import {
   useActiveProgram,
   useNutritionPlan,
 } from '@/controllers';
-import { today, formatDisplayDate, getCycleDay } from '@/lib/utils';
+import { today, formatDisplayDate, getCycleDay, findProgramSessionForCycleDay } from '@/lib/utils';
 import { mortonNutritionPlan } from '@/lib/seed/nutrition';
 import {
   getDefaultPlanLine,
@@ -97,7 +97,7 @@ export default function NutritionPage() {
   const cycleDay = program
     ? getCycleDay(program.startDate ?? todayStr, todayStr, program.cycleLengthDays)
     : null;
-  const todaySession = program?.sessions.find((s) => s.dayNumber === cycleDay);
+  const todaySession = findProgramSessionForCycleDay(program?.sessions, cycleDay);
   const isLiftDay = todaySession?.type === 'lift';
 
   const [dayType, setDayType] = useState<DayType>('moderate');

@@ -14,6 +14,8 @@ import {
   getRecentWorkouts,
   applyWorkoutSetChange,
   deleteCurrentWeekVolumeRollup,
+  getLastWorkoutYouTubeUrl,
+  saveLastWorkoutYouTubeUrl,
 } from '@/services';
 import type { Workout } from '@/lib/types';
 import { onMutationError } from './_shared/on-error';
@@ -40,6 +42,29 @@ export function useActiveProgram(userId: string) {
     queryFn: () => getActiveProgram(userId),
     staleTime: staleTimes.activeProgram,
     enabled: !!userId,
+  });
+}
+
+export function useWorkoutMediaPreference(userId: string) {
+  return useQuery({
+    queryKey: queryKeys(userId).training.workoutMediaPreference(),
+    queryFn: () => getLastWorkoutYouTubeUrl(userId),
+    staleTime: staleTimes.workoutMediaPreference,
+    enabled: !!userId,
+  });
+}
+
+export function useSaveWorkoutMediaPreference(userId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (url: string | null) => saveLastWorkoutYouTubeUrl(userId, url),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys(userId).training.workoutMediaPreference(),
+      });
+    },
+    onError: onMutationError,
   });
 }
 

@@ -369,6 +369,11 @@ export interface UserData {
   isSeeded: boolean;
   /** Optional; missing treated as `1` for reads. */
   dataSchemaVersion?: number;
+  /**
+   * Last session-audio choice for training (canonical https YouTube URL).
+   * `null` means the user explicitly chose “Skip audio”; omit/`undefined` if never saved.
+   */
+  lastWorkoutYouTubeUrl?: string | null;
 }
 
 // Export Options

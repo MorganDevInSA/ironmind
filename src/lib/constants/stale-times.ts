@@ -9,6 +9,8 @@ export const staleTimes = {
   // Training
   activeProgram: Infinity, // Changes only when user switches programs
   programs: Infinity, // Changes only on create/edit
+  /** Stored on `UserData`; only changes when user confirms session audio modal */
+  workoutMediaPreference: Infinity,
   workouts: 5 * 60 * 1000, // 5 min - recent workouts might be viewed across pages
   exercises: Infinity, // Static data, never changes
 

@@ -1,4 +1,5 @@
 import { differenceInDays, startOfDay, parseISO } from 'date-fns';
+import type { ProgramSession } from '@/lib/types';
 
 /**
  * Determine the current day in an N-day rotating cycle
@@ -7,10 +8,19 @@ import { differenceInDays, startOfDay, parseISO } from 'date-fns';
  * @param cycleLengthDays - Length of the cycle (e.g., 14 for Morton's program)
  * @returns Day number in the cycle (1 to cycleLengthDays)
  */
+/** Resolve the planned session for a cycle day (Firestore may store `dayNumber` as a string). */
+export function findProgramSessionForCycleDay(
+  sessions: ProgramSession[] | undefined,
+  cycleDay: number | null | undefined,
+): ProgramSession | undefined {
+  if (sessions == null || cycleDay == null || !Number.isFinite(cycleDay)) return undefined;
+  return sessions.find((s) => Number(s.dayNumber) === cycleDay);
+}
+
 export function getCycleDay(
   startDate: string,
   currentDate: string,
-  cycleLengthDays: number
+  cycleLengthDays: number,
 ): number {
   const start = startOfDay(parseISO(startDate));
   const current = startOfDay(parseISO(currentDate));
@@ -29,10 +39,7 @@ export function getCycleDay(
  * @param daysPerWeek - Number of days per week (default 7)
  * @returns Week number in the cycle
  */
-export function getCycleWeek(
-  dayInCycle: number,
-  daysPerWeek = 7
-): number {
+export function getCycleWeek(dayInCycle: number, daysPerWeek = 7): number {
   return Math.ceil(dayInCycle / daysPerWeek);
 }
 
@@ -54,10 +61,7 @@ export function isProgressionDay(dayInCycle: number): boolean {
  * @param cycleLengthDays - Length of the cycle
  * @returns The base day number that this progression day corresponds to
  */
-export function getBaseDayForProgression(
-  dayInCycle: number,
-  cycleLengthDays: number
-): number {
+export function getBaseDayForProgression(dayInCycle: number, cycleLengthDays: number): number {
   const halfCycle = Math.floor(cycleLengthDays / 2);
 
   if (dayInCycle <= halfCycle) {
@@ -81,7 +85,7 @@ export function getDatesForCycleDay(
   startDate: string,
   targetCycleDay: number,
   cycleLengthDays: number,
-  numberOfCycles: number
+  numberOfCycles: number,
 ): string[] {
   const dates: string[] = [];
   const start = parseISO(startDate);
@@ -108,7 +112,7 @@ export function isSpecificCycleDay(
   startDate: string,
   currentDate: string,
   cycleLengthDays: number,
-  targetCycleDay: number
+  targetCycleDay: number,
 ): boolean {
   const currentDay = getCycleDay(startDate, currentDate, cycleLengthDays);
   return currentDay === targetCycleDay;
@@ -139,7 +143,7 @@ export function getSessionTypeForDay(dayInCycle: number): 'lift' | 'cardio' | 'r
  * @returns Day type for macro targets
  */
 export function getDayTypeFromSessionType(
-  sessionType: 'lift' | 'cardio' | 'recovery'
+  sessionType: 'lift' | 'cardio' | 'recovery',
 ): 'recovery' | 'moderate' | 'high' | 'highest' {
   switch (sessionType) {
     case 'lift':

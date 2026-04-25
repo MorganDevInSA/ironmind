@@ -56,3 +56,18 @@ export async function markUserSeeded(userId: string): Promise<void> {
     updateUserData(userId, { isSeeded: true, dataSchemaVersion: CURRENT_DATA_SCHEMA_VERSION }),
   );
 }
+
+/** `undefined` — no user doc or field missing; `null` — user saved “skip”; string — last YouTube URL */
+export async function getLastWorkoutYouTubeUrl(userId: string): Promise<string | null | undefined> {
+  return withService('profile', 'read workout media preference', async () => {
+    const user = await getUserData(userId);
+    if (!user) return undefined;
+    return user.lastWorkoutYouTubeUrl;
+  });
+}
+
+export async function saveLastWorkoutYouTubeUrl(userId: string, url: string | null): Promise<void> {
+  return withService('profile', 'save workout media preference', () =>
+    updateUserData(userId, { lastWorkoutYouTubeUrl: url }),
+  );
+}

@@ -1,10 +1,18 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { isValid, parseISO } from 'date-fns';
 import { useAuthStore } from '@/stores';
-import { useActiveProgram, useCreateWorkout } from '@/controllers';
-import { getCycleDay, today } from '@/lib/utils';
+import {
+  useActiveProgram,
+  useCreateWorkout,
+  useWorkoutMediaPreference,
+  useSaveWorkoutMediaPreference,
+} from '@/controllers';
+import { TrainingMediaModal } from '@/components/training/training-media-modal';
+import { sessionTypeUsesMediaGate } from '@/lib/program-session-routes';
+import { getCycleDay, findProgramSessionForCycleDay, today } from '@/lib/utils';
 import { ArrowLeft, CheckCircle2, Timer, ChevronDown, ChevronUp, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { SessionExercise, WorkoutExercise, ExerciseSet } from '@/lib/types';
@@ -65,21 +73,37 @@ function fmtTime(s: number) {
   return `${String(m).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 }
 
+function parseSessionDateParam(raw: string | null, fallback: string): string {
+  if (!raw || !/^\d{4}-\d{2}-\d{2}$/.test(raw)) return fallback;
+  const d = parseISO(raw);
+  return isValid(d) ? raw : fallback;
+}
+
 /* ── Page ─────────────────────────────────────────────────────── */
 export default function WorkoutPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user } = useAuthStore();
   const userId = user?.uid ?? '';
 
   const { data: program } = useActiveProgram(userId);
   const { mutate: createWorkout, isPending: isSaving } = useCreateWorkout(userId);
+  const { data: savedWorkoutMediaUrl } = useWorkoutMediaPreference(userId);
+  const { mutate: saveWorkoutMediaPreference } = useSaveWorkoutMediaPreference(userId);
 
   const todayStr = today();
+  const sessionDate = parseSessionDateParam(searchParams.get('date'), todayStr);
   const cycleDay = program
-    ? getCycleDay(program.startDate ?? todayStr, todayStr, program.cycleLengthDays)
+    ? getCycleDay(program.startDate ?? todayStr, sessionDate, program.cycleLengthDays)
     : null;
-  const session = program?.sessions.find((s) => s.dayNumber === cycleDay);
+  const session = findProgramSessionForCycleDay(program?.sessions, cycleDay);
   const exercises = session?.exercises ?? [];
+
+  const needsSessionMediaGate = Boolean(
+    program && session && sessionTypeUsesMediaGate(session.type),
+  );
+  const [mediaGatePassed, setMediaGatePassed] = useState(false);
+  const showSessionMediaGate = needsSessionMediaGate && !mediaGatePassed;
 
   const [started, setStarted] = useState(false);
   const [finished, setFinished] = useState(false);
@@ -152,7 +176,7 @@ export default function WorkoutPage() {
       cycleDayNumber: cycleDay ?? 0,
       sessionName: session?.name ?? '',
       sessionType: 'lift',
-      date: todayStr,
+      date: sessionDate,
       exercises: workoutExercises,
       durationMinutes: Math.max(1, Math.round(elapsed / 60)),
       notes: notes || undefined,
@@ -172,11 +196,33 @@ export default function WorkoutPage() {
           <ArrowLeft size={18} /> Back
         </button>
         <div className="glass-panel p-8 text-center">
-          <p className="text-[color:var(--text-2)]">No session found for today.</p>
+          <p className="text-[color:var(--text-2)]">
+            {sessionDate === todayStr
+              ? 'No session found for today.'
+              : 'No session found for the selected day.'}
+          </p>
         </div>
       </div>
     );
   }
+
+  if (showSessionMediaGate) {
+    return (
+      <div className="mx-auto max-w-4xl space-y-4">
+        <TrainingMediaModal
+          open
+          sessionTitle={session.name}
+          initialLastYouTubeUrl={savedWorkoutMediaUrl}
+          onClose={() => router.push('/training')}
+          onContinue={(result) => {
+            saveWorkoutMediaPreference(result.youtubeUrl);
+            setMediaGatePassed(true);
+          }}
+        />
+      </div>
+    );
+  }
+
   if (session.type !== 'lift') {
     return (
       <div className="space-y-4">
@@ -189,8 +235,13 @@ export default function WorkoutPage() {
         <div className="glass-panel p-8 text-center space-y-3">
           <p className="text-lg font-semibold text-[color:var(--text-0)]">{session.name}</p>
           <p className="text-[color:var(--text-2)]">Today is a {session.type} day.</p>
-          <button onClick={() => router.push('/recovery')} className="btn-primary mt-2">
-            Log Recovery
+          <button
+            onClick={() =>
+              session.type === 'recovery' ? router.push('/recovery') : router.push('/training')
+            }
+            className="btn-primary mt-2"
+          >
+            {session.type === 'recovery' ? 'Log Recovery' : 'Back to Training'}
           </button>
         </div>
       </div>
@@ -212,8 +263,8 @@ export default function WorkoutPage() {
     }, 0);
     return (
       <div className="space-y-4 max-w-4xl mx-auto">
-        <div className="glass-panel p-6 text-center space-y-4 border-[3px] border-[rgba(16,185,129,0.3)]">
-          <CheckCircle2 size={40} className="text-[#10B981] mx-auto" />
+        <div className="glass-panel p-6 text-center space-y-4 border-[3px] border-[color:color-mix(in_srgb,var(--good)_42%,transparent)]">
+          <CheckCircle2 size={40} className="mx-auto text-[color:var(--good)]" aria-hidden />
           <div>
             <h2 className="text-xl font-bold text-[color:var(--text-0)]">Session Complete</h2>
             <p className="text-[color:var(--text-2)]">
@@ -229,7 +280,7 @@ export default function WorkoutPage() {
                 value: `${Math.round(totalVolume / Math.max(1, elapsed / 60))} kg/min`,
               },
             ].map((s) => (
-              <div key={s.label} className="bg-[rgba(18,14,14,0.6)] rounded-lg p-3">
+              <div key={s.label} className="rounded-lg bg-[color:var(--surface-well)] p-3">
                 <p className="text-xs text-[color:var(--text-2)] mb-1">{s.label}</p>
                 <p className="font-mono tabular-nums font-bold text-[color:var(--text-0)]">
                   {s.value}
@@ -250,14 +301,16 @@ export default function WorkoutPage() {
 
   /* ── Active session ─────────────────────────────────────────── */
   return (
-    <div className="space-y-4 max-w-4xl mx-auto pb-8">
+    <div className="mx-auto max-w-4xl space-y-4 pb-8 font-sans">
       {/* Sticky header */}
       <div className="sticky top-14 z-20 glass-panel px-4 py-3 flex items-center gap-3">
         <button
+          type="button"
           onClick={() => router.back()}
           className="p-1.5 text-[color:var(--text-2)] hover:text-[color:var(--text-0)]"
+          aria-label="Back"
         >
-          <ArrowLeft size={18} />
+          <ArrowLeft size={18} className="text-current" aria-hidden />
         </button>
         <div className="flex-1 min-w-0">
           <p className="text-xs text-[color:var(--text-2)] font-semibold uppercase tracking-wider">
@@ -269,13 +322,13 @@ export default function WorkoutPage() {
         </div>
         <div
           className={cn(
-            'flex items-center gap-1.5 px-3 py-1 rounded-full font-mono tabular-nums text-sm font-bold',
+            'flex items-center gap-1.5 rounded-full border px-3 py-1 font-mono text-sm font-bold tabular-nums',
             started
-              ? 'bg-[rgba(16,185,129,0.12)] border border-[rgba(16,185,129,0.35)] text-[#10B981]'
-              : 'bg-[rgba(65,50,50,0.12)] border border-[rgba(65,50,50,0.25)] text-[color:var(--text-2)]',
+              ? 'border-[color:color-mix(in_srgb,var(--good)_38%,transparent)] bg-[color:color-mix(in_srgb,var(--good)_12%,transparent)] text-[color:var(--good)]'
+              : 'border-[color:var(--chrome-border)] bg-[color:color-mix(in_srgb,var(--accent)_8%,transparent)] text-[color:var(--text-2)]',
           )}
         >
-          <Timer size={14} />
+          <Timer size={14} className="shrink-0 text-current" aria-hidden />
           {fmtTime(elapsed)}
         </div>
         <span className="font-mono tabular-nums text-[color:var(--accent)] font-bold text-sm">
@@ -284,17 +337,19 @@ export default function WorkoutPage() {
       </div>
 
       {/* Progress bar */}
-      <div className="h-1 bg-[rgba(18,14,14,0.72)] rounded-full overflow-hidden mx-1">
+      <div className="mx-1 h-1 overflow-hidden rounded-full bg-[color:var(--surface-track)]">
         <div
           className="h-full bg-[color:var(--accent)] rounded-full transition-all duration-500"
           style={{ width: `${progress}%` }}
         />
       </div>
 
-      {/* Session note */}
+      {/* Session note — accent border/text (never legacy amber warn gold) */}
       {session.notes && (
-        <div className="glass-panel p-3 border-l-4 border-[#F59E0B]">
-          <p className="text-sm text-[color:var(--text-2)]">{session.notes}</p>
+        <div className="glass-panel border-l-4 border-[color:var(--accent)] bg-[color-mix(in_srgb,var(--accent)_8%,transparent)] p-3">
+          <p className="font-sans text-sm leading-relaxed text-[color:var(--text-0)]">
+            {session.notes}
+          </p>
         </div>
       )}
 
@@ -317,18 +372,20 @@ export default function WorkoutPage() {
               className={cn('glass-panel overflow-hidden', allDone && 'opacity-80')}
             >
               <button
+                type="button"
                 onClick={() => setExpanded(isOpen ? null : exercise.exerciseId)}
-                className="w-full flex items-center gap-3 p-4"
+                className="flex w-full items-center gap-3 p-4 font-sans text-left"
               >
                 <div
                   className={cn(
-                    'w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0',
+                    'flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2',
                     allDone
-                      ? 'border-[#10B981] bg-[rgba(16,185,129,0.15)]'
-                      : 'border-[rgba(65,50,50,0.4)]',
+                      ? 'border-[color:var(--good)] bg-[color:color-mix(in_srgb,var(--good)_16%,transparent)]'
+                      : 'border-[color:var(--chrome-border)]',
                   )}
+                  aria-hidden
                 >
-                  {allDone && <div className="w-2 h-2 rounded-full bg-[#10B981]" />}
+                  {allDone && <div className="h-2 w-2 rounded-full bg-[color:var(--good)]" />}
                 </div>
 
                 <div className="flex-1 text-left min-w-0">
@@ -349,7 +406,7 @@ export default function WorkoutPage() {
 
                 <div className="flex items-center gap-3 shrink-0">
                   {exVolume > 0 && (
-                    <span className="text-xs font-mono tabular-nums text-[#F59E0B]">
+                    <span className="text-xs font-mono tabular-nums text-theme-accent">
                       {Math.round(exVolume).toLocaleString()} kg
                     </span>
                   )}
@@ -357,9 +414,17 @@ export default function WorkoutPage() {
                     {doneSets}/{exercise.sets}
                   </span>
                   {isOpen ? (
-                    <ChevronUp size={16} className="text-[color:var(--text-2)]" />
+                    <ChevronUp
+                      size={16}
+                      className="shrink-0 text-[color:var(--text-2)]"
+                      aria-hidden
+                    />
                   ) : (
-                    <ChevronDown size={16} className="text-[color:var(--text-2)]" />
+                    <ChevronDown
+                      size={16}
+                      className="shrink-0 text-[color:var(--text-2)]"
+                      aria-hidden
+                    />
                   )}
                 </div>
               </button>
@@ -378,10 +443,10 @@ export default function WorkoutPage() {
                       <div
                         key={i}
                         className={cn(
-                          'grid grid-cols-[2.5rem_1fr_1fr_5rem] gap-2 items-center p-2 rounded-lg border transition-all',
+                          'grid grid-cols-[2.5rem_1fr_1fr_5rem] items-center gap-2 rounded-lg border p-2 transition-all',
                           log.timeStamped
-                            ? 'border-[rgba(16,185,129,0.3)] bg-[rgba(16,185,129,0.06)]'
-                            : 'border-[rgba(65,50,50,0.2)] bg-[rgba(18,14,14,0.4)]',
+                            ? 'border-[color:color-mix(in_srgb,var(--good)_38%,transparent)] bg-[color:color-mix(in_srgb,var(--good)_8%,transparent)]'
+                            : 'border-[color:var(--chrome-border-subtle)] bg-[color:var(--surface-well)]',
                         )}
                       >
                         <span className="text-xs font-mono text-[color:var(--text-2)] text-center">
@@ -397,7 +462,7 @@ export default function WorkoutPage() {
                             updateSet(exercise.exerciseId, i, 'weight', e.target.value)
                           }
                           placeholder={i > 0 ? sets[i - 1].weight || '—' : '—'}
-                          className="w-full bg-[rgba(18,14,14,0.7)] border border-[rgba(65,50,50,0.25)] rounded px-2 py-1.5 text-sm text-[color:var(--text-0)] font-mono tabular-nums placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color-mix(in srgb,var(--accent) 40%,transparent0.4)]"
+                          className="w-full rounded border border-[color:var(--chrome-border)] bg-[color:var(--surface-well)] px-2 py-1.5 font-mono text-sm tabular-nums text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)]"
                         />
 
                         <input
@@ -408,16 +473,17 @@ export default function WorkoutPage() {
                             updateSet(exercise.exerciseId, i, 'reps', e.target.value)
                           }
                           placeholder="—"
-                          className="w-full bg-[rgba(18,14,14,0.7)] border border-[rgba(65,50,50,0.25)] rounded px-2 py-1.5 text-sm text-[color:var(--text-0)] font-mono tabular-nums placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color-mix(in srgb,var(--accent) 40%,transparent0.4)]"
+                          className="w-full rounded border border-[color:var(--chrome-border)] bg-[color:var(--surface-well)] px-2 py-1.5 font-mono text-sm tabular-nums text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)]"
                         />
 
                         <button
+                          type="button"
                           onClick={() => stampSet(exercise.exerciseId, i)}
                           className={cn(
-                            'w-full h-8 rounded-lg text-xs font-mono font-semibold border transition-all',
+                            'h-8 w-full rounded-lg border font-mono text-xs font-semibold transition-all',
                             log.timeStamped
-                              ? 'border-[rgba(16,185,129,0.4)] bg-[rgba(16,185,129,0.12)] text-[#10B981]'
-                              : 'border-[rgba(65,50,50,0.3)] text-[color:var(--text-2)] hover:border-[color-mix(in srgb,var(--accent) 40%,transparent0.4)] hover:text-[color:var(--text-0)]',
+                              ? 'border-[color:color-mix(in_srgb,var(--good)_45%,transparent)] bg-[color:color-mix(in_srgb,var(--good)_14%,transparent)] text-[color:var(--good)]'
+                              : 'border-[color:var(--chrome-border)] text-[color:var(--text-2)] hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]',
                           )}
                         >
                           {log.timeStamped ?? '—'}
@@ -446,7 +512,7 @@ export default function WorkoutPage() {
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Felt strong / fatigue / PR notes…"
           rows={2}
-          className="w-full bg-[rgba(18,14,14,0.6)] border border-[rgba(65,50,50,0.25)] rounded-lg p-3 text-sm text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color-mix(in srgb,var(--accent) 40%,transparent0.4)] resize-none"
+          className="w-full resize-none rounded-lg border border-[color:var(--chrome-border)] bg-[color:var(--surface-well)] p-3 font-sans text-sm text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)]"
         />
       </div>
 
@@ -460,9 +526,12 @@ export default function WorkoutPage() {
         )}
       >
         {isSaving ? (
-          <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin inline-block" />
+          <span
+            className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-[color:color-mix(in_srgb,var(--text-0)_35%,transparent)] border-t-[color:var(--text-0)]"
+            aria-hidden
+          />
         ) : (
-          <Trophy size={18} />
+          <Trophy size={18} className="shrink-0" aria-hidden />
         )}
         {isSaving ? 'Saving…' : `Finish Session (${completedSets}/${totalSets} sets)`}
       </button>

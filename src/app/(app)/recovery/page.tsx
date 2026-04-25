@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { isValid, parseISO } from 'date-fns';
 import { useAuthStore } from '@/stores';
 import { useSaveRecoveryEntry, useRecentRecoveryEntries } from '@/controllers';
 import { today, formatDisplayDate } from '@/lib/utils';
@@ -119,14 +120,24 @@ function SliderField({
   );
 }
 
+function parseRecoveryDateParam(raw: string | null, fallback: string): string {
+  if (!raw || !/^\d{4}-\d{2}-\d{2}$/.test(raw)) return fallback;
+  const d = parseISO(raw);
+  return isValid(d) ? raw : fallback;
+}
+
 /* ── Page ─────────────────────────────────────────────────────── */
 export default function RecoveryPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user } = useAuthStore();
   const userId = user?.uid ?? '';
 
   const { mutate: saveRecovery, isPending, isSuccess } = useSaveRecoveryEntry(userId);
   const { data: history } = useRecentRecoveryEntries(userId, 14);
+
+  const todayStr = today();
+  const logDate = parseRecoveryDateParam(searchParams.get('date'), todayStr);
 
   const [form, setForm] = useState({
     sleepHours: 7.5,
@@ -155,11 +166,10 @@ export default function RecoveryPage() {
       ),
     );
 
-    const todayStr = today();
     saveRecovery({
-      date: todayStr,
+      date: logDate,
       entry: {
-        date: todayStr,
+        date: logDate,
         sleepHours: form.sleepHours,
         sleepQuality: form.sleepQuality,
         hrv: form.hrv,
@@ -176,7 +186,7 @@ export default function RecoveryPage() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="glass-panel p-10 max-w-sm w-full text-center space-y-4">
-          <CheckCircle2 size={40} className="text-[#10B981] mx-auto" />
+          <CheckCircle2 size={40} className="text-[color:var(--good)] mx-auto" />
           <h2 className="text-xl font-bold text-[color:var(--text-0)]">Recovery logged.</h2>
           <button onClick={() => router.push('/dashboard')} className="btn-primary w-full">
             Dashboard
@@ -219,7 +229,8 @@ export default function RecoveryPage() {
     <div
       className={cn(
         'glass-panel p-4 flex items-center gap-4',
-        latestEntry.date !== today() && 'border border-[rgba(16,185,129,0.22)]',
+        latestEntry.date !== today() &&
+          'border border-[color:color-mix(in_srgb,var(--good)_22%,transparent)]',
       )}
     >
       <div
@@ -229,7 +240,7 @@ export default function RecoveryPage() {
             ? 'text-[color:var(--accent)] border-[color:color-mix(in_srgb,var(--accent)_40%,transparent)]'
             : latestEntry.readinessScore >= 60
               ? 'text-[color:var(--accent)] border-[color:color-mix(in_srgb,var(--accent)_40%,transparent)]'
-              : 'text-[#EF4444] border-[rgba(239,68,68,0.4)]',
+              : 'text-[color:var(--bad)] border-[color:color-mix(in_srgb,var(--bad)_40%,transparent)]',
         )}
       >
         {Math.round(latestEntry.readinessScore)}

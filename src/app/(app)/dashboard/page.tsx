@@ -13,9 +13,12 @@ import {
   useProtocol,
   useRecoveryEntry,
   useSupplementLog,
+  useWorkoutMediaPreference,
+  useSaveWorkoutMediaPreference,
 } from '@/controllers';
 import {
   getCycleDay,
+  findProgramSessionForCycleDay,
   today,
   formatDisplayDate,
   formatShortDate,
@@ -52,6 +55,12 @@ import { cn } from '@/lib/utils';
 import { measurementForChart } from '@/lib/utils/measurement-bounds';
 import { MEASUREMENT_CHART_SERIES } from '@/lib/constants/measurement-chart-series';
 import type { Workout, NutritionDay, SupplementLog, ProgramSession, CheckIn } from '@/lib/types';
+import {
+  postSessionMediaHref,
+  routeForTodaySessionStart,
+  sessionTypeUsesMediaGate,
+} from '@/lib/program-session-routes';
+import { TrainingMediaModal } from '@/components/training/training-media-modal';
 import { mortonNutritionPlan } from '@/lib/seed/nutrition';
 import { mortonSupplementProtocol } from '@/lib/seed/supplements';
 import type { NutritionPlanSeed } from '@/lib/seed/nutrition';
@@ -186,6 +195,15 @@ function MiniMeasurementLegendSwatch({ dash, stroke }: { dash: string; stroke: s
 }
 const THEME_FILL_GRADIENT =
   'linear-gradient(90deg, color-mix(in srgb, var(--accent-light) 85%, white 15%) 0%, color-mix(in srgb, var(--accent) 72%, black 28%) 100%)';
+const CHART_TICK = { fontSize: 9, fill: 'var(--text-detail)' };
+const CHART_TOOLTIP_STYLE = {
+  background: 'var(--panel-strong)',
+  border: '1px solid var(--chrome-border)',
+  borderRadius: 12,
+  color: 'var(--text-0)',
+  fontSize: 12,
+};
+const CHART_TOOLTIP_LABEL_STYLE = { color: 'var(--text-1)' };
 
 function PhysiqueMiniCharts({
   checkIns,
@@ -235,7 +253,7 @@ function PhysiqueMiniCharts({
         <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">
           Trend
         </span>
-        <div className="flex rounded-lg overflow-hidden border border-[rgba(65,50,50,0.35)]">
+        <div className="flex rounded-lg overflow-hidden border border-[color:var(--chrome-border)]">
           <button
             type="button"
             onClick={(e) => {
@@ -291,7 +309,7 @@ function PhysiqueMiniCharts({
               <XAxis
                 dataKey="dateKey"
                 tickFormatter={(v) => (typeof v === 'string' ? formatShortDate(v) : String(v))}
-                tick={{ fontSize: 9, fill: '#B8B8B8' }}
+                tick={CHART_TICK}
                 tickLine={false}
                 axisLine={false}
               />
@@ -300,18 +318,13 @@ function PhysiqueMiniCharts({
                   (min: number) => Math.floor(min - 0.5),
                   (max: number) => Math.ceil(max + 0.5),
                 ]}
-                tick={{ fontSize: 9, fill: '#B8B8B8' }}
+                tick={CHART_TICK}
                 tickLine={false}
                 axisLine={false}
               />
               <Tooltip
-                contentStyle={{
-                  background: 'rgba(10,10,10,0.95)',
-                  border: '1px solid rgba(65,50,50,0.4)',
-                  borderRadius: 12,
-                  fontSize: 12,
-                }}
-                labelStyle={{ color: 'color:var(--text-1)' }}
+                contentStyle={CHART_TOOLTIP_STYLE}
+                labelStyle={CHART_TOOLTIP_LABEL_STYLE}
                 labelFormatter={(label) =>
                   typeof label === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(label)
                     ? formatDisplayDate(label)
@@ -347,18 +360,14 @@ function PhysiqueMiniCharts({
                 <XAxis
                   dataKey="dateKey"
                   tickFormatter={(v) => (typeof v === 'string' ? formatShortDate(v) : String(v))}
-                  tick={{ fontSize: 9, fill: '#B8B8B8' }}
+                  tick={CHART_TICK}
                   tickLine={false}
                   axisLine={false}
                 />
-                <YAxis tick={{ fontSize: 9, fill: '#B8B8B8' }} tickLine={false} axisLine={false} />
+                <YAxis tick={CHART_TICK} tickLine={false} axisLine={false} />
                 <Tooltip
-                  contentStyle={{
-                    background: 'rgba(10,10,10,0.95)',
-                    border: '1px solid rgba(65,50,50,0.4)',
-                    borderRadius: 12,
-                    fontSize: 12,
-                  }}
+                  contentStyle={CHART_TOOLTIP_STYLE}
+                  labelStyle={CHART_TOOLTIP_LABEL_STYLE}
                   labelFormatter={(label) =>
                     typeof label === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(label)
                       ? formatDisplayDate(label)
@@ -503,9 +512,9 @@ function VitaminsContent({
                 )}
               >
                 {taken ? (
-                  <CheckCircle2 size={14} className="text-[#10B981] shrink-0" />
+                  <CheckCircle2 size={14} className="text-[color:var(--good)] shrink-0" />
                 ) : (
-                  <span className="w-3.5 h-3.5 rounded-full border border-[rgba(65,50,50,0.22)] shrink-0 inline-block" />
+                  <span className="w-3.5 h-3.5 rounded-full border border-[color:var(--chrome-border-subtle)] shrink-0 inline-block" />
                 )}
                 <span
                   className={
@@ -565,7 +574,7 @@ function SessionProgramPreview({ session }: { session: ProgramSession }) {
           <p className="text-[10px] text-[color:var(--text-detail)] uppercase tracking-wider mb-2">
             Exercises ({exercises.length})
           </p>
-          <div className="divide-y divide-[rgba(65,50,50,0.14)]">
+          <div className="divide-y divide-[color:var(--chrome-border-subtle)]">
             {exercises.map((ex, i) => (
               <div key={i} className="flex items-start justify-between gap-2 py-2 text-sm">
                 <div className="flex items-start gap-2 min-w-0">
@@ -581,7 +590,7 @@ function SessionProgramPreview({ session }: { session: ProgramSession }) {
                         {ex.name}
                       </span>
                       {ex.isKPI && (
-                        <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-[rgba(220,38,38,0.14)] text-[color:var(--text-0)] border border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)] shrink-0">
+                        <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-[color:color-mix(in_srgb,var(--accent)_14%,transparent)] text-[color:var(--text-0)] border border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)] shrink-0">
                           KPI
                         </span>
                       )}
@@ -639,7 +648,7 @@ function SessionProgramPreview({ session }: { session: ProgramSession }) {
           <p className="text-[10px] text-[color:var(--text-detail)] uppercase tracking-wider mb-2">
             Core
           </p>
-          <div className="divide-y divide-[rgba(65,50,50,0.14)]">
+          <div className="divide-y divide-[color:var(--chrome-border-subtle)]">
             {core.map((c, i) => (
               <div key={i} className="flex items-start justify-between gap-2 py-2 text-sm">
                 <span className="text-[color:var(--text-0)]">{c.name}</span>
@@ -661,7 +670,7 @@ function SessionProgramPreview({ session }: { session: ProgramSession }) {
             {mobility.map((m, i) => (
               <li
                 key={i}
-                className="text-sm text-[#D4D4D4] pl-3 border-l-2 border-[rgba(220,38,38,0.28)] leading-snug"
+                className="text-sm text-[color:var(--text-detail)] pl-3 border-l-2 border-[color:color-mix(in_srgb,var(--accent)_28%,transparent)] leading-snug"
               >
                 {m}
               </li>
@@ -684,9 +693,11 @@ function SessionProgramPreview({ session }: { session: ProgramSession }) {
 
 const sessionTableTh =
   'text-left py-2.5 px-3 text-[10px] font-semibold uppercase tracking-wider text-[color:var(--text-detail)]';
-const sessionTableTd = 'py-2.5 px-3 align-top border-t border-[rgba(65,50,50,0.14)]';
+const sessionTableTd = 'py-2.5 px-3 align-top border-t border-[color:var(--chrome-border-subtle)]';
 const sessionTableWrap =
-  'overflow-x-auto rounded-lg border border-[rgba(65,50,50,0.28)] bg-[rgba(0,0,0,0.18)]';
+  'overflow-x-auto rounded-lg border border-[color:var(--chrome-border)] bg-[color:var(--surface-well)]';
+const sessionTableHeader = 'bg-[color:var(--surface-track)]';
+const sessionTableNumber = 'text-right font-mono tabular-nums text-[color:var(--text-detail)]';
 
 function SessionProgramTable({ session }: { session: ProgramSession }) {
   const exercises = session.exercises ?? [];
@@ -723,7 +734,7 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
           <div className={sessionTableWrap}>
             <table className="w-full min-w-[520px] text-sm">
               <thead>
-                <tr className="bg-[rgba(0,0,0,0.35)]">
+                <tr className={sessionTableHeader}>
                   <th className={cn(sessionTableTh, 'w-10')}>#</th>
                   <th className={sessionTableTh}>Exercise</th>
                   <th className={cn(sessionTableTh, 'text-right w-[4.5rem]')}>Sets</th>
@@ -746,7 +757,7 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="font-medium">{ex.name}</span>
                         {ex.isKPI ? (
-                          <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-[rgba(220,38,38,0.14)] text-[color:var(--text-0)] border border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)]">
+                          <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-[color:color-mix(in_srgb,var(--accent)_14%,transparent)] text-[color:var(--text-0)] border border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)]">
                             KPI
                           </span>
                         ) : null}
@@ -757,22 +768,8 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
                         </p>
                       ) : null}
                     </td>
-                    <td
-                      className={cn(
-                        sessionTableTd,
-                        'text-right font-mono tabular-nums text-[#D4D4D4]',
-                      )}
-                    >
-                      {ex.sets}
-                    </td>
-                    <td
-                      className={cn(
-                        sessionTableTd,
-                        'text-right font-mono tabular-nums text-[#D4D4D4]',
-                      )}
-                    >
-                      {ex.reps}
-                    </td>
+                    <td className={cn(sessionTableTd, sessionTableNumber)}>{ex.sets}</td>
+                    <td className={cn(sessionTableTd, sessionTableNumber)}>{ex.reps}</td>
                     <td
                       className={cn(
                         sessionTableTd,
@@ -797,7 +794,7 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
           <div className={sessionTableWrap}>
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-[rgba(0,0,0,0.35)]">
+                <tr className={sessionTableHeader}>
                   <th className={sessionTableTh}>Activity</th>
                   <th className={cn(sessionTableTh, 'text-right w-[6rem]')}>Time</th>
                   <th className={sessionTableTh}>Structure &amp; notes</th>
@@ -808,14 +805,7 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
                   <td className={cn(sessionTableTd, 'text-[color:var(--text-0)] font-medium')}>
                     {cardio.type}
                   </td>
-                  <td
-                    className={cn(
-                      sessionTableTd,
-                      'text-right font-mono tabular-nums text-[#D4D4D4]',
-                    )}
-                  >
-                    {cardio.duration} min
-                  </td>
+                  <td className={cn(sessionTableTd, sessionTableNumber)}>{cardio.duration} min</td>
                   <td
                     className={cn(
                       sessionTableTd,
@@ -848,7 +838,7 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
           <div className={sessionTableWrap}>
             <table className="w-full min-w-[480px] text-sm">
               <thead>
-                <tr className="bg-[rgba(0,0,0,0.35)]">
+                <tr className={sessionTableHeader}>
                   <th className={sessionTableTh}>Protocol</th>
                   <th className={sessionTableTh}>Timing</th>
                   <th className={cn(sessionTableTh, 'text-right w-[5rem]')}>Rounds</th>
@@ -869,14 +859,7 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
                       in {bw.inhale}s{bw.hold != null ? ` · hold ${bw.hold}s` : ''} · out{' '}
                       {bw.exhale}s{bw.holdOut != null ? ` · pause ${bw.holdOut}s` : ''}
                     </td>
-                    <td
-                      className={cn(
-                        sessionTableTd,
-                        'text-right font-mono tabular-nums text-[#D4D4D4]',
-                      )}
-                    >
-                      {bw.rounds}
-                    </td>
+                    <td className={cn(sessionTableTd, sessionTableNumber)}>{bw.rounds}</td>
                   </tr>
                 ))}
               </tbody>
@@ -893,7 +876,7 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
           <div className={sessionTableWrap}>
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-[rgba(0,0,0,0.35)]">
+                <tr className={sessionTableHeader}>
                   <th className={sessionTableTh}>Exercise</th>
                   <th className={cn(sessionTableTh, 'text-right w-[10rem]')}>Prescription</th>
                 </tr>
@@ -905,7 +888,7 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
                     <td
                       className={cn(
                         sessionTableTd,
-                        'text-right font-mono tabular-nums text-[#D4D4D4] text-xs',
+                        'text-right font-mono tabular-nums text-[color:var(--text-detail)] text-xs',
                       )}
                     >
                       {corePrescription(c)}
@@ -926,7 +909,7 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
           <div className={sessionTableWrap}>
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-[rgba(0,0,0,0.35)]">
+                <tr className={sessionTableHeader}>
                   <th className={sessionTableTh}>Focus</th>
                 </tr>
               </thead>
@@ -936,7 +919,7 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
                     <td
                       className={cn(
                         sessionTableTd,
-                        'text-[#D4D4D4] pl-4 border-l-2 border-[rgba(220,38,38,0.28)]',
+                        'text-[color:var(--text-detail)] pl-4 border-l-2 border-[color:color-mix(in_srgb,var(--accent)_28%,transparent)]',
                       )}
                     >
                       {m}
@@ -974,7 +957,7 @@ function SessionDetailModal({
   onClose,
   isViewingToday,
   hasLoggedWorkoutToday,
-  onGoWorkout,
+  onStartTodaySession,
   onGoTraining,
 }: {
   open: boolean;
@@ -983,7 +966,7 @@ function SessionDetailModal({
   onClose: () => void;
   isViewingToday: boolean;
   hasLoggedWorkoutToday: boolean;
-  onGoWorkout: () => void;
+  onStartTodaySession: () => void;
   onGoTraining: () => void;
 }) {
   if (!open || !session) return null;
@@ -995,10 +978,10 @@ function SessionDetailModal({
     >
       <div className="absolute inset-0 bg-black/65 backdrop-blur-sm" />
       <div
-        className="relative w-full sm:max-w-2xl mx-0 sm:mx-4 glass-panel rounded-t-2xl sm:rounded-2xl max-h-[90vh] overflow-hidden flex flex-col border border-[rgba(65,50,50,0.35)]"
+        className="relative w-full sm:max-w-2xl mx-0 sm:mx-4 glass-panel rounded-t-2xl sm:rounded-2xl max-h-[90vh] overflow-hidden flex flex-col border border-[color:var(--chrome-border)]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-start justify-between gap-3 p-4 border-b border-[rgba(65,50,50,0.25)] shrink-0">
+        <div className="flex items-start justify-between gap-3 p-4 border-b border-[color:var(--chrome-border-subtle)] shrink-0">
           <div className="flex items-start gap-3 min-w-0">
             <span className="text-[color:var(--accent)] shrink-0 mt-0.5">
               <Dumbbell size={22} />
@@ -1016,7 +999,7 @@ function SessionDetailModal({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-lg text-[color:var(--text-1)] hover:text-[color:var(--text-0)] hover:bg-[rgba(255,255,255,0.05)] shrink-0"
+            className="p-2 rounded-lg text-[color:var(--text-1)] hover:text-[color:var(--text-0)] hover:bg-[color:var(--surface-track)] shrink-0"
             aria-label="Close"
           >
             <X size={18} />
@@ -1025,22 +1008,36 @@ function SessionDetailModal({
         <div className="flex-1 overflow-y-auto p-4 sm:p-5">
           <SessionProgramTable session={session} />
         </div>
-        <div className="flex flex-wrap items-center gap-2 p-4 border-t border-[rgba(65,50,50,0.25)] shrink-0 bg-[rgba(0,0,0,0.2)]">
+        <div className="flex flex-wrap items-center gap-2 p-4 border-t border-[color:var(--chrome-border-subtle)] shrink-0 bg-[color:var(--surface-well)]">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2.5 rounded-xl text-sm font-semibold text-[#D4D4D4] border border-[rgba(65,50,50,0.45)] hover:bg-[rgba(255,255,255,0.05)]"
+            className="px-4 py-2.5 rounded-xl text-sm font-semibold text-[color:var(--text-detail)] border border-[color:var(--chrome-border)] hover:bg-[color:var(--surface-track)]"
           >
             Close
           </button>
           {isViewingToday ? (
             <button
               type="button"
-              onClick={onGoWorkout}
+              onClick={onStartTodaySession}
               className="px-4 py-2.5 rounded-xl text-sm font-bold bg-[color:var(--accent)] text-white hover:brightness-110 flex items-center gap-2"
             >
-              <Dumbbell size={16} />
-              {hasLoggedWorkoutToday ? 'Open workout' : 'Start workout'}
+              {session.type === 'lift' ? (
+                <>
+                  <Dumbbell size={16} />
+                  {hasLoggedWorkoutToday ? 'Open workout' : 'Start workout'}
+                </>
+              ) : session.type === 'recovery' ? (
+                <>
+                  <Activity size={16} />
+                  Log recovery
+                </>
+              ) : (
+                <>
+                  <Dumbbell size={16} />
+                  View training
+                </>
+              )}
             </button>
           ) : (
             <button
@@ -1073,7 +1070,7 @@ function ActivityContent({
     <div className="space-y-4">
       <SessionProgramPreview session={session} />
       {done ? (
-        <div className="flex items-center justify-center gap-2 py-3 text-[#10B981]">
+        <div className="flex items-center justify-center gap-2 py-3 text-[color:var(--good)]">
           <CheckCircle2 size={18} />
           <span className="font-semibold">Workout Complete</span>
         </div>
@@ -1086,8 +1083,22 @@ function ActivityContent({
           onClick={onStart}
           className="w-full py-3 bg-[color:var(--accent)] text-white font-bold rounded-xl hover:brightness-110 transition-all flex items-center justify-center gap-2"
         >
-          <Dumbbell size={18} />
-          Start Workout
+          {session.type === 'lift' ? (
+            <>
+              <Dumbbell size={18} />
+              Start Workout
+            </>
+          ) : session.type === 'recovery' ? (
+            <>
+              <Activity size={18} />
+              Log recovery
+            </>
+          ) : (
+            <>
+              <Dumbbell size={18} />
+              View training
+            </>
+          )}
         </button>
       )}
     </div>
@@ -1128,7 +1139,7 @@ function ScheduleModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center gap-3 p-4 border-b border-[rgba(65,50,50,0.28)] shrink-0">
+        <div className="flex items-center gap-3 p-4 border-b border-[color:var(--chrome-border-subtle)] shrink-0">
           <span className="inline-flex items-center justify-center w-7 h-7 rounded-md border border-[color:color-mix(in_srgb,var(--accent)_26%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_10%,transparent)] shrink-0">
             <meta.icon size={14} className="text-[color:var(--accent-light)]" />
           </span>
@@ -1136,7 +1147,9 @@ function ScheduleModal({
             <h3 className="font-semibold text-[color:var(--text-0)] truncate">{item.label}</h3>
             <p className="text-xs text-[color:var(--text-detail)]">{item.time}</p>
           </div>
-          {item.done === true && <CheckCircle2 size={15} className="text-[#10B981] shrink-0" />}
+          {item.done === true && (
+            <CheckCircle2 size={15} className="text-[color:var(--good)] shrink-0" />
+          )}
           <button
             onClick={onClose}
             className="p-1.5 text-[color:var(--text-detail)] hover:text-[color:var(--text-0)] shrink-0 transition-colors"
@@ -1281,7 +1294,7 @@ function TodaySchedule({
         <div className="overflow-x-auto">
           <table className="w-full text-sm min-w-[min(100%,52rem)]">
             <thead>
-              <tr className="border-b border-[rgba(65,50,50,0.22)]">
+              <tr className="border-b border-[color:var(--chrome-border-subtle)]">
                 <th className="pb-2 text-left pr-4 text-xs font-semibold text-[color:var(--text-detail)] uppercase tracking-wider whitespace-nowrap w-[4.5rem]">
                   Time
                 </th>
@@ -1299,7 +1312,7 @@ function TodaySchedule({
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[rgba(65,50,50,0.14)]">
+            <tbody className="divide-y divide-[color:var(--chrome-border-subtle)]">
               {items.map((item, i) => {
                 const meta = KIND_META[item.kind];
                 return (
@@ -1359,11 +1372,11 @@ function TodaySchedule({
                       {item.done === true ? (
                         <CheckCircle2
                           size={15}
-                          className="text-[#10B981] inline-block mt-0.5"
+                          className="text-[color:var(--good)] inline-block mt-0.5"
                           aria-hidden
                         />
                       ) : item.done === false ? (
-                        <span className="inline-block w-3.5 h-3.5 rounded-full border border-[rgba(65,50,50,0.22)] mt-1" />
+                        <span className="inline-block w-3.5 h-3.5 rounded-full border border-[color:var(--chrome-border-subtle)] mt-1" />
                       ) : (
                         <span className="text-xs text-[rgba(186,186,186,0.38)]">—</span>
                       )}
@@ -1456,7 +1469,7 @@ function DensityCard({ workout, onOpen }: { workout: Workout; onOpen?: () => voi
           ))}
         </div>
         <div
-          className="flex rounded-xl overflow-hidden border border-[rgba(65,50,50,0.22)]"
+          className="flex rounded-xl overflow-hidden border border-[color:var(--chrome-border-subtle)]"
           onClick={(e) => e.stopPropagation()}
           onKeyDown={(e) => e.stopPropagation()}
         >
@@ -1595,7 +1608,7 @@ function DashboardTrendWindow({
                     'shrink-0 min-w-[2.75rem] px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all border',
                     active
                       ? 'is-selected text-[color:var(--text-0)]'
-                      : 'border-[rgba(65,50,50,0.35)] text-[color:var(--text-1)] hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]',
+                      : 'border-[color:var(--chrome-border)] text-[color:var(--text-1)] hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]',
                   )}
                   aria-pressed={active}
                 >
@@ -1609,7 +1622,7 @@ function DashboardTrendWindow({
         <div
           role="group"
           aria-label="Custom date range"
-          className="flex flex-wrap items-end gap-2 pt-1 border-t border-[rgba(65,50,50,0.22)] lg:border-t-0 lg:pt-0 lg:ml-auto lg:pl-4 lg:border-l lg:border-[rgba(65,50,50,0.22)]"
+          className="flex flex-wrap items-end gap-2 pt-1 border-t border-[color:var(--chrome-border-subtle)] lg:border-t-0 lg:pt-0 lg:ml-auto lg:pl-4 lg:border-l lg:border-[color:var(--chrome-border-subtle)]"
         >
           <div className="flex flex-col gap-0.5 min-w-0">
             <label
@@ -1691,8 +1704,8 @@ function TrendRangeDayTabs({
               className={cn(
                 'im-tooltip-trigger shrink-0 min-w-[2.75rem] px-2.5 py-2 rounded-lg text-xs font-mono tabular-nums transition-all border',
                 isSelected
-                  ? 'is-selected text-[#FAFAFA]'
-                  : 'border-[rgba(65,50,50,0.35)] text-[color:var(--text-1)] hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]',
+                  ? 'is-selected text-[color:var(--text-0)]'
+                  : 'border-[color:var(--chrome-border)] text-[color:var(--text-1)] hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]',
               )}
               aria-pressed={isSelected}
               data-tooltip={
@@ -1718,7 +1731,11 @@ export default function DashboardPage() {
   const { user } = useAuthStore();
   const userId = user?.uid ?? '';
 
+  const { data: savedWorkoutMediaUrl } = useWorkoutMediaPreference(userId);
+  const { mutate: saveWorkoutMediaPreference } = useSaveWorkoutMediaPreference(userId);
+
   const [sessionDetailOpen, setSessionDetailOpen] = useState(false);
+  const [trainingMediaOpen, setTrainingMediaOpen] = useState(false);
 
   const todayStr = today();
 
@@ -1812,7 +1829,7 @@ export default function DashboardPage() {
 
   const selectedSession =
     cycleDayForSelected != null
-      ? activeProgram?.sessions.find((s) => s.dayNumber === cycleDayForSelected)
+      ? findProgramSessionForCycleDay(activeProgram?.sessions, cycleDayForSelected)
       : undefined;
   const isLiftForSelected = selectedSession?.type === 'lift';
   const isViewingToday = selectedTrendDate === todayStr;
@@ -1867,13 +1884,32 @@ export default function DashboardPage() {
         onClose={() => setSessionDetailOpen(false)}
         isViewingToday={isViewingToday}
         hasLoggedWorkoutToday={hasCompletedWorkoutSelected}
-        onGoWorkout={() => {
+        onStartTodaySession={() => {
           setSessionDetailOpen(false);
-          router.push('/training/workout');
+          if (!selectedSession) return;
+          if (isViewingToday && sessionTypeUsesMediaGate(selectedSession.type)) {
+            setTrainingMediaOpen(true);
+            return;
+          }
+          router.push(routeForTodaySessionStart(selectedSession, selectedTrendDate));
         }}
         onGoTraining={() => {
           setSessionDetailOpen(false);
           router.push('/training');
+        }}
+      />
+
+      <TrainingMediaModal
+        open={trainingMediaOpen}
+        sessionTitle={selectedSession?.name}
+        initialLastYouTubeUrl={savedWorkoutMediaUrl}
+        onClose={() => setTrainingMediaOpen(false)}
+        onContinue={(result) => {
+          saveWorkoutMediaPreference(result.youtubeUrl);
+          setTrainingMediaOpen(false);
+          if (selectedSession)
+            router.push(postSessionMediaHref(selectedSession, selectedTrendDate));
+          else router.push('/training/workout');
         }}
       />
 
@@ -1936,7 +1972,19 @@ export default function DashboardPage() {
               nutrition={selectedDayNutrition}
               supplements={selectedDaySupplements}
               todayDone={hasCompletedWorkoutSelected}
-              onActivityClick={() => router.push('/training/workout')}
+              onActivityClick={() => {
+                if (
+                  selectedSession &&
+                  isViewingToday &&
+                  sessionTypeUsesMediaGate(selectedSession.type)
+                ) {
+                  setTrainingMediaOpen(true);
+                  return;
+                }
+                if (selectedSession)
+                  router.push(routeForTodaySessionStart(selectedSession, selectedTrendDate));
+                else router.push('/training');
+              }}
               scheduleTitle={scheduleTitle}
               dateBadge={dateBadge}
               previewHint={previewHint}
@@ -1977,12 +2025,16 @@ export default function DashboardPage() {
                     <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1 -mr-0.5 max-h-[min(72vh,42rem)] lg:max-h-none">
                       <SessionProgramPreview session={selectedSession} />
                     </div>
-                    <div className="border-t border-[rgba(65,50,50,0.25)] pt-3 space-y-1.5 shrink-0">
+                    <div className="border-t border-[color:var(--chrome-border-subtle)] pt-3 space-y-1.5 shrink-0">
                       <p className="text-xs text-[color:var(--accent)]/90 font-medium">
                         {isViewingToday
-                          ? hasCompletedWorkoutSelected
-                            ? 'Open workout →'
-                            : 'Start workout →'
+                          ? selectedSession.type === 'lift'
+                            ? hasCompletedWorkoutSelected
+                              ? 'Open workout →'
+                              : 'Start workout →'
+                            : selectedSession.type === 'recovery'
+                              ? 'Log recovery →'
+                              : 'View training →'
                           : 'Open training →'}
                       </p>
                       {!isViewingToday && (
