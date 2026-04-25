@@ -20,7 +20,7 @@ import {
 } from '@/lib/utils';
 import { Dumbbell, Calendar, TrendingUp, History, Activity } from 'lucide-react';
 import Link from 'next/link';
-import { postSessionMediaHref } from '@/lib/program-session-routes';
+import { appendMediaGateBypass, postSessionMediaHref } from '@/lib/program-session-routes';
 import { TrainingMediaModal } from '@/components/training/training-media-modal';
 
 export default function TrainingPage() {
@@ -71,8 +71,11 @@ export default function TrainingPage() {
         onContinue={(result) => {
           saveWorkoutMediaPreference(result.youtubeUrl);
           setMediaOpen(false);
-          if (selectedSession) router.push(postSessionMediaHref(selectedSession, selectedDate));
-          else router.push('/training/workout');
+          if (selectedSession) {
+            router.push(appendMediaGateBypass(postSessionMediaHref(selectedSession, selectedDate)));
+          } else {
+            router.push('/training/workout?media=1');
+          }
         }}
       />
       <div>

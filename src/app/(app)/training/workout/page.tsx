@@ -93,6 +93,7 @@ export default function WorkoutPage() {
 
   const todayStr = today();
   const sessionDate = parseSessionDateParam(searchParams.get('date'), todayStr);
+  const mediaBypassRequested = searchParams.get('media') === '1';
   const cycleDay = program
     ? getCycleDay(program.startDate ?? todayStr, sessionDate, program.cycleLengthDays)
     : null;
@@ -102,7 +103,12 @@ export default function WorkoutPage() {
   const needsSessionMediaGate = Boolean(
     program && session && sessionTypeUsesMediaGate(session.type),
   );
-  const [mediaGatePassed, setMediaGatePassed] = useState(false);
+  const [mediaGatePassed, setMediaGatePassed] = useState(mediaBypassRequested);
+
+  useEffect(() => {
+    setMediaGatePassed(mediaBypassRequested);
+  }, [mediaBypassRequested, sessionDate]);
+
   const showSessionMediaGate = needsSessionMediaGate && !mediaGatePassed;
 
   const [started, setStarted] = useState(false);

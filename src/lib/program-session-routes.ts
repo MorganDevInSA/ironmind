@@ -5,6 +5,11 @@ function withSessionDateQuery(path: string, sessionDate?: string): string {
   return `${path}?date=${encodeURIComponent(sessionDate)}`;
 }
 
+/** Marks destination as already passed playlist picker to avoid duplicate modal in /training/workout. */
+export function appendMediaGateBypass(href: string): string {
+  return href.includes('?') ? `${href}&media=1` : `${href}?media=1`;
+}
+
 /** Where to send the user after optional session audio (lift + cardio → workout stub; recovery → recovery log). */
 export function postSessionMediaHref(session: ProgramSession, sessionDate?: string): string {
   const path = session.type === 'recovery' ? '/recovery' : '/training/workout';

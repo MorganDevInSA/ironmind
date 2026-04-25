@@ -56,6 +56,7 @@ import { measurementForChart } from '@/lib/utils/measurement-bounds';
 import { MEASUREMENT_CHART_SERIES } from '@/lib/constants/measurement-chart-series';
 import type { Workout, NutritionDay, SupplementLog, ProgramSession, CheckIn } from '@/lib/types';
 import {
+  appendMediaGateBypass,
   postSessionMediaHref,
   routeForTodaySessionStart,
   sessionTypeUsesMediaGate,
@@ -1908,8 +1909,10 @@ export default function DashboardPage() {
           saveWorkoutMediaPreference(result.youtubeUrl);
           setTrainingMediaOpen(false);
           if (selectedSession)
-            router.push(postSessionMediaHref(selectedSession, selectedTrendDate));
-          else router.push('/training/workout');
+            router.push(
+              appendMediaGateBypass(postSessionMediaHref(selectedSession, selectedTrendDate)),
+            );
+          else router.push('/training/workout?media=1');
         }}
       />
 

@@ -11,7 +11,7 @@ import {
 } from '@/controllers';
 import { ArrowLeft, Activity, Dumbbell } from 'lucide-react';
 import { formatDisplayDate, getCycleDay, findProgramSessionForCycleDay, today } from '@/lib/utils';
-import { postSessionMediaHref } from '@/lib/program-session-routes';
+import { appendMediaGateBypass, postSessionMediaHref } from '@/lib/program-session-routes';
 import { TrainingMediaModal } from '@/components/training/training-media-modal';
 
 export default function WorkoutHistoryPage() {
@@ -39,8 +39,8 @@ export default function WorkoutHistoryPage() {
         onContinue={(result) => {
           saveWorkoutMediaPreference(result.youtubeUrl);
           setMediaOpen(false);
-          if (todaySession) router.push(postSessionMediaHref(todaySession));
-          else router.push('/training/workout');
+          if (todaySession) router.push(appendMediaGateBypass(postSessionMediaHref(todaySession)));
+          else router.push('/training/workout?media=1');
         }}
       />
       <div className="flex items-center gap-3">
