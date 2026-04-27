@@ -105,6 +105,7 @@ All collection path strings must come from **`src/lib/firebase/config.ts`** → 
 
 - Filenames must match the expected set (e.g. `athlete_profile.json`, `training_program.json`, …).
 - **`FILE_VALIDATORS`** — minimal structural checks per file. If you extend the coach pack format, update validators and **`ParsedCoachData`** / types together.
+- **`startDate` on `training_program.json` and `phase.json`:** When the JSON includes a valid **`YYYY-MM-DD`**, import **preserves** it as the Firestore program/phase anchor; otherwise the import run uses **today** (`calendarDateOr` in `import.service.ts`). Athletes can still change program Week 1 start in-app (`Program.startDate`).
 - Writes go through **import + batch helpers** and **`importJobs`**; do not bypass for “quick tests” unless you accept broken rollback semantics.
 
 **Compensation artifacts:** If you add new write steps to import, extend **`ImportArtifact`** in `src/services/import-compensation.ts` and implement rollback branches.

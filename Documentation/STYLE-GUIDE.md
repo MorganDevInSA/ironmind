@@ -23,18 +23,18 @@ IRONMIND should feel like a disciplined performance war room:
 
 ### Background + text
 
-| Token                  | Value                                                        | Role                                                            |
-| ---------------------- | ------------------------------------------------------------ | --------------------------------------------------------------- |
-| `--bg-0`               | `#080808`                                                    | Main canvas                                                     |
-| `--bg-1`               | `#0D0D0D`                                                    | Section background                                              |
-| `--bg-2`               | `#131313`                                                    | Elevated background                                             |
-| `--panel`              | `rgba(18, 14, 14, 0.78)`                                     | Glass panel base                                                |
-| `--panel-border`       | `color-mix(in srgb, var(--accent) 6%, transparent)`          | Panel edge (resting)                                            |
-| `--panel-border-hover` | `color-mix(in srgb, var(--accent) 62%, transparent)`         | Panel edge (hover/focus-within)                                 |
-| `--panel-glow`         | `0 0 14px color-mix(in srgb, var(--accent) 9%, transparent)` | Panel hover glow                                                |
-| `--text-0`             | `#F0F0F0`                                                    | Primary text                                                    |
-| `--text-1`             | `#9A9A9A`                                                    | Secondary text (theme-tinted on non-default presets and custom) |
-| `--text-2`             | `#5E5E5E`                                                    | Labels/meta (theme-tinted on non-default presets and custom)    |
+| Token                  | Value                                                        | Role                                                                                      |
+| ---------------------- | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| `--bg-0`               | `#080808`                                                    | Main canvas                                                                               |
+| `--bg-1`               | `#0D0D0D`                                                    | Section background                                                                        |
+| `--bg-2`               | `#131313`                                                    | Elevated background                                                                       |
+| `--panel`              | `rgba(18, 14, 14, 0.78)`                                     | Glass panel base                                                                          |
+| `--panel-border`       | `color-mix(in srgb, var(--accent) 6%, transparent)`          | Panel edge (resting)                                                                      |
+| `--panel-border-hover` | `color-mix(in srgb, var(--accent) 62%, transparent)`         | Panel edge (hover/focus-within)                                                           |
+| `--panel-glow`         | `0 0 14px color-mix(in srgb, var(--accent) 9%, transparent)` | Panel hover glow                                                                          |
+| `--text-0`             | `#F0F0F0`                                                    | Primary text                                                                              |
+| `--text-1`             | `#A8A3A3`                                                    | Secondary text (default crimson: neutral warm grey; presets/custom tint in `globals.css`) |
+| `--text-2`             | `#6F6A6A`                                                    | Labels/meta (same note as `--text-1`)                                                     |
 
 ### Accent + status
 
@@ -161,6 +161,8 @@ Do not hardcode `/public` image paths in components.
 ## 7) Onboarding visual updates
 
 Onboarding now includes a dedicated theme step (`StepTheme`) early in the flow. Theme tiles and profile selection follow the same selected-state language as dashboard controls.
+
+**Coach file import (`StepImportFiles`):** Use semantic tokens (`--panel`, `--panel-strong`, `--chrome-border`, `--shadow-*`, `--bad` for errors) and **`.btn-secondary`** for secondary actions — avoid fixed `rgba(22,16,16)` / `rgba(65,50,50)` hairlines so cobalt/emerald/violet themes do not inherit a crimson-only cast.
 
 Demo profile cards include expanded coach-grade context blocks:
 

@@ -22,10 +22,10 @@ Blood, strength, sweat, growth. Pure dark with accent fire.
 --panel-border-hover: color-mix(in srgb, var(--accent) 62%, transparent);
 --panel-glow: 0 0 14px color-mix(in srgb, var(--accent) 9%, transparent);
 
-/* Text (neutral, theme-independent) */
+/* Text — default crimson uses neutral warm greys (see globals.css :root) */
 --text-0: #f0f0f0; /* Primary text */
---text-1: #9a9a9a; /* Secondary text */
---text-2: #5e5e5e; /* Muted/labels */
+--text-1: #a8a3a3; /* Secondary text */
+--text-2: #6f6a6a; /* Muted/labels */
 --text-detail: #bababa; /* Readable secondary on dark */
 
 /* Accent (theme-aware — changes with data-theme) */
@@ -64,12 +64,12 @@ All classes are defined in `globals.css` and are theme-aware.
 
 ### Buttons
 
-| Class            | Use                                    |
-| ---------------- | -------------------------------------- |
-| `.btn-primary`   | Main CTA — accent gradient, shadow     |
-| `.btn-secondary` | Secondary action — muted, accent hover |
-| `.btn-ghost`     | Minimal — text only, hover background  |
-| `.btn-gold`      | Alias for `.btn-primary` (legacy name) |
+| Class            | Use                                                                                                                                                            |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `.btn-primary`   | Main CTA — accent gradient, shadow                                                                                                                             |
+| `.btn-secondary` | Secondary action — `var(--surface-well)` + `var(--chrome-border)`; accent border on hover (theme-safe; do not duplicate with fixed `rgba(22,16,16)` hairlines) |
+| `.btn-ghost`     | Minimal — text only, hover background                                                                                                                          |
+| `.btn-gold`      | Alias for `.btn-primary` (legacy name)                                                                                                                         |
 
 ### Typography
 
@@ -178,16 +178,12 @@ Or inline:
 </button>
 ```
 
-### Secondary Button (Inline)
+### Secondary Button
+
+Prefer the **`.btn-secondary`** class (`globals.css`) — it uses `var(--surface-well)` and `var(--chrome-border)` so secondary actions stay correct on every `data-theme`.
 
 ```tsx
-<button
-  className="px-6 py-3 rounded-lg font-semibold text-[color:var(--text-1)]
-  bg-[rgba(22,16,16,0.9)] border border-[color:var(--panel-border)]
-  hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)]
-  hover:text-[color:var(--text-0)]
-  active:scale-95 transition-all duration-200"
->
+<button type="button" className="btn-secondary px-6 py-3">
   Action
 </button>
 ```

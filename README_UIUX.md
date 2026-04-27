@@ -125,12 +125,14 @@ summary sections.
 ### Dashboard trend window
 
 Workout density and physique mini-charts on `/dashboard` follow a **trend window** control:
-multi-week presets (1–4 wk) and an optional **custom from–to range**. A **scrollable day strip**
-lists every calendar day in that range. Selecting a date updates **session plan**, **today’s
-schedule** (planned meals / vitamins / activity completion from logs), **nutrition**, **recovery**,
-and **supplements** cards for that **same calendar date** — implemented with **`useNutritionDay`**,
-**`useRecoveryEntry`**, and **`useSupplementLog`** alongside trend-scoped workout queries, not by
-overloading the dashboard bundle key. **Start workout** stays tied to true calendar today.
+multi-week **presets (1–4 wk)** span **forward** from **`Program.startDate`** (cycle day 1;
+fallback today if unset), inclusive for `N` days — plus an optional **custom from–to range**
+(unchanged: explicit calendar bounds). A **scrollable day strip** lists every calendar day in
+that range. Selecting a date updates **session plan** (via `getCycleDay` + `startDate`), **that
+day’s schedule** (meals / vitamins / activity from logs), **nutrition**, **recovery**, and
+**supplements** — implemented with **`useNutritionDay`**, **`useRecoveryEntry`**, and
+**`useSupplementLog`** alongside **`useWorkouts`** over the preset `[from, to]` (not
+`useRecentWorkouts` for presets). **Start workout** stays tied to true calendar today.
 Controllers use bounded date filters (and `enabled` flags where needed) so queries stay cheap.
 
 ### Nutrition meal pickers

@@ -614,7 +614,7 @@ function SessionProgramPreview({ session }: { session: ProgramSession }) {
                     ) : null}
                   </div>
                 </div>
-                <span className="font-mono tabular-nums text-[color:var(--text-detail)] text-xs shrink-0 pt-0.5">
+                <span className="tabular-nums text-[color:var(--text-detail)] text-xs shrink-0 pt-0.5 font-medium">
                   {ex.sets} × {ex.reps} · {ex.rest}s
                 </span>
               </div>
@@ -630,7 +630,7 @@ function SessionProgramPreview({ session }: { session: ProgramSession }) {
             {session.cardio.note ? ` · ${session.cardio.note}` : ''}
           </p>
           {session.cardio.intervals && (
-            <p className="text-xs text-[color:var(--text-detail)] font-mono tabular-nums">
+            <p className="text-xs text-[color:var(--text-detail)] tabular-nums">
               {session.cardio.intervals.work}s work / {session.cardio.intervals.rest}s rest ×{' '}
               {session.cardio.intervals.rounds} rounds
             </p>
@@ -646,7 +646,7 @@ function SessionProgramPreview({ session }: { session: ProgramSession }) {
             {breath.map((bw, i) => (
               <li key={i} className="text-sm">
                 <span className="font-medium text-[color:var(--text-0)]">{bw.name}</span>
-                <span className="text-[color:var(--text-detail)] text-xs font-mono tabular-nums ml-2">
+                <span className="text-[color:var(--text-detail)] text-xs tabular-nums ml-2 font-medium">
                   in {bw.inhale}s{bw.hold != null ? ` · hold ${bw.hold}s` : ''} · out {bw.exhale}s
                   {bw.holdOut != null ? ` · pause ${bw.holdOut}s` : ''} · {bw.rounds} rnd
                 </span>
@@ -664,7 +664,7 @@ function SessionProgramPreview({ session }: { session: ProgramSession }) {
             {core.map((c, i) => (
               <div key={i} className="flex items-start justify-between gap-2 py-2 text-sm">
                 <span className="text-[color:var(--text-0)]">{c.name}</span>
-                <span className="font-mono tabular-nums text-[color:var(--text-detail)] text-xs shrink-0 text-right">
+                <span className="tabular-nums text-[color:var(--text-detail)] text-xs shrink-0 text-right font-medium">
                   {c.sets}×{c.reps != null ? c.reps : c.holdSec != null ? `${c.holdSec}s` : '—'}
                   {c.perSide ? ' / side' : ''}
                 </span>
@@ -709,7 +709,7 @@ const sessionTableTd = 'py-2.5 px-3 align-top border-t border-[color:var(--chrom
 const sessionTableWrap =
   'overflow-x-auto rounded-lg border border-[color:var(--chrome-border)] bg-[color:var(--surface-well)]';
 const sessionTableHeader = 'bg-[color:var(--surface-track)]';
-const sessionTableNumber = 'text-right font-mono tabular-nums text-[color:var(--text-detail)]';
+const sessionTableNumber = 'text-right tabular-nums text-[color:var(--text-detail)] font-medium';
 
 function SessionProgramTable({ session }: { session: ProgramSession }) {
   const exercises = session.exercises ?? [];
@@ -757,13 +757,8 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
               <tbody>
                 {exercises.map((ex, i) => (
                   <tr key={`${ex.exerciseId}-${i}`}>
-                    <td
-                      className={cn(
-                        sessionTableTd,
-                        'font-mono tabular-nums text-[color:var(--text-detail)]',
-                      )}
-                    >
-                      {i + 1}
+                    <td className={cn(sessionTableTd, 'w-10 text-[color:var(--text-detail)]')}>
+                      <span className="exercise-index-badge">{i + 1}</span>
                     </td>
                     <td className={cn(sessionTableTd, 'text-[color:var(--text-0)]')}>
                       <div className="flex flex-wrap items-center gap-2">
@@ -778,14 +773,7 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
                     </td>
                     <td className={cn(sessionTableTd, sessionTableNumber)}>{ex.sets}</td>
                     <td className={cn(sessionTableTd, sessionTableNumber)}>{ex.reps}</td>
-                    <td
-                      className={cn(
-                        sessionTableTd,
-                        'text-right font-mono tabular-nums text-[color:var(--text-detail)]',
-                      )}
-                    >
-                      {ex.rest}s
-                    </td>
+                    <td className={cn(sessionTableTd, sessionTableNumber)}>{ex.rest}s</td>
                   </tr>
                 ))}
               </tbody>
@@ -821,7 +809,7 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
                     )}
                   >
                     {cardio.intervals ? (
-                      <span className="font-mono tabular-nums block mb-1">
+                      <span className="tabular-nums block mb-1 text-[color:var(--text-detail)]">
                         {cardio.intervals.work}s work / {cardio.intervals.rest}s rest ×{' '}
                         {cardio.intervals.rounds} rounds
                       </span>
@@ -861,7 +849,7 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
                     <td
                       className={cn(
                         sessionTableTd,
-                        'font-mono tabular-nums text-xs text-[color:var(--text-detail)]',
+                        'text-xs text-[color:var(--text-detail)] tabular-nums leading-snug',
                       )}
                     >
                       in {bw.inhale}s{bw.hold != null ? ` · hold ${bw.hold}s` : ''} · out{' '}
@@ -896,7 +884,7 @@ function SessionProgramTable({ session }: { session: ProgramSession }) {
                     <td
                       className={cn(
                         sessionTableTd,
-                        'text-right font-mono tabular-nums text-[color:var(--text-detail)] text-xs',
+                        'text-right text-[color:var(--text-detail)] text-xs tabular-nums font-medium',
                       )}
                     >
                       {corePrescription(c)}
@@ -1602,7 +1590,7 @@ function DashboardTrendWindow({
     'transition-all duration-200 [color-scheme:dark]';
 
   return (
-    <div className="glass-panel dashboard-card-surface px-4 py-3 space-y-2">
+    <div className="glass-panel dashboard-card-surface card-hover px-4 py-3 space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="data-label">Trend window</span>
         <span className="text-[10px] text-[color:var(--text-detail)] font-mono tabular-nums">

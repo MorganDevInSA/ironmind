@@ -295,7 +295,7 @@ Single umbrella module for domain entities: `AthleteProfile`, `Program`, `Workou
 
 `collections.importJobs(uid)` is the subcollection path for per-run job documents (see **Import pipeline** above).
 
-Structured JSON files (e.g. `athlete_profile.json`, `training_program.json`, …) are validated, merged into `ParsedCoachData`, then persisted through the same services as seed data.
+Structured JSON files (e.g. `athlete_profile.json`, `training_program.json`, …) are validated, merged into `ParsedCoachData`, then persisted through the same services as seed data. Valid **`YYYY-MM-DD`** `startDate` values on **`training_program.json`** and **`phase.json`** are written as-is; otherwise import stamps **today** (`calendarDateOr` in `import.service.ts`).
 
 Current onboarding flow is **6 steps**:
 
@@ -359,8 +359,8 @@ From `.cursor/rules/IRONMIND.md`:
 ### 13.4 Dashboard layout & exercise list readability
 
 - **Overview shell:** The authenticated dashboard wraps its primary content in **`.dashboard-overview`** (`globals.css`). It is **horizontally centered** (`max-width` + auto margins) with **rounded corners** (`1.25rem`) and a subtle warm-dark translucent fill. `.dashboard-overview` uses the same panel border system as `.glass-panel`: subtle resting border (6% accent), accent glow on hover/focus-within, 1px border width.
-- **Trend window:** Dashboard charts for training density and physique minis respect a user-selected **date range** (presets + custom) via shared dashboard state — extend controllers with `enabled` / bounded queries when adding new range-driven widgets.
-- **Trend day strip:** One tab per calendar day in the active trend bounds. **Session** for the selection uses `getCycleDay(program.startDate, selectedDate, cycleLength)`. **Logged day data** uses the same per-date controller pattern as domain pages: **`useNutritionDay`**, **`useRecoveryEntry`**, **`useSupplementLog`** keyed by the selected `yyyy-MM-dd` (not only the dashboard bundle’s “today” slice). **`useDashboardData`** still supplies profile, program, weekly volume, and the initial shell load.
+- **Trend window:** Dashboard charts for training density and physique minis respect a user-selected **date range** (week presets + custom **from–to**) via shared dashboard state. **Week presets (1–4 wk)** run **forward** from **`Program.startDate`** (cycle day 1 anchor), inclusive for `N` calendar days — not backward from today. Custom range is unchanged (explicit from/to). Extend controllers with `enabled` / bounded queries when adding new range-driven widgets.
+- **Trend day strip:** One tab per calendar day in the active trend bounds. **Session** for the selection uses `getCycleDay(program.startDate ?? today, selectedDate, cycleLength)`. **Logged day data** uses the same per-date controller pattern as domain pages: **`useNutritionDay`**, **`useRecoveryEntry`**, **`useSupplementLog`** keyed by the selected `yyyy-MM-dd` (not only the dashboard bundle’s “today” slice). **`useDashboardData`** supplies profile, program, weekly volume, and the initial shell load; it is fetched early enough to feed trend `from`/`to` from **`activeProgram.startDate`**. **Week 1 start** is user-editable (`useUpdateProgram` + `ProgramCycleStartControl` on dashboard and training).
 - **Today's schedule:** Non-workout items (meals, vitamins, activities) use **icon-forward** type chips (accent-themed), not unrelated rainbow pills.
 - **Ordered exercises:** Row indices use **`.exercise-index-badge`** — **dark tile + primary text + thin accent border**. Avoid **grey-on-saturated-accent** number chips (low contrast); follow **`IRONMIND.md`** and the **ironmind-styling** skill.
 

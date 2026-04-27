@@ -52,6 +52,8 @@ Pages/Components  →  Controllers (use-*.ts)  →  Services (*.service.ts)  →
 - Use CSS variables for accent colors: `var(--accent)`, `var(--accent-light)`, `var(--accent-2)`
 - Use `color-mix()` for opacity: `color-mix(in srgb, var(--accent) 20%, transparent)`
 - Never hardcode accent hex values (`#DC2626`, etc.)
+- **Program cycle anchor:** `Program.startDate` (ISO `yyyy-MM-dd`) is the calendar day for **cycle day 1**; `getCycleDay` / session pickers use it everywhere. Athletes set it from **dashboard** (`ProgramCycleStartControl`) and **training** via **`useUpdateProgram`**. Dashboard **trend week presets (1–4 wk)** extend **forward** from that anchor (not backward from today); preset workouts use **`useWorkouts`** over the computed `[from, to]` range.
+- **Coach JSON import:** Valid `startDate` on `training_program.json` / `phase.json` (`YYYY-MM-DD`) is preserved on import when present (`import.service.ts`); otherwise today is used.
 - Native `<input type="checkbox">` and `<input type="radio">` are globally themed via `accent-color: var(--accent)` in globals.css
 - Nutrition meal plan-line `<select>`: use `.nutrition-meal-select` (see `globals.css`) and keep controlled values in sync with saved `planLine` (do not replace user-selected preset lines with the slot default in UI state)
 - Progress visuals (bars/sliders) must use **filled-only accent gradients** and neutral empty tracks

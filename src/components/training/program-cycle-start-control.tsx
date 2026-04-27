@@ -35,21 +35,8 @@ export function ProgramCycleStartControl({
     setDraft(saved);
   }, [saved, program?.id]);
 
-  if (!program) {
-    return (
-      <div
-        className={cn(
-          'rounded-lg border border-[color:var(--chrome-border-subtle)] px-3 py-2 text-xs text-[color:var(--text-2)]',
-          className,
-        )}
-      >
-        No active program — import a plan to set cycle week 1.
-      </div>
-    );
-  }
-
-  const dirty = draft !== saved;
-
+  /** Same as `DashboardTrendWindow` — keep dashboard control surfaces visually one system. */
+  const panelWrap = 'glass-panel dashboard-card-surface card-hover px-4 py-3 space-y-2';
   const inputClass =
     'rounded-lg px-2.5 py-1.5 text-xs font-mono tabular-nums min-w-0 ' +
     'bg-[color:var(--bg-2)] border border-[color:var(--panel-border)] text-[color:var(--text-0)] ' +
@@ -57,28 +44,29 @@ export function ProgramCycleStartControl({
     'focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--accent)_10%,transparent)] focus:outline-none ' +
     'transition-all duration-200 [color-scheme:dark]';
 
-  return (
-    <div
-      className={cn(
-        'rounded-lg border border-[color:var(--chrome-border-subtle)] bg-[color:color-mix(in_srgb,var(--bg-2)_40%,transparent)] px-3 py-2.5 space-y-2',
-        className,
-      )}
-    >
-      <div className="flex flex-wrap items-start justify-between gap-2">
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">
-            Week 1 start
-          </p>
-          <p className="text-[10px] text-[color:var(--text-2)] leading-snug mt-0.5 max-w-prose">
-            The calendar date that is{' '}
-            <span className="text-[color:var(--text-1)]">cycle day 1</span> in your program (
-            {program.cycleLengthDays}-day rotation). Planned sessions on the strip use this anchor.
-          </p>
-        </div>
-        <p className="text-[10px] font-mono tabular-nums text-[color:var(--text-detail)] shrink-0">
-          Saved: {formatDisplayDate(saved)}
-        </p>
+  if (!program) {
+    return (
+      <div className={cn(panelWrap, 'text-xs text-[color:var(--text-2)]', className)}>
+        No active program — import a plan to set cycle week 1.
       </div>
+    );
+  }
+
+  const dirty = draft !== saved;
+
+  return (
+    <div className={cn(panelWrap, className)}>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="data-label">Week 1 start</span>
+        <span className="text-[10px] text-[color:var(--text-detail)] font-mono tabular-nums shrink-0">
+          Saved: {formatDisplayDate(saved)}
+        </span>
+      </div>
+      <p className="text-[10px] text-[color:var(--text-2)] leading-snug">
+        The calendar date that is <span className="text-[color:var(--text-1)]">cycle day 1</span> in
+        your program ({program.cycleLengthDays}-day rotation). Planned sessions on the strip use
+        this anchor.
+      </p>
 
       <div className="flex flex-wrap items-end gap-2">
         <div className="flex flex-col gap-0.5 min-w-0">

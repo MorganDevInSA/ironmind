@@ -63,16 +63,16 @@ Accent colors and several text/chrome tokens change per theme; deep backgrounds 
 | `--panel-border-hover` | `color-mix(in srgb, var(--accent) 62%, transparent)`         | Panel border on hover/focus-within |
 | `--panel-glow`         | `0 0 14px color-mix(in srgb, var(--accent) 9%, transparent)` | Panel glow on hover                |
 
-### Text (Fixed — theme-tinted overrides)
+### Text (Default neutral; theme-tinted on presets)
 
-| Token           | Default   | Use                        |
-| --------------- | --------- | -------------------------- |
-| `--text-0`      | `#F0F0F0` | Primary text               |
-| `--text-1`      | `#9A9A9A` | Secondary text             |
-| `--text-2`      | `#5E5E5E` | Muted text, labels         |
-| `--text-detail` | `#BABABA` | Readable secondary on dark |
+| Token           | Default (crimson / no `data-theme`) | Use                        |
+| --------------- | ----------------------------------- | -------------------------- |
+| `--text-0`      | `#F0F0F0`                           | Primary text               |
+| `--text-1`      | `#A8A3A3`                           | Secondary body / UI copy   |
+| `--text-2`      | `#6F6A6A`                           | Muted text, labels         |
+| `--text-detail` | `#BABABA`                           | Readable secondary on dark |
 
-> **Note:** `--text-1`, `--text-2`, and `--text-detail` are overridden per theme for accent tinting. For example, in the hot-pink theme: `--text-1: #CC80A8`, `--text-2: #9A5478`, `--text-detail: #D898B8`. Always reference the tokens — never hardcode text color values.
+> **Note:** Default crimson keeps **neutral warm greys** so secondary copy does not read pink; preset themes (`hot-pink`, `cobalt`, `forge`, `emerald`, `violet`, `custom`) override `--text-1` / `--text-2` / `--text-detail` for chromatic harmony. Always reference the tokens — never hardcode text hex values.
 
 ### Accent (Theme-Aware)
 
@@ -190,11 +190,11 @@ Use Tailwind's default spacing scale. Key values:
 
 ## Dashboard-Specific Tokens
 
-| Token                            | Value                     | Use                        |
-| -------------------------------- | ------------------------- | -------------------------- |
-| `--dashboard-overview-max-width` | `72rem`                   | Max width on large screens |
-| `--exercise-index-bg`            | `rgba(22, 18, 18, 0.96)`  | Exercise number badge      |
-| `--exercise-index-border`        | `rgba(220, 38, 38, 0.42)` | Exercise badge border      |
+| Token                            | Value                                                | Use                        |
+| -------------------------------- | ---------------------------------------------------- | -------------------------- |
+| `--dashboard-overview-max-width` | `72rem`                                              | Max width on large screens |
+| `--exercise-index-bg`            | `rgba(22, 18, 18, 0.96)`                             | Exercise number badge      |
+| `--exercise-index-border`        | `color-mix(in srgb, var(--accent) 42%, transparent)` | Exercise badge border      |
 
 ---
 
@@ -225,19 +225,20 @@ Use Tailwind's default spacing scale. Key values:
 
 Replace on sight — these are legacy values:
 
-| Old Token                       | Replace With                                                                              |
-| ------------------------------- | ----------------------------------------------------------------------------------------- |
-| `#D4AF37`, `#F4D03F`, `#B8860B` | `var(--accent)`, `var(--accent-light)`                                                    |
-| `#3B82F6`, `#2A6CFF`            | `var(--accent)`                                                                           |
-| `#B8C6DE`, `#7F91AD`            | `var(--text-1)`                                                                           |
-| `rgba(212, 175, 55, ...)`       | `color-mix(in srgb, var(--accent) X%, transparent)`                                       |
-| `rgba(59, 130, 246, ...)`       | `color-mix(in srgb, var(--accent) X%, transparent)`                                       |
-| `rgba(16, 22, 34, ...)`         | `rgba(18, 14, 14, ...)`                                                                   |
-| `bg-surface`                    | `bg-[color:var(--bg-2)]`                                                                  |
-| `text-accent`                   | `text-[color:var(--accent)]` (Tailwind utility resolves to hardcoded hex, bypasses theme) |
-| `bg-accent`                     | Use `.btn-primary` class or `bg-[color:var(--accent)]`                                    |
-| `border-accent`                 | `border-[color:var(--accent)]`                                                            |
-| `focus:border-accent`           | `focus:border-[color:var(--accent)]`                                                      |
+| Old Token                                                                              | Replace With                                                                                                                                            |
+| -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `#D4AF37`, `#F4D03F`, `#B8860B`                                                        | `var(--accent)`, `var(--accent-light)`                                                                                                                  |
+| `#3B82F6`, `#2A6CFF`                                                                   | `var(--accent)`                                                                                                                                         |
+| `#B8C6DE`, `#7F91AD`                                                                   | `var(--text-1)`                                                                                                                                         |
+| `rgba(212, 175, 55, ...)`                                                              | `color-mix(in srgb, var(--accent) X%, transparent)`                                                                                                     |
+| `rgba(59, 130, 246, ...)`                                                              | `color-mix(in srgb, var(--accent) X%, transparent)`                                                                                                     |
+| `rgba(16, 22, 34, ...)`                                                                | `rgba(18, 14, 14, ...)`                                                                                                                                 |
+| `rgba(22, 16, 16, …)` / `rgba(65, 50, 50, …)` on shared panels or **`.btn-secondary`** | `var(--surface-well)`, `var(--chrome-border)`, or semantic panel tokens — keeps cobalt/emerald/violet onboarding from picking up crimson-only hairlines |
+| `bg-surface`                                                                           | `bg-[color:var(--bg-2)]`                                                                                                                                |
+| `text-accent`                                                                          | `text-[color:var(--accent)]` (Tailwind utility resolves to hardcoded hex, bypasses theme)                                                               |
+| `bg-accent`                                                                            | Use `.btn-primary` class or `bg-[color:var(--accent)]`                                                                                                  |
+| `border-accent`                                                                        | `border-[color:var(--accent)]`                                                                                                                          |
+| `focus:border-accent`                                                                  | `focus:border-[color:var(--accent)]`                                                                                                                    |
 
 ---
 

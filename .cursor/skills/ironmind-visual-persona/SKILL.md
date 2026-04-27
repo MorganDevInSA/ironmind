@@ -32,7 +32,7 @@ IRONMIND supports multiple color themes via CSS custom properties. The default i
 1. **Always use CSS variables** for accent colors — never hardcode hex values
 2. **Use `var(--accent)`** for primary accent, `var(--accent-light)` for highlights, `var(--accent-2)` for dark tones
 3. **Use `color-mix()`** for opacity variants: `color-mix(in srgb, var(--accent) 20%, transparent)`
-4. **Neutral colors are mostly fixed** — backgrounds (`--bg-0`, `--bg-1`, `--bg-2`) and `--text-0` don't change per theme. Note that `--text-1`, `--text-2`, and `--text-detail` are **accent-tinted** on non-default presets and **custom** (brighter, accent-blended). They are not purely fixed neutrals on those themes.
+4. **Neutral colors are mostly fixed** — backgrounds (`--bg-0`, `--bg-1`, `--bg-2`) and `--text-0` don't change per theme. **Default crimson** uses **neutral warm** `--text-1` / `--text-2` (see `globals.css` :root) so secondary copy does not read pink. **Non-default presets** and **custom** tint `--text-1`, `--text-2`, and `--text-detail` toward the active accent.
 
 ### Available Themes
 
@@ -52,17 +52,17 @@ To apply a preset: `document.documentElement.dataset.theme = 'forge'` (or use `u
 
 ## Color Psychology (Theme-Aware)
 
-| Token            | Default Hex | Emotion                    | Use When                          |
-| ---------------- | ----------- | -------------------------- | --------------------------------- |
-| `--bg-0`         | `#080808`   | Power, void, foundation    | Background base                   |
-| `--accent`       | `#DC2626`   | Blood, strength, drive     | PRs, milestones, CTAs, active nav |
-| `--accent-light` | `#EF4444`   | Fire, urgency              | Active indicators, highlights     |
-| `--accent-2`     | `#991B1B`   | Iron, depth, permanence    | Shadows, glows, dark accents      |
-| `--good`         | `#22C55E`   | Growth, completion         | Goals hit, meals done, sets done  |
-| `--warn`         | `#F59E0B`   | Warning, caution           | Recovery flags, near-limits       |
-| `--bad`          | `#EF4444`   | Danger, error              | Failures, errors                  |
-| `--text-1`       | `#9A9A9A`   | Precision, neutral support | Secondary text                    |
-| `--text-2`       | `#5E5E5E`   | Silence, structure         | Labels, hints                     |
+| Token            | Default Hex         | Emotion                    | Use When                                         |
+| ---------------- | ------------------- | -------------------------- | ------------------------------------------------ |
+| `--bg-0`         | `#080808`           | Power, void, foundation    | Background base                                  |
+| `--accent`       | `#DC2626`           | Blood, strength, drive     | PRs, milestones, CTAs, active nav                |
+| `--accent-light` | `#EF4444`           | Fire, urgency              | Active indicators, highlights                    |
+| `--accent-2`     | `#991B1B`           | Iron, depth, permanence    | Shadows, glows, dark accents                     |
+| `--good`         | `#22C55E`           | Growth, completion         | Goals hit, meals done, sets done                 |
+| `--warn`         | `#F59E0B`           | Warning, caution           | Recovery flags, near-limits                      |
+| `--bad`          | `#EF4444`           | Danger, error              | Failures, errors                                 |
+| `--text-1`       | `#A8A3A3` (default) | Precision, neutral support | Secondary text (`globals.css`; presets override) |
+| `--text-2`       | `#6F6A6A` (default) | Silence, structure         | Labels, hints (`globals.css`; presets override)  |
 
 **Color ratio rule**: 85% dark neutrals · 12% text · 3% accent at rest.
 

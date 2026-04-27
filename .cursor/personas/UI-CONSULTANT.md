@@ -227,6 +227,8 @@ These patterns are the result of iterative refinement and must be preserved:
 - **Alerts bell**: Always visible; **active** (non-dismissed) alert count drives accent strength, optional pulse dot, and a small numeric badge; dismissed rows drop out of the panel for the **browser session** (session-scoped dismiss, not a Firestore write).
 - **Progress fill language**: Filled portions use accent gradient (lighter -> darker); empty tracks stay neutral (`--surface-track`) with no accent tint.
 - **Dashboard nutrition + supplements**: Two equal cards in one full-width row (`md:grid-cols-2`), same combined span as other `col-span-full` panels. Card titles and metrics follow the **trend strip’s selected calendar date** (not a fixed “today” snapshot when browsing history).
+- **Dashboard trend presets**: Week chips (1–4 wk) extend **forward** from **`Program.startDate`** (Week 1 / cycle day 1), not backward from today; session subtitles use the same anchor via `getCycleDay`.
+- **Onboarding coach import**: Secondary surfaces use **`--panel` / `--chrome-border`** and **`.btn-secondary`** (theme-safe); errors use **`--bad`**, not `--accent-light`.
 - **Nutrition meal `<select>`**: Use `.nutrition-meal-select`; controlled value reflects saved `planLine` (fallback to computed default only when unset — never treat “preset option” as “show default” in UI state).
 - **Native form theming**: `accent-color: var(--accent)` globally applied to checkboxes and radios.
 - **Single-column centered layout**: All pages use `max-w-4xl mx-auto` — no multi-column layouts on desktop.

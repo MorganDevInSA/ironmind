@@ -65,8 +65,14 @@ Every page must pass this checklist before being marked complete.
 
 ### Dashboard — trend day strip (`/dashboard`)
 
+- [ ] **Week presets (1–4 wk)** span **forward** from **`Program.startDate`** (cycle day 1; fallback today); charts / workout queries use **`useWorkouts`** over that `[from, to]` — not “last N days” from today alone
+- [ ] **Week 1 start** control persists **`startDate`** via **`useUpdateProgram`** and invalidates training + dashboard bundle caches after save
 - [ ] Changing the selected date updates **session**, **schedule row** (meals / vitamins / activity from logs), **nutrition**, **recovery**, and **supplements** for that date — use **`useNutritionDay`**, **`useRecoveryEntry`**, **`useSupplementLog`** keyed by selection, not only **`useDashboardData`**’s today bundle fields
 - [ ] **Start workout** / primary logging CTAs remain gated to **calendar today** when product requires it
+
+### Onboarding — coach file import (`StepImportFiles`)
+
+- [ ] Secondary actions use **`.btn-secondary`** (or equivalent **`--surface-well`** + **`--chrome-border`**); errors use **`--bad`**, not **`--accent-light`**
 
 ### Shell — alerts bell (`TopBar`)
 

@@ -32,6 +32,12 @@ Firebase     src/lib/firebase/          (SDK wrappers)
 
 > All other Firebase/service imports in components must go through controllers.
 
+### Program / phase `startDate`
+
+- **Firestore:** `Program.startDate` is the persisted anchor for rotating **`dayNumber`** → calendar mapping (`src/lib/utils/cycle.ts` + consumers).
+- **Coach import:** `importCoachData` keeps a valid ISO **`YYYY-MM-DD`** from `training_program.json` / `phase.json` when provided; invalid or missing values fall back to import-day (`calendarDateOr` in `import.service.ts`).
+- **UI writes:** `useUpdateProgram` (`src/controllers/use-training.ts`) patches `startDate` and invalidates training + dashboard bundle queries.
+
 ---
 
 ## Import Rules

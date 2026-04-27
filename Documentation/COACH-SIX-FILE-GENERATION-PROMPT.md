@@ -8,6 +8,7 @@ Use this prompt with an LLM after the athlete completes the intake questionnaire
 
 - These **six files** define the athlete’s **templates** (profile, program blueprint, nutrition bands, supplements, phase targets, weekly volume landmarks). They are **imported into Firestore** as structured documents.
 - They do **not** create fourteen separate **logged workout rows**—**historical logs** come from in-app tracking or demo generators. You still output a **complete 14-day program blueprint** and coherent targets.
+- **`training_program.json` / `phase.json` `startDate`:** Use a real **`YYYY-MM-DD`** when the coach intends a fixed block start; IronMind import **keeps** that date when valid. Users can later adjust **Week 1 start** in the app (dashboard + training); dashboard trend presets align **forward** from `Program.startDate`.
 
 ### Which files are “14 days”?
 
