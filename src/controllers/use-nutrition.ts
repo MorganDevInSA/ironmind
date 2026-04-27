@@ -49,15 +49,43 @@ export function useNutritionPlan(userId: string) {
   });
 }
 
+function mergeNutritionDayCache(
+  prev: NutritionDay | null | undefined,
+  date: string,
+  data: Partial<NutritionDay>,
+): NutritionDay | null | undefined {
+  if (prev) {
+    return { ...prev, ...data, date } as NutritionDay;
+  }
+  if (
+    data.meals != null &&
+    data.dayType != null &&
+    data.macroTargets != null &&
+    data.macroActuals != null &&
+    data.complianceScore != null
+  ) {
+    return {
+      ...data,
+      date,
+      id: data.id ?? date,
+    } as NutritionDay;
+  }
+  return prev;
+}
+
 export function useSaveNutritionDay(userId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ date, data }: { date: string; data: Partial<NutritionDay> }) =>
       saveNutritionDay(userId, date, data),
-    onSuccess: (_, { date }) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys(userId).nutrition.day(date) });
-      queryClient.invalidateQueries({ queryKey: queryKeys(userId).nutrition.all });
+    onSuccess: (_, { date, data }) => {
+      const dayKey = queryKeys(userId).nutrition.day(date);
+      queryClient.setQueryData<NutritionDay | null | undefined>(dayKey, (prev) =>
+        mergeNutritionDayCache(prev, date, data),
+      );
+      void queryClient.invalidateQueries({ queryKey: dayKey });
+      void queryClient.invalidateQueries({ queryKey: queryKeys(userId).nutrition.all });
       invalidateDashboardBundle(queryClient, userId);
     },
     onError: onMutationError,
