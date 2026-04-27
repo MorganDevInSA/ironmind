@@ -50,16 +50,65 @@ const EXPECTED_FILES = [
     description: 'Supplement windows and timing',
   },
   {
-    name: 'phase.json',
-    label: 'Current Phase',
-    description: 'Training phase with targets and strategy',
-  },
-  {
     name: 'volume_landmarks.json',
     label: 'Volume Landmarks',
     description: 'MEV / MAV / MRV per muscle group',
   },
+  {
+    name: 'phase.json',
+    label: 'Current Phase',
+    description: 'Training phase with targets and strategy',
+  },
 ];
+
+/** Alternate download names (lowercase) → canonical key in `fileStates` / import pipeline. */
+const IMPORT_FILENAME_ALIASES: Record<string, string> = {
+  'volume-landmarks.json': 'volume_landmarks.json',
+  'volume landmarks.json': 'volume_landmarks.json',
+};
+
+/** Last path segment, trim, Unicode-normalize, lowercase; map fullwidth `_` (U+FF3F) to ASCII. */
+function normalizeImportBasename(raw: string): string {
+  const tail = raw.trim().normalize('NFKC').split(/[/\\]/).pop() ?? raw;
+  return tail
+    .toLowerCase()
+    .replace(/\u0000/g, '')
+    .replace(/\uff3f/g, '_');
+}
+
+function resolveCanonicalImportFilename(basename: string): string | null {
+  if (EXPECTED_FILES.some((f) => f.name === basename)) return basename;
+  const alias = IMPORT_FILENAME_ALIASES[basename];
+  if (alias) return alias;
+  // Windows “double .json” when extensions are hidden
+  const deDuped = basename.replace(/\.json\.json$/i, '.json');
+  if (deDuped !== basename && EXPECTED_FILES.some((f) => f.name === deDuped)) return deDuped;
+  return null;
+}
+
+function stripUtf8Bom(text: string): string {
+  return text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
+}
+
+/** If the disk name is wrong/empty but the JSON is clearly landmarks, still slot this file. */
+function looksLikeVolumeLandmarksData(data: unknown): boolean {
+  if (data === null || typeof data !== 'object' || Array.isArray(data)) return false;
+  const o = data as Record<string, unknown>;
+  const chest = o.chest;
+  const back = o.back;
+  if (chest === null || typeof chest !== 'object' || Array.isArray(chest)) return false;
+  if (back === null || typeof back !== 'object' || Array.isArray(back)) return false;
+  const c = chest as Record<string, unknown>;
+  const b = back as Record<string, unknown>;
+  return (
+    typeof c.mv === 'number' &&
+    typeof c.mev === 'number' &&
+    typeof c.mav === 'number' &&
+    typeof c.mrv === 'number' &&
+    typeof b.mv === 'number' &&
+    typeof b.mev === 'number'
+  );
+}
 
 type FileStatus = 'idle' | 'loaded' | 'error';
 interface FileState {
@@ -112,18 +161,40 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
   const seedMutation = useSeedDemoData(userId);
 
   const loadFile = useCallback((file: File) => {
-    const name = file.name.toLowerCase();
-    if (!EXPECTED_FILES.find((f) => f.name === name)) return;
+    const basename = normalizeImportBasename(file.name);
+    const canonical = resolveCanonicalImportFilename(basename);
     const reader = new FileReader();
+    reader.onerror = () => {
+      if (!canonical) return;
+      setFileStates((prev) => ({
+        ...prev,
+        [canonical]: { status: 'error', content: null, error: 'Could not read file' },
+      }));
+    };
     reader.onload = (e) => {
-      const content = e.target?.result as string;
+      const raw = e.target?.result as string;
+      const content = stripUtf8Bom(raw);
       try {
-        JSON.parse(content);
-        setFileStates((prev) => ({ ...prev, [name]: { status: 'loaded', content, error: null } }));
-      } catch {
+        const parsed = JSON.parse(content);
+        let key = canonical;
+        if (!key && looksLikeVolumeLandmarksData(parsed)) {
+          key = 'volume_landmarks.json';
+        }
+        if (!key) return;
         setFileStates((prev) => ({
           ...prev,
-          [name]: { status: 'error', content: null, error: 'Invalid JSON' },
+          [key]: { status: 'loaded', content, error: null },
+        }));
+      } catch {
+        const errKey =
+          canonical ??
+          (basename.includes('volume') && basename.includes('landmark')
+            ? 'volume_landmarks.json'
+            : null);
+        if (!errKey) return;
+        setFileStates((prev) => ({
+          ...prev,
+          [errKey]: { status: 'error', content: null, error: 'Invalid JSON' },
         }));
       }
     };
@@ -225,8 +296,8 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
           bg-[rgba(18,14,14,0.94)] border border-[rgba(65,50,50,0.40)]
           shadow-[0_16px_40px_rgba(0,0,0,0.60)]"
         >
-          <div className="w-16 h-16 rounded-full bg-[color:color-mix(in_srgb,var(--good)_15%,transparent)] border border-[color:color-mix(in_srgb,var(--good)_35%,transparent)] flex items-center justify-center mx-auto">
-            <CheckCircle2 size={32} className="text-[color:var(--good)]" />
+          <div className="w-16 h-16 rounded-full bg-[color:color-mix(in_srgb,var(--accent)_15%,transparent)] border border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)] flex items-center justify-center mx-auto">
+            <CheckCircle2 size={32} className="text-[color:var(--accent-light)]" />
           </div>
           <div>
             <h2 className="text-2xl font-bold text-[color:var(--text-0)] mb-2">
@@ -387,7 +458,7 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
         </div>
       </div>
 
-      {/* Drop zone */}
+      {/* Bulk drop zone — required for multi-select / drag-all-six; slots below handle one file each. */}
       <div
         ref={dropRef}
         onDrop={handleDrop}
@@ -425,25 +496,26 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
         </label>
       </div>
 
-      {/* Individual file slots */}
+      {/* Individual file slots — use index-based input ids (no `.` in id) so label→input works everywhere. */}
       <div className="flex flex-col gap-2">
-        {EXPECTED_FILES.map((file) => {
+        {EXPECTED_FILES.map((file, slotIndex) => {
           const state = fileStates[file.name];
+          const slotInputId = `import-coach-slot-${slotIndex}`;
           return (
             <label
               key={file.name}
-              htmlFor={`slot-${file.name}`}
+              htmlFor={slotInputId}
               className={cn(
                 'flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all select-none',
                 state.status === 'loaded'
-                  ? 'border-[color:color-mix(in_srgb,var(--good)_35%,transparent)] bg-[color:color-mix(in_srgb,var(--good)_6%,transparent)]'
+                  ? 'border-[color:color-mix(in_srgb,var(--accent)_40%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_10%,transparent)]'
                   : state.status === 'error'
                     ? 'border-[color:color-mix(in_srgb,var(--bad)_35%,transparent)] bg-[color:color-mix(in_srgb,var(--bad)_6%,transparent)]'
                     : 'border-[color:var(--chrome-border)] bg-[color:var(--surface-well)] hover:border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)] active:scale-[0.99]',
               )}
             >
               <input
-                id={`slot-${file.name}`}
+                id={slotInputId}
                 type="file"
                 accept=".json,application/json"
                 className="sr-only"
@@ -451,7 +523,7 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
               />
               <div className="shrink-0">
                 {state.status === 'loaded' ? (
-                  <CheckCircle2 size={22} className="text-[color:var(--good)]" />
+                  <CheckCircle2 size={22} className="text-[color:var(--accent-light)]" />
                 ) : state.status === 'error' ? (
                   <XCircle size={22} className="text-[color:var(--accent-light)]" />
                 ) : (
@@ -468,7 +540,7 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
                 className={cn(
                   'shrink-0 text-xs font-bold uppercase tracking-wider',
                   state.status === 'loaded'
-                    ? 'text-[color:var(--good)]'
+                    ? 'text-[color:var(--accent-light)]'
                     : state.status === 'error'
                       ? 'text-[color:var(--accent-light)]'
                       : 'text-[color:var(--text-2)]',

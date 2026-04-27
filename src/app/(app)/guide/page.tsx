@@ -386,8 +386,8 @@ export default function GuidePage() {
             ['training_program.json', '14-day rotating cycle with all exercises'],
             ['nutrition_plan.json', 'Macro targets by day type + meal schedule'],
             ['supplement_protocol.json', 'Supplement windows and timing'],
-            ['phase.json', 'Training phase with targets and strategy'],
             ['volume_landmarks.json', 'MEV / MAV / MRV per muscle group'],
+            ['phase.json', 'Training phase with targets and strategy'],
           ].map(([name, desc]) => (
             <div
               key={name}

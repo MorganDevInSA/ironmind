@@ -12,8 +12,8 @@ const EXPECTED_FILES = [
   { name: 'training_program.json', description: '14-day rotating cycle with all exercises' },
   { name: 'nutrition_plan.json', description: 'Macro targets by day type + meal schedule' },
   { name: 'supplement_protocol.json', description: 'Supplement windows and timing' },
-  { name: 'phase.json', description: 'Training phase with targets and strategy' },
   { name: 'volume_landmarks.json', description: 'MEV / MAV / MRV per muscle group' },
+  { name: 'phase.json', description: 'Training phase with targets and strategy' },
 ];
 
 const instructions = [
