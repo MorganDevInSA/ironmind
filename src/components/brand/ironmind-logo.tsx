@@ -31,20 +31,20 @@ export function IronmindLogo({
 
   const variantClass =
     variant === 'sidebar-expanded'
-      ? 'max-h-14 h-auto w-auto max-w-[min(100%,8.75rem)] object-contain object-center'
+      ? 'max-h-[3.25rem] h-auto w-auto max-w-[min(100%,8.25rem)] object-contain object-center'
       : variant === 'sidebar-collapsed'
-        ? 'h-[3rem] w-auto max-w-[3.5rem] object-contain object-center'
+        ? 'h-[2.75rem] w-auto max-w-[3.25rem] object-contain object-center'
         : variant === 'topbar'
-          ? 'h-12 w-auto max-w-[6.25rem] object-contain object-center'
+          ? 'h-[2.875rem] w-auto max-w-[6rem] object-contain object-center'
           : 'mx-auto h-auto max-h-24 w-auto max-w-[min(100%,280px)] object-contain object-center';
 
   const sizes =
     variant === 'auth'
       ? '(max-width: 640px) 85vw, 280px'
       : variant === 'topbar'
-        ? '(max-width: 480px) 72px, 96px'
+        ? '(max-width: 480px) 68px, 88px'
         : variant === 'sidebar-expanded'
-          ? '(max-width: 240px) 112px, 132px'
+          ? '(max-width: 240px) 104px, 124px'
           : '48px';
 
   const intrinsicW = useCombinedMark ? 1536 : 300;

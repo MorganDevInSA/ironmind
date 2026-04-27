@@ -153,7 +153,7 @@ All `<input type="checkbox">` and `<input type="radio">` elements are globally t
 All raster assets are under `public/brand/` and referenced through `brandAssets` in `src/lib/constants/brand-assets.ts`.
 
 - `IronmindLogo`: **sidebar** + **top bar** use `brandAssets.logoCombined` (same lockup as login / mobile header); **register** uses male/female by theme
-- **Sidebar + top bar footprint** (max height/width, `next/image` **`sizes`**): **`src/components/brand/ironmind-logo.tsx`** — expanded rail: **`max-h-14`** + **`max-w`** ~**8.75rem**; collapsed: **`h-[3rem]`** / **`max-w-[3.5rem]`**; **top bar** (mobile header included): **`h-12`** / **`max-w-[6.25rem]`**. Adjust only there; mirror numbers in **`LOGO-BRIEF.md`**.
+- **Sidebar + top bar footprint** (max height/width, `next/image` **`sizes`**): **`src/components/brand/ironmind-logo.tsx`** — expanded rail: **`max-h-[3.25rem]`** + **`max-w`** ~**8.25rem**; collapsed: **`h-[2.75rem]`** / **`max-w-[3.25rem]`**; **top bar** (mobile header included): **`h-[2.875rem]`** / **`max-w-[6rem]`**. Adjust only there; mirror numbers in **`LOGO-BRIEF.md`**.
 - Login hero uses `brandAssets.logoCombined` directly (`next/image`)
 - Apple touch icon uses `brandAssets.appleTouchIcon`
 

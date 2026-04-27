@@ -201,8 +201,8 @@ All raster logos live under **`public/brand/`**. Runtime URLs are centralized in
 
 - **`IronmindLogo`** (`src/components/brand/ironmind-logo.tsx`): **sidebar** + **top bar** use **`logoCombined`** (same asset as **`/login`** including mobile header); **register** (**`auth`**) still uses male/female by theme. Uses **`object-contain object-center`** so PNG framing stays visible (avoid chaining `object-left` + `object-bottom` — Tailwind resolves to one axis and can show empty canvas).
 - **Sidebar sizing (current defaults — change only in `ironmind-logo.tsx`):**
-  - **Expanded:** `max-h-14` (~3.5rem), `max-w` capped at **8.75rem**, **`sizes`** `(max-width: 240px) 112px, 132px`.
-  - **Collapsed:** `h-[3rem]`, `max-w-[3.5rem]`, same combined asset.
-- **Top bar (`variant="topbar"` — desktop + mobile sticky header):** `h-12`, `max-w-[6.25rem]`, **`sizes`** `(max-width: 480px) 72px, 96px`, **`logoCombined`**.
+  - **Expanded:** `max-h-[3.25rem]` (~52px), `max-w` capped at **8.25rem**, **`sizes`** `(max-width: 240px) 104px, 124px`.
+  - **Collapsed:** `h-[2.75rem]`, `max-w-[3.25rem]`, same combined asset.
+- **Top bar (`variant="topbar"` — desktop + mobile sticky header):** `h-[2.875rem]`, `max-w-[6rem]`, **`sizes`** `(max-width: 480px) 68px, 88px`, **`logoCombined`**.
 - **`/login`**: uses **`brandAssets.logoCombined`** directly (`next/image`), not **`IronmindLogo`** — visually matches the sidebar lockup.
 - **OAuth buttons** (Google; Facebook/Microsoft when enabled in UI) use text + icons only — no extra logo files.

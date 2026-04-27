@@ -139,11 +139,11 @@ export function Sidebar() {
       className={cn(
         'fixed left-0 top-0 z-40 flex h-full flex-col overflow-x-visible transition-[width] duration-300 ease-out',
         'bg-[color:var(--chrome-bg)]',
-        sidebarOpen ? 'w-60' : 'w-[72px]',
+        sidebarOpen ? 'w-64' : 'w-24',
       )}
     >
       {/* Logo — fixed size and position regardless of sidebar state */}
-      <div className="flex w-full shrink-0 h-[5.5rem] items-center justify-center px-2">
+      <div className="flex w-full shrink-0 h-[5.5rem] items-center justify-center px-2 pt-0.5">
         <Link
           href="/guide"
           className="flex items-center justify-center rounded-lg outline-none ring-offset-2 ring-offset-[color:var(--bg-1)] focus-visible:ring-2 focus-visible:ring-[color:var(--accent)]/55"
@@ -242,9 +242,14 @@ export function Sidebar() {
                 }}
                 className={cn('nav-item', isActive && 'active')}
               >
-                <span className="flex size-5 shrink-0 items-center justify-center [&>svg]:block [&>svg]:shrink-0">
+                <span
+                  className={cn(
+                    'flex shrink-0 items-center justify-center [&>svg]:block [&>svg]:shrink-0',
+                    sidebarOpen ? 'size-5' : 'size-[18px]',
+                  )}
+                >
                   <Icon
-                    size={20}
+                    size={sidebarOpen ? 20 : 18}
                     className={cn(
                       'transition-colors duration-[220ms]',
                       accentIcon,

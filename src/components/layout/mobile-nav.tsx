@@ -116,7 +116,7 @@ export function MobileNav() {
               href={item.href}
               aria-current={isActive ? 'page' : undefined}
               className={cn(
-                'relative flex-1 flex min-h-16 flex-col items-center justify-center gap-1',
+                'relative flex-1 flex min-h-[4.25rem] flex-col items-center justify-center gap-1',
                 'transition-all duration-200',
                 isActive
                   ? 'text-[color:var(--accent-light)]'
@@ -157,7 +157,7 @@ export function MobileNav() {
           aria-label="More navigation options"
           aria-expanded={moreOpen}
           className={cn(
-            'relative flex-1 flex min-h-16 flex-col items-center justify-center gap-1',
+            'relative flex-1 flex min-h-[4.25rem] flex-col items-center justify-center gap-1',
             'transition-all duration-200',
             isMoreActive || moreOpen
               ? 'text-[color:var(--accent-light)]'

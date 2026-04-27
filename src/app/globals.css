@@ -846,14 +846,14 @@ h4 {
       inset 0px -1px 0 rgba(0, 0, 0, 0.58);
   }
 
-  /* Collapsed rail: hard 56px (= w-[72px] − nav horizontal padding) — same every row; height grows only if content needs it. */
+  /* Collapsed rail: compact tile (56×40); rail is w-24 so px-2 leaves comfortable gutter around the chip. */
   .nav-item[data-rail='collapsed'] {
     display: flex;
     box-sizing: border-box;
     width: 56px;
     min-width: 56px;
     max-width: 56px;
-    min-height: 45px;
+    min-height: 40px;
     height: auto;
     margin-left: auto;
     margin-right: auto;
@@ -861,6 +861,7 @@ h4 {
     align-items: center;
     justify-content: center;
     border-width: 2px;
+    border-radius: 10px;
   }
 
   .nav-item[data-rail='collapsed']:not(.active) {
@@ -1197,14 +1198,14 @@ h4 {
   }
 }
 
-/* Mobile chrome keeps controls above gesture bars while preserving the 64px visual rail. */
+/* Mobile chrome keeps controls above gesture bars while preserving a slightly roomier bottom rail. */
 .mobile-nav-bar {
-  min-height: calc(4rem + env(safe-area-inset-bottom));
+  min-height: calc(4.25rem + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom);
 }
 
 .mobile-more-sheet {
-  bottom: calc(4rem + env(safe-area-inset-bottom));
+  bottom: calc(4.25rem + env(safe-area-inset-bottom));
 }
 
 /* Compact segmented/date controls still need forgiving touch geometry on coarse pointers. */
