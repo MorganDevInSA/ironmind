@@ -294,7 +294,7 @@ function PhysiqueMiniCharts({
             Measurements
           </button>
         </div>
-        <span className="text-[10px] text-[color:var(--text-detail)] ml-auto font-mono tabular-nums">
+        <span className="text-[10px] text-[color:var(--text-detail)] ml-auto tabular-nums">
           {chron.length} pts
         </span>
       </div>
@@ -484,7 +484,7 @@ function MealContent({
                     {food.unit}
                   </span>
                 </span>
-                <span className="font-mono tabular-nums text-[color:var(--text-detail)] text-xs">
+                <span className="tabular-nums text-[color:var(--text-detail)] text-xs">
                   {food.protein}g P · {food.calories} kcal
                 </span>
               </div>
@@ -1342,7 +1342,7 @@ function TodaySchedule({
                       item.done === true && 'opacity-50',
                     )}
                   >
-                    <td className="py-2.5 pr-4 font-mono tabular-nums text-[color:var(--text-detail)] text-xs whitespace-nowrap align-top">
+                    <td className="py-2.5 pr-4 font-medium tabular-nums text-[color:var(--text-detail)] text-xs whitespace-nowrap align-top">
                       {item.time}
                     </td>
                     <td className="py-2.5 pr-4 align-top">
@@ -1481,7 +1481,7 @@ function DensityCard({ workout, onOpen }: { workout: Workout; onOpen?: () => voi
               <p className="text-xs text-[color:var(--text-detail)]">{s.label}</p>
               <p
                 className={cn(
-                  'font-mono tabular-nums font-bold',
+                  'tabular-nums font-bold',
                   s.gold ? 'text-[color:var(--accent)]' : 'text-[color:var(--text-0)]',
                 )}
               >
@@ -1531,10 +1531,10 @@ function DensityCard({ workout, onOpen }: { workout: Workout; onOpen?: () => voi
                   )}
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
-                  <span className="font-mono tabular-nums text-[color:var(--text-0)]">
+                  <span className="tabular-nums text-[color:var(--text-0)]">
                     {Math.round(row.volume).toLocaleString()} kg
                   </span>
-                  <span className="font-mono tabular-nums text-[color:var(--accent)] text-xs w-20 text-right">
+                  <span className="tabular-nums text-[color:var(--accent)] text-xs w-20 text-right">
                     {Math.round(row.volume / durationMin)} kg/min
                   </span>
                 </div>
@@ -1590,7 +1590,7 @@ function DashboardTrendWindow({
   ];
 
   const inputClass =
-    'rounded-lg px-2.5 py-1.5 text-xs font-mono tabular-nums min-w-0 ' +
+    'rounded-lg px-2.5 py-1.5 text-xs tabular-nums min-w-0 ' +
     'bg-[color:var(--bg-2)] border border-[color:var(--panel-border)] text-[color:var(--text-0)] ' +
     'focus:border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)] ' +
     'focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--accent)_10%,transparent)] focus:outline-none ' +
@@ -1600,9 +1600,7 @@ function DashboardTrendWindow({
     <div className="glass-panel dashboard-card-surface card-hover px-4 py-3 space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="data-label">Trend window</span>
-        <span className="text-[10px] text-[color:var(--text-detail)] font-mono tabular-nums">
-          {summary}
-        </span>
+        <span className="text-[10px] text-[color:var(--text-detail)] tabular-nums">{summary}</span>
       </div>
       <p className="text-[10px] text-[color:var(--text-2)] leading-snug">
         Workouts and the physique chart use this calendar range. Week presets run{' '}
@@ -2161,7 +2159,7 @@ export default function DashboardPage() {
                         {isViewingToday ? 'Today' : formatDisplayDate(selectedTrendDate)}
                       </p>
                       <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-bold font-mono tabular-nums text-[color:var(--text-0)]">
+                        <span className="text-3xl font-bold tabular-nums text-[color:var(--text-0)]">
                           {Math.round(recoveryEntry.readinessScore)}
                         </span>
                         <span className="text-sm text-[color:var(--text-detail)]">/100</span>
@@ -2186,7 +2184,7 @@ export default function DashboardPage() {
                   <div className="flex min-h-0 flex-1 flex-col space-y-2">
                     <div className="flex items-baseline justify-between gap-2 shrink-0">
                       <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-bold font-mono tabular-nums text-[color:var(--text-0)]">
+                        <span className="text-3xl font-bold tabular-nums text-[color:var(--text-0)]">
                           {profile?.currentWeight ?? '—'}
                         </span>
                         <span className="text-sm text-[color:var(--text-detail)]">kg</span>
@@ -2237,14 +2235,14 @@ export default function DashboardPage() {
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-[color:var(--text-detail)]">Protein</span>
-                      <span className="font-mono tabular-nums text-[color:var(--text-0)]">
+                      <span className="tabular-nums text-[color:var(--text-0)]">
                         {Math.round(selectedDayNutrition.macroActuals.protein)}g /{' '}
                         {selectedDayNutrition.macroTargets.protein}g
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-[color:var(--text-detail)]">Meals</span>
-                      <span className="font-mono tabular-nums text-[color:var(--text-0)]">
+                      <span className="tabular-nums text-[color:var(--text-0)]">
                         {selectedDayNutrition.meals.filter((m) => m.completed).length}/
                         {selectedDayNutrition.meals.length} eaten
                       </span>
@@ -2285,7 +2283,7 @@ export default function DashboardPage() {
                 {selectedDaySupplements ? (
                   <div className="space-y-2">
                     <div className="flex items-baseline gap-2">
-                      <span className="text-3xl font-bold font-mono tabular-nums text-[color:var(--text-0)]">
+                      <span className="text-3xl font-bold tabular-nums text-[color:var(--text-0)]">
                         {selectedDaySupplements.compliancePercent}
                       </span>
                       <span className="text-sm text-[color:var(--text-detail)]">%</span>
@@ -2345,7 +2343,7 @@ export default function DashboardPage() {
                         <span className="text-[color:var(--text-0)] capitalize">
                           {muscle.muscleGroup}
                         </span>
-                        <span className="font-mono tabular-nums text-[color:var(--text-detail)]">
+                        <span className="tabular-nums text-[color:var(--text-detail)]">
                           {muscle.currentSets} / {muscle.targetSets} sets
                         </span>
                       </div>

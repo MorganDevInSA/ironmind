@@ -38,7 +38,7 @@ export function ProgramCycleStartControl({
   /** Same as `DashboardTrendWindow` — keep dashboard control surfaces visually one system. */
   const panelWrap = 'glass-panel dashboard-card-surface card-hover px-4 py-3 space-y-2';
   const inputClass =
-    'rounded-lg px-2.5 py-1.5 text-xs font-mono tabular-nums min-w-0 ' +
+    'rounded-lg px-2.5 py-1.5 text-xs tabular-nums min-w-0 ' +
     'bg-[color:var(--bg-2)] border border-[color:var(--panel-border)] text-[color:var(--text-0)] ' +
     'focus:border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)] ' +
     'focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--accent)_10%,transparent)] focus:outline-none ' +
@@ -58,7 +58,7 @@ export function ProgramCycleStartControl({
     <div className={cn(panelWrap, className)}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="data-label">Week 1 start</span>
-        <span className="text-[10px] text-[color:var(--text-detail)] font-mono tabular-nums shrink-0">
+        <span className="text-[10px] text-[color:var(--text-detail)] tabular-nums shrink-0">
           Saved: {formatDisplayDate(saved)}
         </span>
       </div>
