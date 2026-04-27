@@ -291,10 +291,10 @@ export default function SettingsPage() {
         </button>
       </div>
 
-      {/* Clear demo / overlay data */}
+      {/* Clear demo / overlay data — same accent treatment as Re-import / Update weights */}
       <div className="glass-panel p-5 space-y-4">
         <div className="flex items-center gap-3">
-          <Eraser size={20} className="text-[color:var(--warn)]" />
+          <Eraser size={20} className="text-[color:var(--accent)]" />
           <h2 className="font-semibold text-[color:var(--text-0)]">Demo &amp; history reset</h2>
         </div>
         <p className="text-sm text-[color:var(--text-2)]">
@@ -306,8 +306,9 @@ export default function SettingsPage() {
           type="button"
           onClick={handleClearDemoData}
           disabled={clearingDemo || !userId}
-          className="w-full py-2.5 border border-[color:color-mix(in_srgb,var(--warn)_35%,transparent)] text-[color:var(--warn)] rounded-lg hover:border-[color:color-mix(in_srgb,var(--warn)_55%,transparent)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-sm font-medium"
+          className="btn-secondary w-full flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
         >
+          <Eraser size={16} aria-hidden />
           {clearingDemo ? 'Clearing…' : 'Clear demo training data'}
         </button>
       </div>
