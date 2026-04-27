@@ -179,7 +179,7 @@ export const TRAINING_YOUTUBE_PRESETS: readonly TrainingYouTubePreset[] = [
     playlistName: '80s',
     summary:
       'Eighties cuts and synth-forward energy—steady drive for accessories, machine work, or longer blocks when you want nostalgic hooks without losing tempo.',
-    url: 'https://www.youtube.com/playlist?list=PL3ESu9Aq2zWIPNSxBDL-9UUQ3Y6YycmR',
+    url: 'https://www.youtube.com/playlist?list=PL3ESu9Aq2zWIPNSxBDL-9UUQ3Y6YycmRK',
   },
   {
     id: 'iv-morgan-rock-anthems',
