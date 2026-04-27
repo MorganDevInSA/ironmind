@@ -91,25 +91,11 @@ export const TRAINING_YOUTUBE_PRESETS: readonly TrainingYouTubePreset[] = [
     url: 'https://www.youtube.com/playlist?list=PL3ESu9Aq2zWIbsA94EVtZYXeyBkZVFsci',
   },
   {
-    id: 'iv-classics',
-    playlistName: 'Classics',
-    summary:
-      'Familiar anthems and timeless hooks—predictable builds and sing-along peaks that carry long sessions, leg days, or anytime you want reliable energy.',
-    url: 'https://www.youtube.com/playlist?list=PL3ESu9Aq2zWK0stiENbI7j4TAuqUmEZdV',
-  },
-  {
     id: 'iv-shared-breakup',
     playlistName: 'Shared Breakup Music',
     summary:
       'Shared, sentimental playlist energy—rhythmic and vocal-forward; good for zone-2 work, incline walks, or upper-body volume where mood matters as much as BPM.',
     url: 'https://www.youtube.com/playlist?list=PL3ESu9Aq2zWK3N2PDDJWGKYXGqvGiGY4l',
-  },
-  {
-    id: 'iv-yt-short',
-    playlistName: 'Featured clip',
-    summary:
-      'Single high-impact YouTube cut—use as a short hype block between main sets, before your top set, or when you only want a few minutes of focused intensity.',
-    url: 'https://youtu.be/SezuFrHm8f0',
   },
   {
     id: 'iv-live-dnb',
@@ -229,13 +215,6 @@ export const TRAINING_YOUTUBE_PRESETS: readonly TrainingYouTubePreset[] = [
     summary:
       'Drum-and-bass energy with rolling bass—use for fast tempos, spin-style finishers, or high-rep circuits where the kick keeps you honest.',
     url: 'https://www.youtube.com/playlist?list=PL3ESu9Aq2zWJrvzTQeqMpX7lTHflp8Ip3',
-  },
-  {
-    id: 'iv-morgan-hip-hop',
-    playlistName: 'Hip Hop',
-    summary:
-      'Hip-hop driven grooves and pocket—anchors tempo work, machine stacks, or any session where bar placement matters as much as BPM.',
-    url: 'https://www.youtube.com/playlist?list=PL3ESu9Aq2zWK3Og_381sIz-Pi8g5WoXBQ',
   },
 ] as const;
 
