@@ -1709,7 +1709,7 @@ function TrendRangeDayTabs({
       <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[color:var(--text-2)]">
         Days in range
       </p>
-      <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-thin">
+      <div className="flex w-full min-w-0 gap-1">
         {dates.map((dateStr) => {
           const isSelected = dateStr === selectedDate;
           const isCalendarToday = dateStr === todayStr;
@@ -1719,7 +1719,7 @@ function TrendRangeDayTabs({
               type="button"
               onClick={() => onSelect(dateStr)}
               className={cn(
-                'im-tooltip-trigger shrink-0 min-w-[2.75rem] px-2.5 py-2 rounded-lg text-xs font-mono tabular-nums transition-all border',
+                'im-tooltip-trigger flex-1 min-w-0 basis-0 px-1 py-2 rounded-lg text-xs tabular-nums text-center transition-all border truncate sm:px-2',
                 isSelected
                   ? 'is-selected text-[color:var(--text-0)]'
                   : 'border-[color:var(--chrome-border)] text-[color:var(--text-1)] hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]',
