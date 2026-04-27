@@ -92,9 +92,9 @@ export const TRAINING_YOUTUBE_PRESETS: readonly TrainingYouTubePreset[] = [
   },
   {
     id: 'iv-shared-breakup',
-    playlistName: 'Shared Breakup Music',
+    playlistName: 'Lady Breakup Music',
     summary:
-      'Shared, sentimental playlist energy—rhythmic and vocal-forward; good for zone-2 work, incline walks, or upper-body volume where mood matters as much as BPM.',
+      'Sentimental, vocal-forward breakup energy—pair to Dude Breakup Music; good for zone-2, incline walks, or upper-body volume when mood matters as much as BPM.',
     url: 'https://www.youtube.com/playlist?list=PL3ESu9Aq2zWK3N2PDDJWGKYXGqvGiGY4l',
   },
   {
@@ -197,9 +197,9 @@ export const TRAINING_YOUTUBE_PRESETS: readonly TrainingYouTubePreset[] = [
   },
   {
     id: 'iv-morgan-ltks',
-    playlistName: 'Volume Block',
+    playlistName: 'Classic Old Rock',
     summary:
-      'Rotating picks for longer sessions—stack with high-volume accessories, machine circuits, or shared-gym days when you need variety across the hour.',
+      'Classic and old-school rock cuts—steady drive for compounds, machine stacks, or longer accessories blocks when you want timeless riffs and singalong hooks.',
     url: 'https://www.youtube.com/playlist?list=PL3ESu9Aq2zWIPsGFbLTks2vGLN0P0XvrG',
   },
   {
