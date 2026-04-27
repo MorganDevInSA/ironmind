@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useId } from 'react';
+import { useState, useEffect, useMemo, useId, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores';
@@ -202,6 +202,12 @@ const CHART_TOOLTIP_STYLE = {
   fontSize: 12,
 };
 const CHART_TOOLTIP_LABEL_STYLE = { color: 'var(--text-1)' };
+
+/** Border / fill / shadow for dashboard hover peek panels (trend day strip, schedule rows). */
+const DASHBOARD_PEEK_SKIN =
+  'rounded-lg border border-[color:color-mix(in_srgb,var(--accent)_42%,transparent)] ' +
+  'bg-[color:color-mix(in_srgb,var(--panel-strong)_92%,black_8%)] ' +
+  'px-3 py-2.5 shadow-[0_10px_28px_color-mix(in_srgb,black_55%,transparent),0_0_12px_color-mix(in_srgb,var(--accent)_18%,transparent)]';
 
 function PhysiqueMiniCharts({
   checkIns,
@@ -1236,6 +1242,11 @@ function TodaySchedule({
   const protocol = protocolProp ?? mortonSupplementProtocol;
 
   const [selected, setSelected] = useState<ScheduleItem | null>(null);
+  const [schedulePeek, setSchedulePeek] = useState<{
+    index: number;
+    left: number;
+    top: number;
+  } | null>(null);
   const items: ScheduleItem[] = [];
 
   /* — Meals — */
@@ -1295,6 +1306,8 @@ function TodaySchedule({
 
   items.sort((a, b) => a.sortKey - b.sortKey);
 
+  const schedulePeekItem = schedulePeek != null ? (items[schedulePeek.index] ?? null) : null;
+
   return (
     <>
       <div className="glass-panel dashboard-card-surface p-4 col-span-full">
@@ -1337,6 +1350,18 @@ function TodaySchedule({
                   <tr
                     key={i}
                     onClick={() => setSelected(item)}
+                    onMouseEnter={(e) => {
+                      const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                      setSchedulePeek({
+                        index: i,
+                        left: r.left + r.width / 2,
+                        top: r.top,
+                      });
+                    }}
+                    onMouseLeave={(e) => {
+                      const rel = e.relatedTarget as Node | null;
+                      if (!(e.currentTarget as HTMLElement).contains(rel)) setSchedulePeek(null);
+                    }}
                     className={cn(
                       'cursor-pointer transition-colors group hover:bg-[color:color-mix(in_srgb,var(--accent)_7%,transparent)]',
                       item.done === true && 'opacity-50',
@@ -1410,6 +1435,56 @@ function TodaySchedule({
           </table>
         </div>
       </div>
+
+      {schedulePeek && schedulePeekItem && typeof document !== 'undefined'
+        ? createPortal(
+            <div
+              aria-hidden
+              className={cn(
+                DASHBOARD_PEEK_SKIN,
+                'pointer-events-none fixed z-[90] w-max max-w-[min(calc(100vw-2rem),16rem)] -translate-x-1/2 -translate-y-[calc(100%+6px)]',
+              )}
+              style={{ left: schedulePeek.left, top: schedulePeek.top }}
+            >
+              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[color:var(--text-2)]">
+                Item type
+              </p>
+              <p className="mt-0.5 text-xs font-semibold text-[color:var(--text-0)]">
+                {KIND_META[schedulePeekItem.kind].label}
+              </p>
+              {schedulePeekItem.kind === 'activity' && session ? (
+                <p className="mt-1 text-[11px] leading-snug text-[color:var(--text-detail)]">
+                  {session.type === 'lift' && 'Strength'}
+                  {session.type === 'cardio' && 'Cardio / conditioning'}
+                  {session.type === 'recovery' && 'Recovery'}
+                </p>
+              ) : null}
+              <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[color:var(--text-2)]">
+                Time
+              </p>
+              <p className="mt-0.5 text-sm font-semibold tabular-nums text-[color:var(--text-0)]">
+                {schedulePeekItem.time}
+              </p>
+              <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[color:var(--text-2)]">
+                Item
+              </p>
+              <p className="mt-0.5 text-sm font-semibold leading-snug text-[color:var(--text-0)]">
+                {schedulePeekItem.label}
+              </p>
+              {schedulePeekItem.detail ? (
+                <>
+                  <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[color:var(--text-2)]">
+                    Description
+                  </p>
+                  <p className="mt-0.5 text-[13px] leading-snug text-[color:var(--text-detail)]">
+                    {schedulePeekItem.detail}
+                  </p>
+                </>
+              ) : null}
+            </div>,
+            document.body,
+          )
+        : null}
 
       {selected && (
         <ScheduleModal
@@ -1711,6 +1786,11 @@ function TrendRangeDayTabs({
   program: Program | null;
   onSelect: (date: string) => void;
 }) {
+  const stripRef = useRef<HTMLDivElement>(null);
+  const [focusDate, setFocusDate] = useState<string | null>(null);
+  const [hoverDate, setHoverDate] = useState<string | null>(null);
+  const peekDate = focusDate !== null ? focusDate : hoverDate;
+
   const cycleAnchor = program ? (program.startDate ?? todayStr) : null;
   const cycleLength = program?.cycleLengthDays ?? null;
 
@@ -1719,7 +1799,7 @@ function TrendRangeDayTabs({
       <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[color:var(--text-2)]">
         Days in range
       </p>
-      <div className="flex w-full min-w-0 gap-1">
+      <div ref={stripRef} className="flex w-full min-w-0 gap-1">
         {dates.map((dateStr) => {
           const isSelected = dateStr === selectedDate;
           const isCalendarToday = dateStr === todayStr;
@@ -1728,16 +1808,52 @@ function TrendRangeDayTabs({
               ? getCycleDay(cycleAnchor, dateStr, cycleLength)
               : null;
           const buttonLabel = cycleDay != null ? String(cycleDay) : formatShortDate(dateStr);
+          const sessForDate =
+            program && cycleDay != null
+              ? findProgramSessionForCycleDay(program.sessions, cycleDay)
+              : undefined;
+          const planKindLine =
+            program == null || cycleDay == null
+              ? null
+              : sessForDate == null
+                ? 'Item type · Rest day'
+                : sessForDate.type === 'lift'
+                  ? 'Item type · Strength'
+                  : sessForDate.type === 'cardio'
+                    ? 'Item type · Cardio / conditioning'
+                    : 'Item type · Recovery';
           const ariaLabel =
             cycleDay != null
-              ? `Cycle day ${cycleDay}, ${formatDisplayDate(dateStr)}${isCalendarToday ? ', Today' : ''}`
+              ? `Cycle day ${cycleDay}, ${formatDisplayDate(dateStr)}${isCalendarToday ? ', Today' : ''}${planKindLine ? `, ${planKindLine}` : ''}`
               : `${formatDisplayDate(dateStr)}${isCalendarToday ? ', Today' : ''}`;
 
           return (
-            <div key={dateStr} className="group relative flex min-w-0 flex-1 basis-0">
+            <div
+              key={dateStr}
+              className="relative flex min-w-0 flex-1 basis-0"
+              onMouseEnter={() => setHoverDate(dateStr)}
+              onMouseLeave={(e) => {
+                const rel = e.relatedTarget as Node | null;
+                if (!e.currentTarget.contains(rel)) setHoverDate(null);
+              }}
+            >
               <button
                 type="button"
+                data-trend-day-tab
+                data-date={dateStr}
                 onClick={() => onSelect(dateStr)}
+                onFocus={() => setFocusDate(dateStr)}
+                onBlur={(e) => {
+                  const rel = e.relatedTarget as HTMLElement | null;
+                  if (rel && stripRef.current?.contains(rel)) {
+                    const next = rel.closest('[data-trend-day-tab]')?.getAttribute('data-date');
+                    if (next) {
+                      setFocusDate(next);
+                      return;
+                    }
+                  }
+                  setFocusDate(null);
+                }}
                 className={cn(
                   'relative z-10 w-full px-1 py-2 rounded-lg text-xs font-semibold tabular-nums text-center transition-all border truncate sm:px-2',
                   isSelected
@@ -1749,37 +1865,39 @@ function TrendRangeDayTabs({
               >
                 {buttonLabel}
               </button>
-              {/* Visual only — aria-label on button carries the same facts for SR */}
-              <div
-                aria-hidden
-                className={cn(
-                  'pointer-events-none absolute bottom-[calc(100%+0.45rem)] left-1/2 z-[80] w-max max-w-[min(calc(100vw-2rem),15rem)] -translate-x-1/2 rounded-lg border px-3 py-2.5',
-                  'border-[color:color-mix(in_srgb,var(--accent)_42%,transparent)]',
-                  'bg-[color:color-mix(in_srgb,var(--panel-strong)_92%,black_8%)]',
-                  'shadow-[0_10px_28px_color-mix(in_srgb,black_55%,transparent),0_0_12px_color-mix(in_srgb,var(--accent)_18%,transparent)]',
-                  'opacity-0 transition-opacity duration-150 ease-out',
-                  'group-hover:opacity-100 group-focus-within:opacity-100',
-                )}
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[color:var(--text-2)]">
-                    Calendar date
+              {peekDate === dateStr ? (
+                <div
+                  aria-hidden
+                  className={cn(
+                    DASHBOARD_PEEK_SKIN,
+                    'pointer-events-none absolute bottom-[calc(100%+0.45rem)] left-1/2 z-[80] w-max max-w-[min(calc(100vw-2rem),15rem)] -translate-x-1/2',
+                  )}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[color:var(--text-2)]">
+                      Calendar date
+                    </p>
+                    {isCalendarToday ? (
+                      <span className="shrink-0 rounded border border-[color:color-mix(in_srgb,var(--accent)_48%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_14%,transparent)] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[color:var(--accent)]">
+                        Today
+                      </span>
+                    ) : null}
+                  </div>
+                  <p className="mt-1 text-sm font-semibold leading-snug text-[color:var(--text-0)]">
+                    {formatDisplayDate(dateStr)}
                   </p>
-                  {isCalendarToday ? (
-                    <span className="shrink-0 rounded border border-[color:color-mix(in_srgb,var(--accent)_48%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_14%,transparent)] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[color:var(--accent)]">
-                      Today
-                    </span>
+                  {cycleDay != null && cycleLength != null ? (
+                    <p className="mt-1 text-[11px] leading-snug text-[color:var(--text-detail)]">
+                      Cycle day {cycleDay} of {cycleLength}
+                    </p>
+                  ) : null}
+                  {planKindLine ? (
+                    <p className="mt-1.5 text-[11px] leading-snug text-[color:var(--text-detail)] border-t border-[color:var(--chrome-border-subtle)] pt-1.5">
+                      {planKindLine}
+                    </p>
                   ) : null}
                 </div>
-                <p className="mt-1 text-sm font-semibold leading-snug text-[color:var(--text-0)]">
-                  {formatDisplayDate(dateStr)}
-                </p>
-                {cycleDay != null && cycleLength != null ? (
-                  <p className="mt-1 text-[11px] leading-snug text-[color:var(--text-detail)]">
-                    Cycle day {cycleDay} of {cycleLength}
-                  </p>
-                ) : null}
-              </div>
+              ) : null}
             </div>
           );
         })}
