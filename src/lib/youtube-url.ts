@@ -161,6 +161,13 @@ export const TRAINING_YOUTUBE_PRESETS: readonly TrainingYouTubePreset[] = [
     url: 'https://www.youtube.com/playlist?list=PL3ESu9Aq2zWK7zyssJujOnRp0Khnia3-f',
   },
   {
+    id: 'iv-live-90s-brit-rock-bush',
+    playlistName: 'Live 90s Brit Rock from "Bush"',
+    summary:
+      'Radio-style live mix: 90s British rock with Bush-forward energy—anthemic vocals and gritty guitars for presses, pulls, and sessions that want post-grunge momentum.',
+    url: 'https://www.youtube.com/watch?v=j4i6PdfOTV0&list=RDj4i6PdfOTV0&start_radio=1',
+  },
+  {
     id: 'iv-slow-electronic',
     playlistName: 'Slow Electronic',
     summary:
