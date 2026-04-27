@@ -126,13 +126,6 @@ export const TRAINING_YOUTUBE_PRESETS: readonly TrainingYouTubePreset[] = [
     url: 'https://www.youtube.com/playlist?list=PL3ESu9Aq2zWK8CHbiO9rIbpE6lxEIxKLs',
   },
   {
-    id: 'iv-eclectic-electronic',
-    playlistName: 'Electronic blend',
-    summary:
-      'Eclectic electronic picks spanning BPMs—use when you want variety across supersets, unstructured gym time, or shared speakers without one narrow genre lock-in.',
-    url: 'https://www.youtube.com/playlist?list=PL3ESu9Aq2zWKCGkbjcqzGpx2cThMGSt02',
-  },
-  {
     id: 'iv-memories',
     playlistName: 'Memories',
     summary:
