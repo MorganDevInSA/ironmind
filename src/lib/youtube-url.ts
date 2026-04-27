@@ -106,16 +106,16 @@ export const TRAINING_YOUTUBE_PRESETS: readonly TrainingYouTubePreset[] = [
   },
   {
     id: 'iv-lift-groove',
-    playlistName: 'Lift groove mix',
+    playlistName: 'Live Prog Psy',
     summary:
-      'Groove-forward selections with consistent drive—fewer sharp drops, more pocket; pairs well with compound waves, RDL volume, or any block that rewards steady rhythm.',
+      'Progressive psy builds and melodic layers—steady climb for long compounds, incline work, or blocks where you want hypnotic forward motion without pure peak-time chaos.',
     url: 'https://www.youtube.com/playlist?list=PL3ESu9Aq2zWJqgfrbAfbAKbdozkH0VClA',
   },
   {
     id: 'iv-density',
-    playlistName: 'Density session',
+    playlistName: 'Live Psy Tech',
     summary:
-      'Dense, training-oriented sequencing that ramps intensity across the hour—suited to longer push sessions, leg press stacks, or when you want the room to feel smaller.',
+      'Psytech and driving four-on-the-floor energy—tight kicks and percussive detail for tempo work, machine stacks, or finishers where the groove stays clinical.',
     url: 'https://www.youtube.com/playlist?list=PL3ESu9Aq2zWLDNst3FSVerlDDomtCsDZ-',
   },
   {
