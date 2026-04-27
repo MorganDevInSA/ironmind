@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useId, useRef } from 'react';
+import { useState, useEffect, useMemo, useId } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores';
@@ -56,14 +56,7 @@ import { cn } from '@/lib/utils';
 import { consumeDashboardTrendWindowFourWeeksBootstrap } from '@/lib/dashboard-trend-session';
 import { bodyweightForChartKg, measurementForChart } from '@/lib/utils/measurement-bounds';
 import { MEASUREMENT_CHART_SERIES } from '@/lib/constants/measurement-chart-series';
-import type {
-  Workout,
-  NutritionDay,
-  SupplementLog,
-  Program,
-  ProgramSession,
-  CheckIn,
-} from '@/lib/types';
+import type { Workout, NutritionDay, SupplementLog, ProgramSession, CheckIn } from '@/lib/types';
 import {
   appendMediaGateBypass,
   postSessionMediaHref,
@@ -72,6 +65,7 @@ import {
 } from '@/lib/program-session-routes';
 import { TrainingMediaModal } from '@/components/training/training-media-modal';
 import { ProgramCycleStartControl } from '@/components/training/program-cycle-start-control';
+import { PlanByDayStrip, PLAN_DAY_PEEK_SKIN } from '@/components/training/plan-by-day-strip';
 import { mortonNutritionPlan } from '@/lib/seed/nutrition';
 import { mortonSupplementProtocol } from '@/lib/seed/supplements';
 import type { NutritionPlanSeed } from '@/lib/seed/nutrition';
@@ -202,12 +196,6 @@ const CHART_TOOLTIP_STYLE = {
   fontSize: 12,
 };
 const CHART_TOOLTIP_LABEL_STYLE = { color: 'var(--text-1)' };
-
-/** Border / fill / shadow for dashboard hover peek panels (trend day strip, schedule rows). */
-const DASHBOARD_PEEK_SKIN =
-  'rounded-lg border border-[color:color-mix(in_srgb,var(--accent)_42%,transparent)] ' +
-  'bg-[color:color-mix(in_srgb,var(--panel-strong)_92%,black_8%)] ' +
-  'px-3 py-2.5 shadow-[0_10px_28px_color-mix(in_srgb,black_55%,transparent),0_0_12px_color-mix(in_srgb,var(--accent)_18%,transparent)]';
 
 function PhysiqueMiniCharts({
   checkIns,
@@ -1441,7 +1429,7 @@ function TodaySchedule({
             <div
               aria-hidden
               className={cn(
-                DASHBOARD_PEEK_SKIN,
+                PLAN_DAY_PEEK_SKIN,
                 'pointer-events-none fixed z-[90] w-max max-w-[min(calc(100vw-2rem),16rem)] -translate-x-1/2 -translate-y-[calc(100%+6px)]',
               )}
               style={{ left: schedulePeek.left, top: schedulePeek.top }}
@@ -1771,142 +1759,6 @@ function DashboardTrendWindow({
 }
 
 /* ─────────────────────────────────────────────────────────────────────
-   One tab per calendar day in the trend range (session = program cycle for that date)
-───────────────────────────────────────────────────────────────────── */
-function TrendRangeDayTabs({
-  dates,
-  selectedDate,
-  todayStr,
-  program,
-  onSelect,
-}: {
-  dates: string[];
-  selectedDate: string;
-  todayStr: string;
-  program: Program | null;
-  onSelect: (date: string) => void;
-}) {
-  const stripRef = useRef<HTMLDivElement>(null);
-  const [focusDate, setFocusDate] = useState<string | null>(null);
-  const [hoverDate, setHoverDate] = useState<string | null>(null);
-  const peekDate = focusDate !== null ? focusDate : hoverDate;
-
-  const cycleAnchor = program ? (program.startDate ?? todayStr) : null;
-  const cycleLength = program?.cycleLengthDays ?? null;
-
-  return (
-    <div className="flex flex-col gap-2">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[color:var(--text-2)]">
-        Days in range
-      </p>
-      <div ref={stripRef} className="flex w-full min-w-0 gap-1">
-        {dates.map((dateStr) => {
-          const isSelected = dateStr === selectedDate;
-          const isCalendarToday = dateStr === todayStr;
-          const cycleDay =
-            cycleAnchor != null && cycleLength != null
-              ? getCycleDay(cycleAnchor, dateStr, cycleLength)
-              : null;
-          const buttonLabel = cycleDay != null ? String(cycleDay) : formatShortDate(dateStr);
-          const sessForDate =
-            program && cycleDay != null
-              ? findProgramSessionForCycleDay(program.sessions, cycleDay)
-              : undefined;
-          const planKindLine =
-            program == null || cycleDay == null
-              ? null
-              : sessForDate == null
-                ? 'Item type · Rest day'
-                : sessForDate.type === 'lift'
-                  ? 'Item type · Strength'
-                  : sessForDate.type === 'cardio'
-                    ? 'Item type · Cardio / conditioning'
-                    : 'Item type · Recovery';
-          const ariaLabel =
-            cycleDay != null
-              ? `Cycle day ${cycleDay}, ${formatDisplayDate(dateStr)}${isCalendarToday ? ', Today' : ''}${planKindLine ? `, ${planKindLine}` : ''}`
-              : `${formatDisplayDate(dateStr)}${isCalendarToday ? ', Today' : ''}`;
-
-          return (
-            <div
-              key={dateStr}
-              className="relative flex min-w-0 flex-1 basis-0"
-              onMouseEnter={() => setHoverDate(dateStr)}
-              onMouseLeave={(e) => {
-                const rel = e.relatedTarget as Node | null;
-                if (!e.currentTarget.contains(rel)) setHoverDate(null);
-              }}
-            >
-              <button
-                type="button"
-                data-trend-day-tab
-                data-date={dateStr}
-                onClick={() => onSelect(dateStr)}
-                onFocus={() => setFocusDate(dateStr)}
-                onBlur={(e) => {
-                  const rel = e.relatedTarget as HTMLElement | null;
-                  if (rel && stripRef.current?.contains(rel)) {
-                    const next = rel.closest('[data-trend-day-tab]')?.getAttribute('data-date');
-                    if (next) {
-                      setFocusDate(next);
-                      return;
-                    }
-                  }
-                  setFocusDate(null);
-                }}
-                className={cn(
-                  'relative z-10 w-full px-1 py-2 rounded-lg text-xs font-semibold tabular-nums text-center transition-all border truncate sm:px-2',
-                  isSelected
-                    ? 'is-selected text-[color:var(--text-0)]'
-                    : 'border-[color:var(--chrome-border)] text-[color:var(--text-1)] hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]',
-                )}
-                aria-pressed={isSelected}
-                aria-label={ariaLabel}
-              >
-                {buttonLabel}
-              </button>
-              {peekDate === dateStr ? (
-                <div
-                  aria-hidden
-                  className={cn(
-                    DASHBOARD_PEEK_SKIN,
-                    'pointer-events-none absolute bottom-[calc(100%+0.45rem)] left-1/2 z-[80] w-max max-w-[min(calc(100vw-2rem),15rem)] -translate-x-1/2',
-                  )}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[color:var(--text-2)]">
-                      Calendar date
-                    </p>
-                    {isCalendarToday ? (
-                      <span className="shrink-0 rounded border border-[color:color-mix(in_srgb,var(--accent)_48%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_14%,transparent)] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[color:var(--accent)]">
-                        Today
-                      </span>
-                    ) : null}
-                  </div>
-                  <p className="mt-1 text-sm font-semibold leading-snug text-[color:var(--text-0)]">
-                    {formatDisplayDate(dateStr)}
-                  </p>
-                  {cycleDay != null && cycleLength != null ? (
-                    <p className="mt-1 text-[11px] leading-snug text-[color:var(--text-detail)]">
-                      Cycle day {cycleDay} of {cycleLength}
-                    </p>
-                  ) : null}
-                  {planKindLine ? (
-                    <p className="mt-1.5 text-[11px] leading-snug text-[color:var(--text-detail)] border-t border-[color:var(--chrome-border-subtle)] pt-1.5">
-                      {planKindLine}
-                    </p>
-                  ) : null}
-                </div>
-              ) : null}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-/* ─────────────────────────────────────────────────────────────────────
    Main dashboard
 ───────────────────────────────────────────────────────────────────── */
 export default function DashboardPage() {
@@ -2158,7 +2010,7 @@ export default function DashboardPage() {
         />
 
         {trendDateList.length > 0 && (
-          <TrendRangeDayTabs
+          <PlanByDayStrip
             dates={trendDateList}
             selectedDate={selectedTrendDate}
             todayStr={todayStr}

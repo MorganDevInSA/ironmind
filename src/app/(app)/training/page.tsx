@@ -10,12 +10,10 @@ import {
   useSaveWorkoutMediaPreference,
 } from '@/controllers';
 import {
-  cn,
   getCycleDay,
   findProgramSessionForCycleDay,
   today,
   formatDisplayDate,
-  formatShortDate,
   getDaysInRange,
 } from '@/lib/utils';
 import { Dumbbell, Calendar, TrendingUp, History, Activity } from 'lucide-react';
@@ -23,6 +21,7 @@ import Link from 'next/link';
 import { appendMediaGateBypass, postSessionMediaHref } from '@/lib/program-session-routes';
 import { TrainingMediaModal } from '@/components/training/training-media-modal';
 import { ProgramCycleStartControl } from '@/components/training/program-cycle-start-control';
+import { PlanByDayStrip } from '@/components/training/plan-by-day-strip';
 
 export default function TrainingPage() {
   const router = useRouter();
@@ -116,37 +115,15 @@ export default function TrainingPage() {
             </div>
 
             {scheduleDates.length > 0 && (
-              <div className="flex flex-col gap-2 border-t border-[color:var(--chrome-border-subtle)] pt-4">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[color:var(--text-2)]">
-                  Plan by day
-                </p>
-                <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-thin">
-                  {scheduleDates.map((dateStr) => {
-                    const isSelected = dateStr === selectedDate;
-                    const isCalendarToday = dateStr === todayStr;
-                    return (
-                      <button
-                        key={dateStr}
-                        type="button"
-                        onClick={() => setSelectedDate(dateStr)}
-                        className={cn(
-                          'im-tooltip-trigger shrink-0 min-w-[2.75rem] px-2.5 py-2 rounded-lg text-xs font-mono tabular-nums transition-all border',
-                          isSelected
-                            ? 'is-selected text-[color:var(--text-0)]'
-                            : 'border-[color:var(--chrome-border)] text-[color:var(--text-1)] hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]',
-                        )}
-                        aria-pressed={isSelected}
-                        data-tooltip={
-                          isCalendarToday
-                            ? `Today · ${formatDisplayDate(dateStr)}`
-                            : formatDisplayDate(dateStr)
-                        }
-                      >
-                        {formatShortDate(dateStr)}
-                      </button>
-                    );
-                  })}
-                </div>
+              <div className="border-t border-[color:var(--chrome-border-subtle)] pt-4">
+                <PlanByDayStrip
+                  dates={scheduleDates}
+                  selectedDate={selectedDate}
+                  todayStr={todayStr}
+                  program={program ?? null}
+                  onSelect={setSelectedDate}
+                  sectionLabel="Plan by day"
+                />
               </div>
             )}
 
