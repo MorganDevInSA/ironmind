@@ -536,6 +536,7 @@ Minimum touch target size: **44×44px** on mobile.
 - **Z-index:** give portaled peeks a **`fixed` z-index** above normal page content and other overlays (sidebar rail uses **`z-[160]`**) so they are not occluded by the main shell or modals at `z-[80]`.
 - **Width / layout / border:** caption peeks use **`globals.css`** **`.sidebar-rail-peek-panel`** / **`.plan-day-strip-peek-panel`** — **216px** locked (`width` / `min` / `max`), **2px** theme **`border-color`** (same **62%** accent mix as `.nav-item.active`), not Tailwind arbitrary border classes on the node. Hint lines **wrap** (`break-words` / `leading-snug`). **Centered** copy (`text-center` on the peek root).
 - **Expand/collapse button:** short **`aria-label`** only (`Expand sidebar` / `Collapse sidebar`); skip an extra decorative hover card so it does not compete with nav peeks.
+- **Logo:** **`IronmindLogo`** uses **`alt="IRONMIND"`** on the image; navigation semantics stay on **`Link`** / buttons — the mark is branding only. Combined lockup vs theme shields: see **`ironmind-visual-persona`** / **`LOGO-BRIEF`**.
 
 Reference: [`src/components/layout/sidebar.tsx`](../../../src/components/layout/sidebar.tsx).
 

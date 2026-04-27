@@ -87,6 +87,7 @@ Review every page / screen / component for:
 - Scroll fatigue
 - Redundant steps
 - **Collapsed sidebar:** icon rail should expose **title + short hint** on hover/focus without duplicating SR strings (decorative peek + `aria-label` on the link); peeks must **not** clip under the main column — use **portal + fixed** + shared **caption peek** sizing (**`PEEK_CAPTION_PANEL_SKIN`**, **216px** layout class in `globals.css`) aligned with **plan-by-day** strip peeks (see `sidebar.tsx`, `plan-by-day-strip.tsx`, **ironmind-a11y**)
+- **Sidebar brand mark:** **`IronmindLogo`** must use the **combined** lockup (**`logoCombined`**, same as login) — not the theme shield assets; keep the rail uncluttered — sizing is owned by **`ironmind-logo.tsx`** (see **LOGO-BRIEF**)
 - **Data-dense tables:** avoid **redundant hover cards** that repeat columns already on screen
 
 Always identify what feels “off” even if technically functional.

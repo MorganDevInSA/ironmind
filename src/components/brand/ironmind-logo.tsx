@@ -5,11 +5,7 @@ import { cn } from '@/lib/utils';
 import { brandAssets } from '@/lib/constants/brand-assets';
 import { useUIStore } from '@/stores';
 
-export type IronmindLogoVariant =
-  | 'sidebar-expanded'
-  | 'sidebar-collapsed'
-  | 'auth'
-  | 'topbar';
+export type IronmindLogoVariant = 'sidebar-expanded' | 'sidebar-collapsed' | 'auth' | 'topbar';
 
 /** Keep object-position neutral — mixed object-* utilities only apply one axis and can frame empty canvas. */
 export function IronmindLogo({
@@ -20,17 +16,23 @@ export function IronmindLogo({
   variant: IronmindLogoVariant;
   className?: string;
   priority?: boolean;
-}) {  
+}) {
   const theme = useUIStore((s) => s.theme);
 
-  const src =
-    theme === 'hot-pink' ? brandAssets.logoFemale : brandAssets.logoMale;
+  /** Sidebar rail uses the same combined lockup as `/login` (landscape PNG), not theme male/female shields. */
+  const useCombinedMark = variant === 'sidebar-expanded' || variant === 'sidebar-collapsed';
+
+  const src = useCombinedMark
+    ? brandAssets.logoCombined
+    : theme === 'hot-pink'
+      ? brandAssets.logoFemale
+      : brandAssets.logoMale;
 
   const variantClass =
     variant === 'sidebar-expanded'
-      ? 'h-[8rem] w-[8rem] object-contain object-center'
+      ? 'max-h-14 h-auto w-auto max-w-[min(100%,8.75rem)] object-contain object-center'
       : variant === 'sidebar-collapsed'
-        ? 'h-[3rem] w-[3rem] object-contain object-center'
+        ? 'h-[3rem] w-auto max-w-[3.5rem] object-contain object-center'
         : variant === 'topbar'
           ? 'h-12 w-auto max-w-[6.25rem] object-contain object-center'
           : 'mx-auto h-auto max-h-24 w-auto max-w-[min(100%,280px)] object-contain object-center';
@@ -41,8 +43,11 @@ export function IronmindLogo({
       : variant === 'topbar'
         ? '96px'
         : variant === 'sidebar-expanded'
-          ? '104px'
+          ? '(max-width: 240px) 112px, 132px'
           : '48px';
+
+  const intrinsicW = useCombinedMark ? 1536 : 300;
+  const intrinsicH = useCombinedMark ? 1024 : 301;
 
   return (
     <span className="inline-flex items-center justify-center shrink-0 [&>img]:max-h-full">
@@ -50,8 +55,8 @@ export function IronmindLogo({
         key={src}
         src={src}
         alt="IRONMIND"
-        width={300}
-        height={301}
+        width={intrinsicW}
+        height={intrinsicH}
         sizes={sizes}
         priority={priority}
         className={cn(variantClass, className)}

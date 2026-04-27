@@ -89,6 +89,10 @@ the alert bell. Each bar renders 10 segments with:
 - **Per-indicator detail panels**: each bar has its own hover/focus detail modal (no inline titles
   or inline numeric labels in the header row)
 
+### Logo in app chrome
+
+The **desktop sidebar** (expanded and collapsed) renders the **combined** landscape mark (**`logoCombined`**) via **`IronmindLogo`** — the same asset as the **login** hero — so chrome and sign-in stay visually aligned. The **top bar** and **registration** screens use the **theme shield** PNGs (male/female by preset). **Sizing** (max height/width, responsive **`sizes`**) lives in **`src/components/brand/ironmind-logo.tsx`** only; **`Documentation/LOGO-BRIEF.md`** records the inventory and default caps.
+
 ### Smart alerts (top bar)
 
 - **Bell** stays in the header next to the LED stack; styling **dims** when there are no **active** (non-dismissed) alerts.

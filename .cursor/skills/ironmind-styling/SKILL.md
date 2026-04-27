@@ -103,6 +103,15 @@ All classes are defined in `globals.css` and are theme-aware.
 | `.tab-button`        | Tab navigation button                |
 | `.tab-button.active` | Active tab with accent underline     |
 
+### Brand logo (`IronmindLogo`)
+
+| Concern        | Pattern                                                                                                                                                                |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Component**  | **`IronmindLogo`** — variants **`sidebar-expanded`**, **`sidebar-collapsed`**, **`topbar`**, **`auth`**                                                                |
+| **Asset**      | Sidebar → **`brandAssets.logoCombined`**; top bar + register → male/female by theme                                                                                    |
+| **Sizing**     | **Source of truth:** **`src/components/brand/ironmind-logo.tsx`** (max height/width + **`next/image` `sizes`**). Sync **`Documentation/LOGO-BRIEF.md`** when adjusting |
+| **Object fit** | **`object-contain object-center`** — avoid mixing **`object-left`** / **`object-bottom`** (see **LOGO-BRIEF**)                                                         |
+
 ### Utilities
 
 | Class                    | Use                                                                                                                     |

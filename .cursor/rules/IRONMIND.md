@@ -99,6 +99,13 @@ Never use `{isOpen && <div>...</div>}` for expand/collapse — always render the
 - **Shared shell + size:** **`PEEK_CAPTION_PANEL_SKIN`** (`peek-caption.ts`) for fill/blur/shadow/padding; **`.sidebar-rail-peek-panel`** / **`.plan-day-strip-peek-panel`** in `globals.css` for **216px** lock, **centered** copy, intrinsic height, and **theme border** (**2px** `color-mix(in srgb, var(--accent) 62%, transparent)` — same as `.nav-item.active`; define border in CSS, not Tailwind arbitrary utilities on the peek). **Plan-by-day** uses **`plan-by-day-strip-peek-panel`** + same skin.
 - **Expand/collapse control:** icon-only **`aria-label`** (`Expand sidebar` / `Collapse sidebar`) is enough; avoid a second decorative hover flyout on that control (it competed with nav peeks and the same z-index band).
 
+### Brand logo (`IronmindLogo`)
+
+- **Sidebar rail** (expanded + collapsed): **`brandAssets.logoCombined`** — same landscape lockup as **`/login`**, not the theme male/female shield PNGs.
+- **Top bar** + **register**: **`logoMale`** / **`logoFemale`** by theme (**`hot-pink`** → female).
+- **Sizing** is centralized in **`src/components/brand/ironmind-logo.tsx`** (Tailwind max height/width caps + **`next/image` `sizes`**). When changing footprint, update that file and keep **`Documentation/LOGO-BRIEF.md`**, **`Documentation/STYLE-GUIDE.md`** §6, and **`Documentation/ARCHITECTURE.md`** §13.6 aligned.
+- **Object fit:** **`object-contain object-center`** only — do not mix conflicting **`object-*`** utilities (Tailwind applies one axis; wrong combos can frame empty canvas). Full inventory: **`Documentation/LOGO-BRIEF.md`**.
+
 ---
 
 ## Skills Reference

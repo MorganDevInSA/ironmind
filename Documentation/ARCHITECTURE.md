@@ -378,7 +378,7 @@ Persistent layout chrome uses the same **warm dark** token hierarchy as the rest
 
 - **On disk:** All raster logo PNGs live under **`public/brand/`** (male, female, combined mark, Apple touch icon, optional alternate crops).
 - **In code:** **`src/lib/constants/brand-assets.ts`** exports **`brandAssets`** — the only supported way to reference those URLs (`brandAssets.logoMale`, `logoFemale`, `logoCombined`, `appleTouchIcon`, alternates).
-- **Components:** **`IronmindLogo`** (`src/components/brand/ironmind-logo.tsx`) picks male vs female PNG by UI theme (hot-pink → female). **`/login`** uses the **combined** mark directly via `brandAssets.logoCombined`.
+- **Components:** **`IronmindLogo`**: **sidebar** uses **`logoCombined`** (same asset as **`/login`**); **top bar** and **register** use male vs female by theme (hot-pink → female). **`/login`** uses the combined mark directly via **`next/image`** (not required to use **`IronmindLogo`**). Combined raster is **1536×1024**; sizing and responsive **`sizes`** live in **`ironmind-logo.tsx`** (expanded/collapsed caps — do not scatter Tailwind on **`sidebar.tsx`**).
 - **Full asset list and prompts:** **`Documentation/LOGO-BRIEF.md`**.
 
 ### 13.7 Shared selected-state styling

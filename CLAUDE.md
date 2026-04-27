@@ -8,4 +8,6 @@
 
 **App shell — caption peeks:** `peek-caption.ts` (**`PEEK_CAPTION_PANEL_SKIN`**) + `globals.css` layout classes (216px, **accent border in plain CSS** = same 62% mix as `.nav-item.active`, centered). **`sidebar.tsx`** — rail peeks use **`createPortal` + `fixed`** (not in-rail `absolute`); combined **`aria-label`** when collapsed; no duplicate hover card on expand/collapse. **`plan-by-day-strip.tsx`** — same skin above day pills. Dashboard **today’s schedule** table: no redundant row-hover portal. See **ironmind-a11y**, `Documentation/ARCHITECTURE.md` §13.5, `.cursor/rules/IRONMIND.md`.
 
+**Brand logos:** **`IronmindLogo`** — sidebar rail uses **`logoCombined`** (same lockup as **`/login`**); top bar + register use theme shields. Max dimensions and **`next/image` `sizes`** are centralized in **`src/components/brand/ironmind-logo.tsx`**; update **`Documentation/LOGO-BRIEF.md`** when changing footprint. See `.cursor/rules/IRONMIND.md` (Brand logo), **ironmind-visual-persona**, **ironmind-styling**.
+
 **Training day strip vs dashboard:** `useUIStore` **`dashboardTrendSelectedDate`** (persisted) mirrors the dashboard **`PlanByDayStrip`** selection. **`/training`** shows **14 calendar days forward** from that anchor (fallback: today). Changing a pill on Training updates the same store so returning to the dashboard stays aligned.
