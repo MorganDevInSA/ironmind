@@ -127,7 +127,7 @@ export const TRAINING_YOUTUBE_PRESETS: readonly TrainingYouTubePreset[] = [
   },
   {
     id: 'iv-memories',
-    playlistName: 'Memories',
+    playlistName: 'Youth Mix 2000AD',
     summary:
       'Nostalgic, vocal-led tracks with emotional lift—steady enough for controlled hypertrophy, machine work, or cooldown walks while keeping heart rate honest.',
     url: 'https://www.youtube.com/playlist?list=PL3ESu9Aq2zWL1WAkwn_gbKBFXvlBA0S-k',
