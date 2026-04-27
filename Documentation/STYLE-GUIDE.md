@@ -109,6 +109,8 @@ Persistent navigation chrome uses:
 
 Use these in sidebar/topbar/mobile-nav. Do not hardcode cool greys for app rails.
 
+**Collapsed desktop sidebar + plan-by-day strip:** optional **caption peeks** (small caps title + hint line, **centered**) — **border** (**2px**, accent **62%** `color-mix`, same as **`.nav-item.active`**) is defined in **`globals.css`** on **`.sidebar-rail-peek-panel`** / **`.plan-day-strip-peek-panel`** (not Tailwind arbitrary borders). Fill, blur, padding, and shadow live in **`PEEK_CAPTION_PANEL_SKIN`** (`src/lib/constants/peek-caption.ts`). **216px** locked width via those same layout classes. **Sidebar** uses **`createPortal` + `fixed`**; **day strip** uses **`absolute`** above pills. See **`sidebar.tsx`**, **`plan-by-day-strip.tsx`**, **`.cursor/skills/ironmind-a11y/SKILL.md`**.
+
 The top bar includes **stacked Knight Rider LED bars**: readiness + target progress, each with
 its own hover/focus detail panel. Inline metric labels are intentionally removed from the header
 row for cleaner chrome.

@@ -18,14 +18,9 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { useUIStore } from '@/stores';
+import { PEEK_CAPTION_PANEL_SKIN } from '@/lib/constants/peek-caption';
 import { cn } from '@/lib/utils';
 import { IronmindLogo } from '@/components/brand/ironmind-logo';
-
-/** Matches dashboard / plan-strip hover peek chrome (theme accent); slightly stronger glow for rail reads. */
-const SIDEBAR_NAV_PEEK_SKIN =
-  'rounded-lg border border-[color:color-mix(in_srgb,var(--accent)_48%,transparent)] ' +
-  'bg-[color:color-mix(in_srgb,var(--panel-strong)_94%,black_6%)] backdrop-blur-sm ' +
-  'px-3 py-2.5 shadow-[0_12px_32px_color-mix(in_srgb,black_58%,transparent),0_0_18px_color-mix(in_srgb,var(--accent)_22%,transparent)]';
 
 const navItems = [
   {
@@ -190,9 +185,9 @@ export function Sidebar() {
           <div
             aria-hidden
             className={cn(
-              SIDEBAR_NAV_PEEK_SKIN,
+              PEEK_CAPTION_PANEL_SKIN,
               'sidebar-rail-peek-panel',
-              'pointer-events-none fixed z-[160] -translate-y-1/2 text-left',
+              'pointer-events-none fixed z-[160] -translate-y-1/2 text-center',
             )}
             style={{ left: collapsedPeek.left, top: collapsedPeek.top }}
           >

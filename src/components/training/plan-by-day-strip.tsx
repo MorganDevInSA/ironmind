@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react';
 import type { Program } from '@/lib/types';
-import { PEEK_PANEL_FIXED_WIDTH_CLASS } from '@/lib/constants/peek-panels';
+import { PEEK_CAPTION_PANEL_SKIN } from '@/lib/constants/peek-caption';
 import {
   cn,
   findProgramSessionForCycleDay,
@@ -11,11 +11,8 @@ import {
   getCycleDay,
 } from '@/lib/utils';
 
-/** Border / fill / shadow for day-strip and related hover peek panels. */
-export const PLAN_DAY_PEEK_SKIN =
-  'rounded-lg border border-[color:color-mix(in_srgb,var(--accent)_42%,transparent)] ' +
-  'bg-[color:color-mix(in_srgb,var(--panel-strong)_92%,black_8%)] ' +
-  'px-3 py-2.5 shadow-[0_10px_28px_color-mix(in_srgb,black_55%,transparent),0_0_12px_color-mix(in_srgb,var(--accent)_18%,transparent)]';
+/** Alias of `PEEK_CAPTION_PANEL_SKIN` — same peek shell as collapsed sidebar rail. */
+export const PLAN_DAY_PEEK_SKIN = PEEK_CAPTION_PANEL_SKIN;
 
 export type PlanByDayStripProps = {
   dates: string[];
@@ -28,9 +25,8 @@ export type PlanByDayStripProps = {
 };
 
 /**
- * Equal-width day pills with cycle-day labels when a program exists. Hover/focus shows a peek
- * panel (same chrome + fixed width as collapsed sidebar rail): **display date** as title, one
- * hint line (cycle position · session kind · Today when relevant).
+ * Equal-width day pills with cycle-day labels when a program exists. Hover/focus shows the shared
+ * caption peek (`PEEK_CAPTION_PANEL_SKIN` + `.plan-day-strip-peek-panel`): date title + hint line.
  */
 export function PlanByDayStrip({
   dates,
@@ -141,8 +137,8 @@ export function PlanByDayStrip({
                   aria-hidden
                   className={cn(
                     PLAN_DAY_PEEK_SKIN,
-                    PEEK_PANEL_FIXED_WIDTH_CLASS,
-                    'pointer-events-none absolute bottom-[calc(100%+0.45rem)] left-1/2 z-[80] -translate-x-1/2 text-left',
+                    'plan-day-strip-peek-panel',
+                    'pointer-events-none absolute bottom-[calc(100%+0.45rem)] left-1/2 z-[80] -translate-x-1/2 text-center',
                   )}
                 >
                   <span className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">

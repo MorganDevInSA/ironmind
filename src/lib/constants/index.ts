@@ -1,4 +1,4 @@
-export * from './peek-panels';
+export * from './peek-caption';
 export * from './brand-assets';
 export * from './query-keys';
 export * from './stale-times';

@@ -156,6 +156,11 @@ sequences; CSS handles micro-interactions. Neither is used where the other is be
 - Mobile: bottom tab bar with overflow "More" menu exposing all routes
 - Both layouts share the same component tree — no duplicate page implementations
 - Touch targets meet 44px minimum; mobile nav lives in the thumb zone
+- **Caption peeks (collapsed rail + plan-by-day strip):** shared **`PEEK_CAPTION_PANEL_SKIN`**
+  and **`globals.css`** layout (**216px** locked width, centered title + hint). Sidebar uses
+  **portal + fixed** (`sidebar.tsx`) so rail peeks are not clipped by `nav` overflow or painted
+  under the main column; day-strip peeks (`plan-by-day-strip.tsx`) use the same shell **above**
+  pills. Expand/collapse is **icon + short `aria-label`** only (no duplicate hover card)
 
 ### Accessibility
 

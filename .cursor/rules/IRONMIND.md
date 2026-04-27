@@ -92,6 +92,13 @@ All `.glass-panel`, `.glass-panel-strong`, and `.dashboard-overview` elements ha
 Expandable content uses the `.accordion-wrapper` + `.accordion-inner` pattern (CSS grid-row animation).
 Never use `{isOpen && <div>...</div>}` for expand/collapse — always render the accordion wrapper.
 
+### Collapsed sidebar navigation (desktop rail)
+
+- **Decorative peeks** (title + one-line hint beside icons): keep them **`aria-hidden`**; put the combined name on the **`aria-label`** of each nav **`Link`** when the rail is collapsed only (when labels are visible, let visible text be the name).
+- **Implementation:** render those peeks with **`createPortal(..., document.body)`** and **`position: fixed`** from **`getBoundingClientRect()`** — not `absolute`/`left-full` inside **`aside`** or **`nav`**. Reasons: (1) in `(app)/layout.tsx` the **main column follows the sidebar in DOM order** and can **paint over** flyouts that extend past the narrow rail; (2) **`overflow-y: auto`** on `nav` forces effective **horizontal clipping** of outward tooltips per CSS overflow rules.
+- **Shared shell + size:** **`PEEK_CAPTION_PANEL_SKIN`** (`peek-caption.ts`) for fill/blur/shadow/padding; **`.sidebar-rail-peek-panel`** / **`.plan-day-strip-peek-panel`** in `globals.css` for **216px** lock, **centered** copy, intrinsic height, and **theme border** (**2px** `color-mix(in srgb, var(--accent) 62%, transparent)` — same as `.nav-item.active`; define border in CSS, not Tailwind arbitrary utilities on the peek). **Plan-by-day** uses **`plan-by-day-strip-peek-panel`** + same skin.
+- **Expand/collapse control:** icon-only **`aria-label`** (`Expand sidebar` / `Collapse sidebar`) is enough; avoid a second decorative hover flyout on that control (it competed with nav peeks and the same z-index band).
+
 ---
 
 ## Skills Reference

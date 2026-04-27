@@ -222,7 +222,7 @@ and recovery range sliders.
 ### Desktop (> 1024px)
 
 - Multi-column, generous whitespace
-- Persistent sidebar
+- Persistent sidebar; **collapsed rail** shares **caption peek** chrome + **216px** layout class with **plan-by-day** strip (**`PEEK_CAPTION_PANEL_SKIN`** + **`globals.css`** — small-caps title + hint, centered) — **`sidebar.tsx`** / **`ironmind-a11y`** (portal + SR split)
 - Full data visualizations
 - Feel: **Mission control**
 

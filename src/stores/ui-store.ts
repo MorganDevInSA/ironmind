@@ -39,6 +39,10 @@ interface UIState {
   setActiveWorkoutId: (id: string | null) => void;
   startRestTimer: (durationSeconds: number) => void;
   stopRestTimer: () => void;
+
+  /** Dashboard day-strip selection — training page shows the next 14 days starting here. */
+  dashboardTrendSelectedDate: string | null;
+  setDashboardTrendSelectedDate: (date: string) => void;
 }
 
 export const useUIStore = create<UIState>()(
@@ -68,6 +72,9 @@ export const useUIStore = create<UIState>()(
       startRestTimer: (durationSeconds) =>
         set({ restTimerEnd: Date.now() + durationSeconds * 1000 }),
       stopRestTimer: () => set({ restTimerEnd: null }),
+
+      dashboardTrendSelectedDate: null,
+      setDashboardTrendSelectedDate: (date) => set({ dashboardTrendSelectedDate: date }),
     }),
     {
       name: 'ui-storage',
@@ -75,6 +82,7 @@ export const useUIStore = create<UIState>()(
         sidebarOpen: state.sidebarOpen,
         theme: state.theme,
         customAccent: state.customAccent,
+        dashboardTrendSelectedDate: state.dashboardTrendSelectedDate,
       }),
     },
   ),

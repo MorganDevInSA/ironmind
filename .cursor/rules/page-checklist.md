@@ -62,6 +62,12 @@ Every page must pass this checklist before being marked complete.
 - [ ] No 404 links
 - [ ] Back navigation works as expected
 - [ ] Active state shown in nav
+- [ ] **Desktop collapsed rail** (`Sidebar`): optional title+hint peeks use **portal + `fixed`** + **`PEEK_CAPTION_PANEL_SKIN`** + **`.sidebar-rail-peek-panel`** (see `IRONMIND.md` / **ironmind-a11y**); sighted users can see peeks **over** the main column without clip/stack bugs; **plan-by-day** strip peeks match the same shell (**`.plan-day-strip-peek-panel`**)
+- [ ] **Sidebar expand toggle:** accessible **`aria-label`** only — no redundant decorative hover card on the chevron
+
+### Dashboard — today’s schedule (Plan table)
+
+- [ ] **No duplicate row-hover portal** over the schedule table — the table columns (time, type, item, description) are the source of truth; row click may still open detail modal
 
 ### Dashboard — trend day strip (`/dashboard`)
 
@@ -69,6 +75,7 @@ Every page must pass this checklist before being marked complete.
 - [ ] **Week 1 start** control persists **`startDate`** via **`useUpdateProgram`** and invalidates training + dashboard bundle caches after save
 - [ ] Changing the selected date updates **session**, **schedule row** (meals / vitamins / activity from logs), **nutrition**, **recovery**, and **supplements** for that date — use **`useNutritionDay`**, **`useRecoveryEntry`**, **`useSupplementLog`** keyed by selection, not only **`useDashboardData`**’s today bundle fields
 - [ ] **Start workout** / primary logging CTAs remain gated to **calendar today** when product requires it
+- [ ] **Plan-by-day** / days-in-range hover peeks use **`PEEK_CAPTION_PANEL_SKIN`** + **`.plan-day-strip-peek-panel`** (same caption shell + **216px** layout as collapsed sidebar — **ironmind-styling**)
 
 ### Onboarding — coach file import (`StepImportFiles`)
 

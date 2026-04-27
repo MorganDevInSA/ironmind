@@ -1,6 +1,6 @@
 ---
 name: ironmind-styling
-description: Apply IRONMIND UI styling with theme-aware patterns. Use when implementing buttons, cards, panels, badges, typography, data displays, or any UI element. All accent colors use CSS variables for multi-theme support.
+description: Apply IRONMIND UI styling with theme-aware patterns. Use when implementing buttons, cards, panels, badges, typography, data displays, accent-border hover peeks, or any UI element. All accent colors use CSS variables for multi-theme support.
 ---
 
 # IRONMIND UI/UX Styling
@@ -303,6 +303,23 @@ Use `.nav-item` class:
 ```
 
 Native checkbox/radio inputs are globally themed via `accent-color: var(--accent)` in `globals.css` — no extra styling needed.
+
+---
+
+## Accent-border “peek” panels (hover / focus supplements)
+
+**Caption peeks** (dashboard/training **plan-by-day** strip + **collapsed** sidebar rail) share one implementation:
+
+| Piece                                                                       | Location                                                                                                                                                                                                                                                                     |
+| --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Border** (2px solid, accent **62%** mix — matches **`.nav-item.active`**) | **`globals.css`** on **`.sidebar-rail-peek-panel`** / **`.plan-day-strip-peek-panel`** — plain CSS (`border-color: color-mix(...)`) so **`var(--accent)`** always wins; avoid Tailwind arbitrary border utilities on these panels (they could fall back to a light default). |
+| Shell (fill / blur / shadow / `px-3 py-2.5`)                                | **`PEEK_CAPTION_PANEL_SKIN`** in [`src/lib/constants/peek-caption.ts`](../../../src/lib/constants/peek-caption.ts) — **`sidebar.tsx`** + **[`plan-by-day-strip.tsx`](../../../src/components/training/plan-by-day-strip.tsx)** (`PLAN_DAY_PEEK_SKIN` aliases it).            |
+| Rigid width                                                                 | Same globals classes — **`width` / `min-width` / `max-width`: 216px** (`box-sizing: border-box`); intrinsic height from padding + two lines.                                                                                                                                 |
+| Copy alignment                                                              | **`text-center`** on the peek root in both components (title + hint).                                                                                                                                                                                                        |
+
+Shadow / inset stack in **`PEEK_CAPTION_PANEL_SKIN`** follows active-nav lift (**accent 9%** outer glow + hairline insets); border color never lives in the Tailwind string — only in **`globals.css`** next to the layout class.
+
+**Positioning:** peeks that must appear **outside** a scroll container or **over** the main app column (collapsed sidebar rail) use **`createPortal` + `position: fixed`** — not `absolute`/`left-full` inside `overflow-y: auto` or narrow fixed rails (see **ironmind-a11y** shell sidebar section). The **day strip** peek stays **`absolute`** above each pill (sufficient within the card); it still uses the **same** skin + layout class as the rail for visual parity.
 
 ---
 

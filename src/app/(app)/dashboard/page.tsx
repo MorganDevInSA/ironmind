@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useId } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/stores';
+import { useAuthStore, useUIStore } from '@/stores';
 import {
   useDashboardData,
   useWorkouts,
@@ -65,7 +65,7 @@ import {
 } from '@/lib/program-session-routes';
 import { TrainingMediaModal } from '@/components/training/training-media-modal';
 import { ProgramCycleStartControl } from '@/components/training/program-cycle-start-control';
-import { PlanByDayStrip, PLAN_DAY_PEEK_SKIN } from '@/components/training/plan-by-day-strip';
+import { PlanByDayStrip } from '@/components/training/plan-by-day-strip';
 import { mortonNutritionPlan } from '@/lib/seed/nutrition';
 import { mortonSupplementProtocol } from '@/lib/seed/supplements';
 import type { NutritionPlanSeed } from '@/lib/seed/nutrition';
@@ -1230,11 +1230,6 @@ function TodaySchedule({
   const protocol = protocolProp ?? mortonSupplementProtocol;
 
   const [selected, setSelected] = useState<ScheduleItem | null>(null);
-  const [schedulePeek, setSchedulePeek] = useState<{
-    index: number;
-    left: number;
-    top: number;
-  } | null>(null);
   const items: ScheduleItem[] = [];
 
   /* — Meals — */
@@ -1294,8 +1289,6 @@ function TodaySchedule({
 
   items.sort((a, b) => a.sortKey - b.sortKey);
 
-  const schedulePeekItem = schedulePeek != null ? (items[schedulePeek.index] ?? null) : null;
-
   return (
     <>
       <div className="glass-panel dashboard-card-surface p-4 col-span-full">
@@ -1338,18 +1331,6 @@ function TodaySchedule({
                   <tr
                     key={i}
                     onClick={() => setSelected(item)}
-                    onMouseEnter={(e) => {
-                      const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
-                      setSchedulePeek({
-                        index: i,
-                        left: r.left + r.width / 2,
-                        top: r.top,
-                      });
-                    }}
-                    onMouseLeave={(e) => {
-                      const rel = e.relatedTarget as Node | null;
-                      if (!(e.currentTarget as HTMLElement).contains(rel)) setSchedulePeek(null);
-                    }}
                     className={cn(
                       'cursor-pointer transition-colors group hover:bg-[color:color-mix(in_srgb,var(--accent)_7%,transparent)]',
                       item.done === true && 'opacity-50',
@@ -1423,56 +1404,6 @@ function TodaySchedule({
           </table>
         </div>
       </div>
-
-      {schedulePeek && schedulePeekItem && typeof document !== 'undefined'
-        ? createPortal(
-            <div
-              aria-hidden
-              className={cn(
-                PLAN_DAY_PEEK_SKIN,
-                'pointer-events-none fixed z-[90] w-max max-w-[min(calc(100vw-2rem),16rem)] -translate-x-1/2 -translate-y-[calc(100%+6px)]',
-              )}
-              style={{ left: schedulePeek.left, top: schedulePeek.top }}
-            >
-              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[color:var(--text-2)]">
-                Item type
-              </p>
-              <p className="mt-0.5 text-xs font-semibold text-[color:var(--text-0)]">
-                {KIND_META[schedulePeekItem.kind].label}
-              </p>
-              {schedulePeekItem.kind === 'activity' && session ? (
-                <p className="mt-1 text-[11px] leading-snug text-[color:var(--text-detail)]">
-                  {session.type === 'lift' && 'Strength'}
-                  {session.type === 'cardio' && 'Cardio / conditioning'}
-                  {session.type === 'recovery' && 'Recovery'}
-                </p>
-              ) : null}
-              <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[color:var(--text-2)]">
-                Time
-              </p>
-              <p className="mt-0.5 text-sm font-semibold tabular-nums text-[color:var(--text-0)]">
-                {schedulePeekItem.time}
-              </p>
-              <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[color:var(--text-2)]">
-                Item
-              </p>
-              <p className="mt-0.5 text-sm font-semibold leading-snug text-[color:var(--text-0)]">
-                {schedulePeekItem.label}
-              </p>
-              {schedulePeekItem.detail ? (
-                <>
-                  <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[color:var(--text-2)]">
-                    Description
-                  </p>
-                  <p className="mt-0.5 text-[13px] leading-snug text-[color:var(--text-detail)]">
-                    {schedulePeekItem.detail}
-                  </p>
-                </>
-              ) : null}
-            </div>,
-            document.body,
-          )
-        : null}
 
       {selected && (
         <ScheduleModal
@@ -1817,6 +1748,7 @@ export default function DashboardPage() {
   );
 
   const [selectedTrendDate, setSelectedTrendDate] = useState(todayStr);
+  const setDashboardTrendSelectedDate = useUIStore((s) => s.setDashboardTrendSelectedDate);
 
   useEffect(() => {
     const from = trendBounds.from;
@@ -1828,6 +1760,10 @@ export default function DashboardPage() {
       return to;
     });
   }, [trendBounds.from, trendBounds.to, todayStr]);
+
+  useEffect(() => {
+    setDashboardTrendSelectedDate(selectedTrendDate);
+  }, [selectedTrendDate, setDashboardTrendSelectedDate]);
 
   const { data: selectedDayNutrition } = useNutritionDay(userId, selectedTrendDate);
   const { data: selectedDayRecovery } = useRecoveryEntry(userId, selectedTrendDate);

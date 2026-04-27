@@ -868,17 +868,22 @@ h4 {
   }
 
   /*
-   * Collapsed sidebar rail — portaled label/hint popover.
-   * Plain px + all three insets so width never tracks text (Tailwind arbitrary min() was not binding reliably).
+   * Caption peeks — collapsed sidebar rail + plan-by-day strip share one box model (must match sidebar visually).
+   * Width −10% vs prior 240px (=216px); height intrinsic from shared skin + two centered lines.
    */
-  .sidebar-rail-peek-panel {
+  .sidebar-rail-peek-panel,
+  .plan-day-strip-peek-panel {
     display: block;
     box-sizing: border-box;
-    width: 240px;
-    min-width: 240px;
-    max-width: 240px;
+    width: 216px;
+    min-width: 216px;
+    max-width: 216px;
     overflow-wrap: anywhere;
     word-break: break-word;
+    /* Same edge as selected collapsed nav (`.nav-item.active`) — not Tailwind arbitrary border (could resolve wrong / read as white). */
+    border-style: solid;
+    border-width: 2px;
+    border-color: color-mix(in srgb, var(--accent) 62%, transparent);
   }
 
   /* Shared selected-state glow used by tabs, cards, and toggles */

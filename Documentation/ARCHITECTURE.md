@@ -141,7 +141,7 @@ flowchart LR
 ### 5.3 Authenticated shell (`src/app/(app)/layout.tsx`)
 
 - **`AuthGuard`** — Subscribes to Firebase auth; unauthenticated users sent to `/login`; unseeded users redirected to `/onboarding` (with offline/graceful handling).
-- **Layout** — Desktop `Sidebar`, `TopBar`, optional-collapsed sidebar margin via `useUIStore`, `MobileNav` fixed bottom on small screens.
+- **Layout** — Desktop `Sidebar`, `TopBar`, optional-collapsed sidebar margin via `useUIStore`, `MobileNav` fixed bottom on small screens. **DOM order:** sidebar wrapper is **before** the main content wrapper; flyouts that extend past the rail into the content band must not rely on in-`aside` absolute positioning alone (see §13.5).
 
 ### 5.4 Page inventory (implemented routes)
 
@@ -168,7 +168,7 @@ Paths below map to `page.tsx` files — **any new `Link` must target one of thes
 ### 6.1 Zustand (`src/stores/`)
 
 - **`auth-store`** — Current Firebase user snapshot, `isAuthenticated`, persisted slice for user identity.
-- **`ui-store`** — Shell UX + theme preferences (`AppTheme`: `crimson`, `hot-pink`, `cobalt`, `forge`, `emerald`, `violet`, `custom` with optional `customAccent`), persisted in local storage; not Firestore server data.
+- **`ui-store`** — Shell UX + theme preferences (`AppTheme`: `crimson`, `hot-pink`, `cobalt`, `forge`, `emerald`, `violet`, `custom` with optional `customAccent`), persisted in local storage; not Firestore server data. Also **`dashboardTrendSelectedDate`**: mirrors the dashboard **`PlanByDayStrip`** active calendar day; **`/training`** builds its **14-day-forward** day strip from this anchor (fallback **today**), and updates the store when the user picks a pill on Training so both pages stay in sync.
 
 Use Zustand for **transient UI and auth identity**, not for Firestore document mirrors (those belong in TanStack Query).
 
@@ -361,7 +361,7 @@ From `.cursor/rules/IRONMIND.md`:
 - **Overview shell:** The authenticated dashboard wraps its primary content in **`.dashboard-overview`** (`globals.css`). It is **horizontally centered** (`max-width` + auto margins) with **rounded corners** (`1.25rem`) and a subtle warm-dark translucent fill. `.dashboard-overview` uses the same panel border system as `.glass-panel`: subtle resting border (6% accent), accent glow on hover/focus-within, 1px border width.
 - **Trend window:** Dashboard charts for training density and physique minis respect a user-selected **date range** (week presets + custom **from–to**) via shared dashboard state. **Week presets (1–4 wk)** run **forward** from **`Program.startDate`** (cycle day 1 anchor), inclusive for `N` calendar days — not backward from today. Custom range is unchanged (explicit from/to). Extend controllers with `enabled` / bounded queries when adding new range-driven widgets.
 - **Trend day strip:** One tab per calendar day in the active trend bounds. **Session** for the selection uses `getCycleDay(program.startDate ?? today, selectedDate, cycleLength)`. **Logged day data** uses the same per-date controller pattern as domain pages: **`useNutritionDay`**, **`useRecoveryEntry`**, **`useSupplementLog`** keyed by the selected `yyyy-MM-dd` (not only the dashboard bundle’s “today” slice). **`useDashboardData`** supplies profile, program, weekly volume, and the initial shell load; it is fetched early enough to feed trend `from`/`to` from **`activeProgram.startDate`**. **Week 1 start** is user-editable (`useUpdateProgram` + `ProgramCycleStartControl` on dashboard and training).
-- **Today's schedule:** Non-workout items (meals, vitamins, activities) use **icon-forward** type chips (accent-themed), not unrelated rainbow pills.
+- **Today's schedule:** Non-workout items (meals, vitamins, activities) use **icon-forward** type chips (accent-themed), not unrelated rainbow pills. **No row-hover duplicate portal** over the plan table — visible columns carry time, type, item, and description; use row **click** for the detail modal when needed.
 - **Ordered exercises:** Row indices use **`.exercise-index-badge`** — **dark tile + primary text + thin accent border**. Avoid **grey-on-saturated-accent** number chips (low contrast); follow **`IRONMIND.md`** and the **ironmind-styling** skill.
 
 ### 13.5 App chrome (header, sidebar, mobile nav)
@@ -370,6 +370,7 @@ Persistent layout chrome uses the same **warm dark** token hierarchy as the rest
 
 - **Tokens** (`globals.css` `:root`): `--chrome-bg` (sidebar & mobile nav, matches `--bg-1`), `--chrome-bg-topbar` (sticky header — **same value as `--chrome-bg`** so header and sidebar share one shade), `--chrome-bg-toggle` (sidebar rail control, matches `--bg-0`).
 - **Components:** `top-bar.tsx`, `sidebar.tsx`, `mobile-nav.tsx` — backgrounds via `bg-[color:var(--chrome-…)]`; idle/hover chrome text via `var(--text-1)` / `var(--text-0)` (see **`.cursor/rules/IRONMIND.md`**).
+- **Collapsed sidebar nav peeks + plan-by-day strip peeks:** Optional **title + hint** for sighted users only — **`aria-hidden`** on the peek, combined **`aria-label`** on each **`Link`** when the rail is icon-only. **Shared UI:** **`PEEK_CAPTION_PANEL_SKIN`** (fill/shadow/padding) + **`globals.css`** layout classes — **`.sidebar-rail-peek-panel`** / **`.plan-day-strip-peek-panel`** (**216px** wide, **theme accent border** via plain CSS `border-color: color-mix(in srgb, var(--accent) 62%, transparent)` matching **`.nav-item.active`**, centered copy; intrinsic height). Sidebar peeks are **`createPortal` → `document.body`** with **`position: fixed`** and **`getBoundingClientRect()`** so they are not clipped by **`nav`**’s vertical scroll or painted under the **main** column (layout sibling order). Day-strip peeks stay **`absolute`** above pills. **Expand/collapse** control: short **`aria-label`** only; no second decorative hover card on the chevron.
 - **LED indicators:** The top bar's Knight Rider-style LED readiness and weight bars replace the old numeric readiness display and profile section. Two synced pulse-animated bars with hover tooltips, themed via accent CSS variables.
 - **Alerts bell:** Persists beside the LEDs; **active** alert count sets accent emphasis / badge; **session dismiss** hides rows client-side without a server write.
 

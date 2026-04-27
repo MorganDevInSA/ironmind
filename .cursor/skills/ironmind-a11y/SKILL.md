@@ -1,6 +1,6 @@
 ---
 name: ironmind-a11y
-description: Implement accessibility patterns for IRONMIND. Use when building interactive components, forms, modals, or any UI that needs keyboard navigation, screen reader support, or focus management.
+description: Implement accessibility patterns for IRONMIND. Use when building interactive components, forms, modals, shell chrome (collapsed sidebar nav peeks, top bar), or any UI that needs keyboard navigation, screen reader support, or focus management.
 ---
 
 # IRONMIND Accessibility Patterns
@@ -523,6 +523,28 @@ Minimum touch target size: **44×44px** on mobile.
 - **Panel:** When open, provide a **Close** control with `aria-label="Close alerts"`; trap focus only if you upgrade to a true modal — today the panel is a lightweight popover.
 - **Rows:** Each alert is a **full-width `<button>`** (keyboard activatable). Clicking dismisses for the **session** only — document that in copy if users confuse it with “fixing” the underlying issue.
 - **Decorative chrome:** Pulse dot and numeric badge can stay **`aria-hidden`** when the label already conveys count; avoid duplicate announcements.
+
+---
+
+## Shell: collapsed desktop sidebar (`sidebar.tsx`)
+
+**Goal:** Sighted users get a **title + one-line hint** beside icon-only nav; screen readers get one **concise `aria-label`** on each link (no duplicate “tooltip” role that isn’t wired with `aria-describedby`).
+
+- **Collapsed rail:** on each **`Link`**, set **`aria-label`** to the nav label and hint in one string when the rail is collapsed (omit when expanded text is visible); mark the visual peek **`aria-hidden`** so assistive tech does not double-speak.
+- **Expanded rail:** omit `aria-label` on links when the text label is visible (visible name is enough).
+- **Peek delivery:** use **`createPortal(..., document.body)`** + **`position: fixed`** + coordinates from **`getBoundingClientRect()`** on hover and on **`focus`/`blur`** of the link (clear peek when the rail expands). Do **not** rely on `absolute left-full` inside **`aside`** / **`nav`**: the **main column** in `src/app/(app)/layout.tsx` is a **later sibling** and can **paint over** flyouts that extend past the 72px rail; **`nav`** with **`overflow-y: auto`** also prevents reliable horizontal overflow for outward tooltips.
+- **Z-index:** give portaled peeks a **`fixed` z-index** above normal page content and other overlays (sidebar rail uses **`z-[160]`**) so they are not occluded by the main shell or modals at `z-[80]`.
+- **Width / layout / border:** caption peeks use **`globals.css`** **`.sidebar-rail-peek-panel`** / **`.plan-day-strip-peek-panel`** — **216px** locked (`width` / `min` / `max`), **2px** theme **`border-color`** (same **62%** accent mix as `.nav-item.active`), not Tailwind arbitrary border classes on the node. Hint lines **wrap** (`break-words` / `leading-snug`). **Centered** copy (`text-center` on the peek root).
+- **Expand/collapse button:** short **`aria-label`** only (`Expand sidebar` / `Collapse sidebar`); skip an extra decorative hover card so it does not compete with nav peeks.
+
+Reference: [`src/components/layout/sidebar.tsx`](../../../src/components/layout/sidebar.tsx).
+
+---
+
+## Decorative hover detail vs redundant information
+
+- If **all** of the “tooltip” text already appears in the **same viewport** (e.g. a data table row), **do not** add a second hover portal that repeats columns — it adds noise and maintenance cost. Prefer **click** (or expand-in-place) for more detail when needed.
+- If you add hover-only chrome, treat it as **supplementary**: **`aria-hidden="true"`** when the primary control already has a correct accessible name, or wire **`aria-describedby`** only when the peek conveys **new** information.
 
 ---
 

@@ -2,8 +2,8 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { format, parseISO, subDays } from 'date-fns';
-import { useAuthStore } from '@/stores';
+import { addDays, format, parseISO } from 'date-fns';
+import { useAuthStore, useUIStore } from '@/stores';
 import {
   useActiveProgram,
   useWorkoutMediaPreference,
@@ -33,15 +33,17 @@ export default function TrainingPage() {
   const { data: savedWorkoutMediaUrl } = useWorkoutMediaPreference(userId);
   const { mutate: saveWorkoutMediaPreference } = useSaveWorkoutMediaPreference(userId);
 
+  const dashboardTrendSelectedDate = useUIStore((s) => s.dashboardTrendSelectedDate);
+  const setDashboardTrendSelectedDate = useUIStore((s) => s.setDashboardTrendSelectedDate);
+
   const todayStr = today();
-  const scheduleFrom = useMemo(
-    () => format(subDays(parseISO(todayStr), 13), 'yyyy-MM-dd'),
-    [todayStr],
+  /** Same anchor as dashboard day strip: first of 14 forward-looking days. */
+  const stripStart = dashboardTrendSelectedDate ?? todayStr;
+  const stripEnd = useMemo(
+    () => format(addDays(parseISO(stripStart), 13), 'yyyy-MM-dd'),
+    [stripStart],
   );
-  const scheduleDates = useMemo(
-    () => getDaysInRange(scheduleFrom, todayStr),
-    [scheduleFrom, todayStr],
-  );
+  const scheduleDates = useMemo(() => getDaysInRange(stripStart, stripEnd), [stripStart, stripEnd]);
 
   const [selectedDate, setSelectedDate] = useState(todayStr);
 
@@ -49,9 +51,12 @@ export default function TrainingPage() {
     if (!scheduleDates.length) return;
     setSelectedDate((cur) => {
       if (scheduleDates.includes(cur)) return cur;
-      return scheduleDates.includes(todayStr) ? todayStr : scheduleDates[scheduleDates.length - 1]!;
+      if (dashboardTrendSelectedDate && scheduleDates.includes(dashboardTrendSelectedDate)) {
+        return dashboardTrendSelectedDate;
+      }
+      return stripStart;
     });
-  }, [scheduleDates, todayStr]);
+  }, [scheduleDates, stripStart, dashboardTrendSelectedDate]);
 
   const cycleDayForSelected =
     program != null
@@ -121,7 +126,10 @@ export default function TrainingPage() {
                   selectedDate={selectedDate}
                   todayStr={todayStr}
                   program={program ?? null}
-                  onSelect={setSelectedDate}
+                  onSelect={(d) => {
+                    setSelectedDate(d);
+                    setDashboardTrendSelectedDate(d);
+                  }}
                   sectionLabel="Plan by day"
                 />
               </div>

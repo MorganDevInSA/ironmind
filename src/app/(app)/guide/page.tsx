@@ -20,8 +20,17 @@ import {
   Eraser,
 } from 'lucide-react';
 import { useAuthStore } from '@/stores';
+import { cn } from '@/lib/utils';
 import { useClearCoachDemoOverlay } from '@/controllers/use-demo-clear';
 import { toast } from 'sonner';
+
+/** Same hover language as the quick-link tiles: accent border + soft accent lift. */
+const GUIDE_PANEL_HOVER =
+  'transition-all duration-200 ease-out ' +
+  'hover:border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)] ' +
+  'hover:shadow-[0_4px_16px_color-mix(in_srgb,var(--accent)_12%,transparent)] ' +
+  'focus-within:border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)] ' +
+  'focus-within:shadow-[0_4px_16px_color-mix(in_srgb,var(--accent)_12%,transparent)]';
 
 // ─── copy button ─────────────────────────────────────────────────────────────
 
@@ -67,8 +76,11 @@ function Section({
 
   return (
     <div
-      className="rounded-[14px] overflow-hidden border border-[rgba(65,50,50,0.40)]
-      bg-[rgba(18,14,14,0.78)] shadow-[0_10px_24px_rgba(0,0,0,0.45)]"
+      className={cn(
+        'rounded-[14px] overflow-hidden border border-[rgba(65,50,50,0.40)]',
+        'bg-[rgba(18,14,14,0.78)] shadow-[0_10px_24px_rgba(0,0,0,0.45)]',
+        GUIDE_PANEL_HOVER,
+      )}
     >
       <button
         onClick={() => setOpen((v) => !v)}
@@ -149,7 +161,13 @@ function Callout({
       'border-[color:color-mix(in_srgb,var(--good)_30%,transparent)] bg-[color:var(--surface-track)] text-[color:var(--good)]',
   };
   return (
-    <div className={`flex items-start gap-3 p-4 rounded-lg border ${palette[color]}`}>
+    <div
+      className={cn(
+        'flex items-start gap-3 p-4 rounded-lg border',
+        palette[color],
+        GUIDE_PANEL_HOVER,
+      )}
+    >
       <Icon size={15} className="shrink-0 mt-0.5" />
       <div className="text-sm text-[color:var(--text-1)] leading-relaxed">{children}</div>
     </div>
@@ -218,10 +236,11 @@ export default function GuidePage() {
             <Link
               key={item.href}
               href={item.href}
-              className="flex flex-col items-center gap-2 p-3 rounded-[12px] text-center
-                bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)]
-                hover:border-[color:color-mix(in_srgb,var(--accent)_30%,transparent)] hover:shadow-[0_4px_16px_color-mix(in_srgb,var(--accent)_12%,transparent)]
-                transition-all duration-200"
+              className={cn(
+                'flex flex-col items-center gap-2 p-3 rounded-[12px] text-center',
+                'bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)]',
+                GUIDE_PANEL_HOVER,
+              )}
             >
               <Icon size={18} className="text-[color:var(--accent)]" />
               <span className="text-[10px] font-semibold uppercase tracking-wide text-[color:var(--text-1)] leading-tight">
@@ -234,8 +253,11 @@ export default function GuidePage() {
 
       {/* Demo data callout — uses active theme accent */}
       <div
-        className="rounded-[14px] border border-[color:color-mix(in_srgb,var(--accent)_32%,transparent)]
-        bg-[rgba(18,14,14,0.78)] p-5 flex flex-col gap-3"
+        className={cn(
+          'rounded-[14px] border border-[color:color-mix(in_srgb,var(--accent)_32%,transparent)]',
+          'bg-[rgba(18,14,14,0.78)] p-5 flex flex-col gap-3 shadow-[0_10px_24px_rgba(0,0,0,0.45)]',
+          GUIDE_PANEL_HOVER,
+        )}
       >
         <div className="flex items-center gap-2">
           <Zap size={16} className="text-[color:var(--accent)] shrink-0" />
@@ -504,8 +526,11 @@ export default function GuidePage() {
           ].map(([name, desc]) => (
             <div
               key={name}
-              className="flex items-start gap-3 p-3 rounded-lg
-              bg-[rgba(8,8,8,0.7)] border border-[rgba(65,50,50,0.25)]"
+              className={cn(
+                'flex items-start gap-3 p-3 rounded-lg',
+                'bg-[rgba(8,8,8,0.7)] border border-[rgba(65,50,50,0.25)]',
+                GUIDE_PANEL_HOVER,
+              )}
             >
               <FileJson size={14} className="text-[color:var(--accent)] mt-0.5 shrink-0" />
               <div className="flex-1 min-w-0">
@@ -616,7 +641,12 @@ export default function GuidePage() {
           </Step>
         </div>
 
-        <div className="rounded-lg border border-[rgba(65,50,50,0.30)] bg-[rgba(8,8,8,0.7)] p-4 flex flex-col gap-2">
+        <div
+          className={cn(
+            'rounded-lg border border-[rgba(65,50,50,0.30)] bg-[rgba(8,8,8,0.7)] p-4 flex flex-col gap-2',
+            GUIDE_PANEL_HOVER,
+          )}
+        >
           <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[color:var(--text-2)]">
             Context Retention Prompt — use when returning to an existing chat
           </p>
@@ -643,8 +673,11 @@ export default function GuidePage() {
 
       {/* ── FAQ ── */}
       <div
-        className="rounded-[14px] p-5 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)]
-        shadow-[0_10px_24px_rgba(0,0,0,0.45)] flex flex-col gap-4"
+        className={cn(
+          'rounded-[14px] p-5 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)]',
+          'shadow-[0_10px_24px_rgba(0,0,0,0.45)] flex flex-col gap-4',
+          GUIDE_PANEL_HOVER,
+        )}
       >
         <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[color:var(--text-2)]">
           Common Questions
