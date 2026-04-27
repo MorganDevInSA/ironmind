@@ -187,21 +187,22 @@ All raster logos live under **`public/brand/`**. Runtime URLs are centralized in
 
 ### Inventory
 
-| File (`public/brand/…`)               | `brandAssets` key      | Typical use                                                                                                |
-| ------------------------------------- | ---------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `ironmind_logo_male.png`              | `logoMale`             | **`IronmindLogo`** when theme ≠ hot-pink (**top bar**, **register**) — not sidebar.                        |
-| `ironmind_logo_female.png`            | `logoFemale`           | **`IronmindLogo`** when theme is hot-pink (**top bar**, **register**).                                     |
-| `ironmind_logo_combined.png`          | `logoCombined`         | **`/login`** hero; **`IronmindLogo`** **sidebar-expanded** / **sidebar-collapsed** (same lockup as login). |
-| `ironmind_transparent_1_reverted.png` | `appleTouchIcon`       | Root layout **`metadata.icons.apple`** (iOS home screen / PWA).                                            |
-| `ironmind_logo_2_top_right.png`       | `alternateTopRight`    | Marketing / optional UI — not wired by default.                                                            |
-| `ironmind_logo_3_bottom_left.png`     | `alternateBottomLeft`  | Same.                                                                                                      |
-| `ironmind_logo_4_bottom_right.png`    | `alternateBottomRight` | Canonical title-style crop reference (768 × 512 px).                                                       |
+| File (`public/brand/…`)               | `brandAssets` key      | Typical use                                                                         |
+| ------------------------------------- | ---------------------- | ----------------------------------------------------------------------------------- |
+| `ironmind_logo_male.png`              | `logoMale`             | **`IronmindLogo`** **`auth`** when theme ≠ hot-pink (**register**).                 |
+| `ironmind_logo_female.png`            | `logoFemale`           | **`IronmindLogo`** **`auth`** when theme is hot-pink (**register**).                |
+| `ironmind_logo_combined.png`          | `logoCombined`         | **`/login`** hero; **`IronmindLogo`** sidebar + **top bar** (same lockup as login). |
+| `ironmind_transparent_1_reverted.png` | `appleTouchIcon`       | Root layout **`metadata.icons.apple`** (iOS home screen / PWA).                     |
+| `ironmind_logo_2_top_right.png`       | `alternateTopRight`    | Marketing / optional UI — not wired by default.                                     |
+| `ironmind_logo_3_bottom_left.png`     | `alternateBottomLeft`  | Same.                                                                               |
+| `ironmind_logo_4_bottom_right.png`    | `alternateBottomRight` | Canonical title-style crop reference (768 × 512 px).                                |
 
 ### UI wiring notes
 
-- **`IronmindLogo`** (`src/components/brand/ironmind-logo.tsx`): **sidebar** uses **`logoCombined`** (same asset as **`/login`**); **top bar** + **register** still use male/female by theme. Uses **`object-contain object-center`** so PNG framing stays visible (avoid chaining `object-left` + `object-bottom` — Tailwind resolves to one axis and can show empty canvas).
+- **`IronmindLogo`** (`src/components/brand/ironmind-logo.tsx`): **sidebar** + **top bar** use **`logoCombined`** (same asset as **`/login`** including mobile header); **register** (**`auth`**) still uses male/female by theme. Uses **`object-contain object-center`** so PNG framing stays visible (avoid chaining `object-left` + `object-bottom` — Tailwind resolves to one axis and can show empty canvas).
 - **Sidebar sizing (current defaults — change only in `ironmind-logo.tsx`):**
   - **Expanded:** `max-h-14` (~3.5rem), `max-w` capped at **8.75rem**, **`sizes`** `(max-width: 240px) 112px, 132px`.
   - **Collapsed:** `h-[3rem]`, `max-w-[3.5rem]`, same combined asset.
+- **Top bar (`variant="topbar"` — desktop + mobile sticky header):** `h-12`, `max-w-[6.25rem]`, **`sizes`** `(max-width: 480px) 72px, 96px`, **`logoCombined`**.
 - **`/login`**: uses **`brandAssets.logoCombined`** directly (`next/image`), not **`IronmindLogo`** — visually matches the sidebar lockup.
 - **OAuth buttons** (Google; Facebook/Microsoft when enabled in UI) use text + icons only — no extra logo files.

@@ -101,8 +101,8 @@ Never use `{isOpen && <div>...</div>}` for expand/collapse — always render the
 
 ### Brand logo (`IronmindLogo`)
 
-- **Sidebar rail** (expanded + collapsed): **`brandAssets.logoCombined`** — same landscape lockup as **`/login`**, not the theme male/female shield PNGs.
-- **Top bar** + **register**: **`logoMale`** / **`logoFemale`** by theme (**`hot-pink`** → female).
+- **Sidebar rail** (expanded + collapsed) **and sticky top bar** (desktop + mobile header): **`brandAssets.logoCombined`** — same landscape lockup as **`/login`**, not the theme male/female shield PNGs.
+- **Register** (`variant="auth"`): **`logoMale`** / **`logoFemale`** by theme (**`hot-pink`** → female).
 - **Sizing** is centralized in **`src/components/brand/ironmind-logo.tsx`** (Tailwind max height/width caps + **`next/image` `sizes`**). When changing footprint, update that file and keep **`Documentation/LOGO-BRIEF.md`**, **`Documentation/STYLE-GUIDE.md`** §6, and **`Documentation/ARCHITECTURE.md`** §13.6 aligned.
 - **Object fit:** **`object-contain object-center`** only — do not mix conflicting **`object-*`** utilities (Tailwind applies one axis; wrong combos can frame empty canvas). Full inventory: **`Documentation/LOGO-BRIEF.md`**.
 

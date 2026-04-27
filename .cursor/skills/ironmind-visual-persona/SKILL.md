@@ -91,10 +91,10 @@ The 3% accent rule holds for _resting_ state; accent is now more visible because
 
 ## Logo and raster marks
 
-- **Sidebar** (expanded + collapsed rail): **`IronmindLogo`** uses **`brandAssets.logoCombined`** — the **1536×1024** landscape lockup, matching the **`/login`** hero. Keeps brand identity consistent in chrome; **do not** substitute the theme male/female shields here.
-- **Top bar** + **auth registration**: **`IronmindLogo`** uses **`logoMale`** / **`logoFemale`** by theme (**`hot-pink`** → female shield).
+- **Sidebar** (expanded + collapsed rail) **and top bar**: **`IronmindLogo`** uses **`brandAssets.logoCombined`** — the **1536×1024** landscape lockup, matching the **`/login`** hero. Keeps mobile header and desktop chrome aligned; **do not** substitute the theme male/female shields here.
+- **Auth registration** (`variant="auth"`): **`logoMale`** / **`logoFemale`** by theme (**`hot-pink`** → female shield).
 - **Paths:** Reference logos only via **`brandAssets`** (`src/lib/constants/brand-assets.ts`). **Do not** hardcode **`public/brand/`** strings in components.
-- **Sizing:** **`IronmindLogo`** variants own max height/width and **`sizes`** in **`src/components/brand/ironmind-logo.tsx`**. Tune rail footprint there — not ad-hoc classes on **`sidebar.tsx`**.
+- **Sizing:** **`IronmindLogo`** variants own max height/width and **`sizes`** in **`src/components/brand/ironmind-logo.tsx`**. Tune chrome footprint there — not ad-hoc classes on **`sidebar.tsx`** or **`top-bar.tsx`**.
 
 ---
 
@@ -262,4 +262,4 @@ Before shipping UI:
 - [ ] Copy is direct and concise
 - [ ] Dark background with proper depth layers
 - [ ] Theme switches correctly if `data-theme` changes
-- [ ] Sidebar chrome uses **`logoCombined`** via **`IronmindLogo`** (not theme shields); sizing tuned only in **`ironmind-logo.tsx`**
+- [ ] Sidebar + top bar use **`logoCombined`** via **`IronmindLogo`** (not theme shields); sizing tuned only in **`ironmind-logo.tsx`**

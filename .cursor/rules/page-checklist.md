@@ -64,7 +64,7 @@ Every page must pass this checklist before being marked complete.
 - [ ] Active state shown in nav
 - [ ] **Desktop collapsed rail** (`Sidebar`): optional title+hint peeks use **portal + `fixed`** + **`PEEK_CAPTION_PANEL_SKIN`** + **`.sidebar-rail-peek-panel`** (see `IRONMIND.md` / **ironmind-a11y**); sighted users can see peeks **over** the main column without clip/stack bugs; **plan-by-day** strip peeks match the same shell (**`.plan-day-strip-peek-panel`**)
 - [ ] **Sidebar expand toggle:** accessible **`aria-label`** only — no redundant decorative hover card on the chevron
-- [ ] **Sidebar logo:** **`IronmindLogo`** + **`logoCombined`** in the rail (same lockup as login); do not swap in theme shields; resize only via **`ironmind-logo.tsx`** (**LOGO-BRIEF**)
+- [ ] **Sidebar + header logo:** **`IronmindLogo`** + **`logoCombined`** in the rail and **`top-bar.tsx`** (same lockup as login); do not swap in theme shields; resize only via **`ironmind-logo.tsx`** (**LOGO-BRIEF**)
 
 ### Dashboard — today’s schedule (Plan table)
 

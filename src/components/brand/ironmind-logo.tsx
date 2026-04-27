@@ -19,8 +19,9 @@ export function IronmindLogo({
 }) {
   const theme = useUIStore((s) => s.theme);
 
-  /** Sidebar rail uses the same combined lockup as `/login` (landscape PNG), not theme male/female shields. */
-  const useCombinedMark = variant === 'sidebar-expanded' || variant === 'sidebar-collapsed';
+  /** App chrome (sidebar + sticky top bar) uses the combined lockup like `/login`; theme shields remain on register (`auth`). */
+  const useCombinedMark =
+    variant === 'sidebar-expanded' || variant === 'sidebar-collapsed' || variant === 'topbar';
 
   const src = useCombinedMark
     ? brandAssets.logoCombined
@@ -41,7 +42,7 @@ export function IronmindLogo({
     variant === 'auth'
       ? '(max-width: 640px) 85vw, 280px'
       : variant === 'topbar'
-        ? '96px'
+        ? '(max-width: 480px) 72px, 96px'
         : variant === 'sidebar-expanded'
           ? '(max-width: 240px) 112px, 132px'
           : '48px';

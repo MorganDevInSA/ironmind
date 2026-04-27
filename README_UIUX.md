@@ -91,7 +91,7 @@ the alert bell. Each bar renders 10 segments with:
 
 ### Logo in app chrome
 
-The **desktop sidebar** (expanded and collapsed) renders the **combined** landscape mark (**`logoCombined`**) via **`IronmindLogo`** — the same asset as the **login** hero — so chrome and sign-in stay visually aligned. The **top bar** and **registration** screens use the **theme shield** PNGs (male/female by preset). **Sizing** (max height/width, responsive **`sizes`**) lives in **`src/components/brand/ironmind-logo.tsx`** only; **`Documentation/LOGO-BRIEF.md`** records the inventory and default caps.
+The **sidebar** (expanded/collapsed) and **sticky top bar** (desktop and mobile header) render the **combined** landscape mark (**`logoCombined`**) via **`IronmindLogo`** — the same asset as the **login** hero. **Registration** (**`IronmindLogo`** **`auth`**) keeps the **theme shield** PNGs (male/female by preset). **Sizing** (max height/width, responsive **`sizes`**) lives in **`src/components/brand/ironmind-logo.tsx`** only; **`Documentation/LOGO-BRIEF.md`** records the inventory and default caps.
 
 ### Smart alerts (top bar)
 
