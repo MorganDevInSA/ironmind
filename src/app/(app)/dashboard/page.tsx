@@ -56,7 +56,14 @@ import { cn } from '@/lib/utils';
 import { consumeDashboardTrendWindowFourWeeksBootstrap } from '@/lib/dashboard-trend-session';
 import { bodyweightForChartKg, measurementForChart } from '@/lib/utils/measurement-bounds';
 import { MEASUREMENT_CHART_SERIES } from '@/lib/constants/measurement-chart-series';
-import type { Workout, NutritionDay, SupplementLog, ProgramSession, CheckIn } from '@/lib/types';
+import type {
+  Workout,
+  NutritionDay,
+  SupplementLog,
+  Program,
+  ProgramSession,
+  CheckIn,
+} from '@/lib/types';
 import {
   appendMediaGateBypass,
   postSessionMediaHref,
@@ -1697,13 +1704,18 @@ function TrendRangeDayTabs({
   dates,
   selectedDate,
   todayStr,
+  program,
   onSelect,
 }: {
   dates: string[];
   selectedDate: string;
   todayStr: string;
+  program: Program | null;
   onSelect: (date: string) => void;
 }) {
+  const cycleAnchor = program ? (program.startDate ?? todayStr) : null;
+  const cycleLength = program?.cycleLengthDays ?? null;
+
   return (
     <div className="flex flex-col gap-2">
       <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[color:var(--text-2)]">
@@ -1713,26 +1725,64 @@ function TrendRangeDayTabs({
         {dates.map((dateStr) => {
           const isSelected = dateStr === selectedDate;
           const isCalendarToday = dateStr === todayStr;
+          const cycleDay =
+            cycleAnchor != null && cycleLength != null
+              ? getCycleDay(cycleAnchor, dateStr, cycleLength)
+              : null;
+          const buttonLabel = cycleDay != null ? String(cycleDay) : formatShortDate(dateStr);
+          const ariaLabel =
+            cycleDay != null
+              ? `Cycle day ${cycleDay}, ${formatDisplayDate(dateStr)}${isCalendarToday ? ', Today' : ''}`
+              : `${formatDisplayDate(dateStr)}${isCalendarToday ? ', Today' : ''}`;
+
           return (
-            <button
-              key={dateStr}
-              type="button"
-              onClick={() => onSelect(dateStr)}
-              className={cn(
-                'im-tooltip-trigger flex-1 min-w-0 basis-0 px-1 py-2 rounded-lg text-xs tabular-nums text-center transition-all border truncate sm:px-2',
-                isSelected
-                  ? 'is-selected text-[color:var(--text-0)]'
-                  : 'border-[color:var(--chrome-border)] text-[color:var(--text-1)] hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]',
-              )}
-              aria-pressed={isSelected}
-              data-tooltip={
-                isCalendarToday
-                  ? `Today · ${formatDisplayDate(dateStr)}`
-                  : formatDisplayDate(dateStr)
-              }
-            >
-              {formatShortDate(dateStr)}
-            </button>
+            <div key={dateStr} className="group relative flex min-w-0 flex-1 basis-0">
+              <button
+                type="button"
+                onClick={() => onSelect(dateStr)}
+                className={cn(
+                  'relative z-10 w-full px-1 py-2 rounded-lg text-xs font-semibold tabular-nums text-center transition-all border truncate sm:px-2',
+                  isSelected
+                    ? 'is-selected text-[color:var(--text-0)]'
+                    : 'border-[color:var(--chrome-border)] text-[color:var(--text-1)] hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]',
+                )}
+                aria-pressed={isSelected}
+                aria-label={ariaLabel}
+              >
+                {buttonLabel}
+              </button>
+              {/* Visual only — aria-label on button carries the same facts for SR */}
+              <div
+                aria-hidden
+                className={cn(
+                  'pointer-events-none absolute bottom-[calc(100%+0.45rem)] left-1/2 z-[80] w-max max-w-[min(calc(100vw-2rem),15rem)] -translate-x-1/2 rounded-lg border px-3 py-2.5',
+                  'border-[color:color-mix(in_srgb,var(--accent)_42%,transparent)]',
+                  'bg-[color:color-mix(in_srgb,var(--panel-strong)_92%,black_8%)]',
+                  'shadow-[0_10px_28px_color-mix(in_srgb,black_55%,transparent),0_0_12px_color-mix(in_srgb,var(--accent)_18%,transparent)]',
+                  'opacity-0 transition-opacity duration-150 ease-out',
+                  'group-hover:opacity-100 group-focus-within:opacity-100',
+                )}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[color:var(--text-2)]">
+                    Calendar date
+                  </p>
+                  {isCalendarToday ? (
+                    <span className="shrink-0 rounded border border-[color:color-mix(in_srgb,var(--accent)_48%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_14%,transparent)] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[color:var(--accent)]">
+                      Today
+                    </span>
+                  ) : null}
+                </div>
+                <p className="mt-1 text-sm font-semibold leading-snug text-[color:var(--text-0)]">
+                  {formatDisplayDate(dateStr)}
+                </p>
+                {cycleDay != null && cycleLength != null ? (
+                  <p className="mt-1 text-[11px] leading-snug text-[color:var(--text-detail)]">
+                    Cycle day {cycleDay} of {cycleLength}
+                  </p>
+                ) : null}
+              </div>
+            </div>
           );
         })}
       </div>
@@ -1996,6 +2046,7 @@ export default function DashboardPage() {
             dates={trendDateList}
             selectedDate={selectedTrendDate}
             todayStr={todayStr}
+            program={activeProgram ?? null}
             onSelect={setSelectedTrendDate}
           />
         )}
