@@ -22,6 +22,7 @@ import { Dumbbell, Calendar, TrendingUp, History, Activity } from 'lucide-react'
 import Link from 'next/link';
 import { appendMediaGateBypass, postSessionMediaHref } from '@/lib/program-session-routes';
 import { TrainingMediaModal } from '@/components/training/training-media-modal';
+import { ProgramCycleStartControl } from '@/components/training/program-cycle-start-control';
 
 export default function TrainingPage() {
   const router = useRouter();
@@ -87,6 +88,14 @@ export default function TrainingPage() {
 
       <div className="space-y-4">
         <div className="glass-panel p-5">
+          {program ? (
+            <ProgramCycleStartControl
+              userId={userId}
+              program={program}
+              todayStr={todayStr}
+              className="mb-4"
+            />
+          ) : null}
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-[color-mix(in srgb,var(--accent) 10%,transparent0.1)] flex items-center justify-center">

@@ -309,11 +309,11 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
       <div className="flex flex-col items-center justify-center min-h-[60vh] py-4">
         <div
           className="rounded-[14px] p-10 max-w-md w-full text-center space-y-6
-          bg-[rgba(18,14,14,0.94)] border border-[rgba(65,50,50,0.40)]
-          shadow-[0_16px_40px_rgba(0,0,0,0.60)]"
+          bg-[color:var(--panel-strong)] border border-[color:var(--chrome-border)]
+          shadow-[var(--shadow-strong)]"
         >
           <div className="w-16 h-16 rounded-full bg-[color:color-mix(in_srgb,var(--accent)_15%,transparent)] border border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)] flex items-center justify-center mx-auto">
-            <CheckCircle2 size={32} className="text-[color:var(--accent-light)]" />
+            <CheckCircle2 size={32} className="text-[color:var(--accent)]" />
           </div>
           <div>
             <h2 className="text-2xl font-bold text-[color:var(--text-0)] mb-2">
@@ -325,7 +325,7 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
             onClick={() => router.push('/dashboard')}
             className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-white
               bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-2)] border border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]
-              shadow-[0_12px_22px_color-mix(in srgb, var(--accent) 25%, transparent)]
+              shadow-[0_12px_22px_color-mix(in_srgb,var(--accent)_25%,transparent)]
               hover:brightness-110 active:scale-95 transition-all duration-200"
           >
             Go to Dashboard <ArrowRight size={18} />
@@ -360,8 +360,8 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
         ) : null}
 
         <div
-          className="rounded-[14px] p-6 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)]
-          shadow-[0_10px_24px_rgba(0,0,0,0.45)] flex flex-col gap-3"
+          className="rounded-[14px] p-6 bg-[color:var(--panel)] border border-[color:var(--chrome-border)]
+          shadow-[var(--shadow-soft)] flex flex-col gap-3"
         >
           {p && (
             <>
@@ -406,7 +406,7 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
               type="checkbox"
               checked={overwriteExistingData}
               onChange={(e) => setOverwriteExistingData(e.target.checked)}
-              className="mt-1 rounded border-[rgba(65,50,50,0.5)]"
+              className="mt-1 rounded border-[color:var(--chrome-border)]"
               style={{ accentColor: 'var(--accent)' }}
             />
             <span className="text-sm text-[color:var(--text-0)]">
@@ -427,10 +427,7 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
               setOverwriteExistingData(false);
               setSubStep('upload');
             }}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm text-[color:var(--text-1)]
-              bg-[rgba(22,16,16,0.9)] border border-[rgba(65,50,50,0.45)]
-              hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]
-              active:scale-95 transition-all duration-200"
+            className="btn-secondary flex items-center gap-2 px-5 py-2.5"
           >
             <RotateCcw size={16} /> Back
           </button>
@@ -461,7 +458,7 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
         </div>
 
         {importResult && !importResult.success && (
-          <p className="text-sm text-[color:var(--accent-light)]">{importResult.message}</p>
+          <p className="text-sm text-[color:var(--bad)]">{importResult.message}</p>
         )}
       </div>
     );
@@ -559,9 +556,9 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
               />
               <div className="shrink-0">
                 {state.status === 'loaded' ? (
-                  <CheckCircle2 size={22} className="text-[color:var(--accent-light)]" />
+                  <CheckCircle2 size={22} className="text-[color:var(--accent)]" />
                 ) : state.status === 'error' ? (
-                  <XCircle size={22} className="text-[color:var(--accent-light)]" />
+                  <XCircle size={22} className="text-[color:var(--bad)]" />
                 ) : (
                   <FileJson size={22} className="text-[color:var(--text-2)]" />
                 )}
@@ -576,9 +573,9 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
                 className={cn(
                   'shrink-0 text-xs font-bold uppercase tracking-wider',
                   state.status === 'loaded'
-                    ? 'text-[color:var(--accent-light)]'
+                    ? 'text-[color:var(--accent)]'
                     : state.status === 'error'
-                      ? 'text-[color:var(--accent-light)]'
+                      ? 'text-[color:var(--bad)]'
                       : 'text-[color:var(--text-2)]',
                 )}
               >
@@ -592,12 +589,13 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
       {/* CTAs */}
       <div className="flex flex-col gap-3 pb-4">
         <button
+          type="button"
           onClick={handleReview}
           disabled={!hasSelection}
           className={cn(
             'w-full flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-white',
             'bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-2)] border border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]',
-            'shadow-[0_12px_22px_color-mix(in srgb, var(--accent) 25%, transparent)]',
+            'shadow-[0_12px_22px_color-mix(in_srgb,var(--accent)_25%,transparent)]',
             'hover:brightness-110 active:scale-95 transition-all duration-200',
             !hasSelection && 'opacity-40 cursor-not-allowed',
           )}
@@ -606,17 +604,15 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
         </button>
 
         <div className="flex items-center gap-3">
-          <div className="flex-1 h-px bg-[rgba(65,50,50,0.40)]" />
+          <div className="flex-1 h-px bg-[color:var(--chrome-border)]" />
           <span className="text-xs text-[color:var(--text-2)]">or</span>
-          <div className="flex-1 h-px bg-[rgba(65,50,50,0.40)]" />
+          <div className="flex-1 h-px bg-[color:var(--chrome-border)]" />
         </div>
 
         <button
           onClick={() => setDemoModalOpen(true)}
-          className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm text-[color:var(--text-1)]
-            bg-[rgba(22,16,16,0.9)] border border-[rgba(65,50,50,0.45)]
-            hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]
-            active:scale-95 transition-all duration-200"
+          type="button"
+          className="btn-secondary w-full flex items-center justify-center gap-2 px-6 py-3 text-sm"
         >
           <Users size={15} />
           Choose a demo profile instead
@@ -631,11 +627,9 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
       {/* Back nav */}
       <div className="flex">
         <button
+          type="button"
           onClick={onBack}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm text-[color:var(--text-1)]
-            bg-[rgba(22,16,16,0.9)] border border-[rgba(65,50,50,0.45)]
-            hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]
-            active:scale-95 transition-all duration-200"
+          className="btn-secondary flex items-center gap-2 px-5 py-2.5"
         >
           <ArrowLeft size={15} />
           Back

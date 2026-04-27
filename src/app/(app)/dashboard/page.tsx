@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores';
 import {
   useDashboardData,
-  useRecentWorkouts,
   useWorkouts,
   useCheckIns,
   useNutritionPlan,
@@ -27,7 +26,7 @@ import {
   sortCheckInsChronologicalAsc,
   toDateOnlyKey,
 } from '@/lib/utils';
-import { differenceInCalendarDays, format, parseISO, subDays } from 'date-fns';
+import { addDays, differenceInCalendarDays, format, parseISO } from 'date-fns';
 import {
   Activity,
   Dumbbell,
@@ -65,6 +64,7 @@ import {
   sessionTypeUsesMediaGate,
 } from '@/lib/program-session-routes';
 import { TrainingMediaModal } from '@/components/training/training-media-modal';
+import { ProgramCycleStartControl } from '@/components/training/program-cycle-start-control';
 import { mortonNutritionPlan } from '@/lib/seed/nutrition';
 import { mortonSupplementProtocol } from '@/lib/seed/supplements';
 import type { NutritionPlanSeed } from '@/lib/seed/nutrition';
@@ -1610,8 +1610,10 @@ function DashboardTrendWindow({
         </span>
       </div>
       <p className="text-[10px] text-[color:var(--text-2)] leading-snug">
-        Workouts and the physique chart use this calendar range. The day strip below lists every
-        date in the range — select one to preview that day&apos;s planned session.
+        Workouts and the physique chart use this calendar range. Week presets run{' '}
+        <span className="text-[color:var(--text-1)]">forward from Week 1 start</span> (your program
+        cycle anchor). The day strip lists every date in the range — select one to preview that
+        day&apos;s planned session.
       </p>
 
       <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center lg:gap-x-4 lg:gap-y-2">
@@ -1766,6 +1768,8 @@ export default function DashboardPage() {
 
   const todayStr = today();
 
+  const { profile, activeProgram, weeklyVolume, isLoading } = useDashboardData(userId);
+
   const [trendKind, setTrendKind] = useState<'preset' | 'custom'>('preset');
   const [trendPresetDays, setTrendPresetDays] = useState<TrendPresetDays>(7);
   const [customDraft, setCustomDraft] = useState<{ from: string; to: string }>({
@@ -1787,13 +1791,14 @@ export default function DashboardPage() {
 
   const trendBounds = useMemo(() => {
     if (trendKind === 'preset') {
-      const to = todayStr;
-      const from = format(subDays(parseISO(to), trendPresetDays), 'yyyy-MM-dd');
+      /* Forward from cycle day 1 anchor (program start), not backward from today. */
+      const from = activeProgram?.startDate ?? todayStr;
+      const to = format(addDays(parseISO(from), trendPresetDays - 1), 'yyyy-MM-dd');
       return { from, to };
     }
     if (customApplied) return { ...customApplied };
     return { from: todayStr, to: todayStr };
-  }, [trendKind, trendPresetDays, customApplied, todayStr]);
+  }, [trendKind, trendPresetDays, customApplied, todayStr, activeProgram?.startDate]);
 
   const trendSummary = useMemo(
     () => `${formatDisplayDate(trendBounds.from)} – ${formatDisplayDate(trendBounds.to)}`,
@@ -1813,19 +1818,20 @@ export default function DashboardPage() {
     setSelectedTrendDate((cur) => {
       if (cur >= from && cur <= to) return cur;
       if (todayStr >= from && todayStr <= to) return todayStr;
+      if (todayStr < from) return from;
       return to;
     });
   }, [trendBounds.from, trendBounds.to, todayStr]);
-
-  const { profile, activeProgram, weeklyVolume, isLoading } = useDashboardData(userId);
 
   const { data: selectedDayNutrition } = useNutritionDay(userId, selectedTrendDate);
   const { data: selectedDayRecovery } = useRecoveryEntry(userId, selectedTrendDate);
   const { data: selectedDaySupplements } = useSupplementLog(userId, selectedTrendDate);
 
-  const { data: presetWorkouts } = useRecentWorkouts(userId, trendPresetDays, {
-    enabled: trendKind === 'preset',
-  });
+  const { data: presetWorkouts } = useWorkouts(
+    userId,
+    trendKind === 'preset' ? trendBounds : undefined,
+    { enabled: trendKind === 'preset' },
+  );
   const { data: customWorkouts } = useWorkouts(
     userId,
     trendKind === 'custom' && customApplied ? customApplied : undefined,
@@ -1988,6 +1994,13 @@ export default function DashboardPage() {
           }}
           customError={customError}
           summary={trendSummary}
+        />
+
+        <ProgramCycleStartControl
+          userId={userId}
+          program={activeProgram}
+          todayStr={todayStr}
+          rangeFirstDay={trendBounds.from}
         />
 
         {trendDateList.length > 0 && (

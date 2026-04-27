@@ -9,6 +9,7 @@ import {
   getWorkout,
   createWorkout,
   updateWorkout,
+  updateProgram,
   saveWorkout,
   deleteWorkout,
   getRecentWorkouts,
@@ -17,7 +18,7 @@ import {
   getLastWorkoutYouTubeUrl,
   saveLastWorkoutYouTubeUrl,
 } from '@/services';
-import type { Workout } from '@/lib/types';
+import type { Program, Workout } from '@/lib/types';
 import { onMutationError } from './_shared/on-error';
 import { invalidateDashboardBundle } from './_shared/invalidate-dashboard';
 
@@ -42,6 +43,20 @@ export function useActiveProgram(userId: string) {
     queryFn: () => getActiveProgram(userId),
     staleTime: staleTimes.activeProgram,
     enabled: !!userId,
+  });
+}
+
+export function useUpdateProgram(userId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ programId, updates }: { programId: string; updates: Partial<Program> }) =>
+      updateProgram(userId, programId, updates),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys(userId).training.all });
+      invalidateDashboardBundle(queryClient, userId);
+    },
+    onError: onMutationError,
   });
 }
 

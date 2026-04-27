@@ -55,10 +55,10 @@
   --chrome-border-subtle: rgba(42, 36, 36, 0.72);
   --chrome-border-width: 1px;
 
-  /* ── Text — tinted toward accent-light per theme ── */
+  /* ── Text — neutral hierarchy (avoid dusty rose / pink on default crimson) ── */
   --text-0: #f0f0f0;
-  --text-1: #c08080;
-  --text-2: #8a5454;
+  --text-1: #a8a3a3;
+  --text-2: #6f6a6a;
 
   /* ── Accent — Crimson ────────────────────── */
   --accent: #dc2626;
@@ -551,8 +551,8 @@ h4 {
     border-radius: 0.5rem;
     font-weight: 600;
     color: var(--text-1);
-    background: rgba(22, 16, 16, 0.9);
-    border: 1px solid rgba(65, 50, 50, 0.45);
+    background: var(--surface-well);
+    border: 1px solid var(--chrome-border);
     transition: all 0.2s ease;
   }
 
@@ -606,7 +606,7 @@ h4 {
 
   .btn-ghost:hover {
     color: var(--text-0);
-    background: rgba(22, 16, 16, 0.6);
+    background: color-mix(in srgb, var(--surface-track) 75%, transparent);
   }
 
   .btn-ghost:active {

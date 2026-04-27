@@ -110,6 +110,12 @@ const FILE_VALIDATORS: Record<string, (data: unknown) => string | null> = {
   },
 };
 
+const ISO_CALENDAR_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+function calendarDateOr(value: unknown, fallback: string): string {
+  return typeof value === 'string' && ISO_CALENDAR_DATE.test(value) ? value : fallback;
+}
+
 export function parseAndValidateFiles(files: ImportFile[]): {
   data: ParsedCoachData;
   errors: { filename: string; error: string }[];
@@ -320,7 +326,12 @@ export async function importCoachData(
       if (data.trainingProgram) {
         try {
           const today = new Date().toISOString().split('T')[0];
-          const programWithDate = { ...data.trainingProgram, startDate: today, isActive: true };
+          const programStart = calendarDateOr(data.trainingProgram.startDate, today);
+          const programWithDate = {
+            ...data.trainingProgram,
+            startDate: programStart,
+            isActive: true,
+          };
           let programId: string;
           if (existingPrograms.length === 0) {
             programId = await createProgramImportFirstOnly(userId, programWithDate);
@@ -338,7 +349,8 @@ export async function importCoachData(
       if (data.phase) {
         try {
           const today = new Date().toISOString().split('T')[0];
-          const phaseWithDate = { ...data.phase, startDate: today, isActive: true };
+          const phaseStart = calendarDateOr(data.phase.startDate, today);
+          const phaseWithDate = { ...data.phase, startDate: phaseStart, isActive: true };
           let phaseId: string;
           if (existingPhases.length === 0) {
             phaseId = await createPhaseImportFirstOnly(userId, phaseWithDate);
