@@ -21,14 +21,14 @@ import { IronmindLogo } from '@/components/brand/ironmind-logo';
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/training', label: 'Training', icon: Dumbbell },
-  { href: '/nutrition', label: 'Nutrition', icon: Utensils },
-  { href: '/supplements', label: 'Supplements', icon: Pill },
   { href: '/recovery', label: 'Recovery', icon: Activity },
+  { href: '/nutrition', label: 'Nutrition', icon: Utensils },
+  { href: '/training', label: 'Training', icon: Dumbbell },
+  { href: '/supplements', label: 'Supplements', icon: Pill },
   { href: '/physique', label: 'Physique', icon: User },
   { href: '/export', label: 'Export', icon: Download },
-  { href: '/settings', label: 'Settings', icon: Settings },
   { href: '/guide', label: 'User Guide', icon: BookOpen },
+  { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
 /** All nav labels/icons use theme accent; active row gets weight + glow via classes */

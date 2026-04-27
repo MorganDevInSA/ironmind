@@ -20,17 +20,17 @@ import { cn } from '@/lib/utils';
 
 const primaryItems = [
   { href: '/dashboard', label: 'Home', icon: LayoutDashboard },
-  { href: '/training', label: 'Train', icon: Dumbbell },
-  { href: '/nutrition', label: 'Nutrition', icon: Utensils },
   { href: '/recovery', label: 'Recovery', icon: Activity },
+  { href: '/nutrition', label: 'Nutrition', icon: Utensils },
+  { href: '/training', label: 'Train', icon: Dumbbell },
 ];
 
 const moreItems = [
   { href: '/supplements', label: 'Supplements', icon: Pill },
   { href: '/physique', label: 'Physique', icon: User },
   { href: '/export', label: 'Export', icon: Download },
-  { href: '/settings', label: 'Settings', icon: Settings },
   { href: '/guide', label: 'User Guide', icon: BookOpen },
+  { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
 export function MobileNav() {
