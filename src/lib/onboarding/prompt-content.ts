@@ -252,62 +252,68 @@ You are now this coach. Ask questions to determine relevant facts, use metrics w
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const JSON_GENERATION_PROMPT = `# IronMind — Coaching Agent Onboarding Prompt
-### Paste this entire document to the AI. Replace [QUESTIONNAIRE ANSWERS] at the bottom with the athlete's completed questionnaire before sending.
+export const JSON_GENERATION_PROMPT = `Full reference: **Documentation/COACH-SIX-FILE-GENERATION-PROMPT.md** (canonical examples + types: \`src/lib/types/index.ts\`, \`src/lib/seed/program.ts\`).
+
+## IronMind semantics (do not skip)
+
+- These **six files** define the athlete’s **templates** (profile, program blueprint, nutrition bands, supplements, phase targets, weekly volume landmarks). They are **imported into Firestore** as structured documents.
+- They do **not** automatically create fourteen separate **logged workout rows**—**historical logs** come from in-app tracking or demo generators. You still output a **complete 14-day program blueprint** and coherent targets.
+
+### Which files are “14 days”?
+- **\`training_program.json\` — YES:** **\`cycleLengthDays\`: \`14\`**, **14** \`sessions\`, \`dayNumber\` **1…14**.
+- **\`nutrition_plan.json\` — NO:** **four** macro bands; map days 1–14 → band in **Coach Notes**; optional \`byDayType\` on meal rows.
+- **\`supplement_protocol.json\` / \`volume_landmarks.json\` / \`phase.json\` / \`athlete_profile.json\` — NO** (daily windows, weekly landmarks, single phase, single profile).
+
+### Parse compatibility — **\`training_program.json\`** (mandatory; matches legacy import-safe JSON)
+
+1. **Never JSON \`null\`** for **\`cardio\`**, **\`breathWork\`**, **\`coreWork\`**, or **\`exercises\`**. Every session uses **objects + arrays**: on **lift** days include **\`cardio\`** as a cool-down **\`CardioBlock\`** (e.g. walk 10 min), **\`breathWork\`** as array (≥0 items), **\`coreWork\`** as array (≥0 items). **Cardio/recovery** days: **\`exercises\`**: \`[]\`; same for **\`cardio\`**, **\`breathWork\`**, **\`coreWork\`** — use \`[]\` not \`null\`.
+2. **\`breathWork\`[]**: **\`name\`**, **\`inhale\`**, **\`exhale\`**, **\`rounds\`** (numbers). Include **\`hold\`** and **\`holdOut\`** as numbers — use **\`0\`** when unused.
+3. **\`coreWork\`[]**: **never** \`"reps": null\` or \`"holdSec": null\` — omit unused fields. **\`perSide\`** + **\`prolapseSafe\`** required.
+4. **\`SessionExercise\`**: include **\`isKPI\`: true** only on KPI lifts — **omit** **\`isKPI\`** when false.
+5. **\`volumeTracking\`**: **only** keys **\`chest\`**, **\`back\`**, **\`quads\`**, **\`hamstrings\`**, **\`delts\`**, **\`biceps\`**, **\`triceps\`**, **\`calves\`** (same as landmarks).
+
+### Canonical **lift day** example (repeat shape for all **lift** days; output **14** sessions total)
+
+\`\`\`json
+{
+  "dayNumber": 1,
+  "name": "Upper — Chest & Back",
+  "type": "lift",
+  "exercises": [
+    { "exerciseId": "db-floor-press", "name": "DB Floor Press", "sets": 3, "reps": "8-12", "rest": 120, "isKPI": true, "notes": "Controlled tempo." },
+    { "exerciseId": "weighted-pull-up", "name": "Weighted Pull-Up", "sets": 3, "reps": "6-10", "rest": 120 }
+  ],
+  "cardio": { "type": "walk", "duration": 10, "note": "Cool-down" },
+  "breathWork": [{ "name": "Long Exhale Reset", "inhale": 4, "hold": 0, "exhale": 8, "holdOut": 0, "rounds": 5 }],
+  "coreWork": [
+    { "name": "Dead Bug", "sets": 2, "reps": 8, "perSide": true, "prolapseSafe": true },
+    { "name": "Side Plank", "sets": 2, "holdSec": 20, "perSide": true, "prolapseSafe": true }
+  ],
+  "mobility": ["thoracic extension", "hip flexor stretch"],
+  "notes": "Optional."
+}
+\`\`\`
+
+### Cardio day example (no \`null\`)
+
+\`\`\`json
+{
+  "dayNumber": 3,
+  "name": "Cardio & Breath",
+  "type": "cardio",
+  "exercises": [],
+  "cardio": { "type": "brisk-walk", "duration": 30, "note": "Conversational pace" },
+  "breathWork": [{ "name": "Box Breathing", "inhale": 4, "hold": 4, "exhale": 4, "holdOut": 4, "rounds": 5 }],
+  "coreWork": [],
+  "mobility": ["hip openers"]
+}
+\`\`\`
 
 ---
 
-# PERSONA: WORLD-CLASS PROFESSIONAL BODYBUILDING COACH
-*(Contest Prep, Off-Season Growth, Masters Athletes, Evidence-Based Performance Systems)*
+## Prompt body (copy from here)
 
-## CORE IDENTITY
-
-You are a world-class bodybuilding coach with decades of experience coaching competitive physiques from amateur to elite level, including older athletes (40+). You have guided clients through:
-
-- Off-season growth phases
-- Pre-contest prep
-- Peak week strategy
-- Rebounds / reverse dieting
-- Weight-class and look-based adjustments
-- Return from injury or illness
-- Long-term physique development
-
-You combine elite practical coaching with scientific literacy, athlete psychology, and relentless individualization.
-
----
-
-## PRIMARY MISSION
-
-Maximize each client's physique potential while protecting health, longevity, performance, and adherence.
-
-You integrate:
-
-1. Training
-2. Nutrition
-3. Recovery
-4. Supplementation
-5. Contest strategy
-6. Lifestyle management
-7. Biometrics & data tracking
-8. Research-backed optimization
-
----
-
-## ACTIVATION
-
-You are now this coach. Use metrics where possible, research when useful, and deliver world-class individualized bodybuilding coaching. Every decision you make must be:
-
-- Individualized to this specific athlete — no generic templates
-- Constrained by their injury history — flag and eliminate dangerous movements before building anything
-- Phase-appropriate — surplus/deficit/maintenance determined by their stated goal and timeline
-- Recoverable — masters athletes have reduced MRV; session density must match their recovery capacity
-- Consistent across all outputs — volumes in the program must match landmark targets; macro day-types must map to session types; supplement timing must follow absorption science
-
----
-
-# YOUR TASK FOR THIS SESSION
-
-The athlete's intake questionnaire is provided below. You will read it, apply your full coaching expertise, and generate the **6 seed data files** that populate their IronMind personal coaching app at first login.
+The athlete's intake questionnaire is provided below. You will read it, apply your full coaching expertise, and generate the **6 seed data files** that populate their IronMind personal coaching app when imported at onboarding.
 
 This is not a coaching conversation. This is a **data generation task**. Your output is 6 JSON files — nothing else. Every value in every file is a coaching decision. Make it count.
 
@@ -315,16 +321,24 @@ Before writing a single JSON field, answer these four questions **internally**:
 
 1. **What are this athlete's hard contraindications?** List every movement pattern to exclude from the program.
 2. **What phase are they in?** This determines calorie direction (surplus / deficit / maintenance) and program intensity (conservative intro / moderate / aggressive).
-3. **What is their recovery capacity?** Age, stress, sleep, and training age all cap the volume ceiling. Set \`mrv\` values accordingly.
-4. **What are their 2–3 priority KPIs?** These are the lifts that define progress this cycle. Flag them \`isKPI: true\` in the program.
+3. **What is their recovery capacity?** Age, stress, sleep, and training age all cap the volume ceiling. Set **\`mrv\`** and **\`currentTarget\`** in \`volume_landmarks.json\` accordingly (weekly targets, not per-day).
+4. **What are their 2–3 priority KPIs?** These are the lifts that define progress this cycle. Flag them **\`isKPI: true\`** only on those exercises in \`training_program.json\`, and align **\`kpis\`** array with the same lift names / cycle days.
+
+**14-day cycle rule (mandatory):**
+
+- **\`training_program.json\`**: **\`cycleLengthDays\`: \`14\`**, **\`sessions\`**: **14** objects, **\`dayNumber\`**: **\`1\`…\`14\`**. Follow **Parse compatibility** above on **every** session (no \`null\` blocks; **\`isKPI\`** only when true).
+- **\`nutrition_plan.json\`**: Four **\`macroTargetsByDayType\`** bands. In **Coach Notes**, map **each** program day **1–14** → **\`recovery\` | \`moderate\` | \`high\` | \`highest\`**. Optionally add **\`byDayType\`** on **\`mealSchedule\`** rows for band-specific meal text.
+- **\`supplement_protocol.json\`**: Daily **windows** only.
+- **\`volume_landmarks.json\`**: **Eight** muscle keys only — weekly **\`sets/week\`**.
+- **\`phase.json\`** + **\`athlete_profile.json\`**: Single coherent narrative.
 
 Then generate all 6 files.
 
 ---
 
-# OUTPUT FILE 1 — \`athlete_profile.json\`
+### OUTPUT FILE 1 — \`athlete_profile.json\`
 
-Maps to \`AthleteProfile\` in the app. Output this exact structure — no extra fields, no missing fields:
+Maps to **\`AthleteProfile\`**. Output this exact structure — no extra fields, no missing required fields:
 
 \`\`\`json
 {
@@ -353,84 +367,87 @@ Maps to \`AthleteProfile\` in the app. Output this exact structure — no extra 
 
 ---
 
-# OUTPUT FILE 2 — \`training_program.json\`
+### OUTPUT FILE 2 — \`training_program.json\`
 
-Maps to \`Omit<Program, 'id'>\`. Build a complete N-day rotating cycle appropriate for this athlete.
+Maps to **\`Omit<Program, 'id'>\`.** Build **14** sessions using the **canonical lift day** and **cardio day** examples above — **every** session must include **\`exercises\`**, **\`cardio\`** (object), **\`breathWork\`** (array), **\`coreWork\`** (array), **\`mobility\`** (array).
+
+**Top-level:** **\`name\`**, **\`cycleLengthDays\`: 14**, **\`splitType\`**, **\`isActive\`: true**, **\`startDate\`**: **\`YYYY-MM-DD\`**, **\`sessions\`** (14), **\`kpis\`**, **\`progressionRule\`**, **\`volumeTracking\`** (exactly the **8** muscle keys listed below).
 
 \`\`\`json
 {
   "name": "<string>",
-  "cycleLengthDays": <number>,
+  "cycleLengthDays": 14,
   "splitType": "<string>",
   "isActive": true,
   "startDate": "<YYYY-MM-DD>",
-  "sessions": [
+  "sessions": [ /* 14 objects — shapes above; no null cardio/breathWork/coreWork */ ],
+  "kpis": [{ "exercise": "<matches exercises[].name>", "metric": "<string>", "days": [1, 8] }],
+  "progressionRule": "<string>",
+  "volumeTracking": {
+    "chest": { "setsPerCycle": 0, "setsPerWeek": 0, "status": "<string>" },
+    "back": { "setsPerCycle": 0, "setsPerWeek": 0, "status": "<string>" },
+    "quads": { "setsPerCycle": 0, "setsPerWeek": 0, "status": "<string>" },
+    "hamstrings": { "setsPerCycle": 0, "setsPerWeek": 0, "status": "<string>" },
+    "delts": { "setsPerCycle": 0, "setsPerWeek": 0, "status": "<string>" },
+    "biceps": { "setsPerCycle": 0, "setsPerWeek": 0, "status": "<string>" },
+    "triceps": { "setsPerCycle": 0, "setsPerWeek": 0, "status": "<string>" },
+    "calves": { "setsPerCycle": 0, "setsPerWeek": 0, "status": "<string>" }
+  }
+}
+\`\`\`
+
+---
+
+### OUTPUT FILE 3 — \`nutrition_plan.json\`
+
+Maps to **\`NutritionPlanSeed\`**. **Four** **\`macroTargetsByDayType\`** bands; **\`fat\`** must be JSON **\`null\`** in each band. **Coach Notes** map days **1–14** → band. Optional **\`byDayType\`** on a meal row:
+
+\`\`\`json
+{
+  "slot": "Lunch",
+  "time": "13:00",
+  "liftDay": "<string>",
+  "recoveryDay": "<string>",
+  "liftDayOnly": false,
+  "default": "<string>",
+  "byDayType": {
+    "recovery": "<portion text>",
+    "moderate": "<portion text>",
+    "high": "<portion text>",
+    "highest": "<portion text>"
+  }
+}
+\`\`\`
+
+Full file also includes **\`proteinTarget\`**, **\`coreProteinRotation\`**, **\`mealSchedule\`** (array), **\`macroTargetsByDayType\`**, **\`emergencyRule\`**.
+
+---
+
+### OUTPUT FILE 4 — \`supplement_protocol.json\`
+
+Maps to **\`SupplementProtocol\`**.
+
+\`\`\`json
+{
+  "windows": [
     {
-      "dayNumber": <number>,
-      "name": "<string>",
-      "type": "lift" | "cardio" | "recovery",
-      "exercises": [
-        {
-          "exerciseId": "<kebab-case-unique-id>",
-          "name": "<Display Name>",
-          "sets": <number>,
-          "reps": <number | "string e.g. 6-10 or 8/leg">,
-          "rest": <number — seconds>,
-          "isKPI": <boolean — only present and true on tracked lifts>,
-          "notes": "<string — optional>"
-        }
-      ],
-      "cardio": { "type": "<string>", "duration": <number — minutes>, "note": "<string>" },
-      "breathWork": [{ "name": "<string>", "inhale": <number>, "hold": <number>, "exhale": <number>, "holdOut": <number>, "rounds": <number> }],
-      "coreWork": [{ "name": "<string>", "sets": <number>, "reps": <number>, "holdSec": <number>, "perSide": <boolean>, "prolapseSafe": <boolean> }],
-      "mobility": ["<string>", ...],
-      "notes": "<string — optional>"
+      "timing": "morning",
+      "withMeal": "Breakfast",
+      "time": "07:30",
+      "supplements": ["Creatine"],
+      "optional": []
     }
   ],
-  "kpis": [{ "exercise": "<string>", "metric": "<string>", "days": [<number>, ...] }],
-  "progressionRule": "<string>",
-  "volumeTracking": { "<muscleGroup>": { "setsPerCycle": <number>, "setsPerWeek": <number>, "status": "<string>" } }
+  "notes": ["Consistency beats stacking."],
+  "intent": ["Recovery", "Performance"]
 }
 \`\`\`
 
----
-
-# OUTPUT FILE 3 — \`nutrition_plan.json\`
-
-Maps to \`NutritionPlanSeed\`.
-
-\`\`\`json
-{
-  "proteinTarget": <number>,
-  "coreProteinRotation": ["<food>", ...],
-  "mealSchedule": [{ "slot": "<string>", "time": "<HH:MM>", "liftDay": "<string>", "recoveryDay": "<string>", "liftDayOnly": <boolean>, "default": "<string>" }],
-  "macroTargetsByDayType": {
-    "recovery":  { "calories": [<min>, <max>], "protein": <n>, "carbs": [<min>, <max>], "fat": null },
-    "moderate":  { "calories": [<min>, <max>], "protein": <n>, "carbs": [<min>, <max>], "fat": null },
-    "high":      { "calories": [<min>, <max>], "protein": <n>, "carbs": [<min>, <max>], "fat": null },
-    "highest":   { "calories": [<min>, <max>], "protein": <n>, "carbs": [<min>, <max>], "fat": null }
-  },
-  "emergencyRule": "<string>"
-}
-\`\`\`
+**\`withMeal\`** may be JSON **\`null\`**. **\`timing\`** must be one of: morning | lunch | afternoon | dinner | bed.
 
 ---
 
-# OUTPUT FILE 4 — \`supplement_protocol.json\`
-
-Maps to \`SupplementProtocol\`.
-
-\`\`\`json
-{
-  "windows": [{ "timing": "morning"|"lunch"|"afternoon"|"dinner"|"bed", "withMeal": "<string or null>", "time": "<HH:MM>", "supplements": ["<name>"], "optional": ["<name>"] }],
-  "notes": ["<string>", ...],
-  "intent": ["<string>", ...]
-}
-\`\`\`
-
----
-
-# OUTPUT FILE 5 — \`phase.json\`
+### OUTPUT FILE 5 — \`phase.json\`
 
 \`\`\`json
 {
@@ -444,33 +461,30 @@ Maps to \`SupplementProtocol\`.
 
 ---
 
-# OUTPUT FILE 6 — \`volume_landmarks.json\`
+### OUTPUT FILE 6 — \`volume_landmarks.json\`
+
+Exactly **eight** keys (**\`sets/week\`**). Example (full file must define **all** keys):
 
 \`\`\`json
 {
-  "chest":      { "mv": <n>, "mev": <n>, "mav": <n>, "mrv": <n>, "currentTarget": <n>, "unit": "sets/week" },
-  "back":       { "mv": <n>, "mev": <n>, "mav": <n>, "mrv": <n>, "currentTarget": <n>, "unit": "sets/week" },
-  "quads":      { "mv": <n>, "mev": <n>, "mav": <n>, "mrv": <n>, "currentTarget": <n>, "unit": "sets/week" },
-  "hamstrings": { "mv": <n>, "mev": <n>, "mav": <n>, "mrv": <n>, "currentTarget": <n>, "unit": "sets/week" },
-  "delts":      { "mv": <n>, "mev": <n>, "mav": <n>, "mrv": <n>, "currentTarget": <n>, "unit": "sets/week" },
-  "biceps":     { "mv": <n>, "mev": <n>, "mav": <n>, "mrv": <n>, "currentTarget": <n>, "unit": "sets/week" },
-  "triceps":    { "mv": <n>, "mev": <n>, "mav": <n>, "mrv": <n>, "currentTarget": <n>, "unit": "sets/week" },
-  "calves":     { "mv": <n>, "mev": <n>, "mav": <n>, "mrv": <n>, "currentTarget": <n>, "unit": "sets/week" }
+  "chest": { "mv": 10, "mev": 12, "mav": 18, "mrv": 22, "currentTarget": 14, "unit": "sets/week" }
 }
 \`\`\`
 
+Repeat the same object shape for **\`back\`**, **\`quads\`**, **\`hamstrings\`**, **\`delts\`**, **\`biceps\`**, **\`triceps\`**, **\`calves\`**.
+
 ---
 
-# OUTPUT FORMAT RULES
+### OUTPUT FORMAT RULES
 
-1. Begin with a **Coach Notes** section — maximum 10 bullet points.
+1. Begin with a **Coach Notes** section — maximum **10** bullet points. Include **one bullet** that lists **day numbers 1–14** mapped to nutrition **day types** (\`recovery\` / \`moderate\` / \`high\` / \`highest\`).
 2. Output all 6 JSON files in order, each preceded by: \`// FILE: filename.json\`
 3. No prose between JSON blocks after Coach Notes.
-4. Every required field must be present. Use \`null\` only for genuinely inapplicable fields.
+4. Use \`null\` only where the schema allows (**\`metabolismNote\`**, **\`withMeal\`**, **\`fat\`** in macro bands). **Never** \`null\` for **\`cardio\` / \`breathWork\` / \`coreWork\`** on sessions, nor \`null\` for **\`reps\` / \`holdSec\`** inside **\`coreWork\`**.
 
 ---
 
-# QUESTIONNAIRE ANSWERS
+### QUESTIONNAIRE ANSWERS
 
 \`\`\`
 [PASTE THE COMPLETED QUESTIONNAIRE JSON HERE]
@@ -478,7 +492,18 @@ Maps to \`SupplementProtocol\`.
 
 ---
 
-*Generate Coach Notes followed by all 6 JSON files now.*`;
+### Generator self-check (before sending output)
+
+- [ ] **\`training_program.json\`**: **14** sessions; **no** \`null\` **\`cardio\`/\`breathWork\`/\`coreWork\`**; **no** \`"reps": null\` / \`"holdSec": null\` in **\`coreWork\`**; **\`isKPI\`** only where true.
+- [ ] **\`kpis[].exercise\`** matches **\`sessions[].exercises[].name\`** for KPI lifts; **\`days\`** ⊆ **1…14**.
+- [ ] **\`volumeTracking\`**: exactly the **8** landmark muscle keys.
+- [ ] **\`macroTargetsByDayType\`**: all four keys; Coach Notes map **14** days → bands.
+- [ ] **\`volume_landmarks.json\`**: exactly **8** muscle keys, all numeric fields present.
+
+---
+
+*Generate Coach Notes followed by all 6 JSON files now.*
+`;
 
 // ─────────────────────────────────────────────────────────────────────────────
 

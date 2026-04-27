@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { DemoProfileModal } from '@/components/onboarding/DemoProfileModal';
 import {
@@ -17,7 +17,11 @@ import {
   Zap,
   Download,
   Settings,
+  Eraser,
 } from 'lucide-react';
+import { useAuthStore } from '@/stores';
+import { useClearCoachDemoOverlay } from '@/controllers/use-demo-clear';
+import { toast } from 'sonner';
 
 // ─── copy button ─────────────────────────────────────────────────────────────
 
@@ -156,6 +160,33 @@ function Callout({
 
 export default function GuidePage() {
   const [demoModalOpen, setDemoModalOpen] = useState(false);
+  const [clearDemoConfirmOpen, setClearDemoConfirmOpen] = useState(false);
+  const { user } = useAuthStore();
+  const userId = user?.uid ?? '';
+  const { mutate: clearDemoData, isPending: clearingDemo } = useClearCoachDemoOverlay(userId);
+
+  useEffect(() => {
+    if (!clearDemoConfirmOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !clearingDemo) setClearDemoConfirmOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [clearDemoConfirmOpen, clearingDemo]);
+
+  const confirmClearDemoData = () => {
+    clearDemoData(undefined, {
+      onSuccess: () => {
+        setClearDemoConfirmOpen(false);
+        toast.success(
+          'Demo data cleared. Import your coach files from Settings when you are ready.',
+        );
+      },
+      onError: (err) => {
+        toast.error(err instanceof Error ? err.message : 'Could not clear demo data.');
+      },
+    });
+  };
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 flex flex-col gap-6">
@@ -219,8 +250,9 @@ export default function GuidePage() {
           the 5-step process below to generate your own personalised plan and import it. Your demo
           data is replaced the moment you import your own files.
         </p>
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3">
           <button
+            type="button"
             onClick={() => setDemoModalOpen(true)}
             className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold text-sm text-white
               bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-2)]
@@ -230,6 +262,19 @@ export default function GuidePage() {
           >
             <Zap size={14} />
             Load a demo profile
+          </button>
+          <button
+            type="button"
+            onClick={() => userId && setClearDemoConfirmOpen(true)}
+            disabled={clearingDemo || !userId}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold text-sm text-[color:var(--accent-light)]
+              bg-[rgba(22,16,16,0.9)] border border-[color:color-mix(in_srgb,var(--accent)_38%,transparent)]
+              hover:border-[color:color-mix(in_srgb,var(--accent)_55%,transparent)] hover:bg-[color:color-mix(in_srgb,var(--accent)_10%,transparent)] hover:text-[color:var(--text-0)]
+              active:scale-95 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:color-mix(in_srgb,var(--accent)_50%,transparent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--bg-0)]"
+          >
+            <Eraser size={14} />
+            {clearingDemo ? 'Clearing…' : 'Clear demo data'}
           </button>
           <Link
             href="/settings"
@@ -248,6 +293,74 @@ export default function GuidePage() {
         onClose={() => setDemoModalOpen(false)}
         alreadySeeded
       />
+
+      {clearDemoConfirmOpen ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <button
+            type="button"
+            aria-label="Close clear demo confirmation"
+            disabled={clearingDemo}
+            className="absolute inset-0 bg-[rgba(0,0,0,0.75)] backdrop-blur-sm disabled:pointer-events-none"
+            onClick={() => !clearingDemo && setClearDemoConfirmOpen(false)}
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="guide-clear-demo-title"
+            className="relative z-10 w-full max-w-md rounded-[16px] border border-[rgba(65,50,50,0.50)]
+              bg-[rgba(14,10,10,0.98)] shadow-[0_24px_60px_rgba(0,0,0,0.80)] p-6 flex flex-col gap-4"
+          >
+            <div className="flex items-start gap-3">
+              <div
+                className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center border border-[color:color-mix(in_srgb,var(--accent)_35%,transparent)]
+                bg-[color:color-mix(in_srgb,var(--accent)_12%,transparent)]"
+              >
+                <Eraser size={18} className="text-[color:var(--accent-light)]" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h2
+                  id="guide-clear-demo-title"
+                  className="text-lg font-bold text-[color:var(--text-0)] font-heading tracking-tight"
+                >
+                  Clear demo data?
+                </h2>
+                <p className="mt-2 text-sm text-[color:var(--text-1)] leading-relaxed">
+                  Remove all demo-generated training history, logs, check-ins, and the stored
+                  profile and program? You can load a demo again or import your coach files after.{' '}
+                  <strong className="text-[color:var(--text-0)]">This cannot be undone.</strong>
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-1">
+              <button
+                type="button"
+                disabled={clearingDemo}
+                onClick={() => setClearDemoConfirmOpen(false)}
+                className="px-4 py-2.5 rounded-lg font-semibold text-sm text-[color:var(--text-1)]
+                  bg-[rgba(22,16,16,0.9)] border border-[rgba(65,50,50,0.45)]
+                  hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]
+                  active:scale-[0.98] transition-all duration-200 disabled:opacity-40
+                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgba(14,10,10,0.98)]"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={clearingDemo}
+                onClick={confirmClearDemoData}
+                className="px-4 py-2.5 rounded-lg font-semibold text-sm text-white
+                  bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-2)]
+                  border border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]
+                  shadow-[0_8px_20px_color-mix(in_srgb,var(--accent)_22%,transparent)]
+                  hover:brightness-110 active:scale-[0.98] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed
+                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:color-mix(in_srgb,var(--accent-light)_55%,transparent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[rgba(14,10,10,0.98)]"
+              >
+                {clearingDemo ? 'Clearing…' : 'Clear demo data'}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {/* ── Step 1 ── */}
       <Section icon={Brain} number="01" title="Activate Your AI Coach" defaultOpen>

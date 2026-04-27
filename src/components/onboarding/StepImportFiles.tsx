@@ -110,6 +110,17 @@ function looksLikeVolumeLandmarksData(data: unknown): boolean {
   );
 }
 
+function countSelectedCoachDomains(data: ParsedCoachData): number {
+  let n = 0;
+  if (data.athleteProfile) n++;
+  if (data.trainingProgram) n++;
+  if (data.nutritionPlan) n++;
+  if (data.supplementProtocol) n++;
+  if (data.phase) n++;
+  if (data.volumeLandmarks) n++;
+  return n;
+}
+
 type FileStatus = 'idle' | 'loaded' | 'error';
 interface FileState {
   status: FileStatus;
@@ -219,7 +230,7 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
   );
 
   const loadedCount = Object.values(fileStates).filter((s) => s.status === 'loaded').length;
-  const allLoaded = loadedCount === EXPECTED_FILES.length;
+  const hasSelection = loadedCount > 0;
 
   const handleReview = () => {
     const files: ImportFile[] = EXPECTED_FILES.filter(
@@ -249,10 +260,15 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
       { data: parsedData, force },
       {
         onSuccess: (result) => {
-          if (result.success) {
+          if (result.success && result.filesImported.length > 0) {
+            const n = result.filesImported.length;
+            const list = result.filesImported.join(', ');
             setImportResult({
               success: true,
-              message: `${result.filesImported.length} files imported successfully.`,
+              message:
+                n >= EXPECTED_FILES.length
+                  ? `${n} files imported successfully.`
+                  : `Updated ${n} file${n === 1 ? '' : 's'}: ${list}. Everything else is unchanged.`,
             });
             setSubStep('done');
           } else {
@@ -322,6 +338,8 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
   /* ── Confirm ──────────────────────────────────────────────── */
   if (subStep === 'confirm' && parsedData) {
     const p = parsedData.athleteProfile;
+    const domainCount = countSelectedCoachDomains(parsedData);
+    const isPartialSelection = domainCount < EXPECTED_FILES.length;
     return (
       <div className="flex flex-col gap-7 py-4">
         <div>
@@ -332,6 +350,14 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
             Review Your Plan
           </h2>
         </div>
+
+        {isPartialSelection ? (
+          <p className="text-sm text-[color:var(--text-1)] leading-relaxed rounded-lg border border-[color:color-mix(in_srgb,var(--accent)_28%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_8%,transparent)] px-4 py-3">
+            <strong className="text-[color:var(--text-0)]">Partial import.</strong> Only the domains
+            listed below will be written. Your other IronMind data (anything you did not upload
+            here) stays as-is.
+          </p>
+        ) : null}
 
         <div
           className="rounded-[14px] p-6 bg-[rgba(18,14,14,0.78)] border border-[rgba(65,50,50,0.40)]
@@ -357,6 +383,15 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
               mono
             />
           )}
+          {parsedData.supplementProtocol && (
+            <Row
+              label="Supplement protocol"
+              value={`${parsedData.supplementProtocol.windows.length} timing windows`}
+            />
+          )}
+          {parsedData.phase && (
+            <Row label="Training phase (import)" value={parsedData.phase.name} />
+          )}
           {parsedData.volumeLandmarks && (
             <Row label="Volume landmarks" value="Loaded for all 8 muscle groups" />
           )}
@@ -376,12 +411,12 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
             />
             <span className="text-sm text-[color:var(--text-0)]">
               <span className="font-semibold text-[color:var(--warn)]">
-                Replace existing IronMind data
+                Allow import to update my saved data
               </span>
               {' — '}
-              Your account already has a saved plan. Check this to import this coach pack and set it
-              as your active program (profile, supplements, phase, landmarks, and today&apos;s
-              nutrition targets update accordingly).
+              Required when you already have a plan in IronMind. Applies only to the files you
+              selected above (e.g. a revised nutrition plan); everything you did not upload stays
+              unchanged.
             </span>
           </label>
         )}
@@ -444,7 +479,8 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
           Import Your Data Pack
         </h2>
         <p className="mt-2 text-sm text-[color:var(--text-1)]">
-          Upload the 6 JSON files your AI generated. Works from phone, tablet, or desktop.
+          Upload one or more coach JSON files (full pack is six). Use a partial import to replace
+          just nutrition, program, landmarks, etc. Works from phone, tablet, or desktop.
         </p>
       </div>
 
@@ -478,12 +514,12 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
           <Upload size={24} className="mx-auto text-[color:var(--text-2)]" />
           <p className="text-sm text-[color:var(--text-1)]">
             <span className="font-semibold text-[color:var(--text-0)]">
-              Tap to select all 6 files at once
+              Tap to select files (or all six at once)
             </span>{' '}
             or drag them here
           </p>
           <p className="text-xs text-[color:var(--text-2)]">
-            {loadedCount} / {EXPECTED_FILES.length} loaded
+            {loadedCount} / {EXPECTED_FILES.length} selected for import
           </p>
           <input
             id="bulk-upload"
@@ -557,16 +593,16 @@ export function StepImportFiles({ onBack }: StepImportFilesProps) {
       <div className="flex flex-col gap-3 pb-4">
         <button
           onClick={handleReview}
-          disabled={!allLoaded}
+          disabled={!hasSelection}
           className={cn(
             'w-full flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-white',
             'bg-gradient-to-r from-[color:var(--accent)] to-[color:var(--accent-2)] border border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)]',
             'shadow-[0_12px_22px_color-mix(in srgb, var(--accent) 25%, transparent)]',
             'hover:brightness-110 active:scale-95 transition-all duration-200',
-            !allLoaded && 'opacity-40 cursor-not-allowed',
+            !hasSelection && 'opacity-40 cursor-not-allowed',
           )}
         >
-          Review &amp; Import <ArrowRight size={18} />
+          Review selected <ArrowRight size={18} />
         </button>
 
         <div className="flex items-center gap-3">

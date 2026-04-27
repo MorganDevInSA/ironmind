@@ -10,3 +10,4 @@ export * from './alerts.service';
 export * from './dashboard.service';
 export * from './storage.service';
 export * from './import.service';
+export * from './demo-clear.service';

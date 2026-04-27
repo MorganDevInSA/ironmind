@@ -26,6 +26,7 @@ import {
   createProgramImportFirstOnly,
   createPhaseImportFirstOnly,
 } from './import-firestore-batch';
+import { clearCoachDemoOverlay } from './demo-clear.service';
 
 export interface ImportFile {
   filename: string;
@@ -159,9 +160,24 @@ export function parseAndValidateFiles(files: ImportFile[]): {
  * day + import journal note share one batch. First program / first phase on empty subcollections use
  * a single `batch.set` (skip the multi-doc active-pointer transaction). Force re-import with existing
  * programs/phases still uses `createProgram` + `setActiveProgram` / `createPhase` + `setActivePhase`.
- * `markUserSeeded` runs only when every step succeeds (`errors` empty); partial imports can leave data without the seeded flag.
+ * `markUserSeeded` runs only when every attempted write succeeds (`errors` empty). `ParsedCoachData`
+ * may include any subset of the six files — only those fields are written; other domains are untouched.
+ * When **all six** domains are present in `data`, existing Firestore overlay data is cleared first
+ * (`clearCoachDemoOverlay`) so demo/Morton history cannot persist behind a full coach pack; seeded users
+ * may import a full six-pack without `force` (partial packs still require `force` when already seeded).
  * Each run creates a row in `users/{uid}/importJobs` (`running` → terminal status) for audit and future resume UX.
  */
+export function isCompleteCoachParsedData(data: ParsedCoachData): boolean {
+  return (
+    data.athleteProfile != null &&
+    data.trainingProgram != null &&
+    data.nutritionPlan != null &&
+    data.supplementProtocol != null &&
+    data.phase != null &&
+    data.volumeLandmarks != null
+  );
+}
+
 export async function importCoachData(
   userId: string,
   data: ParsedCoachData,
@@ -172,7 +188,8 @@ export async function importCoachData(
     const errors: { filename: string; error: string }[] = [];
 
     const alreadySeeded = await isUserSeeded(userId);
-    if (alreadySeeded && !force) {
+    const completePack = isCompleteCoachParsedData(data);
+    if (alreadySeeded && !force && !completePack) {
       const blocked: ImportResult = {
         success: false,
         completion: 'blocked',
@@ -180,7 +197,8 @@ export async function importCoachData(
         errors: [
           {
             filename: 'all',
-            error: 'User already has data. Use force re-import from Settings to overwrite.',
+            error:
+              'User already has data. Use force re-import from Settings to overwrite, or import all six coach files at once to replace demo data.',
           },
         ],
       };
@@ -223,6 +241,41 @@ export async function importCoachData(
     };
 
     const artifacts: ImportArtifact[] = [];
+
+    if (completePack) {
+      try {
+        await clearCoachDemoOverlay(userId);
+        logServiceWrite('info', {
+          domain: 'import',
+          operation: 'clearCoachDemoOverlayBeforeFullPack',
+          jobId,
+        });
+      } catch (clearErr) {
+        const errMsg = String(clearErr);
+        await updateDocument<ImportJobRecord>(jobPath, jobId, {
+          status: 'failed',
+          completedAt: new Date().toISOString(),
+          filesImported: [],
+          errors: [
+            { filename: 'all', error: `Failed to clear existing data before import: ${errMsg}` },
+          ],
+        });
+        logServiceWrite('error', {
+          domain: 'import',
+          operation: 'clearCoachDemoOverlayBeforeFullPack',
+          jobId,
+          code: 'throw',
+        });
+        return {
+          success: false,
+          completion: 'failed',
+          filesImported: [],
+          errors: [{ filename: 'all', error: errMsg }],
+          jobId,
+        };
+      }
+    }
+
     const snap = await captureImportSnapshots(userId);
     const [existingPrograms, existingPhases] = await Promise.all([
       getPrograms(userId),
