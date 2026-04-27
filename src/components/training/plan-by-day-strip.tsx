@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import type { Program } from '@/lib/types';
+import { PEEK_PANEL_FIXED_WIDTH_CLASS } from '@/lib/constants/peek-panels';
 import {
   cn,
   findProgramSessionForCycleDay,
@@ -27,8 +28,9 @@ export type PlanByDayStripProps = {
 };
 
 /**
- * Equal-width day pills with cycle-day labels when a program exists, calendar peek on hover/focus,
- * and the same keyboard/mouse peek behavior as the dashboard trend strip.
+ * Equal-width day pills with cycle-day labels when a program exists. Hover/focus shows a peek
+ * panel (same chrome + fixed width as collapsed sidebar rail): **display date** as title, one
+ * hint line (cycle position · session kind · Today when relevant).
  */
 export function PlanByDayStrip({
   dates,
@@ -74,6 +76,23 @@ export function PlanByDayStrip({
                   : sessForDate.type === 'cardio'
                     ? 'Item type · Cardio / conditioning'
                     : 'Item type · Recovery';
+          const peekHintParts: string[] = [];
+          if (cycleDay != null && cycleLength != null) {
+            peekHintParts.push(`Cycle day ${cycleDay} of ${cycleLength}`);
+          }
+          if (program != null && cycleDay != null) {
+            if (sessForDate == null) peekHintParts.push('Rest day');
+            else if (sessForDate.type === 'lift') peekHintParts.push('Strength');
+            else if (sessForDate.type === 'cardio') peekHintParts.push('Cardio / conditioning');
+            else peekHintParts.push('Recovery');
+          }
+          if (isCalendarToday) peekHintParts.push('Today');
+          const peekHint =
+            peekHintParts.length > 0
+              ? peekHintParts.join(' · ')
+              : isCalendarToday
+                ? 'Today in your trend window.'
+                : 'Trend window day.';
           const ariaLabel =
             cycleDay != null
               ? `Cycle day ${cycleDay}, ${formatDisplayDate(dateStr)}${isCalendarToday ? ', Today' : ''}${planKindLine ? `, ${planKindLine}` : ''}`
@@ -122,32 +141,16 @@ export function PlanByDayStrip({
                   aria-hidden
                   className={cn(
                     PLAN_DAY_PEEK_SKIN,
-                    'pointer-events-none absolute bottom-[calc(100%+0.45rem)] left-1/2 z-[80] w-max max-w-[min(calc(100vw-2rem),15rem)] -translate-x-1/2',
+                    PEEK_PANEL_FIXED_WIDTH_CLASS,
+                    'pointer-events-none absolute bottom-[calc(100%+0.45rem)] left-1/2 z-[80] -translate-x-1/2 text-left',
                   )}
                 >
-                  <div className="flex items-start justify-between gap-2">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[color:var(--text-2)]">
-                      Calendar date
-                    </p>
-                    {isCalendarToday ? (
-                      <span className="shrink-0 rounded border border-[color:color-mix(in_srgb,var(--accent)_48%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_14%,transparent)] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[color:var(--accent)]">
-                        Today
-                      </span>
-                    ) : null}
-                  </div>
-                  <p className="mt-1 text-sm font-semibold leading-snug text-[color:var(--text-0)]">
+                  <span className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">
                     {formatDisplayDate(dateStr)}
-                  </p>
-                  {cycleDay != null && cycleLength != null ? (
-                    <p className="mt-1 text-[11px] leading-snug text-[color:var(--text-detail)]">
-                      Cycle day {cycleDay} of {cycleLength}
-                    </p>
-                  ) : null}
-                  {planKindLine ? (
-                    <p className="mt-1.5 text-[11px] leading-snug text-[color:var(--text-detail)] border-t border-[color:var(--chrome-border-subtle)] pt-1.5">
-                      {planKindLine}
-                    </p>
-                  ) : null}
+                  </span>
+                  <span className="mt-1 block text-xs leading-snug text-[color:var(--text-detail)] break-words">
+                    {peekHint}
+                  </span>
                 </div>
               ) : null}
             </div>

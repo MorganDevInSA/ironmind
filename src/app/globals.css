@@ -798,19 +798,20 @@ h4 {
 
   /* --- Navigation ------------------------------------------- */
 
+  /* Expanded: hard max (ex-9rem); min-height + auto height so wrapped labels grow vertically. */
   .nav-item {
     width: 100%;
-    max-width: min(100%, 9rem);
+    max-width: 144px;
     margin-left: auto;
     margin-right: auto;
-    /* was 50px; −10% ≈ 45px */
-    height: 45px;
+    min-height: 45px;
+    height: auto;
     box-sizing: border-box;
     border-radius: 12px;
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 0 10px;
+    padding: 8px 10px;
     border: 1px solid color-mix(in srgb, var(--accent) 38%, transparent);
     background: linear-gradient(180deg, rgba(22, 16, 16, 0.92) 0%, #0a0a0a 100%);
     cursor: pointer;
@@ -818,7 +819,8 @@ h4 {
     transition: all 0.22s ease;
     backdrop-filter: blur(8px);
     position: relative;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: visible;
     box-shadow:
       inset 0px 1px 0 rgba(255, 255, 255, 0.045),
       inset 0px -1px 0 rgba(0, 0, 0, 0.48);
@@ -842,6 +844,41 @@ h4 {
       0px 0px 14px color-mix(in srgb, var(--accent) 9%, transparent),
       inset 0px 1px 0 rgba(255, 255, 255, 0.04),
       inset 0px -1px 0 rgba(0, 0, 0, 0.58);
+  }
+
+  /* Collapsed rail: hard 56px (= w-[72px] − nav horizontal padding) — same every row; height grows only if content needs it. */
+  .nav-item[data-rail='collapsed'] {
+    display: flex;
+    box-sizing: border-box;
+    width: 56px;
+    min-width: 56px;
+    max-width: 56px;
+    min-height: 45px;
+    height: auto;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    border-width: 2px;
+  }
+
+  .nav-item[data-rail='collapsed']:not(.active) {
+    border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+  }
+
+  /*
+   * Collapsed sidebar rail — portaled label/hint popover.
+   * Plain px + all three insets so width never tracks text (Tailwind arbitrary min() was not binding reliably).
+   */
+  .sidebar-rail-peek-panel {
+    display: block;
+    box-sizing: border-box;
+    width: 240px;
+    min-width: 240px;
+    max-width: 240px;
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
 
   /* Shared selected-state glow used by tabs, cards, and toggles */
