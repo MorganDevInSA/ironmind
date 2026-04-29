@@ -37,9 +37,8 @@ export function PlanByDayStrip({
   sectionLabel = 'Days in range',
 }: PlanByDayStripProps) {
   const stripRef = useRef<HTMLDivElement>(null);
-  const [focusDate, setFocusDate] = useState<string | null>(null);
   const [hoverDate, setHoverDate] = useState<string | null>(null);
-  const peekDate = focusDate !== null ? focusDate : hoverDate;
+  const peekDate = hoverDate;
 
   const cycleAnchor = program ? (program.startDate ?? todayStr) : null;
   const cycleLength = program?.cycleLengthDays ?? null;
@@ -49,7 +48,7 @@ export function PlanByDayStrip({
       <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[color:var(--text-2)]">
         {sectionLabel}
       </p>
-      <div ref={stripRef} className="flex w-full min-w-0 gap-1">
+      <div ref={stripRef} className="grid w-full min-w-0 grid-cols-7 gap-1 sm:flex sm:flex-nowrap">
         {dates.map((dateStr) => {
           const isSelected = dateStr === selectedDate;
           const isCalendarToday = dateStr === todayStr;
@@ -97,7 +96,7 @@ export function PlanByDayStrip({
           return (
             <div
               key={dateStr}
-              className="relative flex min-w-0 flex-1 basis-0"
+              className="relative min-w-0 sm:flex sm:flex-1 sm:basis-0"
               onMouseEnter={() => setHoverDate(dateStr)}
               onMouseLeave={(e) => {
                 const rel = e.relatedTarget as Node | null;
@@ -109,18 +108,6 @@ export function PlanByDayStrip({
                 data-day-strip-tab
                 data-date={dateStr}
                 onClick={() => onSelect(dateStr)}
-                onFocus={() => setFocusDate(dateStr)}
-                onBlur={(e) => {
-                  const rel = e.relatedTarget as HTMLElement | null;
-                  if (rel && stripRef.current?.contains(rel)) {
-                    const next = rel.closest('[data-day-strip-tab]')?.getAttribute('data-date');
-                    if (next) {
-                      setFocusDate(next);
-                      return;
-                    }
-                  }
-                  setFocusDate(null);
-                }}
                 className={cn(
                   'relative z-10 w-full px-1 py-2 rounded-lg text-xs font-semibold tabular-nums text-center transition-all border truncate sm:px-2',
                   isSelected

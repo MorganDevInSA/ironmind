@@ -1340,7 +1340,7 @@ function TodaySchedule({
                       {item.time}
                     </td>
                     <td className="py-2.5 pr-4 align-top">
-                      <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-[color:color-mix(in_srgb,var(--accent)_24%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_8%,transparent)] text-[color:var(--text-detail)]">
+                      <span className="inline-flex h-6 w-[6rem] items-center justify-center gap-1.5 rounded-full border border-[color:color-mix(in_srgb,var(--accent)_24%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_8%,transparent)] px-2 py-0.5 text-center text-[10px] font-bold uppercase tracking-wider text-[color:var(--text-detail)]">
                         <meta.icon
                           size={11}
                           className="text-[color:var(--accent-light)]"

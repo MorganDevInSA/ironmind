@@ -330,7 +330,7 @@ export default function WorkoutPage() {
           className={cn(
             'flex items-center gap-1.5 rounded-full border px-3 py-1 font-mono text-sm font-bold tabular-nums',
             started
-              ? 'border-[color:color-mix(in_srgb,var(--good)_38%,transparent)] bg-[color:color-mix(in_srgb,var(--good)_12%,transparent)] text-[color:var(--good)]'
+              ? 'border-[color:color-mix(in_srgb,var(--accent)_42%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_12%,transparent)] text-[color:var(--accent-light)]'
               : 'border-[color:var(--chrome-border)] bg-[color:color-mix(in_srgb,var(--accent)_8%,transparent)] text-[color:var(--text-2)]',
           )}
         >
@@ -390,12 +390,14 @@ export default function WorkoutPage() {
                   className={cn(
                     'flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2',
                     allDone
-                      ? 'border-[color:var(--good)] bg-[color:color-mix(in_srgb,var(--good)_16%,transparent)]'
+                      ? 'border-[color:var(--accent-light)] bg-[color:color-mix(in_srgb,var(--accent)_14%,transparent)]'
                       : 'border-[color:var(--chrome-border)]',
                   )}
                   aria-hidden
                 >
-                  {allDone && <div className="h-2 w-2 rounded-full bg-[color:var(--good)]" />}
+                  {allDone && (
+                    <div className="h-2 w-2 rounded-full bg-[color:var(--accent-light)]" />
+                  )}
                 </div>
 
                 <div className="flex-1 text-left min-w-0">
@@ -451,7 +453,7 @@ export default function WorkoutPage() {
                         className={cn(
                           'grid grid-cols-[2.5rem_1fr_1fr_5rem] items-center gap-2 rounded-lg border p-2 transition-[border-color,box-shadow,background-color]',
                           log.timeStamped
-                            ? 'border-[color:color-mix(in_srgb,var(--good)_38%,transparent)] bg-[color:color-mix(in_srgb,var(--good)_8%,transparent)]'
+                            ? 'border-[color:color-mix(in_srgb,var(--accent)_36%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_8%,transparent)]'
                             : 'border-[color:var(--chrome-border-subtle)] bg-[color:var(--surface-well)] focus-within:border-[color:color-mix(in_srgb,var(--accent)_48%,transparent)] focus-within:shadow-[0_0_0_1px_color-mix(in_srgb,var(--accent)_22%,transparent)]',
                         )}
                       >
@@ -488,11 +490,11 @@ export default function WorkoutPage() {
                           className={cn(
                             'h-8 w-full rounded-lg border font-mono text-xs font-semibold transition-all',
                             log.timeStamped
-                              ? 'border-[color:color-mix(in_srgb,var(--good)_45%,transparent)] bg-[color:color-mix(in_srgb,var(--good)_14%,transparent)] text-[color:var(--good)]'
+                              ? 'border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_14%,transparent)] text-[color:var(--accent-light)]'
                               : 'border-[color:var(--chrome-border)] text-[color:var(--text-2)] hover:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)] hover:text-[color:var(--text-0)]',
                           )}
                         >
-                          {log.timeStamped ?? '—'}
+                          {log.timeStamped ?? 'Start'}
                         </button>
                       </div>
                     ))}
@@ -509,6 +511,98 @@ export default function WorkoutPage() {
           );
         })}
       </div>
+
+      {(session.cardio ||
+        (session.breathWork?.length ?? 0) > 0 ||
+        (session.coreWork?.length ?? 0) > 0 ||
+        (session.mobility?.length ?? 0) > 0) && (
+        <div className="glass-panel p-4 space-y-4">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">
+            Session Plan Extras
+          </p>
+
+          {session.cardio && (
+            <div className="space-y-1 rounded-lg bg-[color:var(--surface-track)] p-3">
+              <p className="text-sm font-medium text-[color:var(--text-0)]">Cardio</p>
+              <p className="text-xs text-[color:var(--text-detail)]">
+                {session.cardio.type} · {session.cardio.duration} min
+                {session.cardio.note ? ` · ${session.cardio.note}` : ''}
+              </p>
+              {session.cardio.intervals && (
+                <p className="text-xs text-[color:var(--text-detail)] tabular-nums">
+                  {session.cardio.intervals.work}s work / {session.cardio.intervals.rest}s rest ×{' '}
+                  {session.cardio.intervals.rounds} rounds
+                </p>
+              )}
+            </div>
+          )}
+
+          {(session.breathWork?.length ?? 0) > 0 && (
+            <div className="space-y-2">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">
+                Breath Work
+              </p>
+              <ul className="space-y-1.5">
+                {session.breathWork?.map((bw, i) => (
+                  <li key={`${bw.name}-${i}`} className="text-sm">
+                    <span className="font-medium text-[color:var(--text-0)]">{bw.name}</span>
+                    <span className="ml-2 text-xs tabular-nums text-[color:var(--text-detail)]">
+                      in {bw.inhale}s{bw.hold != null ? ` · hold ${bw.hold}s` : ''} · out{' '}
+                      {bw.exhale}s{bw.holdOut != null ? ` · pause ${bw.holdOut}s` : ''} ·{' '}
+                      {bw.rounds} rnd
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {(session.coreWork?.length ?? 0) > 0 && (
+            <div className="space-y-2">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">
+                Core
+              </p>
+              <ul className="space-y-1.5">
+                {session.coreWork?.map((core, i) => (
+                  <li
+                    key={`${core.name}-${i}`}
+                    className="flex items-center justify-between gap-3 text-sm"
+                  >
+                    <span className="text-[color:var(--text-0)]">{core.name}</span>
+                    <span className="text-xs tabular-nums text-[color:var(--text-detail)]">
+                      {core.sets}×
+                      {core.reps != null
+                        ? core.reps
+                        : core.holdSec != null
+                          ? `${core.holdSec}s`
+                          : '—'}
+                      {core.perSide ? ' / side' : ''}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {(session.mobility?.length ?? 0) > 0 && (
+            <div className="space-y-2">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">
+                Mobility
+              </p>
+              <ul className="space-y-1.5">
+                {session.mobility?.map((m, i) => (
+                  <li
+                    key={`${m}-${i}`}
+                    className="border-l-2 border-[color:color-mix(in_srgb,var(--accent)_28%,transparent)] pl-2 text-sm text-[color:var(--text-detail)]"
+                  >
+                    {m}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Session notes */}
       <div className="glass-panel p-4 space-y-2">
