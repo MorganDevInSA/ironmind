@@ -240,7 +240,7 @@ export function Sidebar() {
                   const rel = e.relatedTarget as Node | null;
                   if (!e.currentTarget.parentElement?.contains(rel)) schedulePeekHide();
                 }}
-                className={cn('nav-item', isActive && 'active')}
+                className={cn('nav-item', sidebarOpen && 'justify-center', isActive && 'active')}
               >
                 <span
                   className={cn(
@@ -262,7 +262,7 @@ export function Sidebar() {
                 {sidebarOpen && (
                   <span
                     className={cn(
-                      'min-w-0 max-w-full flex-1 text-left text-sm leading-snug tracking-wide break-words transition-colors duration-[220ms]',
+                      'min-w-0 max-w-full text-center text-sm leading-snug tracking-wide break-words transition-colors duration-[220ms]',
                       accentLabel,
                       isActive
                         ? 'font-semibold'

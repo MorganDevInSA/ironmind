@@ -1333,7 +1333,6 @@ function TodaySchedule({
                     onClick={() => setSelected(item)}
                     className={cn(
                       'cursor-pointer transition-colors group hover:bg-[color:color-mix(in_srgb,var(--accent)_7%,transparent)]',
-                      item.done === true && 'opacity-50',
                     )}
                   >
                     <td className="py-2.5 pr-4 font-medium tabular-nums text-[color:var(--text-detail)] text-xs whitespace-nowrap align-top">
@@ -1351,14 +1350,7 @@ function TodaySchedule({
                     </td>
                     <td className="py-2.5 pr-4 align-top">
                       <div className="flex items-start gap-2 min-w-0">
-                        <span
-                          className={cn(
-                            'font-semibold leading-snug',
-                            item.done
-                              ? 'text-[color:var(--text-detail)]'
-                              : 'text-[color:var(--text-0)]',
-                          )}
-                        >
+                        <span className="font-semibold leading-snug text-[color:var(--text-0)]">
                           {item.label}
                         </span>
                         <span
@@ -1372,12 +1364,7 @@ function TodaySchedule({
                     </td>
                     <td className="py-2.5 pr-4 align-top min-w-0 max-w-xl">
                       {item.detail ? (
-                        <p
-                          className={cn(
-                            'text-[13px] leading-relaxed text-[color:var(--text-detail)] break-words',
-                            item.done && 'opacity-80',
-                          )}
-                        >
+                        <p className="text-[13px] leading-relaxed text-[color:var(--text-detail)] break-words">
                           {item.detail}
                         </p>
                       ) : (

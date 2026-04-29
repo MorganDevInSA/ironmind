@@ -407,7 +407,7 @@ export default function WorkoutPage() {
                     </span>
                     {exercise.isKPI && <span className="workout-kpi-badge">KPI</span>}
                   </div>
-                  <p className="text-xs text-[color:var(--text-2)]">
+                  <p className="text-sm text-[color:var(--text-0)]">
                     {exercise.sets} × {exercise.reps} · {exercise.rest}s rest
                   </p>
                 </div>
@@ -524,12 +524,12 @@ export default function WorkoutPage() {
           {session.cardio && (
             <div className="space-y-1 rounded-lg bg-[color:var(--surface-track)] p-3">
               <p className="text-sm font-medium text-[color:var(--text-0)]">Cardio</p>
-              <p className="text-xs text-[color:var(--text-detail)]">
+              <p className="text-sm text-[color:var(--text-0)]">
                 {session.cardio.type} · {session.cardio.duration} min
                 {session.cardio.note ? ` · ${session.cardio.note}` : ''}
               </p>
               {session.cardio.intervals && (
-                <p className="text-xs text-[color:var(--text-detail)] tabular-nums">
+                <p className="text-sm text-[color:var(--text-0)] tabular-nums">
                   {session.cardio.intervals.work}s work / {session.cardio.intervals.rest}s rest ×{' '}
                   {session.cardio.intervals.rounds} rounds
                 </p>
@@ -546,7 +546,7 @@ export default function WorkoutPage() {
                 {session.breathWork?.map((bw, i) => (
                   <li key={`${bw.name}-${i}`} className="text-sm">
                     <span className="font-medium text-[color:var(--text-0)]">{bw.name}</span>
-                    <span className="ml-2 text-xs tabular-nums text-[color:var(--text-detail)]">
+                    <span className="ml-2 text-sm tabular-nums text-[color:var(--text-0)]">
                       in {bw.inhale}s{bw.hold != null ? ` · hold ${bw.hold}s` : ''} · out{' '}
                       {bw.exhale}s{bw.holdOut != null ? ` · pause ${bw.holdOut}s` : ''} ·{' '}
                       {bw.rounds} rnd
@@ -569,7 +569,7 @@ export default function WorkoutPage() {
                     className="flex items-center justify-between gap-3 text-sm"
                   >
                     <span className="text-[color:var(--text-0)]">{core.name}</span>
-                    <span className="text-xs tabular-nums text-[color:var(--text-detail)]">
+                    <span className="text-sm tabular-nums text-[color:var(--text-0)]">
                       {core.sets}×
                       {core.reps != null
                         ? core.reps
@@ -593,7 +593,7 @@ export default function WorkoutPage() {
                 {session.mobility?.map((m, i) => (
                   <li
                     key={`${m}-${i}`}
-                    className="border-l-2 border-[color:color-mix(in_srgb,var(--accent)_28%,transparent)] pl-2 text-sm text-[color:var(--text-detail)]"
+                    className="border-l-2 border-[color:color-mix(in_srgb,var(--accent)_28%,transparent)] pl-2 text-sm text-[color:var(--text-0)]"
                   >
                     {m}
                   </li>
