@@ -18,8 +18,6 @@
  */
 
 import { spawnSync, execSync } from 'child_process';
-import fs from 'fs';
-import path from 'path';
 import { exit } from 'process';
 
 // Colors for terminal output
@@ -60,15 +58,8 @@ const commit = execSync('git log -1 --oneline', { encoding: 'utf8' }).trim();
 log(`\nBranch: ${colors.cyan}${branch}${colors.reset}`);
 log(`Commit: ${colors.cyan}${commit}${colors.reset}`);
 
-// Step 2: Run CI chain (clear stale .next — avoids flaky PageNotFoundError during next build)
+// Step 2: Run CI chain (lint + typecheck + build — no .next wipe; that caused corrupt builds)
 logStep('2/5', 'Running CI checks (lint + typecheck + build)...');
-const nextDir = path.join(process.cwd(), '.next');
-try {
-  fs.rmSync(nextDir, { recursive: true, force: true });
-} catch {
-  /* ignore */
-}
-
 const ciResult = spawnSync('npm', ['run', 'ci'], {
   stdio: 'inherit',
   shell: true,
