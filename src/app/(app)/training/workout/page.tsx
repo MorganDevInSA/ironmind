@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useReducer } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { isValid, parseISO } from 'date-fns';
 import { useAuthStore } from '@/stores';
@@ -33,25 +33,205 @@ function inferMuscle(name: string) {
   return 'other';
 }
 
-/* ── Set log state ────────────────────────────────────────────── */
-interface SetLog {
+/* ── Session-only workout draft state ─────────────────────────── */
+type DraftSet = {
+  id: string;
   weight: string;
   reps: string;
   timeStamped: string | null;
-}
-type SetLogs = Record<string, SetLog[]>;
+};
 
-function initSetLogs(exercises: SessionExercise[]): SetLogs {
-  return Object.fromEntries(
-    exercises.map((ex) => [
-      ex.exerciseId,
-      Array.from({ length: ex.sets }, () => ({
-        weight: '',
-        reps: typeof ex.reps === 'number' ? String(ex.reps) : '',
-        timeStamped: null,
-      })),
-    ]),
-  );
+type DraftExercise = {
+  id: string;
+  sourceExerciseId?: string;
+  name: string;
+  repsTarget: number | string;
+  restSec: number;
+  isKPI?: boolean;
+  notes?: string;
+  muscleGroup?: string;
+  sets: DraftSet[];
+  order: number;
+  isAddedByUser: boolean;
+};
+
+type WorkoutDraftState = {
+  notes: string;
+  startedAt: string;
+  started: boolean;
+  finished: boolean;
+  expandedExerciseId: string | null;
+  initializedSessionKey: string | null;
+  exercises: DraftExercise[];
+};
+
+type WorkoutDraftAction =
+  | { type: 'INIT_FROM_SESSION'; payload: { sessionKey: string; exercises: DraftExercise[] } }
+  | { type: 'TOGGLE_EXPANDED'; payload: { exerciseId: string } }
+  | { type: 'SET_SESSION_NOTES'; payload: { notes: string } }
+  | { type: 'MARK_STARTED' }
+  | { type: 'MARK_FINISHED' }
+  | { type: 'ADD_EXERCISE'; payload: { exercise: DraftExercise } }
+  | { type: 'REMOVE_EXERCISE'; payload: { exerciseId: string } }
+  | {
+      type: 'UPDATE_EXERCISE_FIELDS';
+      payload: {
+        exerciseId: string;
+        patch: Partial<
+          Pick<DraftExercise, 'name' | 'repsTarget' | 'restSec' | 'notes' | 'muscleGroup'>
+        >;
+      };
+    }
+  | { type: 'ADD_SET'; payload: { exerciseId: string } }
+  | { type: 'SET_EXERCISE_SET_COUNT'; payload: { exerciseId: string; count: number } }
+  | {
+      type: 'UPDATE_SET_FIELD';
+      payload: { exerciseId: string; setId: string; field: 'weight' | 'reps'; value: string };
+    }
+  | { type: 'TOGGLE_SET_STAMP'; payload: { exerciseId: string; setId: string; nowHHMM: string } };
+
+function makeId(prefix: string) {
+  return `${prefix}:${Date.now()}:${Math.random().toString(36).slice(2, 9)}`;
+}
+
+function buildDraftSet(defaultReps: number | string): DraftSet {
+  return {
+    id: makeId('set'),
+    weight: '',
+    reps: typeof defaultReps === 'number' ? String(defaultReps) : '',
+    timeStamped: null,
+  };
+}
+
+function buildDraftExercises(exercises: SessionExercise[]): DraftExercise[] {
+  return exercises.map((ex, index) => ({
+    id: `ex:${ex.exerciseId}:${index}`,
+    sourceExerciseId: ex.exerciseId,
+    name: ex.name,
+    repsTarget: ex.reps,
+    restSec: ex.rest,
+    isKPI: ex.isKPI,
+    notes: ex.notes,
+    muscleGroup: inferMuscle(ex.name),
+    sets: Array.from({ length: ex.sets }, () => buildDraftSet(ex.reps)),
+    order: index,
+    isAddedByUser: false,
+  }));
+}
+
+function workoutDraftReducer(
+  state: WorkoutDraftState,
+  action: WorkoutDraftAction,
+): WorkoutDraftState {
+  switch (action.type) {
+    case 'INIT_FROM_SESSION':
+      if (state.initializedSessionKey === action.payload.sessionKey) return state;
+      return {
+        ...state,
+        initializedSessionKey: action.payload.sessionKey,
+        exercises: action.payload.exercises,
+        expandedExerciseId: action.payload.exercises[0]?.id ?? null,
+      };
+    case 'TOGGLE_EXPANDED':
+      return {
+        ...state,
+        expandedExerciseId:
+          state.expandedExerciseId === action.payload.exerciseId ? null : action.payload.exerciseId,
+      };
+    case 'SET_SESSION_NOTES':
+      return { ...state, notes: action.payload.notes };
+    case 'MARK_STARTED':
+      return state.started ? state : { ...state, started: true };
+    case 'MARK_FINISHED':
+      return { ...state, finished: true };
+    case 'ADD_EXERCISE': {
+      const exercises = [
+        ...state.exercises,
+        { ...action.payload.exercise, order: state.exercises.length },
+      ];
+      return { ...state, exercises, expandedExerciseId: action.payload.exercise.id };
+    }
+    case 'REMOVE_EXERCISE': {
+      const exercises = state.exercises
+        .filter((ex) => ex.id !== action.payload.exerciseId)
+        .map((ex, idx) => ({ ...ex, order: idx }));
+      return {
+        ...state,
+        exercises,
+        expandedExerciseId:
+          state.expandedExerciseId === action.payload.exerciseId ? null : state.expandedExerciseId,
+      };
+    }
+    case 'UPDATE_EXERCISE_FIELDS':
+      return {
+        ...state,
+        exercises: state.exercises.map((ex) =>
+          ex.id === action.payload.exerciseId ? { ...ex, ...action.payload.patch } : ex,
+        ),
+      };
+    case 'ADD_SET':
+      return {
+        ...state,
+        exercises: state.exercises.map((ex) =>
+          ex.id === action.payload.exerciseId
+            ? { ...ex, sets: [...ex.sets, buildDraftSet(ex.repsTarget)] }
+            : ex,
+        ),
+      };
+    case 'SET_EXERCISE_SET_COUNT':
+      return {
+        ...state,
+        exercises: state.exercises.map((ex) => {
+          if (ex.id !== action.payload.exerciseId) return ex;
+          const nextCount = Math.max(1, Math.min(20, action.payload.count));
+          if (nextCount === ex.sets.length) return ex;
+          if (nextCount < ex.sets.length) {
+            return { ...ex, sets: ex.sets.slice(0, nextCount) };
+          }
+          const add = Array.from({ length: nextCount - ex.sets.length }, () =>
+            buildDraftSet(ex.repsTarget),
+          );
+          return { ...ex, sets: [...ex.sets, ...add] };
+        }),
+      };
+    case 'UPDATE_SET_FIELD':
+      return {
+        ...state,
+        exercises: state.exercises.map((ex) =>
+          ex.id === action.payload.exerciseId
+            ? {
+                ...ex,
+                sets: ex.sets.map((set) =>
+                  set.id === action.payload.setId
+                    ? { ...set, [action.payload.field]: action.payload.value }
+                    : set,
+                ),
+              }
+            : ex,
+        ),
+      };
+    case 'TOGGLE_SET_STAMP':
+      return {
+        ...state,
+        exercises: state.exercises.map((ex) =>
+          ex.id === action.payload.exerciseId
+            ? {
+                ...ex,
+                sets: ex.sets.map((set) =>
+                  set.id === action.payload.setId
+                    ? {
+                        ...set,
+                        timeStamped: set.timeStamped ? null : action.payload.nowHHMM,
+                      }
+                    : set,
+                ),
+              }
+            : ex,
+        ),
+      };
+    default:
+      return state;
+  }
 }
 
 function nowHHMM() {
@@ -111,57 +291,78 @@ export default function WorkoutPage() {
 
   const showSessionMediaGate = needsSessionMediaGate && !mediaGatePassed;
 
-  const [started, setStarted] = useState(false);
-  const [finished, setFinished] = useState(false);
-  const [setLogs, setSetLogs] = useState<SetLogs>({});
-  const [expanded, setExpanded] = useState<string | null>(null);
-  const [notes, setNotes] = useState('');
-  const [startedAt] = useState(() => new Date().toISOString());
-  const elapsed = useElapsed(started && !finished);
+  const [draft, dispatch] = useReducer(workoutDraftReducer, {
+    notes: '',
+    startedAt: new Date().toISOString(),
+    started: false,
+    finished: false,
+    expandedExerciseId: null,
+    initializedSessionKey: null,
+    exercises: [],
+  });
+  const [newExerciseName, setNewExerciseName] = useState('');
+  const [newExerciseReps, setNewExerciseReps] = useState('10');
+  const [newExerciseRest, setNewExerciseRest] = useState('90');
+  const [editExerciseModal, setEditExerciseModal] = useState<{
+    open: boolean;
+    exerciseId: string | null;
+    name: string;
+    repsTarget: string;
+    restSec: string;
+    setCount: string;
+    notes: string;
+  }>({
+    open: false,
+    exerciseId: null,
+    name: '',
+    repsTarget: '10',
+    restSec: '90',
+    setCount: '1',
+    notes: '',
+  });
+  const elapsed = useElapsed(draft.started && !draft.finished);
 
+  const sessionKey = `${sessionDate}:${session?.name ?? 'no-session'}:${exercises.length}`;
   useEffect(() => {
-    if (exercises.length && !Object.keys(setLogs).length) {
-      setSetLogs(initSetLogs(exercises));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [exercises]);
+    if (!exercises.length) return;
+    dispatch({
+      type: 'INIT_FROM_SESSION',
+      payload: {
+        sessionKey,
+        exercises: buildDraftExercises(exercises),
+      },
+    });
+  }, [sessionKey, exercises]);
 
-  const completedSets = Object.values(setLogs).reduce(
-    (s, arr) => s + arr.filter((a) => a.timeStamped !== null).length,
+  const completedSets = draft.exercises.reduce(
+    (sum, ex) => sum + ex.sets.filter((set) => set.timeStamped !== null).length,
     0,
   );
-  const totalSets = exercises.reduce((s, e) => s + e.sets, 0);
+  const totalSets = draft.exercises.reduce((sum, ex) => sum + ex.sets.length, 0);
   const progress = totalSets > 0 ? Math.round((completedSets / totalSets) * 100) : 0;
 
   const updateSet = useCallback(
-    (exerciseId: string, idx: number, field: 'weight' | 'reps', val: string) => {
-      setSetLogs((prev) => {
-        const arr = [...(prev[exerciseId] ?? [])];
-        arr[idx] = { ...arr[idx], [field]: val };
-        return { ...prev, [exerciseId]: arr };
+    (exerciseId: string, setId: string, field: 'weight' | 'reps', val: string) => {
+      dispatch({
+        type: 'UPDATE_SET_FIELD',
+        payload: { exerciseId, setId, field, value: val },
       });
     },
     [],
   );
 
-  const stampSet = useCallback(
-    (exerciseId: string, idx: number) => {
-      setSetLogs((prev) => {
-        const arr = [...(prev[exerciseId] ?? [])];
-        // Toggle: if already stamped, clear it; otherwise record now
-        arr[idx] = { ...arr[idx], timeStamped: arr[idx].timeStamped ? null : nowHHMM() };
-        return { ...prev, [exerciseId]: arr };
-      });
-      if (!started) setStarted(true);
-    },
-    [started],
-  );
+  const stampSet = useCallback((exerciseId: string, setId: string) => {
+    dispatch({
+      type: 'TOGGLE_SET_STAMP',
+      payload: { exerciseId, setId, nowHHMM: nowHHMM() },
+    });
+    dispatch({ type: 'MARK_STARTED' });
+  }, []);
 
   const handleFinish = () => {
-    setFinished(true);
-    const workoutExercises: WorkoutExercise[] = exercises.map((ex) => {
-      const logs = setLogs[ex.exerciseId] ?? [];
-      const sets: ExerciseSet[] = logs.map((log, si) => ({
+    dispatch({ type: 'MARK_FINISHED' });
+    const workoutExercises: WorkoutExercise[] = draft.exercises.map((ex) => {
+      const sets: ExerciseSet[] = ex.sets.map((log, si) => ({
         setNumber: si + 1,
         type: 'working' as const,
         weight: parseFloat(log.weight) || 0,
@@ -169,9 +370,9 @@ export default function WorkoutPage() {
         completed: log.timeStamped !== null,
       }));
       return {
-        exerciseId: ex.exerciseId,
+        exerciseId: ex.sourceExerciseId ?? ex.id,
         name: ex.name,
-        muscleGroup: inferMuscle(ex.name),
+        muscleGroup: ex.muscleGroup ?? inferMuscle(ex.name),
         sets,
         notes: ex.notes,
       };
@@ -185,10 +386,85 @@ export default function WorkoutPage() {
       date: sessionDate,
       exercises: workoutExercises,
       durationMinutes: Math.max(1, Math.round(elapsed / 60)),
-      notes: notes || undefined,
-      startedAt,
+      notes: draft.notes || undefined,
+      startedAt: draft.startedAt,
       completedAt: new Date().toISOString(),
     });
+  };
+
+  const openEditExerciseModal = (exercise: DraftExercise) => {
+    setEditExerciseModal({
+      open: true,
+      exerciseId: exercise.id,
+      name: exercise.name,
+      repsTarget: String(exercise.repsTarget),
+      restSec: String(exercise.restSec),
+      setCount: String(exercise.sets.length),
+      notes: exercise.notes ?? '',
+    });
+  };
+
+  const closeEditExerciseModal = () => {
+    setEditExerciseModal((prev) => ({ ...prev, open: false, exerciseId: null }));
+  };
+
+  const saveEditExerciseModal = () => {
+    if (!editExerciseModal.exerciseId) return;
+    const name = editExerciseModal.name.trim();
+    if (!name) return;
+    const repsTargetRaw = editExerciseModal.repsTarget.trim();
+    const repsTargetNum = Number(repsTargetRaw);
+    const repsTarget =
+      Number.isFinite(repsTargetNum) && repsTargetRaw !== '' ? repsTargetNum : repsTargetRaw;
+    const restSec = Number.isFinite(Number(editExerciseModal.restSec))
+      ? Math.max(0, Math.round(Number(editExerciseModal.restSec)))
+      : 0;
+    const setCount = Number.isFinite(Number(editExerciseModal.setCount))
+      ? Math.max(1, Math.round(Number(editExerciseModal.setCount)))
+      : 1;
+
+    dispatch({
+      type: 'UPDATE_EXERCISE_FIELDS',
+      payload: {
+        exerciseId: editExerciseModal.exerciseId,
+        patch: {
+          name,
+          repsTarget,
+          restSec,
+          notes: editExerciseModal.notes.trim() || undefined,
+          muscleGroup: inferMuscle(name),
+        },
+      },
+    });
+    dispatch({
+      type: 'SET_EXERCISE_SET_COUNT',
+      payload: { exerciseId: editExerciseModal.exerciseId, count: setCount },
+    });
+    closeEditExerciseModal();
+  };
+
+  const addExercisePanel = () => {
+    const baseName = newExerciseName.trim() || 'Custom Exercise';
+    const repsRaw = newExerciseReps.trim();
+    const repsNum = Number(repsRaw);
+    const repsTarget = Number.isFinite(repsNum) && repsRaw !== '' ? repsNum : repsRaw || '10';
+    const restSec = Number.isFinite(Number(newExerciseRest))
+      ? Math.max(0, Math.round(Number(newExerciseRest)))
+      : 90;
+    const exercise: DraftExercise = {
+      id: makeId('ex'),
+      name: baseName,
+      repsTarget,
+      restSec,
+      sets: [buildDraftSet(repsTarget)],
+      order: draft.exercises.length,
+      isAddedByUser: true,
+      muscleGroup: inferMuscle(baseName),
+    };
+    dispatch({ type: 'ADD_EXERCISE', payload: { exercise } });
+    setNewExerciseName('');
+    setNewExerciseReps('10');
+    setNewExerciseRest('90');
   };
 
   /* ── Guard states ─────────────────────────────────────────────── */
@@ -255,9 +531,9 @@ export default function WorkoutPage() {
   }
 
   /* ── Done state ─────────────────────────────────────────────── */
-  if (finished) {
-    const totalVolume = exercises.reduce((s, ex) => {
-      const logs = setLogs[ex.exerciseId] ?? [];
+  if (draft.finished) {
+    const totalVolume = draft.exercises.reduce((s, ex) => {
+      const logs = ex.sets ?? [];
       return (
         s +
         logs.reduce(
@@ -329,7 +605,7 @@ export default function WorkoutPage() {
         <div
           className={cn(
             'flex items-center gap-1.5 rounded-full border px-3 py-1 font-mono text-sm font-bold tabular-nums',
-            started
+            draft.started
               ? 'border-[color:color-mix(in_srgb,var(--accent)_42%,transparent)] bg-[color:color-mix(in_srgb,var(--accent)_12%,transparent)] text-[color:var(--accent-light)]'
               : 'border-[color:var(--chrome-border)] bg-[color:color-mix(in_srgb,var(--accent)_8%,transparent)] text-[color:var(--text-2)]',
           )}
@@ -361,11 +637,11 @@ export default function WorkoutPage() {
 
       {/* Exercise list */}
       <div className="space-y-2">
-        {exercises.map((exercise: SessionExercise) => {
-          const sets = setLogs[exercise.exerciseId] ?? [];
+        {draft.exercises.map((exercise) => {
+          const sets = exercise.sets ?? [];
           const doneSets = sets.filter((s) => s.timeStamped !== null).length;
-          const allDone = doneSets === exercise.sets;
-          const isOpen = expanded === exercise.exerciseId;
+          const allDone = doneSets === exercise.sets.length;
+          const isOpen = draft.expandedExerciseId === exercise.id;
           const exVolume = sets.reduce(
             (s, l) =>
               s + (l.timeStamped ? (parseFloat(l.weight) || 0) * (parseFloat(l.reps) || 0) : 0),
@@ -374,7 +650,7 @@ export default function WorkoutPage() {
 
           return (
             <div
-              key={exercise.exerciseId}
+              key={exercise.id}
               className={cn(
                 'glass-panel overflow-hidden transition-[border-color,box-shadow] duration-200',
                 allDone && 'opacity-80',
@@ -383,7 +659,12 @@ export default function WorkoutPage() {
             >
               <button
                 type="button"
-                onClick={() => setExpanded(isOpen ? null : exercise.exerciseId)}
+                onClick={() =>
+                  dispatch({
+                    type: 'TOGGLE_EXPANDED',
+                    payload: { exerciseId: exercise.id },
+                  })
+                }
                 className="flex w-full items-center gap-3 p-4 font-sans text-left"
               >
                 <div
@@ -408,7 +689,7 @@ export default function WorkoutPage() {
                     {exercise.isKPI && <span className="workout-kpi-badge">KPI</span>}
                   </div>
                   <p className="text-sm text-[color:var(--text-0)]">
-                    {exercise.sets} × {exercise.reps} · {exercise.rest}s rest
+                    {exercise.sets.length} × {exercise.repsTarget} · {exercise.restSec}s rest
                   </p>
                 </div>
 
@@ -419,7 +700,7 @@ export default function WorkoutPage() {
                     </span>
                   )}
                   <span className="text-xs font-mono tabular-nums text-[color:var(--text-2)]">
-                    {doneSets}/{exercise.sets}
+                    {doneSets}/{exercise.sets.length}
                   </span>
                   {isOpen ? (
                     <ChevronUp
@@ -449,7 +730,7 @@ export default function WorkoutPage() {
 
                     {sets.map((log, i) => (
                       <div
-                        key={i}
+                        key={log.id}
                         className={cn(
                           'grid grid-cols-[2.5rem_1fr_1fr_5rem] items-center gap-2 rounded-lg border p-2 transition-[border-color,box-shadow,background-color]',
                           log.timeStamped
@@ -466,9 +747,7 @@ export default function WorkoutPage() {
                           step="0.5"
                           min="0"
                           value={log.weight}
-                          onChange={(e) =>
-                            updateSet(exercise.exerciseId, i, 'weight', e.target.value)
-                          }
+                          onChange={(e) => updateSet(exercise.id, log.id, 'weight', e.target.value)}
                           placeholder={i > 0 ? sets[i - 1].weight || '—' : '—'}
                           className="w-full rounded border border-[color:var(--chrome-border)] bg-[color:var(--surface-well)] px-2 py-1.5 font-mono text-sm tabular-nums text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)]"
                         />
@@ -477,16 +756,14 @@ export default function WorkoutPage() {
                           type="number"
                           min="0"
                           value={log.reps}
-                          onChange={(e) =>
-                            updateSet(exercise.exerciseId, i, 'reps', e.target.value)
-                          }
+                          onChange={(e) => updateSet(exercise.id, log.id, 'reps', e.target.value)}
                           placeholder="—"
                           className="w-full rounded border border-[color:var(--chrome-border)] bg-[color:var(--surface-well)] px-2 py-1.5 font-mono text-sm tabular-nums text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)]"
                         />
 
                         <button
                           type="button"
-                          onClick={() => stampSet(exercise.exerciseId, i)}
+                          onClick={() => stampSet(exercise.id, log.id)}
                           className={cn(
                             'h-8 w-full rounded-lg border font-mono text-xs font-semibold transition-all',
                             log.timeStamped
@@ -504,12 +781,83 @@ export default function WorkoutPage() {
                         {exercise.notes}
                       </p>
                     )}
+
+                    <div className="flex flex-wrap items-center gap-2 pt-1">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          dispatch({ type: 'ADD_SET', payload: { exerciseId: exercise.id } })
+                        }
+                        className="btn-ghost px-3 py-1.5 text-xs"
+                      >
+                        + Add set
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => openEditExerciseModal(exercise)}
+                        className="btn-ghost px-3 py-1.5 text-xs"
+                      >
+                        Edit exercise
+                      </button>
+                      {draft.exercises.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            dispatch({
+                              type: 'REMOVE_EXERCISE',
+                              payload: { exerciseId: exercise.id },
+                            })
+                          }
+                          className="btn-ghost px-3 py-1.5 text-xs text-[color:var(--text-2)] hover:text-[color:var(--bad)]"
+                        >
+                          Remove panel
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           );
         })}
+
+        {/* Add exercise panel (session-only) — directly below last exercise / sets */}
+        <div className="glass-panel p-4 space-y-3">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">
+            Add Exercise (today only)
+          </p>
+          <div className="grid gap-2 sm:grid-cols-[1.5fr_0.7fr_0.7fr_auto]">
+            <input
+              type="text"
+              value={newExerciseName}
+              onChange={(e) => setNewExerciseName(e.target.value)}
+              placeholder="Exercise name"
+              className="w-full rounded border border-[color:var(--chrome-border)] bg-[color:var(--surface-well)] px-2 py-2 text-sm text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)]"
+            />
+            <input
+              type="text"
+              value={newExerciseReps}
+              onChange={(e) => setNewExerciseReps(e.target.value)}
+              placeholder="Reps"
+              className="w-full rounded border border-[color:var(--chrome-border)] bg-[color:var(--surface-well)] px-2 py-2 text-sm text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)]"
+            />
+            <input
+              type="number"
+              min={0}
+              value={newExerciseRest}
+              onChange={(e) => setNewExerciseRest(e.target.value)}
+              placeholder="Rest s"
+              className="w-full rounded border border-[color:var(--chrome-border)] bg-[color:var(--surface-well)] px-2 py-2 text-sm text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)]"
+            />
+            <button
+              type="button"
+              onClick={addExercisePanel}
+              className="btn-secondary px-3 py-2 text-sm"
+            >
+              + Add
+            </button>
+          </div>
+        </div>
       </div>
 
       {(session.cardio ||
@@ -608,13 +956,108 @@ export default function WorkoutPage() {
       <div className="glass-panel p-4 space-y-2">
         <label className="text-sm font-medium text-[color:var(--text-1)]">Session Notes</label>
         <textarea
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
+          value={draft.notes}
+          onChange={(e) =>
+            dispatch({ type: 'SET_SESSION_NOTES', payload: { notes: e.target.value } })
+          }
           placeholder="Felt strong / fatigue / PR notes…"
           rows={2}
           className="w-full resize-none rounded-lg border border-[color:var(--chrome-border)] bg-[color:var(--surface-well)] p-3 font-sans text-sm text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)]"
         />
       </div>
+
+      {/* Edit exercise modal */}
+      {editExerciseModal.open && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
+          <button
+            type="button"
+            aria-label="Close exercise editor"
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={closeEditExerciseModal}
+          />
+          <div className="relative w-full max-w-lg glass-panel-strong p-4 space-y-3">
+            <h3 className="text-base font-semibold text-[color:var(--text-0)]">
+              Edit exercise panel
+            </h3>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <label className="text-xs text-[color:var(--text-2)]">
+                Name
+                <input
+                  type="text"
+                  value={editExerciseModal.name}
+                  onChange={(e) =>
+                    setEditExerciseModal((prev) => ({ ...prev, name: e.target.value }))
+                  }
+                  className="mt-1 w-full rounded border border-[color:var(--chrome-border)] bg-[color:var(--surface-well)] px-2 py-2 text-sm text-[color:var(--text-0)] focus:outline-none focus:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)]"
+                />
+              </label>
+              <label className="text-xs text-[color:var(--text-2)]">
+                Reps target
+                <input
+                  type="text"
+                  value={editExerciseModal.repsTarget}
+                  onChange={(e) =>
+                    setEditExerciseModal((prev) => ({ ...prev, repsTarget: e.target.value }))
+                  }
+                  className="mt-1 w-full rounded border border-[color:var(--chrome-border)] bg-[color:var(--surface-well)] px-2 py-2 text-sm text-[color:var(--text-0)] focus:outline-none focus:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)]"
+                />
+              </label>
+              <label className="text-xs text-[color:var(--text-2)]">
+                Rest (seconds)
+                <input
+                  type="number"
+                  min={0}
+                  value={editExerciseModal.restSec}
+                  onChange={(e) =>
+                    setEditExerciseModal((prev) => ({ ...prev, restSec: e.target.value }))
+                  }
+                  className="mt-1 w-full rounded border border-[color:var(--chrome-border)] bg-[color:var(--surface-well)] px-2 py-2 text-sm text-[color:var(--text-0)] focus:outline-none focus:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)]"
+                />
+              </label>
+              <label className="text-xs text-[color:var(--text-2)]">
+                Number of sets
+                <input
+                  type="number"
+                  min={1}
+                  max={20}
+                  value={editExerciseModal.setCount}
+                  onChange={(e) =>
+                    setEditExerciseModal((prev) => ({ ...prev, setCount: e.target.value }))
+                  }
+                  className="mt-1 w-full rounded border border-[color:var(--chrome-border)] bg-[color:var(--surface-well)] px-2 py-2 text-sm text-[color:var(--text-0)] focus:outline-none focus:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)]"
+                />
+              </label>
+            </div>
+            <label className="text-xs text-[color:var(--text-2)] block">
+              Notes
+              <textarea
+                rows={2}
+                value={editExerciseModal.notes}
+                onChange={(e) =>
+                  setEditExerciseModal((prev) => ({ ...prev, notes: e.target.value }))
+                }
+                className="mt-1 w-full resize-none rounded border border-[color:var(--chrome-border)] bg-[color:var(--surface-well)] px-2 py-2 text-sm text-[color:var(--text-0)] focus:outline-none focus:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)]"
+              />
+            </label>
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={closeEditExerciseModal}
+                className="btn-ghost px-3 py-2 text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={saveEditExerciseModal}
+                className="btn-primary px-3 py-2 text-sm"
+              >
+                Save changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Finish */}
       <button
