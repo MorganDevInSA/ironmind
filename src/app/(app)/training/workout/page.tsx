@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useReducer } from 'react';
+import { useState, useEffect, useCallback, useMemo, useReducer } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { isValid, parseISO } from 'date-fns';
 import { useAuthStore } from '@/stores';
@@ -278,7 +278,7 @@ export default function WorkoutPage() {
     ? getCycleDay(program.startDate ?? todayStr, sessionDate, program.cycleLengthDays)
     : null;
   const session = findProgramSessionForCycleDay(program?.sessions, cycleDay);
-  const exercises = session?.exercises ?? [];
+  const exercises = useMemo(() => session?.exercises ?? [], [session?.exercises]);
 
   const needsSessionMediaGate = Boolean(
     program && session && sessionTypeUsesMediaGate(session.type),
