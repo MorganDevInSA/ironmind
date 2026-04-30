@@ -48,7 +48,7 @@ export function PlanByDayStrip({
       <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[color:var(--text-2)]">
         {sectionLabel}
       </p>
-      <div ref={stripRef} className="grid w-full min-w-0 grid-cols-7 gap-1 sm:flex sm:flex-nowrap">
+      <div ref={stripRef} className="grid w-full min-w-0 grid-cols-7 gap-1">
         {dates.map((dateStr) => {
           const isSelected = dateStr === selectedDate;
           const isCalendarToday = dateStr === todayStr;
@@ -96,7 +96,7 @@ export function PlanByDayStrip({
           return (
             <div
               key={dateStr}
-              className="relative min-w-0 sm:flex sm:flex-1 sm:basis-0"
+              className="relative min-w-0"
               onMouseEnter={() => setHoverDate(dateStr)}
               onMouseLeave={(e) => {
                 const rel = e.relatedTarget as Node | null;
