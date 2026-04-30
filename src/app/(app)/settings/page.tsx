@@ -7,7 +7,7 @@ import { useProfile, useUpdateProfile } from '@/controllers';
 import { logout } from '@/lib/firebase';
 import { Settings, Upload, User, LogOut, Target, Palette, Eraser } from 'lucide-react';
 import { useClearCoachDemoOverlay } from '@/controllers/use-demo-clear';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 import type { AppTheme } from '@/stores/ui-store';
 
@@ -65,6 +65,7 @@ export default function SettingsPage() {
 
   const [targetWeight, setTargetWeight] = useState('');
   const [currentWeight, setCurrentWeight] = useState('');
+  const customAccentInputRef = useRef<HTMLInputElement | null>(null);
   const athleteName =
     profile?.clientName?.trim() ||
     user?.displayName?.trim() ||
@@ -109,6 +110,11 @@ export default function SettingsPage() {
     resetUIPreferences();
     await logout();
     router.push('/login');
+  };
+
+  const handleSelectCustomTheme = () => {
+    setTheme('custom');
+    customAccentInputRef.current?.click();
   };
 
   return (
@@ -158,7 +164,7 @@ export default function SettingsPage() {
           })}
           <button
             type="button"
-            onClick={() => setTheme('custom')}
+            onClick={handleSelectCustomTheme}
             className={`w-full p-3 rounded-lg border text-left transition-colors ${
               theme === 'custom'
                 ? 'border-[color:color-mix(in_srgb,var(--accent)_50%,transparent)] bg-[color:var(--surface-track)]'
@@ -174,6 +180,7 @@ export default function SettingsPage() {
                   aria-hidden
                 />
                 <input
+                  ref={customAccentInputRef}
                   type="color"
                   value={customAccent}
                   onClick={(e) => {

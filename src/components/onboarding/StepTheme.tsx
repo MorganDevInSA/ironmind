@@ -1,6 +1,7 @@
 'use client';
 
 import { ArrowLeft, ArrowRight, Palette } from 'lucide-react';
+import { useRef } from 'react';
 import { useUIStore } from '@/stores';
 import type { AppTheme } from '@/stores/ui-store';
 import { cn } from '@/lib/utils';
@@ -59,6 +60,12 @@ export function StepTheme({ onNext, onBack }: StepThemeProps) {
   const customAccent = useUIStore((s) => s.customAccent);
   const setTheme = useUIStore((s) => s.setTheme);
   const setCustomAccent = useUIStore((s) => s.setCustomAccent);
+  const customAccentInputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleSelectCustomTheme = () => {
+    setTheme('custom');
+    customAccentInputRef.current?.click();
+  };
 
   return (
     <div className="flex flex-col gap-7 py-4">
@@ -124,6 +131,7 @@ export function StepTheme({ onNext, onBack }: StepThemeProps) {
               aria-hidden
             />
             <input
+              ref={customAccentInputRef}
               type="color"
               value={customAccent}
               onChange={(e) => {
@@ -137,7 +145,7 @@ export function StepTheme({ onNext, onBack }: StepThemeProps) {
           </span>
           <button
             type="button"
-            onClick={() => setTheme('custom')}
+            onClick={handleSelectCustomTheme}
             className={cn(
               'rounded-lg border px-3 py-2 text-xs font-semibold uppercase tracking-wider transition-colors',
               theme === 'custom'
