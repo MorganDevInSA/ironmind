@@ -99,8 +99,11 @@ export function PlanByDayStrip({
               className="relative min-w-0"
               onMouseEnter={() => setHoverDate(dateStr)}
               onMouseLeave={(e) => {
-                const rel = e.relatedTarget as Node | null;
-                if (!e.currentTarget.contains(rel)) setHoverDate(null);
+                const rel = e.relatedTarget;
+                // `relatedTarget` is EventTarget | null — not always a Node (e.g. Window); `contains` requires Node.
+                if (rel == null || !(rel instanceof Node) || !e.currentTarget.contains(rel)) {
+                  setHoverDate(null);
+                }
               }}
             >
               <button
