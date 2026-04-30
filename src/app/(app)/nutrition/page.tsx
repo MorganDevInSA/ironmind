@@ -27,6 +27,8 @@ import {
 import { cn } from '@/lib/utils';
 import type { DayType, Meal, MacroTargetRange } from '@/lib/types';
 
+const CUSTOM_MEAL_SENTINEL = '__custom__';
+
 function buildDefaultMeals(
   schedule: typeof mortonNutritionPlan.mealSchedule,
   isLiftDay: boolean,
@@ -106,6 +108,15 @@ export default function NutritionPage() {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
+  const [customMealModal, setCustomMealModal] = useState<{
+    open: boolean;
+    slot: string | null;
+    value: string;
+  }>({
+    open: false,
+    slot: null,
+    value: '',
+  });
 
   const persistNutritionDay = useCallback(
     (nextMeals: Meal[], nextDayType: DayType = dayType, nextNotes: string = agentNotes) => {
@@ -189,6 +200,30 @@ export default function NutritionPage() {
     const next = meals.map((m) => (m.slot === slot ? { ...m, planLine: value } : m));
     setMeals(next);
     persistNutritionDay(next);
+  };
+
+  const openCustomMealModal = (slot: string, currentValue: string) => {
+    setCustomMealModal({
+      open: true,
+      slot,
+      value: currentValue,
+    });
+  };
+
+  const closeCustomMealModal = () => {
+    setCustomMealModal({
+      open: false,
+      slot: null,
+      value: '',
+    });
+  };
+
+  const saveCustomMealLine = () => {
+    const slot = customMealModal.slot;
+    const customText = customMealModal.value.trim();
+    if (!slot || !customText) return;
+    handlePlanLineChange(slot, customText);
+    closeCustomMealModal();
   };
 
   const completedCount = meals.filter((m) => m.completed).length;
@@ -425,7 +460,14 @@ export default function NutritionPage() {
                           <span className="sr-only">Meal option for {meal.slot}</span>
                           <select
                             value={selectValue}
-                            onChange={(e) => handlePlanLineChange(meal.slot, e.target.value)}
+                            onChange={(e) => {
+                              const nextValue = e.target.value;
+                              if (nextValue === CUSTOM_MEAL_SENTINEL) {
+                                openCustomMealModal(meal.slot, displayLine);
+                                return;
+                              }
+                              handlePlanLineChange(meal.slot, nextValue);
+                            }}
                             disabled={isSaving}
                             aria-label={`Meal option for ${meal.slot.replace('-', ' ')}`}
                             className={cn(
@@ -447,6 +489,7 @@ export default function NutritionPage() {
                                 {opt.length > 90 ? `${opt.slice(0, 87)}…` : opt}
                               </option>
                             ))}
+                            <option value={CUSTOM_MEAL_SENTINEL}>+ Add custom meal...</option>
                           </select>
                         </label>
                       ) : (
@@ -502,6 +545,72 @@ export default function NutritionPage() {
           </div>
         </div>
       </div>
+
+      {customMealModal.open && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            aria-label="Close custom meal modal"
+            onClick={closeCustomMealModal}
+          />
+          <div className="relative w-full max-w-lg glass-panel-strong p-4 sm:p-5 space-y-4">
+            <div className="space-y-1">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--text-2)]">
+                Custom Meal Line
+              </p>
+              <h3 className="text-base font-semibold text-[color:var(--text-0)]">
+                Add custom meal option
+              </h3>
+            </div>
+
+            <div className="space-y-2">
+              <label
+                htmlFor="nutrition-custom-meal-input"
+                className="text-xs text-[color:var(--text-2)]"
+              >
+                Meal description
+              </label>
+              <input
+                id="nutrition-custom-meal-input"
+                type="text"
+                value={customMealModal.value}
+                onChange={(e) =>
+                  setCustomMealModal((prev) => ({
+                    ...prev,
+                    value: e.target.value,
+                  }))
+                }
+                placeholder="e.g. Chicken wrap + fruit"
+                className="w-full rounded-lg border border-[color:var(--chrome-border)] bg-[color:var(--surface-well)] px-3 py-2.5 text-sm text-[color:var(--text-0)] placeholder:text-[color:var(--text-2)] focus:outline-none focus:border-[color:color-mix(in_srgb,var(--accent)_45%,transparent)]"
+                autoFocus
+              />
+              {!customMealModal.value.trim() && (
+                <p className="text-[11px] text-[color:var(--warn)]">
+                  Enter a meal line before saving.
+                </p>
+              )}
+            </div>
+
+            <div className="flex items-center justify-end gap-2">
+              <button type="button" onClick={closeCustomMealModal} className="btn-ghost px-4 py-2">
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={saveCustomMealLine}
+                disabled={!customMealModal.value.trim() || isSaving}
+                className={cn(
+                  'btn-primary px-4 py-2',
+                  (!customMealModal.value.trim() || isSaving) && 'opacity-50 cursor-not-allowed',
+                )}
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
