@@ -37,8 +37,12 @@ export default function TrainingPage() {
   const setDashboardTrendSelectedDate = useUIStore((s) => s.setDashboardTrendSelectedDate);
 
   const todayStr = today();
-  /** Same anchor as dashboard day strip: first of 14 forward-looking days. */
-  const stripStart = dashboardTrendSelectedDate ?? todayStr;
+  /**
+   * Fixed 14-day window anchor — must not follow the selected pill, or clicking a date reorders
+   * the strip. Match dashboard preset trend `from`: cycle day 1 (program start), else today.
+   * `dashboardTrendSelectedDate` still syncs which day is highlighted vs the dashboard.
+   */
+  const stripStart = program?.startDate ?? todayStr;
   const stripEnd = useMemo(
     () => format(addDays(parseISO(stripStart), 13), 'yyyy-MM-dd'),
     [stripStart],
