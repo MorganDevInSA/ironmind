@@ -166,6 +166,7 @@ export default function RecoveryPage() {
     mood: 3,
   });
   const [tab, setTab] = useState<'log' | 'trends'>('log');
+  const sleepProgress = ((form.sleepHours - 3) / (12 - 3)) * 100;
 
   const handleSubmit = () => {
     const readinessScore = Math.min(
@@ -335,8 +336,13 @@ export default function RecoveryPage() {
                 step={0.5}
                 value={form.sleepHours}
                 onChange={(e) => setForm((f) => ({ ...f, sleepHours: Number(e.target.value) }))}
-                className="w-full h-2 rounded-full"
-                style={{ accentColor: 'var(--accent)' }}
+                className="recovery-slider w-full h-2 rounded-full"
+                style={{
+                  accentColor: 'var(--accent)',
+                  ['--slider-progress' as string]: `${sleepProgress}%`,
+                  ['--slider-fill' as string]: sliderFillGradient,
+                  ['--slider-track' as string]: sliderTrackColor,
+                }}
               />
               <div className="flex justify-between text-xs text-[color:var(--text-2)]">
                 <span>3h</span>

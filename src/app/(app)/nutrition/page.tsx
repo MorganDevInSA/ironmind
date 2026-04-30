@@ -69,7 +69,7 @@ function MacroBar({
     <div className="space-y-1">
       <div className="flex justify-between text-xs">
         <span className="text-[color:var(--text-2)]">{label}</span>
-        <span className="font-mono tabular-nums text-[color:var(--text-0)]">
+        <span className="font-medium tabular-nums text-[color:var(--text-0)]">
           {Math.round(actual)} / {targetStr}g
         </span>
       </div>
@@ -302,7 +302,7 @@ export default function NutritionPage() {
             <div className="pt-2 space-y-2.5 border-t border-[rgba(65,50,50,0.15)]">
               <div className="flex justify-between text-xs mb-1">
                 <span className="text-[color:var(--text-2)]">Calories target</span>
-                <span className="font-mono tabular-nums text-[color:var(--text-0)]">
+                <span className="font-medium tabular-nums text-[color:var(--text-0)]">
                   {targets.calories[0]}–{targets.calories[1]} kcal
                 </span>
               </div>
@@ -376,7 +376,7 @@ export default function NutritionPage() {
               <Utensils size={18} className="text-[color:var(--accent)]" />
               <h2 className="font-semibold text-[color:var(--text-0)]">Today&apos;s Meals</h2>
             </div>
-            <span className="text-sm font-mono tabular-nums text-[color:var(--text-2)]">
+            <span className="text-sm font-medium tabular-nums text-[color:var(--text-2)]">
               {completedCount}/{meals.length} eaten
             </span>
           </div>
@@ -431,7 +431,7 @@ export default function NutritionPage() {
                         onClick={() => setExpanded(isOpen ? null : meal.slot)}
                       >
                         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                          <span className="font-mono tabular-nums text-xs text-[color:var(--text-2)] shrink-0 w-10">
+                          <span className="tabular-nums text-xs text-[color:var(--text-2)] shrink-0 w-10">
                             {meal.time}
                           </span>
                           <span
