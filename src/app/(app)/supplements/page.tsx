@@ -224,12 +224,7 @@ function WindowCard({ window: w, windowLog, onToggle, onAddCustom }: WindowCardP
                 isChecked ? '' : 'hover:bg-[rgba(22,16,16,0.55)]',
               )}
             >
-              <span
-                className={cn(
-                  'text-sm transition-colors',
-                  isChecked ? 'text-[color:var(--accent-light)]' : 'text-[color:var(--text-0)]',
-                )}
-              >
+              <span className={cn('text-sm transition-colors', 'text-[color:var(--text-0)]')}>
                 {supplement}
               </span>
               <div
@@ -258,7 +253,7 @@ function WindowCard({ window: w, windowLog, onToggle, onAddCustom }: WindowCardP
                 isChecked ? '' : 'hover:bg-[rgba(22,16,16,0.55)]',
               )}
             >
-              <span className="text-sm text-[color:var(--text-1)]">
+              <span className="text-sm text-[color:var(--text-0)]">
                 {supplement}
                 <span className="text-[10px] text-[color:var(--text-2)] ml-1.5">(optional)</span>
               </span>
